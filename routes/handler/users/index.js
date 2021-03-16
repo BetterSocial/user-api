@@ -1,6 +1,6 @@
-const create = require("./create");
+const verifyUser = require("./verifyUser");
 const test = require("./test");
 module.exports = {
-  create,
+  verifyUser,
   test,
 };
