@@ -5,6 +5,6 @@ var router = express.Router();
 const locationsController = require('../controllers/locations');
 
 /* GET locations listing. */
-router.post('/list', locationsController.list);
+router.get('/list', locationsController.list);
 
 module.exports = router;
