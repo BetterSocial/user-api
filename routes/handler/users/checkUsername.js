@@ -1,4 +1,4 @@
-const { User } = require("../../../database/models");
+const { User, sequelize } = require("../../../database/models");
 module.exports = async (req, res) => {
   if (!req.body.username) {
     res.json({
@@ -8,7 +8,10 @@ module.exports = async (req, res) => {
     });
   }
   const data = await User.count({
-    where: { username: req.body.username },
+    where: sequelize.where(
+      sequelize.fn("lower", sequelize.col("username")),
+      sequelize.fn("lower", req.body.username)
+    ),
   });
   res.json({
     status: "success",
@@ -16,10 +19,3 @@ module.exports = async (req, res) => {
     body: data,
   });
 };
-/*
- belum vaclisasi ini 
-
- The username does allow capital letters, but when checking for availability, small & big letters should be treated the same: 
-
-    E.g. if '@AliIrawan' already exists, another user cannot choose ‘@aliirawan’
-*/
