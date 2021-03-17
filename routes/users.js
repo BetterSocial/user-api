@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const checkUsernameHendler = require("./handler/users");
+const checkUsernameHendler = require("../controllers/users");
 
 router.post("/check-username", checkUsernameHendler.checkUsername);
 

@@ -1,4 +1,4 @@
-const { User, sequelize } = require("../../../database/models");
+const { User, sequelize } = require("../../databases/models");
 module.exports = async (req, res) => {
   if (!req.body.username) {
     res.json({
