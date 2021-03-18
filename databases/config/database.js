@@ -12,7 +12,7 @@ module.exports = {
     },
     define: {
       timestamps: true,
-      freezeTableName: true,
+      freezeTableName: true
     },
   },
   test: {
@@ -26,7 +26,7 @@ module.exports = {
     },
     define: {
       timestamps: true,
-      freezeTableName: true,
+      freezeTableName: true
     },
   },
   production: {
@@ -40,7 +40,7 @@ module.exports = {
     },
     define: {
       timestamps: true,
-      freezeTableName: true,
+      freezeTableName: true
     },
   },
 };
