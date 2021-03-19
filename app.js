@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const verifyToken = require("./middlewares/verifyToken");
 
 app.use("/", indexRouter);
-app.use("/users", verifyToken, usersRouter);
+app.use("/users", usersRouter);
 app.use("/location", locationsRouter);
 
 module.exports = app;
