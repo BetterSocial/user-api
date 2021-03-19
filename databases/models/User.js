@@ -14,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
   User.init(
     {
       user_id: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
-      human_id: { type: DataTypes.STRING, allowNull: false },
+      human_id: { type: DataTypes.STRING, allowNull: false, unique: true  },
       country_code: { type: DataTypes.STRING, allowNull: false },
-      username: { type: DataTypes.STRING, allowNull: false },
+      username: { type: DataTypes.STRING, allowNull: false, unique: true },
       real_name: { type: DataTypes.STRING, allowNull: true },
       createdAt: {
         type: DataTypes.DATE,
@@ -30,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       last_active_at: { type: DataTypes.DATE, allowNull: false },
       profile_pic_path: { type: DataTypes.STRING, allowNull: false },
+      profile_pic_asset_id: { type: DataTypes.STRING, allowNull: false },
+      profile_pic_public_id: { type: DataTypes.STRING, allowNull: false },
       status: { type: DataTypes.BOOLEAN, allowNull: false },
     },
     {

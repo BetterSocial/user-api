@@ -2,9 +2,9 @@ const { User, sequelize } = require("../../databases/models");
 module.exports = async (req, res) => {
   if (!req.body.username) {
     res.json({
-      status: "error",
       code: 404,
       message: "username not found",
+      data: "",
     });
   }
   const data = await User.count({
@@ -14,8 +14,8 @@ module.exports = async (req, res) => {
     ),
   });
   res.json({
-    status: "success",
+    message: "success",
     code: 200,
-    body: data,
+    data: data,
   });
 };
