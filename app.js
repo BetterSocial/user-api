@@ -17,6 +17,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+const verifyToken = require("./middlewares/verifyToken");
+
+app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/topics", topicsRouter);
 app.use("/location", locationsRouter);
