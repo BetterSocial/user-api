@@ -1,5 +1,5 @@
 {
-  "name": "init",
+  "name": "service-user-ping",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -20,9 +20,8 @@
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.5.1",
-    "uuid": "^8.3.2"
-  },
-  "devDependencies": {
-    "sequelize-cli": "^6.2.0"
+    "uuid": "^8.3.2",
+    "sequelize-cli": "^6.2.0",
+    "axios": "^0.21.1"
   }
 }
