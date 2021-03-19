@@ -1,6 +1,6 @@
 const verifyUser = require("./verifyUser");
-const test = require("./test");
+const veryfyToken = require("./veryfyToken");
 module.exports = {
   verifyUser,
-  test,
+  veryfyToken,
 };
