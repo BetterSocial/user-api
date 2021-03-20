@@ -28,10 +28,17 @@ module.exports = async (req, res) => {
     follows: "string[]|empty:false",
     follow_source: "string|empty:false",
   };
-  let { users, local_community, topics, follows, follow_source } = req.body;
-  const validate = v.validate(req.body, schema);
+  let {
+    users,
+    local_community,
+    topics,
+    follows,
+    follow_source,
+  } = req.body.data;
+  const validate = v.validate(req.body.data, schema);
   if (validate.length) {
-    return res.status(400).json({
+    return res.status(200).json({
+      code: 404,
       status: "error",
       message: validate,
     });
@@ -179,7 +186,6 @@ module.exports = async (req, res) => {
           code: 500,
           message: error,
         });
-        
       }
     } else {
       return res.status(500).json({
