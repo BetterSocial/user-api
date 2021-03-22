@@ -69,7 +69,7 @@ module.exports = async (req, res) => {
           user_id: uuidv4(),
           human_id: users.human_id,
           country_code: users.country_code,
-          username: users.username,
+          username: users.username.toLowerCase(),
           real_name: users.real_name,
           profile_pic_path: users.profile_pic_path
             ? returnCloudinary.url
