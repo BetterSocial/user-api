@@ -6,6 +6,6 @@ const veryfyToken = require("./veryfyToken");
 module.exports = {
   checkUsername,
   register,
-    verifyUser,
+  verifyUser,
   veryfyToken,
 };

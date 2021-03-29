@@ -38,8 +38,8 @@ module.exports = async (req, res) => {
   } = req.body.data;
   const validate = v.validate(req.body.data, schema);
   if (validate.length) {
-    return res.status(200).json({
-      code: 404,
+    return res.status(403).json({
+      code: 403,
       status: "error",
       message: validate,
     });
@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
         invalidate: true,
       });
     } catch (error) {
-      return res.status(200).json({
+      return res.status(500).json({
         code: 500,
         status: "error",
         message: error,
@@ -68,9 +68,11 @@ module.exports = async (req, res) => {
           //   generate UUID
           user_id: uuidv4(),
           human_id: users.human_id,
-          country_code: users.country_code,
+          country_code: users.country_code.toLowerCase(),
           username: users.username.toLowerCase(),
-          real_name: users.real_name,
+          real_name: users.real_name
+            ? users.real_name.toLowerCase()
+            : users.real_name,
           profile_pic_path: users.profile_pic_path
             ? returnCloudinary.url
             : null,
@@ -83,7 +85,7 @@ module.exports = async (req, res) => {
           created_at: myTs,
           updated_at: myTs,
           last_active_at: myTs,
-          status: "A",
+          status: "Y",
         },
         { transaction: t }
       );
@@ -189,7 +191,7 @@ module.exports = async (req, res) => {
     return res.status(201).json({
       status: "success",
       code: 200,
-      body: result,
+      data: result,
     });
   } catch (error) {
     console.log("isi err ", error);
