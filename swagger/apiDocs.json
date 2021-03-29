@@ -1,0 +1,299 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Better Social",
+    "description": "Better Social API Documentation",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    },
+    {
+      "url": "https://bettersocial-dev-user-api.herokuapp.com"
+    }
+  ],
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Onboarding",
+      "description": "Onboarding"
+    },
+    {
+      "name": "Profiles",
+      "description": "Profiles"
+    }
+  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/topics/list": {
+      "get": {
+        "tags": ["Onboarding"],
+        "summary": "Get all topics",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/location/list": {
+      "post": {
+        "tags": ["Onboarding"],
+        "description": "Find location for autocomplete",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Baldwin Hills"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Location found",
+            "schema": {
+              "$ref": "#/definitions/Locations"
+            }
+          }
+        }
+      }
+    },
+    "/who-to-follow/list": {
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Get all users related follow",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/profiles/get-my-profile/{userID}": {
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Get my profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/profiles/changes-real-name/{userID}": {
+      "post": {
+        "tags": ["Profiles"],
+        "summary": "Update real name profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "real_name": {
+                    "type": "string",
+                    "example": "Amril"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/profiles/changes-image/{userID}": {
+      "post": {
+        "tags": ["Profiles"],
+        "summary": "Update image path profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profile_pic_path": {
+                    "type": "string",
+                    "example": "http://res.cloudinary.com"
+                  },
+                  "profile_pic_asset_id": {
+                    "type": "string",
+                    "example": "2abe656f19812b83f11d17a99306e961"
+                  },
+                  "profile_pic_public_id": {
+                    "type": "string",
+                    "example": "hvdedodxplwd9g9npetb"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/profiles/following/{userID}": {
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Get following user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/profiles/set-following": {
+      "post": {
+        "tags": ["Profiles"],
+        "description": "Set following",
+        "summary": "Set following",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id_follower": {
+                    "type": "string",
+                    "example": "288d5679-6c68-41ec-be83-7f15a4e82d3d"
+                  },
+                  "user_id_followed": {
+                    "type": "string",
+                    "example": "288d5679-6c68-41ec-be83-7f15a4e82d3d"
+                  },
+                  "follow_source": {
+                    "type": "string",
+                    "example": "my-profile"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success set following",
+            "schema": {
+              "$ref": "#/definitions/Locations"
+            }
+          }
+        }
+      }
+    },
+    "/profiles/unset-following": {
+      "post": {
+        "tags": ["Profiles"],
+        "description": "Unset following",
+        "summary": "Unset following",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id_follower": {
+                    "type": "string",
+                    "example": "288d5679-6c68-41ec-be83-7f15a4e82d3d"
+                  },
+                  "user_id_followed": {
+                    "type": "string",
+                    "example": "288d5679-6c68-41ec-be83-7f15a4e82d3d"
+                  },
+                  "follow_source": {
+                    "type": "string",
+                    "example": "my-profile"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success unset following",
+            "schema": {
+              "$ref": "#/definitions/Locations"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Locations": {
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -9,11 +9,22 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      // models.User.hasMany(models.UserFollowUser);
+
+      models.User.hasMany(models.UserFollowUser, {
+        foreignKey: 'user_id_follower',
+        as: 'following'
+      });
+      models.User.hasMany(models.UserFollowUser, {
+        foreignKey: 'user_id_followed',
+        as: 'follower'
+      });
+
     }
   }
   User.init(
     {
-      user_id: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
+      user_id: { type: DataTypes.UUID, allowNull: false, primaryKey: true, },
       human_id: { type: DataTypes.STRING, allowNull: false, unique: true },
       country_code: { type: DataTypes.STRING, allowNull: false },
       username: { type: DataTypes.STRING, allowNull: false, unique: true },

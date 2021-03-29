@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
       },
-      user_id_follower: { type: DataTypes.STRING, allowNull: false },
-      user_id_followed: { type: DataTypes.STRING, allowNull: false },
+      user_id_follower: { type: DataTypes.UUID, allowNull: false },
+      user_id_followed: { type: DataTypes.UUID, allowNull: false },
     },
     {
       sequelize,

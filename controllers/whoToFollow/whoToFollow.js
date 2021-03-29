@@ -1,8 +1,7 @@
-const Users = require("../databases/models").User;
-
-module.exports = {
-  whoToFollow(req, res) {
-    return Users.findAll({})
+const { User } = require("../../databases/models");
+module.exports = async (req, res) => {
+  try {
+    return User.findAll({})
       .then((list) => {
         let result = [
           {
@@ -17,5 +16,12 @@ module.exports = {
         });
       })
       .catch((error) => res.status(400).json(error));
-  },
+  } catch (error) {
+    const { status, data } = error.response;
+    return res.json({
+      code: status,
+      data: 0,
+      message: data,
+    });
+  }
 };

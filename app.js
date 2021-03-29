@@ -3,12 +3,15 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+var swaggerUi = require("swagger-ui-express");
 
-var topicsRouter = require("./routes/topics");
-var locationsRouter = require("./routes/locations");
-var whoToFollowRouter = require("./routes/whoToFollow");
+const swaggerApiDocumentation = require('./swagger/apiDocs.json')
 
+const topicsRouter = require("./routes/topics");
+const locationsRouter = require("./routes/locations");
+const whoToFollowRouter = require("./routes/whoToFollow");
 const usersRouter = require("./routes/users");
+const profilesRouter = require("./routes/profiles");
 const indexRouter = require("./routes/index");
 const verifyToken = require("./middlewares/verifyToken");
 
@@ -25,5 +28,8 @@ app.use("/users", usersRouter);
 app.use("/topics", topicsRouter);
 app.use("/location", locationsRouter);
 app.use("/who-to-follow", whoToFollowRouter);
+app.use("/profiles", profilesRouter);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerApiDocumentation));
 
 module.exports = app;
