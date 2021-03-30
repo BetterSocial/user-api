@@ -7,8 +7,7 @@ const v = new Validator();
 module.exports = async (req, res) => {
   try {
     const schema = {
-      profile_pic_path: "string|base64|optional: true",
-      // profile_pic_path: "string|stringBase64|optional: true",
+      profile_pic_path: "string|stringBase64|empty:false",
     };
     const validate = v.validate(req.body, schema);
     if (validate.length) {
@@ -27,9 +26,10 @@ module.exports = async (req, res) => {
         status: "error",
         message: "user not found",
       });
-    } else if (user && profile_pic_path) {
+    }
+    if (user && profile_pic_path) {
       try {
-        const uploadStr = "data:image/jpeg;base64," + users.profile_pic_path;
+        const uploadStr = profile_pic_path;
         returnCloudinary = await cloudinary.v2.uploader.upload(uploadStr, {
           overwrite: false,
           invalidate: true,
