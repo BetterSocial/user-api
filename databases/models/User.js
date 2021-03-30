@@ -44,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       profile_pic_asset_id: { type: DataTypes.STRING, allowNull: true },
       profile_pic_public_id: { type: DataTypes.STRING, allowNull: true },
       status: { type: DataTypes.BOOLEAN, allowNull: false },
+      bio: { type: DataTypes.TEXT, allowNull: true }
     },
     {
       sequelize,
