@@ -36,6 +36,6 @@ app.use("/profiles", profilesRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerApiDocumentation));
 
-app.use("/api/activity", feedRouter);
+app.use("/api/v1", indexRouter);
 
 module.exports = app;
