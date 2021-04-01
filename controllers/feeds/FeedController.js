@@ -6,15 +6,9 @@ const jwt = require("jsonwebtoken");
 const { duration } = require("moment-timezone");
 const { result } = require("lodash");
 
-const getToken = (req) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  return token;
-};
-
 exports.createPostFeed = async (req, res) => {
   try {
-    const token = getToken(req);
+    const token = req.token;
     const now = new Date();
 
     if (token == null) {
@@ -34,7 +28,7 @@ exports.createPostFeed = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
-      duration_time: "string|empty:false",
+      duration_feed: "string|empty:false",
       images_url: "string",
     };
 
@@ -56,7 +50,7 @@ exports.createPostFeed = async (req, res) => {
       topics,
       anonimity,
       location,
-      duration_time,
+      duration_feed,
       images_url,
     } = req.body;
     const client = stream.connect(
@@ -78,7 +72,7 @@ exports.createPostFeed = async (req, res) => {
         privacy: privacy,
         anonimity: anonimity,
         location: location,
-        duration_time: duration_time,
+        duration_feed: duration_feed,
         images_url: images_url,
       })
       .then((result) => {
@@ -133,12 +127,10 @@ exports.createToken = async (req, res) => {
 
 exports.reaction = async (req, res) => {
   try {
-    const token = getToken(req);
-
     const { activity_id, kind, message, target_feeds } = req.body;
     const client = stream.connect(
       process.env.API_KEY,
-      token,
+      req.token,
       process.env.APP_ID
     );
 
@@ -162,11 +154,7 @@ exports.reaction = async (req, res) => {
 
 exports.getPost = async (req, res) => {
   try {
-    const token = getToken(req);
-
-    jwt.verify(token, process.env.SECRET, (err, user) => {
-      console.log(err);
-    });
+    const token = req.token;
 
     const client = stream.connect(
       process.env.API_KEY,
@@ -214,7 +202,7 @@ exports.getReaction = async (req, res) => {
         message: validate,
       });
     }
-    const token = getToken(req);
+    const token = req.token;
     const client = stream.connect(
       process.env.API_KEY,
       token,
