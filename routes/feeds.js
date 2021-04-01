@@ -10,5 +10,6 @@ router.get("/feeds", feedController.getPost);
 router.post("/reaction", feedController.reaction);
 router.get("/reactions", feedController.getReaction);
 router.post("/follow-user", feedController.followUser);
+router.post("/create-user", feedController.createUser);
 
 module.exports = router;

@@ -13,6 +13,8 @@ const { v4: uuidv4 } = require("uuid");
 const Validator = require("fastest-validator");
 const moment = require("moment");
 const v = new Validator();
+const getstreamService = require("../../services/getstream");
+
 module.exports = async (req, res) => {
   var returnCloudinary = null;
   const schema = {
@@ -188,6 +190,16 @@ module.exports = async (req, res) => {
 
       return user;
     });
+
+    let data = {
+      human_id: result.human_id,
+      username: result.username,
+      profile_pic_url: result.profile_pic_path,
+      created_at: result.createdAt,
+    };
+    const user_id = result.user_id;
+
+    await getstreamService.createUser(data, user_id);
     return res.status(201).json({
       status: "success",
       code: 200,

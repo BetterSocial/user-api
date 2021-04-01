@@ -5,6 +5,7 @@ const v = new Validator();
 const jwt = require("jsonwebtoken");
 const { duration } = require("moment-timezone");
 const { result } = require("lodash");
+const getstreamService = require("../../services/getstream");
 
 exports.createPostFeed = async (req, res) => {
   try {
@@ -117,11 +118,10 @@ exports.createToken = async (req, res) => {
   const payload = { user_id: user_id };
   let token2 = jwt.sign(payload, process.env.SECRET);
   const clientServer = stream.connect(process.env.API_KEY, process.env.SECRET);
-  const userToken = clientServer.createUserToken(user_id);
+  const userToken = await getstreamService.createToken(user_id);
   return res.status(200).json({
     id: user_id,
     token: userToken,
-    tokenw: token2,
   });
 };
 
@@ -236,22 +236,27 @@ exports.getReaction = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-  const { name, job, gender } = req.body;
-  const client = stream.connect(process.env.API_KEY, process.env.SECRET);
-  client
-    .user("jack")
-    .create({
-      name: "jack testing",
-      occupation: "Traveler",
-      gender: "male",
-    })
+  const clientServerSide = getstreamService.streamClientServerSide();
+  console.log(clientServerSide);
+  let data = {
+    human_id: "1234567",
+    username: "testing ",
+    profile_pic_url:
+      "https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png",
+    created_at: "2021-03-31T22:51:33.000Z",
+  };
+  const user_id = "usupsuparma_testing";
+  getstreamService
+    .createUser(data, user_id)
     .then((result) => {
+      console.log(result);
       res.status(201).json({
         status: "success",
         data: result,
       });
     })
     .catch((err) => {
+      console.log(err);
       res.status(404).json({
         status: "failed",
         data: null,
