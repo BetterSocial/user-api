@@ -61,6 +61,8 @@ module.exports = async (req, res) => {
       location: location,
       duration_feed: duration_feed,
       images_url: images_url,
+      count_upvote: 0,
+      count_downvote: 0,
     };
     getstreamService
       .createPost(token, feedGroup, data)
@@ -80,11 +82,10 @@ module.exports = async (req, res) => {
         });
       });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       code: status,
       data: null,
-      message: "internal server error",
+      message: "Internal server error",
       error: error,
     });
   }

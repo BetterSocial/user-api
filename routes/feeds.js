@@ -11,7 +11,6 @@ router.post("/create-token", feedController.createToken);
 router.get("/feeds", feed.getFeeds);
 router.post("/reaction", feedController.reaction);
 router.get("/reactions", feedController.getReaction);
-router.post("/follow-user", feedController.followUser);
-router.post("/create-user", feedController.createUser);
+router.post("/follow-user", feed.followUser);
 
 module.exports = router;
