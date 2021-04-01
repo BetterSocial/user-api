@@ -4,9 +4,11 @@ var router = express.Router();
 // controller
 const feedController = require("../controllers/feeds/FeedController");
 
-router.post("/post", feedController.createPostFeed);
+const feed = require("../controllers/feeds");
+
+router.post("/post", feed.createPost);
 router.post("/create-token", feedController.createToken);
-router.get("/feeds", feedController.getPost);
+router.get("/feeds", feed.getFeeds);
 router.post("/reaction", feedController.reaction);
 router.get("/reactions", feedController.getReaction);
 router.post("/follow-user", feedController.followUser);
