@@ -3,10 +3,13 @@ const getstreamService = require("../../services/getstream");
 const Validator = require("fastest-validator");
 const v = new Validator();
 
+function addDays(theDate, days) {
+  return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
+}
+
 module.exports = async (req, res) => {
   try {
     const token = req.token;
-    const now = new Date();
 
     if (token == null) {
       return res.status(401).json({
@@ -20,13 +23,12 @@ module.exports = async (req, res) => {
       topics: "array|empty:false",
       message: "string|empty:false",
       verb: "string|empty:false",
-      object: "object|empty:false",
       feedGroup: "string|empty:false",
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
       duration_feed: "string|empty:false",
-      images_url: "string",
+      images_url: "array",
     };
 
     const validate = v.validate(req.body, schema);
@@ -51,9 +53,16 @@ module.exports = async (req, res) => {
       images_url,
     } = req.body;
 
+    let expiredAt = null;
+
+    if (duration_feed !== "never") {
+      let date = new Date();
+      date = addDays(date, duration_feed);
+      expiredAt = date.toISOString();
+    }
+
     let data = {
       verb: verb,
-      object: object,
       message: message,
       topics: topics,
       privacy: privacy,
@@ -61,6 +70,7 @@ module.exports = async (req, res) => {
       location: location,
       duration_feed: duration_feed,
       images_url: images_url,
+      expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
     };
@@ -83,7 +93,7 @@ module.exports = async (req, res) => {
       });
   } catch (error) {
     return res.status(500).json({
-      code: status,
+      code: 500,
       data: null,
       message: "Internal server error",
       error: error,
