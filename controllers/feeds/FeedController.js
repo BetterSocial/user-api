@@ -1,6 +1,5 @@
 const stream = require("getstream");
 const Validator = require("fastest-validator");
-const cli = require("cli");
 const v = new Validator();
 const jwt = require("jsonwebtoken");
 const { duration } = require("moment-timezone");
