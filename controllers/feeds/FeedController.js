@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const { duration } = require("moment-timezone");
 const { result } = require("lodash");
 const getstreamService = require("../../services/getstream");
+const cloudinary = require("cloudinary");
 
 exports.createPostFeed = async (req, res) => {
   try {
@@ -30,7 +31,7 @@ exports.createPostFeed = async (req, res) => {
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
       duration_feed: "string|empty:false",
-      images_url: "string",
+      images_url: "array",
     };
 
     const validate = v.validate(req.body, schema);
@@ -41,7 +42,6 @@ exports.createPostFeed = async (req, res) => {
         message: validate,
       });
     }
-
     let {
       message,
       verb,
@@ -54,6 +54,51 @@ exports.createPostFeed = async (req, res) => {
       duration_feed,
       images_url,
     } = req.body;
+    let resUrl;
+    if (images_url) {
+      resUrl = await Promise.all(
+        images_url.map(async (res) => {
+          try {
+            const uploadStr = "data:image/jpeg;base64," + res;
+            let returnCloudinary = await cloudinary.v2.uploader.upload(
+              uploadStr,
+              {
+                overwrite: false,
+                invalidate: true,
+              }
+            );
+            return returnCloudinary.url;
+          } catch (error) {
+            return res.status(500).json({
+              code: 500,
+              status: "error",
+              message: error,
+            });
+          }
+        })
+      );
+
+      // await Promise.map(images_url, async (res) => {
+      //   try {
+      //     const uploadStr = "data:image/jpeg;base64," + res;
+      //     let returnCloudinary = await cloudinary.v2.uploader.upload(
+      //       uploadStr,
+      //       {
+      //         overwrite: false,
+      //         invalidate: true,
+      //       }
+      //     );
+      //     console.log(returnCloudinary);
+      //     url_image_results.push(returnCloudinary);
+      //   } catch (error) {
+      //     return res.status(500).json({
+      //       code: 500,
+      //       status: "error",
+      //       message: error,
+      //     });
+      //   }
+      // });
+    }
     const client = stream.connect(
       process.env.API_KEY,
       token,
@@ -74,7 +119,7 @@ exports.createPostFeed = async (req, res) => {
         anonimity: anonimity,
         location: location,
         duration_feed: duration_feed,
-        images_url: images_url,
+        images_url: resUrl,
       })
       .then((result) => {
         res.status(200).json({
