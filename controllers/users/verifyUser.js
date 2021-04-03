@@ -7,7 +7,6 @@ module.exports = async (req, res) => {
       where: { human_id: req.body.user_id },
     });
     let userId = userData.user_id;
-    console.log(userId);
     const token = await getstreamService.createToken(userId);
     return res.json({
       code: 200,

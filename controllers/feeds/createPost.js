@@ -43,7 +43,6 @@ module.exports = async (req, res) => {
     let {
       message,
       verb,
-      object,
       feedGroup,
       privacy,
       topics,
@@ -61,11 +60,18 @@ module.exports = async (req, res) => {
       expiredAt = date.toISOString();
     }
 
+    let object = {
+      verb: verb,
+      message: message,
+      topics: topics,
+    };
+
     let data = {
       verb: verb,
       message: message,
       topics: topics,
       privacy: privacy,
+      object: object,
       anonimity: anonimity,
       location: location,
       duration_feed: duration_feed,
