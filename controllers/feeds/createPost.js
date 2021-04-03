@@ -29,14 +29,15 @@ module.exports = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
-      duration_feed: "string|empty:false",
+      duration_feed: "number|empty:false",
       images_url: "array",
     };
 
     const validate = v.validate(req.body, schema);
     if (validate.length) {
-      return res.status(403).json({
-        code: 403,
+      console.log(validate);
+      return res.status(400).json({
+        code: 400,
         status: "error",
         message: validate,
       });
@@ -71,6 +72,7 @@ module.exports = async (req, res) => {
             );
             return returnCloudinary.url;
           } catch (error) {
+            console.log("error upload gambar");
             return res.status(500).json({
               code: 500,
               status: "error",
@@ -80,7 +82,7 @@ module.exports = async (req, res) => {
         })
       );
     }
-
+    console.log(duration_feed);
     if (duration_feed !== "never") {
       let date = new Date();
       date = addDays(date, duration_feed);
@@ -109,22 +111,23 @@ module.exports = async (req, res) => {
     };
     getstreamService
       .createPost(token, feedGroup, data)
-      .then((result) => {
+      .then(() => {
         res.status(200).json({
           code: 200,
           status: "success create post",
-          data: result,
+          data: null,
         });
       })
       .catch((err) => {
         console.log(err);
-        res.status(400).json({
-          code: 400,
+        res.status(403).json({
+          code: 403,
           status: "failed create post",
           data: null,
         });
       });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       code: 500,
       data: null,
