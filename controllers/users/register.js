@@ -13,8 +13,12 @@ const { v4: uuidv4 } = require("uuid");
 const Validator = require("fastest-validator");
 const moment = require("moment");
 const v = new Validator();
+const getstreamService = require("../../services/getstream");
+
 module.exports = async (req, res) => {
   var returnCloudinary = null;
+  let defaultImage =
+    "https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png";
   const schema = {
     users: {
       $$type: "object|empty:false",
@@ -75,7 +79,7 @@ module.exports = async (req, res) => {
             : users.real_name,
           profile_pic_path: users.profile_pic_path
             ? returnCloudinary.url
-            : null,
+            : defaultImage,
           profile_pic_asset_id: users.profile_pic_path
             ? returnCloudinary.asset_id
             : null,
@@ -188,6 +192,16 @@ module.exports = async (req, res) => {
 
       return user;
     });
+
+    let data = {
+      human_id: result.human_id,
+      username: result.username,
+      profile_pic_url: result.profile_pic_path,
+      created_at: result.createdAt,
+    };
+    const user_id = result.user_id;
+
+    await getstreamService.createUser(data, user_id);
     return res.status(201).json({
       status: "success",
       code: 200,
