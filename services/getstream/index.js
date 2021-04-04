@@ -5,6 +5,10 @@ const getFeeds = require("./getFeeds");
 const followUser = require("./followUser");
 const createReaction = require("./createReaction");
 const getReaction = require("./getReaction");
+const upVote = require("./upVote");
+const downVote = require("./downVote");
+const comment = require("./comment");
+const like = require("./like");
 
 module.exports = {
   createUser,
@@ -14,4 +18,8 @@ module.exports = {
   followUser,
   createReaction,
   getReaction,
+  upVote,
+  downVote,
+  comment,
+  like,
 };
