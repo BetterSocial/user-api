@@ -82,7 +82,6 @@ module.exports = async (req, res) => {
         })
       );
     }
-    console.log(duration_feed);
     if (duration_feed !== "never") {
       let date = new Date();
       date = addDays(date, duration_feed);
