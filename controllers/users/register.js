@@ -17,6 +17,8 @@ const getstreamService = require("../../services/getstream");
 
 module.exports = async (req, res) => {
   var returnCloudinary = null;
+  let defaultImage =
+    "https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png";
   const schema = {
     users: {
       $$type: "object|empty:false",
@@ -77,7 +79,7 @@ module.exports = async (req, res) => {
             : users.real_name,
           profile_pic_path: users.profile_pic_path
             ? returnCloudinary.url
-            : null,
+            : defaultImage,
           profile_pic_asset_id: users.profile_pic_path
             ? returnCloudinary.asset_id
             : null,

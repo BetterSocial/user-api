@@ -27,12 +27,19 @@ app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use("/", indexRouter);
+//Please delete it when you start the sprint 3
 app.use("/users", usersRouter);
 app.use("/topics", topicsRouter);
 app.use("/location", locationsRouter);
 app.use("/who-to-follow", whoToFollowRouter);
 app.use("/profiles", profilesRouter);
+
+// app.use("/", indexRouter);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/topics", topicsRouter);
+app.use("/api/v1/location", locationsRouter);
+app.use("/api/v1/who-to-follow", whoToFollowRouter);
+app.use("/api/v1/profiles", profilesRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerApiDocumentation));
 app.use("/api/v1", indexRouter);

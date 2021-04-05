@@ -12,5 +12,8 @@ router.get("/feeds", feed.getFeeds);
 router.post("/reaction", feed.createReaction);
 router.get("/reactions", feed.getReaction);
 router.post("/follow-user", feed.followUser);
+router.post("/upvote", feed.upvote);
+router.post("/comment", feed.comment);
+router.post("/like", feed.like);
 
 module.exports = router;
