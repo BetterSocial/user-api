@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
           //   generate UUID
           user_id: uuidv4(),
           human_id: users.human_id,
-          country_code: users.country_code.toLowerCase(),
+          country_code: users.country_code.toUpperCase(),
           username: users.username.toLowerCase(),
           real_name: users.real_name
             ? users.real_name.toLowerCase()
