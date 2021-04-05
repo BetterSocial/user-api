@@ -15,10 +15,15 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'user_id_follower',
         as: 'following'
       });
+
       models.User.hasMany(models.UserFollowUser, {
         foreignKey: 'user_id_followed',
         as: 'follower'
       });
+
+      models.User.belongsToMany(models.Topics, { through: 'user_topics',  foreignKey: 'user_id' , as: 'topics'});
+
+      models.User.belongsToMany(models.Locations, { through: 'user_location',  foreignKey: 'user_id' , as: 'locations'});
 
     }
   }
@@ -50,6 +55,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "User",
       tableName: "users",
+      underscored: true
     }
   );
   return User;
