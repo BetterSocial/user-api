@@ -74,7 +74,7 @@
     },
     "/who-to-follow/list": {
       "get": {
-        "tags": ["Profiles"],
+        "tags": ["Onboarding"],
         "summary": "Get all users related follow",
         "responses": {
           "200": {
@@ -95,6 +95,55 @@
               "type": "string"
             },
             "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/profiles/following/{userID}": {
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Get following user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/profiles/get-other-profile/{userID}": {
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Get other profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          },
+          {
+            "name": "other_user_id",
+            "in": "query",
+            "description": "Other user id example 288d5679-6c68-41ec-be83-7f15a4e82d3d",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
@@ -164,15 +213,7 @@
                 "properties": {
                   "profile_pic_path": {
                     "type": "string",
-                    "example": "http://res.cloudinary.com"
-                  },
-                  "profile_pic_asset_id": {
-                    "type": "string",
-                    "example": "2abe656f19812b83f11d17a99306e961"
-                  },
-                  "profile_pic_public_id": {
-                    "type": "string",
-                    "example": "hvdedodxplwd9g9npetb"
+                    "example": "base64 image"
                   }
                 }
               }
@@ -186,10 +227,10 @@
         }
       }
     },
-    "/profiles/following/{userID}": {
-      "get": {
+    "/profiles/remove-image/{userID}": {
+      "delete": {
         "tags": ["Profiles"],
-        "summary": "Get following user",
+        "summary": "Remove image path profile",
         "parameters": [
           {
             "in": "path",
@@ -207,6 +248,44 @@
         }
       }
     },
+    "/profiles/update-bio/{userID}": {
+      "post": {
+        "tags": ["Profiles"],
+        "summary": "Update bio profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string"
+            },
+            "description": "example 288d5679-6c68-41ec-be83-7f15a4e82d3d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bio": {
+                    "type": "string",
+                    "example": "My Bio"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+
     "/profiles/set-following": {
       "post": {
         "tags": ["Profiles"],

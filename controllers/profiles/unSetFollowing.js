@@ -24,6 +24,14 @@ module.exports = async (req, res) => {
     }
     let { user_id_follower, user_id_followed, follow_source } = req.body;
 
+    if(user_id_follower == user_id_followed) {
+      return res.status(403).json({
+        code: 403,
+        status: "error",
+        message: "only allow following other profiles",
+      });
+    }
+
     const userFollow = await UserFollowUser.findOne({
       where: { user_id_follower, user_id_followed },
     });

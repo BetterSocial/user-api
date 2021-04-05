@@ -42,7 +42,6 @@ app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerApiDocumentation));
-
 app.use("/api/v1", indexRouter);
 
 module.exports = app;

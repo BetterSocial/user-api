@@ -1,9 +1,8 @@
-const Topics = require("../databases/models").topics;
+const { Topics } = require("../../databases/models");
 const groupBy = require("lodash/groupBy");
-
-module.exports = {
-  list(req, res) {
-    return Topics.findAll()
+module.exports = async (req, res) => {
+  try {
+    return Topics.findAll({})
       .then((todos) => {
         const response = groupBy(todos, function (n) {
           return n.categories;
@@ -15,5 +14,12 @@ module.exports = {
         });
       })
       .catch((error) => res.status(400).json(error));
-  },
+  } catch (error) {
+    const { status, data } = error.response;
+    return res.json({
+      code: status,
+      data: 0,
+      message: data,
+    });
+  }
 };

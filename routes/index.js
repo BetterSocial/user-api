@@ -2,7 +2,12 @@ var express = require("express");
 var router = express.Router();
 
 const feed = require("./feeds");
+const users = require("./users");
+const whoToFollow = require("./whoToFollow");
+const topics = require("./topics");
+const locations = require("./locations");
 const auth = require("../middlewares/auth");
+
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -10,5 +15,9 @@ router.get("/", function (req, res, next) {
 });
 
 router.use("/activity", auth.isAuth, feed);
+router.use("/users", users);
+router.use("/topics", topics);
+router.use("/location", locations);
+router.use("/who-to-follow", whoToFollow);
 
 module.exports = router;

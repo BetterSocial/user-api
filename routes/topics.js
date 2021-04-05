@@ -5,6 +5,6 @@ var router = express.Router();
 const topicsController = require('../controllers/topics');
 
 /* GET locations listing. */
-router.get('/list', topicsController.list);
+router.get('/list', topicsController.topics);
 
 module.exports = router;
