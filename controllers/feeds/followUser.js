@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    getstreamService
+    getstreamService.followUser
       .followUser(token, user_id, feedGroup, status)
       .then((result) => {
         res.status(200).json({

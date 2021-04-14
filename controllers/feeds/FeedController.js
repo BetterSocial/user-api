@@ -7,6 +7,13 @@ const { result } = require("lodash");
 const getstreamService = require("../../services/getstream");
 const cloudinary = require("cloudinary");
 
+const changeValue = (item) => {
+  if (/\s/.test(item)) {
+    return item.replace(" ", "-");
+  }
+  return item;
+};
+
 exports.createPostFeed = async (req, res) => {
   try {
     const token = req.token;
@@ -159,12 +166,14 @@ exports.createToken = async (req, res) => {
     });
   }
   let { user_id } = req.body;
+  let id = changeValue(user_id.toLowerCase());
+  console.log(id);
   const payload = { user_id: user_id };
   let token2 = jwt.sign(payload, process.env.SECRET);
-  const clientServer = stream.connect(process.env.API_KEY, process.env.SECRET);
-  const userToken = await getstreamService.createToken(user_id);
+  // const clientServer = stream.connect(process.env.API_KEY, process.env.SECRET);
+  const userToken = await getstreamService.createToken(id);
   return res.status(200).json({
-    id: user_id,
+    id: id,
     token: userToken,
   });
 };

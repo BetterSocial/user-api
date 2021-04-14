@@ -6,6 +6,8 @@ const {
   UserTopicHistory,
   UserFollowUser,
   UserFollowUserHistory,
+  Locations,
+  Topics,
 } = require("../../databases/models");
 const sequelize = require("../../databases/models").sequelize;
 const cloudinary = require("cloudinary");
@@ -14,6 +16,17 @@ const Validator = require("fastest-validator");
 const moment = require("moment");
 const v = new Validator();
 const getstreamService = require("../../services/getstream");
+const jwt = require("jsonwebtoken");
+
+const changeValue = (items) => {
+  return items.map((item, index) => {
+    let temp = Object.assign({}, item.dataValues);
+    if (/\s/.test(temp.name)) {
+      return temp.name.replace(" ", "-");
+    }
+    return temp.name;
+  });
+};
 
 module.exports = async (req, res) => {
   var returnCloudinary = null;
@@ -64,6 +77,7 @@ module.exports = async (req, res) => {
       });
     }
   }
+
   try {
     const result = await sequelize.transaction(async (t) => {
       let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
@@ -189,7 +203,6 @@ module.exports = async (req, res) => {
           transaction: t,
         });
       }
-
       return user;
     });
 
@@ -200,12 +213,63 @@ module.exports = async (req, res) => {
       created_at: result.createdAt,
     };
     const user_id = result.user_id;
+    let userId = user_id.toLowerCase();
 
-    await getstreamService.createUser(data, user_id);
+    let userGetstream = await getstreamService.createUser(data, userId);
+    console.log(userGetstream);
+    let token = await getstreamService.createToken(userId);
+    let dataLocations = await Locations.findAll({
+      where: {
+        location_id: local_community,
+      },
+    })
+      .then((list) => {
+        return list;
+      })
+      .catch((error) => {
+        return res.status(400).json(error);
+      });
+
+    let dataTopics = await Topics.findAll({
+      where: {
+        topic_id: topics,
+      },
+      attributes: ["name"],
+    })
+      .then((result) => {
+        let body = changeValue(result);
+        return body;
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(400).json(error);
+      });
+
+    await getstreamService.followLocation.followLocations(token, dataLocations);
+
+    await getstreamService.followUser.followUsers(token, follows);
+
+    await getstreamService.followTopic.followTopics(token, dataTopics);
+
+    const opts = {
+      algorithm: "HS256",
+      noTimestamp: true,
+    };
+    const payload = {
+      user_id: userId,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+    };
+    const refresh_token = await jwt.sign(
+      payload,
+      process.env.SECRET_REFRESH_TOKEN,
+      opts
+    );
     return res.status(201).json({
       status: "success",
       code: 200,
       data: result,
+      token: token,
+      refresh_token: refresh_token,
     });
   } catch (error) {
     console.log("isi err ", error);
