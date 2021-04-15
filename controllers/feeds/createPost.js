@@ -1,4 +1,5 @@
 const getstreamService = require("../../services/getstream");
+const { User } = require("../../databases/models");
 
 const Validator = require("fastest-validator");
 const v = new Validator();
@@ -8,6 +9,14 @@ const cloudinary = require("cloudinary");
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
 }
+
+const getUserDetail = async (userId) => {
+  try {
+    return await User.findByPk(userId);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 module.exports = async (req, res) => {
   try {
@@ -55,7 +64,10 @@ module.exports = async (req, res) => {
       images_url,
     } = req.body;
 
+    let userDetail = await getUserDetail(req.userId);
+
     let expiredAt = null;
+    let to = [];
 
     let resUrl;
     if (images_url) {
@@ -92,7 +104,21 @@ module.exports = async (req, res) => {
       verb: verb,
       message: message,
       topics: topics,
+      feed_group: feedGroup,
+      username: userDetail.username,
+      profile_pic_path: userDetail.profile_pic_path,
+      real_name: userDetail.real_name,
     };
+
+    if (topics !== null || "") {
+      topics.map((value, index) => {
+        to.push("topic:" + value);
+      });
+    }
+
+    if (location !== null || "") {
+      to.push("location:" + location);
+    }
 
     let data = {
       verb: verb,
@@ -107,7 +133,9 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
+      // to: to,
     };
+
     getstreamService
       .createPost(token, feedGroup, data)
       .then(() => {
