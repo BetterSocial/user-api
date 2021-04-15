@@ -13,5 +13,6 @@ router.get(
   auth.isAuth,
   usersHandler.varifyTokenGetstream
 );
+router.get("/showing-audience-estimates", usersHandler.showingAudience);
 
 module.exports = router;
