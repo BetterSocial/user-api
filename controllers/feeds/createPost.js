@@ -4,6 +4,7 @@ const Validator = require("fastest-validator");
 const v = new Validator();
 
 const cloudinary = require("cloudinary");
+const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -89,6 +90,7 @@ module.exports = async (req, res) => {
       expiredAt = date.toISOString();
     }
 
+    TO.push("location:everywhare");
     if (topics !== null) {
       topics.map((value) => {
         TO.push("topic:" + value);
@@ -96,7 +98,8 @@ module.exports = async (req, res) => {
     }
 
     if (location !== null) {
-      TO.push("location:" + location);
+      let loc = formatLocationGetStream(location);
+      TO.push("location:" + loc);
     }
 
     let object = {
