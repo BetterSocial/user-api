@@ -37,9 +37,6 @@ exports.followLocations = async (token, locations) => {
     const city = follows.findIndex(
       (x) => x.target === "location:" + changeValue(item.city.toLowerCase())
     );
-    console.log(item.city);
-    console.log(item.state);
-    console.log("===========");
     city === -1
       ? item.city !== ""
         ? follows.push({
