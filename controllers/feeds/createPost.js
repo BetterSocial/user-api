@@ -56,6 +56,7 @@ module.exports = async (req, res) => {
     } = req.body;
 
     let expiredAt = null;
+    let TO = [];
 
     let resUrl;
     if (images_url) {
@@ -88,6 +89,16 @@ module.exports = async (req, res) => {
       expiredAt = date.toISOString();
     }
 
+    if (topics !== null) {
+      topics.map((value) => {
+        TO.push("topic:" + value);
+      });
+    }
+
+    if (location !== null) {
+      TO.push("location:" + location);
+    }
+
     let object = {
       verb: verb,
       message: message,
@@ -107,6 +118,7 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
+      to: TO,
     };
     getstreamService
       .createPost(token, feedGroup, data)
