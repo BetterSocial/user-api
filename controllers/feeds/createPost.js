@@ -91,6 +91,7 @@ module.exports = async (req, res) => {
     }
 
     TO.push("location:everywhare");
+    TO.push("user:" + req.userId);
     if (topics !== null) {
       topics.map((value) => {
         TO.push("topic:" + value);
