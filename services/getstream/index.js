@@ -11,6 +11,7 @@ const comment = require("./comment");
 const like = require("./like");
 const followTopic = require("./followTopic");
 const followLocation = require("./followLocation");
+const deleteFeed = require("./deleteFeed");
 
 module.exports = {
   createUser,
@@ -26,4 +27,5 @@ module.exports = {
   like,
   followTopic,
   followLocation,
+  deleteFeed,
 };

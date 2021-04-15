@@ -1,4 +1,5 @@
 const getstreamService = require("../../services/getstream");
+const { User } = require("../../databases/models");
 
 const Validator = require("fastest-validator");
 const v = new Validator();
@@ -9,6 +10,14 @@ const formatLocationGetStream = require("../../helpers/formatLocationGetStream")
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
 }
+
+const getUserDetail = async (userId) => {
+  try {
+    return await User.findByPk(userId);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 module.exports = async (req, res) => {
   try {
@@ -55,6 +64,8 @@ module.exports = async (req, res) => {
       duration_feed,
       images_url,
     } = req.body;
+
+    let userDetail = await getUserDetail(req.userId);
 
     let expiredAt = null;
     let TO = [];
@@ -107,6 +118,10 @@ module.exports = async (req, res) => {
       verb: verb,
       message: message,
       topics: topics,
+      feed_group: feedGroup,
+      username: userDetail.username,
+      profile_pic_path: userDetail.profile_pic_path,
+      real_name: userDetail.real_name,
     };
 
     let data = {
@@ -124,6 +139,7 @@ module.exports = async (req, res) => {
       count_downvote: 0,
       to: TO,
     };
+
     getstreamService
       .createPost(token, feedGroup, data)
       .then(() => {
