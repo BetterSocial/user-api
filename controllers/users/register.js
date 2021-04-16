@@ -215,8 +215,7 @@ module.exports = async (req, res) => {
     const user_id = result.user_id;
     let userId = user_id.toLowerCase();
 
-    let userGetstream = await getstreamService.createUser(data, userId);
-    console.log(userGetstream);
+    await getstreamService.createUser(data, userId);
     let token = await getstreamService.createToken(userId);
     let dataLocations = await Locations.findAll({
       where: {
