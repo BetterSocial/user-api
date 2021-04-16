@@ -9,6 +9,8 @@ const upVote = require("./upVote");
 const downVote = require("./downVote");
 const comment = require("./comment");
 const like = require("./like");
+const followTopic = require("./followTopic");
+const followLocation = require("./followLocation");
 const deleteFeed = require("./deleteFeed");
 
 module.exports = {
@@ -23,5 +25,7 @@ module.exports = {
   downVote,
   comment,
   like,
+  followTopic,
+  followLocation,
   deleteFeed,
 };

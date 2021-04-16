@@ -25,7 +25,7 @@ exports.createToken = async (req, res) => {
   // const clientServer = stream.connect(process.env.API_KEY, process.env.SECRET);
   const userToken = await getstreamService.createToken(user_id);
   return res.status(200).json({
-    id: user_id,
+    id: id,
     token: userToken,
   });
 };

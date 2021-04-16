@@ -5,6 +5,7 @@ const Validator = require("fastest-validator");
 const v = new Validator();
 
 const cloudinary = require("cloudinary");
+const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -67,7 +68,7 @@ module.exports = async (req, res) => {
     let userDetail = await getUserDetail(req.userId);
 
     let expiredAt = null;
-    let to = [];
+    let TO = [];
 
     let resUrl;
     if (images_url) {
@@ -100,6 +101,19 @@ module.exports = async (req, res) => {
       expiredAt = date.toISOString();
     }
 
+    TO.push("location:everywhare");
+    TO.push("user:" + req.userId);
+    if (topics !== null) {
+      topics.map((value) => {
+        TO.push("topic:" + value);
+      });
+    }
+
+    if (location !== null) {
+      let loc = formatLocationGetStream(location);
+      TO.push("location:" + loc);
+    }
+
     let object = {
       verb: verb,
       message: message,
@@ -109,16 +123,6 @@ module.exports = async (req, res) => {
       profile_pic_path: userDetail.profile_pic_path,
       real_name: userDetail.real_name,
     };
-
-    if (topics !== null || "") {
-      topics.map((value, index) => {
-        to.push("topic:" + value);
-      });
-    }
-
-    if (location !== null || "") {
-      to.push("location:" + location);
-    }
 
     let data = {
       verb: verb,
@@ -133,7 +137,7 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
-      // to: to,
+      to: TO,
     };
 
     getstreamService

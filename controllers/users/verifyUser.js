@@ -8,6 +8,7 @@ module.exports = async (req, res) => {
       where: { human_id: req.body.user_id },
     });
     let userId = userData.user_id;
+    let userId = userId.toLowerCase();
     const token = await getstreamService.createToken(userId);
     const opts = {
       algorithm: "HS256",
