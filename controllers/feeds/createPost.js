@@ -85,7 +85,6 @@ module.exports = async (req, res) => {
             );
             return returnCloudinary.url;
           } catch (error) {
-            console.log("error upload gambar");
             return res.status(500).json({
               code: 500,
               status: "error",
@@ -98,7 +97,9 @@ module.exports = async (req, res) => {
     if (duration_feed !== "never") {
       let date = new Date();
       date = addDays(date, duration_feed);
-      expiredAt = date.toISOString();
+      // 2021-04-20T09:02:15.000Z
+      let utc = new Date(date.toUTCString());
+      expiredAt = utc.toISOString();
     }
 
     TO.push("location:everywhare");
