@@ -12,24 +12,36 @@ module.exports = (sequelize, DataTypes) => {
       // models.User.hasMany(models.UserFollowUser);
 
       models.User.hasMany(models.UserFollowUser, {
-        foreignKey: 'user_id_follower',
-        as: 'following'
+        foreignKey: "user_id_follower",
+        as: "following",
       });
 
       models.User.hasMany(models.UserFollowUser, {
-        foreignKey: 'user_id_followed',
-        as: 'follower'
+        foreignKey: "user_id_followed",
+        as: "follower",
       });
 
-      models.User.belongsToMany(models.Topics, { through: 'user_topics',  foreignKey: 'user_id' , as: 'topics'});
+      models.User.belongsToMany(models.Topics, {
+        through: "user_topics",
+        foreignKey: "user_id",
+        as: "topics",
+      });
 
-      models.User.belongsToMany(models.Locations, { through: 'user_location',  foreignKey: 'user_id' , as: 'locations'});
-
+      models.User.belongsToMany(models.Locations, {
+        through: "user_location",
+        foreignKey: "user_id",
+        as: "locations",
+      });
+      models.User.belongsToMany(models.UserLocation, {
+        through: "user_location",
+        foreignKey: "user_id",
+        as: "user_locations",
+      });
     }
   }
   User.init(
     {
-      user_id: { type: DataTypes.UUID, allowNull: false, primaryKey: true, },
+      user_id: { type: DataTypes.UUID, allowNull: false, primaryKey: true },
       human_id: { type: DataTypes.STRING, allowNull: false, unique: true },
       country_code: { type: DataTypes.STRING, allowNull: false },
       username: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -49,13 +61,13 @@ module.exports = (sequelize, DataTypes) => {
       profile_pic_asset_id: { type: DataTypes.STRING, allowNull: true },
       profile_pic_public_id: { type: DataTypes.STRING, allowNull: true },
       status: { type: DataTypes.BOOLEAN, allowNull: false },
-      bio: { type: DataTypes.TEXT, allowNull: true }
+      bio: { type: DataTypes.TEXT, allowNull: true },
     },
     {
       sequelize,
       modelName: "User",
       tableName: "users",
-      underscored: true
+      underscored: true,
     }
   );
   return User;
