@@ -65,40 +65,42 @@ module.exports = async (req, res) => {
       images_url,
     } = req.body;
 
-    let userDetail = await getUserDetail(req.userId);
+    // let userDetail = await getUserDetail(req.userId);
 
     let expiredAt = null;
     let TO = [];
 
-    let resUrl;
-    if (images_url) {
-      resUrl = await Promise.all(
-        images_url.map(async (res) => {
-          try {
-            const uploadStr = "data:image/jpeg;base64," + res;
-            let returnCloudinary = await cloudinary.v2.uploader.upload(
-              uploadStr,
-              {
-                overwrite: false,
-                invalidate: true,
-              }
-            );
-            return returnCloudinary.url;
-          } catch (error) {
-            console.log("error upload gambar");
-            return res.status(500).json({
-              code: 500,
-              status: "error",
-              message: error,
-            });
-          }
-        })
-      );
-    }
+    // let resUrl;
+    // if (images_url) {
+    //   resUrl = await Promise.all(
+    //     images_url.map(async (res) => {
+    //       try {
+    //         const uploadStr = "data:image/jpeg;base64," + res;
+    //         let returnCloudinary = await cloudinary.v2.uploader.upload(
+    //           uploadStr,
+    //           {
+    //             overwrite: false,
+    //             invalidate: true,
+    //           }
+    //         );
+    //         return returnCloudinary.url;
+    //       } catch (error) {
+    //         console.log("error upload gambar");
+    //         return res.status(500).json({
+    //           code: 500,
+    //           status: "error",
+    //           message: error,
+    //         });
+    //       }
+    //     })
+    //   );
+    // }
     if (duration_feed !== "never") {
       let date = new Date();
       date = addDays(date, duration_feed);
-      expiredAt = date.toISOString();
+      // 2021-04-20T09:02:15.000Z
+      let utc = new Date(date.toUTCString());
+      expiredAt = utc.toISOString();
     }
 
     TO.push("location:everywhare");
