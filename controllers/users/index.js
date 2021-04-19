@@ -4,6 +4,7 @@ const verifyUser = require("./verifyUser");
 const veryfyToken = require("./veryfyToken");
 const refreshToken = require("./refreshToken");
 const varifyTokenGetstream = require("./varifyTokenGetstream");
+const showingAudience = require("../users/showingAudienceEstimates");
 module.exports = {
   checkUsername,
   register,
@@ -11,4 +12,5 @@ module.exports = {
   veryfyToken,
   refreshToken,
   varifyTokenGetstream,
+  showingAudience,
 };
