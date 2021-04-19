@@ -7,6 +7,7 @@ const removeImageProfile = require("./removeImageProfile");
 const following = require("./following");
 const setFollowing = require("./setFollowing");
 const unSetFollowing = require("./unSetFollowing");
+const getProfileByName = require("./getProfileByName")
 
 module.exports = {
   changeRealName,
@@ -17,5 +18,6 @@ module.exports = {
   unSetFollowing,
   removeImageProfile,
   getOtherProfile,
-  updateBio
+  updateBio,
+  getProfileByName
 };
