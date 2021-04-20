@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
       return res.json({
         code: 200,
         status: "Success",
-        data: "Less than Hundreds(test)",
+        data: "Less than Hundreds",
       });
     }
   } catch (error) {
