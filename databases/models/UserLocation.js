@@ -9,6 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      models.UserLocation.belongsToMany(models.User, {
+        through: "user_location",
+        foreignKey: "user_location_id",
+        as: "users",
+      });
+      models.UserLocation.hasMany(models.Locations, {
+        foreignKey: "location_id",
+        as: "locations",
+      });
     }
   }
   UserLocation.init(
@@ -17,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BIGINT,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       user_id: { type: DataTypes.STRING, allowNull: false },
       location_id: { type: DataTypes.BIGINT, allowNull: false },
