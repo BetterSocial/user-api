@@ -8,7 +8,7 @@ exports.followLocation = async (token, userId) => {
 
 const changeValue = (item) => {
   if (/\s/.test(item)) {
-    return item.replace(" ", "-");
+    return item.split(" ").join("-");
   }
   return item;
 };
@@ -69,6 +69,5 @@ exports.followLocations = async (token, locations) => {
         : null
       : null;
   });
-
   return await clientServer.followMany(follows);
 };
