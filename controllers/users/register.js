@@ -22,7 +22,7 @@ const changeValue = (items) => {
   return items.map((item, index) => {
     let temp = Object.assign({}, item.dataValues);
     if (/\s/.test(temp.name)) {
-      return temp.name.replace(" ", "-");
+      return temp.name.split(" ").join("-");
     }
     return temp.name;
   });
