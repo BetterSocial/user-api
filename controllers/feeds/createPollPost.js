@@ -4,7 +4,8 @@ const Validator = require("fastest-validator");
 const {Polling, PollingOption} = require("../../databases/models");
 const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
-const moment = require('moment')
+const moment = require('moment');
+const { POST_TYPE_POLL } = require("../../helpers/constants");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -157,6 +158,7 @@ module.exports = async (req, res) => {
       count_upvote: 0,
       count_downvote: 0,
       polls : pollsOptionUUIDs,
+      post_type : POST_TYPE_POLL,
       polls_expired_at : pollsDurationInIso,
       multiplechoice
     };

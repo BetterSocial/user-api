@@ -6,6 +6,7 @@ const v = new Validator();
 
 const cloudinary = require("cloudinary");
 const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
+const { POST_TYPE_STANDARD } = require("../../helpers/constants");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -138,6 +139,7 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
+      post_type : POST_TYPE_STANDARD,
       to: TO,
     };
 
