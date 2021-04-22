@@ -1,22 +1,19 @@
 const stream = require("getstream");
-exports.followUser = async (token, userId, feedGroup, status = 1) => {
+exports.followTopic = async (token, userId) => {
+  let id = userId.toLowerCase();
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
   const user = client.feed("main_feed", client.userId, token);
-  if (status === 1) {
-    return user.follow(feedGroup, userId);
-  } else {
-    return user.unfollow(feedGroup, userId);
-  }
+  return user.follow("topic", id);
 };
 
-exports.followUsers = async (token, userIds) => {
+exports.followTopics = async (token, userIds) => {
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
   const clientServer = stream.connect(process.env.API_KEY, process.env.SECRET);
   const follows = [];
   userIds.map((item) => {
     follows.push({
       source: "main_feed:" + client.userId,
-      target: "user:" + item.toLowerCase(),
+      target: "topic:" + item.toLowerCase(),
     });
   });
 

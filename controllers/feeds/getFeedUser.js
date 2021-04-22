@@ -2,11 +2,9 @@ const getstreamService = require("../../services/getstream");
 module.exports = async (req, res) => {
   try {
     const token = req.token;
-
     getstreamService
-      .getFeeds(token, "main_feed", "")
+      .getFeeds(token, "user", "")
       .then((result) => {
-        console.log(result);
         let data = [];
         result.results.map((item, index) => {
           let now = new Date();

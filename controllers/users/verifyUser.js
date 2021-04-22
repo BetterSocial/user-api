@@ -7,7 +7,8 @@ module.exports = async (req, res) => {
     const userData = await User.findOne({
       where: { human_id: req.body.user_id },
     });
-    let userId = userData.user_id;
+    let user_id = userData.user_id;
+    let userId = user_id.toLowerCase();
     const token = await getstreamService.createToken(userId);
     const opts = {
       algorithm: "HS256",

@@ -1,32 +1,19 @@
 const getstreamService = require("../../services/getstream");
 module.exports = async (req, res) => {
   try {
-    const token = req.token;
+    const foreignId = req.body.foreign_id;
+    const feedGroup = req.body.feed_group;
 
     getstreamService
-      .getFeeds(token, "main_feed", "")
+      .deleteFeed(req.token, feedGroup, foreignId)
       .then((result) => {
-        console.log(result);
-        let data = [];
-        result.results.map((item, index) => {
-          let now = new Date();
-          let dateActivity = new Date(item.expired_at);
-          if (now < dateActivity) {
-            data.push(item);
-          }
-        });
         res.status(200).json({
           code: 200,
           status: "success",
-          data: {
-            results: data,
-            next: result.next,
-            duration: result.duration,
-          },
+          data: result,
         });
       })
       .catch((err) => {
-        console.log(err);
         res.status(403).json({
           status: "failed",
           data: null,
