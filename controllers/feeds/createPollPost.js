@@ -1,9 +1,10 @@
 const getstreamService = require("../../services/getstream");
 
 const Validator = require("fastest-validator");
+const {Polling, PollingOption} = require("../../databases/models");
+const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
-
-const cloudinary = require("cloudinary");
+const moment = require('moment')
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -12,6 +13,7 @@ function addDays(theDate, days) {
 module.exports = async (req, res) => {
   try {
     const token = req.token;
+    const now = new Date();
 
     if (token == null) {
       return res.status(401).json({
@@ -29,18 +31,23 @@ module.exports = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
-      duration_feed: "number|empty:false",
-      images_url: "array",
+      duration_feed: "string|empty:false",
+      polls : "array|empty:false",
+      pollsduration : {
+        $$type : "object",
+        day : "string|empty:false",
+        hour : "string|empty:false",
+        minute : "string|empty:false",
+      },
+      multiplechoice : "boolean|empty:false"
     };
 
-    const validate = v.validate(req.body, schema);
-    if (validate.length) {
-      console.log(validate);
-      return res.status(400).json({
-        code: 400,
-        status: "error",
-        message: validate,
-      });
+    const validated = v.validate(req.body, schema)
+    if(validated.length) {
+      return res.status(403).json({
+        message : "Error validation",
+        error : validated
+      })
     }
 
     let {
@@ -53,9 +60,30 @@ module.exports = async (req, res) => {
       location,
       duration_feed,
       images_url,
+      polls,
+      pollsduration,
+      multiplechoice
     } = req.body;
 
+    // CHECK EXPIRATION DATE
+    let { day, hour, minute } = pollsduration
+    let pollsDurationMoment = moment().add(day, "days").add(hour, "hour").add(minute, "minute")
+    let pollsDurationInIso = pollsDurationMoment.toISOString()
+
     let expiredAt = null;
+    let date = new Date()
+    if (duration_feed !== "never") {
+      date = addDays(date, duration_feed);
+      expiredAt = date.toISOString();
+    }
+    
+    console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`)
+    if(pollsDurationMoment.valueOf() > date.getTime()) return res.status(403).json({
+      message : "Polling Duration cannot be more than post expiration date",
+      success : false
+    })
+
+    // CHECK EXPIRATION DATE (END)
 
     let resUrl;
     if (images_url) {
@@ -82,10 +110,31 @@ module.exports = async (req, res) => {
         })
       );
     }
-    if (duration_feed !== "never") {
-      let date = new Date();
-      date = addDays(date, duration_feed);
-      expiredAt = date.toISOString();
+
+    let poll = await Polling.create({
+      polling_id : uuidv4(),
+      post_id : uuidv4(),
+      user_id : req.userId,
+      question : message,
+      flg_multiple : multiplechoice
+    })
+
+    let pollId = poll.toJSON().polling_id
+    console.log("Polling UUID : ")
+    console.log(pollId)
+
+    let pollsOptionUUIDs = []
+    for(let i = 0; i < polls.length; i++) {
+      let item = polls[i]      
+      let pollOption = await PollingOption.create({
+        polling_option_id : uuidv4(),
+        polling_id : pollId,
+        option : item.text,
+        counter : 0,
+      })
+
+      let pollOptionUUID = pollOption.toJSON().polling_option_id
+      pollsOptionUUIDs.push(pollOptionUUID)
     }
 
     let object = {
@@ -106,8 +155,12 @@ module.exports = async (req, res) => {
       images_url: resUrl,
       expired_at: expiredAt,
       count_upvote: 0,
-      count_downvote: 0
+      count_downvote: 0,
+      polls : pollsOptionUUIDs,
+      polls_expired_at : pollsDurationInIso,
+      multiplechoice
     };
+
     getstreamService
       .createPost(token, feedGroup, data)
       .then(() => {
@@ -125,6 +178,7 @@ module.exports = async (req, res) => {
           data: null,
         });
       });
+    
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -133,5 +187,5 @@ module.exports = async (req, res) => {
       message: "Internal server error",
       error: error,
     });
-  }
-};
+  }  
+}

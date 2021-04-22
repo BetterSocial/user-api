@@ -6,6 +6,7 @@ const getReaction = require("./getReaction");
 const upvote = require("./upVote");
 const comment = require("./comment");
 const like = require("./like");
+const createPollPost = require('./createPollPost')
 
 module.exports = {
   createPost,
@@ -16,4 +17,5 @@ module.exports = {
   upvote,
   comment,
   like,
+  createPollPost
 };
