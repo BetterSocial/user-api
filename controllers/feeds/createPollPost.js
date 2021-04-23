@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
 
     const schema = {
       topics: "array|empty:false",
-      message: "string|empty:false",
+      message: "string",
       verb: "string|empty:false",
       feedGroup: "string|empty:false",
       privacy: "string|empty:false",
@@ -36,15 +36,17 @@ module.exports = async (req, res) => {
       polls : "array|empty:false",
       pollsduration : {
         $$type : "object",
-        day : "string|empty:false",
-        hour : "string|empty:false",
-        minute : "string|empty:false",
+        day : "number|empty:false",
+        hour : "number|empty:false",
+        minute : "number|empty:false",
       },
       multiplechoice : "boolean|empty:false"
     };
 
     const validated = v.validate(req.body, schema)
     if(validated.length) {
+      console.log("Error validation")
+      console.log(validated)
       return res.status(403).json({
         message : "Error validation",
         error : validated
