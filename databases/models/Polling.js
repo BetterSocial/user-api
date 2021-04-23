@@ -8,13 +8,13 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     Polling.init({
-        polling_id : { type : DataTypes.UUID, allowNull : false, primaryKey : true},
+        polling_id : { type : DataTypes.UUID, primaryKey : true},
         post_id : { type : DataTypes.UUID},
         question : { type : DataTypes.STRING, allowNull : true },
         user_id : { type : DataTypes.STRING, allowNull : false},
         flg_multiple : { type : DataTypes.BOOLEAN, allowNull : false, defaultValue : false},
-        createdAt : { type: DataTypes.DATE, field: "created_at", allowNull: false},
-        updatedAt : { type: DataTypes.DATE, field: "updated_at", allowNull: true},
+        createdAt : { type: DataTypes.DATE, field: "created_at"},
+        updatedAt : { type: DataTypes.DATE, field: "updated_at"},
     }, {
         sequelize,
         modelName : "Polling",

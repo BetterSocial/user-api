@@ -1,7 +1,7 @@
 const getstreamService = require("../../services/getstream");
 
 const Validator = require("fastest-validator");
-const {Polling, PollingOption} = require("../../databases/models");
+const {Polling, PollingOption, Post, sequelize} = require("../../databases/models");
 const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
 const moment = require('moment');
@@ -86,7 +86,9 @@ module.exports = async (req, res) => {
 
     // CHECK EXPIRATION DATE (END)
 
-    let resUrl;
+    let currentDate = new Date().toISOString()
+
+    let resUrl = "";
     if (images_url) {
       resUrl = await Promise.all(
         images_url.map(async (res) => {
@@ -112,29 +114,91 @@ module.exports = async (req, res) => {
       );
     }
 
-    let poll = await Polling.create({
-      polling_id : uuidv4(),
-      post_id : uuidv4(),
-      user_id : req.userId,
-      question : message,
-      flg_multiple : multiplechoice
-    })
+    console.log(resUrl)
+    // let post = await Post.create({
+    //   post_id : uuidv4(),
+    //   author_user_id : req.userId,
+    //   anonymous : anonimity,
+    //   duration : expiredAt,
+    //   topic_id : 1,
+    //   post_content : resUrl
+    // })
 
-    let pollId = poll.toJSON().polling_id
+    // let postId = post.toJSON().post_id
+
+    let post = await sequelize.query(
+      `INSERT INTO posts (author_user_id, anonymous, duration, topic_id, post_content, created_at, updated_at)
+        VALUES(:authorUserId, :anonymous, :duration, :topicId, :postContent, :createdAt, :updatedAt)
+        RETURNING post_id`,{
+        replacements : {
+          authorUserId : req.userId,
+          anonymous : anonimity,
+          duration : expiredAt,
+          topicId : 1,
+          postContent : resUrl,
+          createdAt : currentDate,
+          updatedAt : currentDate
+        }
+      }
+    )
+
+    let postId = post[0][0].post_id
+
+    // let poll = await Polling.create({
+    //   polling_id : uuidv4(),
+    //   post_id : postId,
+    //   user_id : req.userId,
+    //   question : message,
+    //   flg_multiple : multiplechoice
+    // })
+
+    let poll = await sequelize.query(
+      `INSERT INTO polling 
+        (question, post_id, user_id, flg_multiple, created_at, updated_at) 
+        VALUES (:question, :post_id, :user_id, :flg_multiple, :created_at, :updated_at)
+        RETURNING polling_id`,{
+        replacements : {
+          question : message,
+          post_id : postId,
+          user_id : req.userId,
+          flg_multiple : multiplechoice,
+          created_at : currentDate,
+          updated_at : currentDate
+        },
+        type : sequelize.QueryTypes.INSERT
+      })
+
+    let pollId = poll[0][0].polling_id
     console.log("Polling UUID : ")
     console.log(pollId)
 
     let pollsOptionUUIDs = []
     for(let i = 0; i < polls.length; i++) {
       let item = polls[i]      
-      let pollOption = await PollingOption.create({
-        polling_option_id : uuidv4(),
-        polling_id : pollId,
-        option : item.text,
-        counter : 0,
-      })
+      // let pollOption = await PollingOption.create({
+      //   polling_option_id : uuidv4(),
+      //   polling_id : pollId,
+      //   option : item.text,
+      //   counter : 0,
+      // })
 
-      let pollOptionUUID = pollOption.toJSON().polling_option_id
+      // let pollOptionUUID = pollOption.toJSON().polling_option_id
+      let pollOption = await sequelize.query(
+        `INSERT INTO polling_option 
+        (polling_id, option, counter, created_at, updated_at)
+        VALUES (:pollingId, :option, :counter, :createdAt, :updatedAt)
+        RETURNING polling_option_id`, {
+          replacements : {
+            pollingId : pollId,
+            option : item.text,
+            counter : 0,
+            createdAt : currentDate,
+            updatedAt : currentDate
+          }
+        }
+      )
+
+      let pollOptionUUID = pollOption[0][0].polling_option_id
       pollsOptionUUIDs.push(pollOptionUUID)
     }
 
