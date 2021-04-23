@@ -1,10 +1,10 @@
 const getstreamService = require("../../services/getstream");
 
 const Validator = require("fastest-validator");
-const {Polling, PollingOption} = require("../../databases/models");
+const { Polling, PollingOption } = require("../../databases/models");
 const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
-const moment = require('moment');
+const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
 
 function addDays(theDate, days) {
@@ -33,22 +33,22 @@ module.exports = async (req, res) => {
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
       duration_feed: "string|empty:false",
-      polls : "array|empty:false",
-      pollsduration : {
-        $$type : "object",
-        day : "string|empty:false",
-        hour : "string|empty:false",
-        minute : "string|empty:false",
+      polls: "array|empty:false",
+      pollsduration: {
+        $$type: "object",
+        day: "string|empty:false",
+        hour: "string|empty:false",
+        minute: "string|empty:false",
       },
-      multiplechoice : "boolean|empty:false"
+      multiplechoice: "boolean|empty:false",
     };
 
-    const validated = v.validate(req.body, schema)
-    if(validated.length) {
+    const validated = v.validate(req.body, schema);
+    if (validated.length) {
       return res.status(403).json({
-        message : "Error validation",
-        error : validated
-      })
+        message: "Error validation",
+        error: validated,
+      });
     }
 
     let {
@@ -63,26 +63,30 @@ module.exports = async (req, res) => {
       images_url,
       polls,
       pollsduration,
-      multiplechoice
+      multiplechoice,
     } = req.body;
 
     // CHECK EXPIRATION DATE
-    let { day, hour, minute } = pollsduration
-    let pollsDurationMoment = moment().add(day, "days").add(hour, "hour").add(minute, "minute")
-    let pollsDurationInIso = pollsDurationMoment.toISOString()
+    let { day, hour, minute } = pollsduration;
+    let pollsDurationMoment = moment()
+      .add(day, "days")
+      .add(hour, "hour")
+      .add(minute, "minute");
+    let pollsDurationInIso = pollsDurationMoment.toISOString();
 
     let expiredAt = null;
-    let date = new Date()
+    let date = new Date();
     if (duration_feed !== "never") {
       date = addDays(date, duration_feed);
       expiredAt = date.toISOString();
     }
-    
-    console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`)
-    if(pollsDurationMoment.valueOf() > date.getTime()) return res.status(403).json({
-      message : "Polling Duration cannot be more than post expiration date",
-      success : false
-    })
+
+    console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`);
+    if (pollsDurationMoment.valueOf() > date.getTime())
+      return res.status(403).json({
+        message: "Polling Duration cannot be more than post expiration date",
+        success: false,
+      });
 
     // CHECK EXPIRATION DATE (END)
 
@@ -113,29 +117,29 @@ module.exports = async (req, res) => {
     }
 
     let poll = await Polling.create({
-      polling_id : uuidv4(),
-      post_id : uuidv4(),
-      user_id : req.userId,
-      question : message,
-      flg_multiple : multiplechoice
-    })
+      polling_id: uuidv4(),
+      post_id: uuidv4(),
+      user_id: req.userId,
+      question: message,
+      flg_multiple: multiplechoice,
+    });
 
-    let pollId = poll.toJSON().polling_id
-    console.log("Polling UUID : ")
-    console.log(pollId)
+    let pollId = poll.toJSON().polling_id;
+    console.log("Polling UUID : ");
+    console.log(pollId);
 
-    let pollsOptionUUIDs = []
-    for(let i = 0; i < polls.length; i++) {
-      let item = polls[i]      
+    let pollsOptionUUIDs = [];
+    for (let i = 0; i < polls.length; i++) {
+      let item = polls[i];
       let pollOption = await PollingOption.create({
-        polling_option_id : uuidv4(),
-        polling_id : pollId,
-        option : item.text,
-        counter : 0,
-      })
+        polling_option_id: uuidv4(),
+        polling_id: pollId,
+        option: item.text,
+        counter: 0,
+      });
 
-      let pollOptionUUID = pollOption.toJSON().polling_option_id
-      pollsOptionUUIDs.push(pollOptionUUID)
+      let pollOptionUUID = pollOption.toJSON().polling_option_id;
+      pollsOptionUUIDs.push(pollOptionUUID);
     }
 
     let object = {
@@ -157,10 +161,10 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
-      polls : pollsOptionUUIDs,
-      post_type : POST_TYPE_POLL,
-      polls_expired_at : pollsDurationInIso,
-      multiplechoice
+      polls: pollsOptionUUIDs,
+      post_type: POST_TYPE_POLL,
+      polls_expired_at: pollsDurationInIso,
+      multiplechoice,
     };
 
     getstreamService
@@ -173,14 +177,13 @@ module.exports = async (req, res) => {
         });
       })
       .catch((err) => {
-        console.log(err);
+        console.log("error", err);
         res.status(403).json({
           code: 403,
           status: "failed create post",
           data: null,
         });
       });
-    
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -189,5 +192,5 @@ module.exports = async (req, res) => {
       message: "Internal server error",
       error: error,
     });
-  }  
-}
+  }
+};
