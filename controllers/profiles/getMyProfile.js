@@ -18,18 +18,16 @@ module.exports = async (req, res) => {
           model: UserFollowUser,
           as: "follower",
         },
+        // {
+        //   model: UserLocation,
+        //   as: "user_locations",
+        // },
         {
           model: Locations,
           as: "locations",
         },
       ],
     });
-    // const userLocation = await UserLocation.findAll({
-    //   where: {
-    //     user_id: req.params.id,
-    //   },
-    // });
-    // console.log(user.user_locations);
     if (user === null) {
       return res.status(404).json({
         code: 404,
