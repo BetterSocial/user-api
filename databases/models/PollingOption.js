@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     PollingOption.init({
-        polling_option_id : { type : DataTypes.UUID, allowNull : false, primaryKey : true},
+        polling_option_id : { type : DataTypes.UUID, primaryKey : true},
         polling_id : { type : DataTypes.UUID, allowNull : false },
         option : { type : DataTypes.STRING, allowNull : false },
         counter : { type : DataTypes.BIGINT, allowNull : true},
