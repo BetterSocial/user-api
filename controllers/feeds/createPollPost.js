@@ -1,10 +1,15 @@
 const getstreamService = require("../../services/getstream");
 
 const Validator = require("fastest-validator");
-const {Polling, PollingOption, Post, sequelize} = require("../../databases/models");
+const {
+  Polling,
+  PollingOption,
+  Post,
+  sequelize,
+} = require("../../databases/models");
 const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
-const moment = require('moment');
+const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
 
 function addDays(theDate, days) {
@@ -33,24 +38,24 @@ module.exports = async (req, res) => {
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
       duration_feed: "string|empty:false",
-      polls : "array|empty:false",
-      pollsduration : {
-        $$type : "object",
-        day : "number|empty:false",
-        hour : "number|empty:false",
-        minute : "number|empty:false",
+      polls: "array|empty:false",
+      pollsduration: {
+        $$type: "object",
+        day: "number|empty:false",
+        hour: "number|empty:false",
+        minute: "number|empty:false",
       },
-      multiplechoice : "boolean|empty:false"
+      multiplechoice: "boolean|empty:false",
     };
 
-    const validated = v.validate(req.body, schema)
-    if(validated.length) {
-      console.log("Error validation")
-      console.log(validated)
+    const validated = v.validate(req.body, schema);
+    if (validated.length) {
+      console.log("Error validation");
+      console.log(validated);
       return res.status(403).json({
-        message : "Error validation",
-        error : validated
-      })
+        message: "Error validation",
+        error: validated,
+      });
     }
 
     let {
@@ -65,30 +70,34 @@ module.exports = async (req, res) => {
       images_url,
       polls,
       pollsduration,
-      multiplechoice
+      multiplechoice,
     } = req.body;
 
     // CHECK EXPIRATION DATE
-    let { day, hour, minute } = pollsduration
-    let pollsDurationMoment = moment().add(day, "days").add(hour, "hour").add(minute, "minute")
-    let pollsDurationInIso = pollsDurationMoment.toISOString()
+    let { day, hour, minute } = pollsduration;
+    let pollsDurationMoment = moment()
+      .add(day, "days")
+      .add(hour, "hour")
+      .add(minute, "minute");
+    let pollsDurationInIso = pollsDurationMoment.toISOString();
 
     let expiredAt = null;
-    let date = new Date()
+    let date = new Date();
     if (duration_feed !== "never") {
       date = addDays(date, duration_feed);
       expiredAt = date.toISOString();
     }
-    
-    console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`)
-    if(pollsDurationMoment.valueOf() > date.getTime()) return res.status(403).json({
-      message : "Polling Duration cannot be more than post expiration date",
-      success : false
-    })
+
+    console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`);
+    if (pollsDurationMoment.valueOf() > date.getTime())
+      return res.status(403).json({
+        message: "Polling Duration cannot be more than post expiration date",
+        success: false,
+      });
 
     // CHECK EXPIRATION DATE (END)
 
-    let currentDate = new Date().toISOString()
+    let currentDate = new Date().toISOString();
 
     let resUrl = "";
     if (images_url) {
@@ -116,7 +125,7 @@ module.exports = async (req, res) => {
       );
     }
 
-    console.log(resUrl)
+    console.log(resUrl);
     // let post = await Post.create({
     //   post_id : uuidv4(),
     //   author_user_id : req.userId,
@@ -131,20 +140,21 @@ module.exports = async (req, res) => {
     let post = await sequelize.query(
       `INSERT INTO posts (author_user_id, anonymous, duration, topic_id, post_content, created_at, updated_at)
         VALUES(:authorUserId, :anonymous, :duration, :topicId, :postContent, :createdAt, :updatedAt)
-        RETURNING post_id`,{
-        replacements : {
-          authorUserId : req.userId,
-          anonymous : anonimity,
-          duration : expiredAt,
-          topicId : 1,
-          postContent : resUrl,
-          createdAt : currentDate,
-          updatedAt : currentDate
-        }
+        RETURNING post_id`,
+      {
+        replacements: {
+          authorUserId: req.userId,
+          anonymous: anonimity,
+          duration: expiredAt,
+          topicId: 1,
+          postContent: resUrl,
+          createdAt: currentDate,
+          updatedAt: currentDate,
+        },
       }
-    )
+    );
 
-    let postId = post[0][0].post_id
+    let postId = post[0][0].post_id;
 
     // let poll = await Polling.create({
     //   polling_id : uuidv4(),
@@ -158,25 +168,27 @@ module.exports = async (req, res) => {
       `INSERT INTO polling 
         (question, post_id, user_id, flg_multiple, created_at, updated_at) 
         VALUES (:question, :post_id, :user_id, :flg_multiple, :created_at, :updated_at)
-        RETURNING polling_id`,{
-        replacements : {
-          question : message,
-          post_id : postId,
-          user_id : req.userId,
-          flg_multiple : multiplechoice,
-          created_at : currentDate,
-          updated_at : currentDate
+        RETURNING polling_id`,
+      {
+        replacements: {
+          question: message,
+          post_id: postId,
+          user_id: req.userId,
+          flg_multiple: multiplechoice,
+          created_at: currentDate,
+          updated_at: currentDate,
         },
-        type : sequelize.QueryTypes.INSERT
-      })
+        type: sequelize.QueryTypes.INSERT,
+      }
+    );
 
-    let pollId = poll[0][0].polling_id
-    console.log("Polling UUID : ")
-    console.log(pollId)
+    let pollId = poll[0][0].polling_id;
+    console.log("Polling UUID : ");
+    console.log(pollId);
 
-    let pollsOptionUUIDs = []
-    for(let i = 0; i < polls.length; i++) {
-      let item = polls[i]      
+    let pollsOptionUUIDs = [];
+    for (let i = 0; i < polls.length; i++) {
+      let item = polls[i];
       // let pollOption = await PollingOption.create({
       //   polling_option_id : uuidv4(),
       //   polling_id : pollId,
@@ -189,19 +201,20 @@ module.exports = async (req, res) => {
         `INSERT INTO polling_option 
         (polling_id, option, counter, created_at, updated_at)
         VALUES (:pollingId, :option, :counter, :createdAt, :updatedAt)
-        RETURNING polling_option_id`, {
-          replacements : {
-            pollingId : pollId,
-            option : item.text,
-            counter : 0,
-            createdAt : currentDate,
-            updatedAt : currentDate
-          }
+        RETURNING polling_option_id`,
+        {
+          replacements: {
+            pollingId: pollId,
+            option: item.text,
+            counter: 0,
+            createdAt: currentDate,
+            updatedAt: currentDate,
+          },
         }
-      )
+      );
 
-      let pollOptionUUID = pollOption[0][0].polling_option_id
-      pollsOptionUUIDs.push(pollOptionUUID)
+      let pollOptionUUID = pollOption[0][0].polling_option_id;
+      pollsOptionUUIDs.push(pollOptionUUID);
     }
 
     let object = {
@@ -209,6 +222,9 @@ module.exports = async (req, res) => {
       message: message,
       topics: topics,
     };
+
+    let TO = [];
+    TO.push("user:" + req.userId);
 
     let data = {
       verb: verb,
@@ -223,10 +239,11 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
-      polls : pollsOptionUUIDs,
-      post_type : POST_TYPE_POLL,
-      polls_expired_at : pollsDurationInIso,
-      multiplechoice
+      polls: pollsOptionUUIDs,
+      post_type: POST_TYPE_POLL,
+      polls_expired_at: pollsDurationInIso,
+      multiplechoice,
+      to: TO,
     };
 
     getstreamService
@@ -246,7 +263,6 @@ module.exports = async (req, res) => {
           data: null,
         });
       });
-    
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -255,5 +271,5 @@ module.exports = async (req, res) => {
       message: "Internal server error",
       error: error,
     });
-  }  
-}
+  }
+};

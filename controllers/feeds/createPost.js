@@ -46,7 +46,6 @@ module.exports = async (req, res) => {
 
     const validate = v.validate(req.body, schema);
     if (validate.length) {
-      console.log(validate);
       return res.status(400).json({
         code: 400,
         status: "error",
@@ -95,7 +94,7 @@ module.exports = async (req, res) => {
         })
       );
     }
-    if (duration_feed !== "never") {
+    if (duration_feed !== 999) {
       let date = new Date();
       date = addDays(date, duration_feed);
       // 2021-04-20T09:02:15.000Z
@@ -139,7 +138,7 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
-      post_type : POST_TYPE_STANDARD,
+      post_type: POST_TYPE_STANDARD,
       to: TO,
     };
 
