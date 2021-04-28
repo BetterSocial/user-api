@@ -18,10 +18,12 @@ module.exports = async (req, res) => {
 
     // check if name using string
     if (typeof name === "string") {
-      stringToCapitalize = name
-        .trim()
-        .toLowerCase()
-        .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
+      // stringToCapitalize = name
+      //   .trim()
+      //   .toLowerCase()
+      //   .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
+      // stringToLowerCase = name;
+      stringToCapitalize = name;
       stringToLowerCase = name;
     } else {
       return res.status(404).json({
@@ -36,20 +38,26 @@ module.exports = async (req, res) => {
         [Op.or]: [
           {
             neighborhood: {
-              [Op.like]: `%${stringToCapitalize}%`,
-            },
-          },
-          {
-            neighborhood: {
               [Op.like]: `%${name}%`,
             },
           },
           {
-            neighborhood: {
-              [Op.like]: `%${stringToLowerCase.toLowerCase()}%`,
+            city: {
+              [Op.like]: `%${name}%`,
+            },
+          },
+          {
+            state: {
+              [Op.like]: `%${stringToCapitalize.toUpperCase()}%`,
+            },
+          },
+          {
+            country: {
+              [Op.like]: `%${name}%`,
             },
           },
         ],
+        status: "Y",
       },
     })
       .then((list) => {
