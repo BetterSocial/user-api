@@ -34,16 +34,17 @@ module.exports = async (req, res) => {
       }
     }
     if (userCount > 99) {
+      let data = Math.ceil((userCount / 100).toFixed(0)) * 100;
       return res.json({
         code: 200,
         status: "Success",
-        data: userCount,
+        data: data.toLocaleString("en"),
       });
     } else {
       return res.json({
         code: 200,
         status: "Success",
-        data: "Less than Hundreds",
+        data: "<100",
       });
     }
   } catch (error) {
