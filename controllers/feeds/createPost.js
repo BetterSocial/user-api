@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
-      duration_feed: "number|empty:false",
+      duration_feed: "string|empty:false",
       images_url: "array",
     };
 
@@ -94,7 +94,7 @@ module.exports = async (req, res) => {
         })
       );
     }
-    if (duration_feed !== 999) {
+    if (duration_feed !== "never") {
       let date = new Date();
       date = addDays(date, duration_feed);
       // 2021-04-20T09:02:15.000Z
