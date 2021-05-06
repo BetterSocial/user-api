@@ -223,6 +223,9 @@ module.exports = async (req, res) => {
       topics: topics,
     };
 
+    let TO = [];
+    TO.push("user:" + req.userId);
+
     let data = {
       verb: verb,
       message: message,
@@ -240,6 +243,7 @@ module.exports = async (req, res) => {
       post_type: POST_TYPE_POLL,
       polls_expired_at: pollsDurationInIso,
       multiplechoice,
+      to: TO,
     };
 
     getstreamService
