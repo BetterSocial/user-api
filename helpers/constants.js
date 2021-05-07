@@ -1,7 +1,13 @@
 const POST_TYPE_STANDARD = 0
 const POST_TYPE_POLL = 1
 
+const POST_VERB_POLL = "poll"
+
+const MAX_FEED_FETCH_LIMIT = 10
+
 module.exports = {
     POST_TYPE_STANDARD,
-    POST_TYPE_POLL
+    POST_TYPE_POLL,
+    POST_VERB_POLL,
+    MAX_FEED_FETCH_LIMIT
 }
