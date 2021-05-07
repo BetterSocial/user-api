@@ -1,27 +1,50 @@
-// const { User, sequelize } = require("../../databases/models");
-const { UserFollowUser, sequelize } = require("../../databases/models");
+const {
+  UserFollowUser,
+  UserLocation,
+  sequelize,
+} = require("../../databases/models");
 module.exports = async (req, res) => {
   try {
+    let userCount = 0;
     let params = req.query;
-    // let totalFollow = await UserFollowUser.count({
-    //   where: {
-    //     user_id_follower: "288d5679-6c68-41ec-be83-7f15a4e82d3d",
-    //   },
-    // });
-    // console.log("follower ", totalFollow);
-    console.log(params);
-    let total_audience = 89;
-    if (total_audience > 99) {
+    let userId = req.userId;
+
+    if (params.privacy.toLowerCase() == "public") {
+      if (params.location.toLowerCase() == "everywhere") {
+        userCount = await UserLocation.count();
+      } else {
+        userCount = await UserLocation.count({
+          where: {
+            location_id: params.location,
+          },
+        });
+      }
+    } else {
+      if (params.location.toLowerCase() == "everywhere") {
+        userCount = await UserFollowUser.count({
+          where: {
+            user_id_followed: userId,
+          },
+        });
+      } else {
+        let resultData = await sequelize.query(
+          `SELECT COUNT(*) FROM user_follow_user INNER JOIN user_location on user_follow_user.user_id_follower = user_location.user_id WHERE user_follow_user.user_id_followed='${userId}' AND user_location.location_id=${params.location}`
+        );
+        userCount = resultData[0][0].count;
+      }
+    }
+    if (userCount > 99) {
+      let data = Math.ceil((userCount / 100).toFixed(0)) * 100;
       return res.json({
         code: 200,
         status: "Success",
-        data: total_audience,
+        data: data.toLocaleString("en"),
       });
     } else {
       return res.json({
         code: 200,
         status: "Success",
-        data: "Less than Hundreds(test)",
+        data: "<100",
       });
     }
   } catch (error) {
