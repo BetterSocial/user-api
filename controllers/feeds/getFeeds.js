@@ -21,7 +21,6 @@ module.exports = async (req, res) => {
           let now = new Date();
           let dateActivity = new Date(item.expired_at);
           if (now < dateActivity) {
-            data.push(item);
             if(item.verb === POST_VERB_POLL) {
               let newItem = { ...item }
               let pollOptions = await PollingOption.findAll({
