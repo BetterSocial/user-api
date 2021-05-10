@@ -18,5 +18,6 @@ router.get(
   auth.isAuth,
   usersHandler.showingAudience
 );
+router.post("/blockuser", auth.isAuth, usersHandler.blockUser);
 
 module.exports = router;
