@@ -8,5 +8,7 @@ module.exports = async (activityId, message, token) => {
   );
   return await clientUser.reactions.add("comment", activityId, {
     text: message,
+    count_upvote: 0,
+    count_downvote: 0,
   });
 };
