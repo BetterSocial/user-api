@@ -92,6 +92,9 @@ module.exports = async (req, res) => {
           message: "Polling Duration cannot be more than post expiration date",
           success: false,
       });
+    } else {
+      date = addDays(date, 100 * 365)
+      expiredAt = date.toISOString()
     }
 
     // CHECK EXPIRATION DATE (END)
