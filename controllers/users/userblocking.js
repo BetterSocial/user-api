@@ -16,7 +16,6 @@ module.exports = async (req, res) => {
       postId: "string",
       reason: "array|optional:true",
       message: "string|optional:true",
-      action: "string",
       source: "string",
     };
     const validate = await v.validate(req.body, schema);
@@ -55,7 +54,7 @@ module.exports = async (req, res) => {
       // const userBlockHistory = {
       //   user_id_blocker: req.userId,
       //   user_id_blocked: req.body.userId,
-      //   action: req.body.action,
+      //   action: "out",
       //   source: req.body.source,
       // };
       // await UserBlockedUserHistory.create(userBlockHistory, { transaction: t });
@@ -70,12 +69,12 @@ module.exports = async (req, res) => {
       return resultUserBlock;
     });
 
-    // await getstreamService.followUser.followUser(
-    //   req.token,
-    //   req.body.userId,
-    //   "user",
-    //   0
-    // );
+    await getstreamService.followUser.followUser(
+      req.token,
+      req.body.userId,
+      "user",
+      0
+    );
     res.json({
       message: "The user has been successfully blocked",
       code: 200,
