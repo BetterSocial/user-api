@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
         for(let i = 0; i < result.results.length; i++) {
           let item = result.results[i]
           let now = new Date();
-          let dateActivity = new Date(item.expired_at);
-          if (now < dateActivity) {
+          let dateExpired = new Date(item.expired_at);
+          if (now < dateExpired) {
             if(item.verb === POST_VERB_POLL) {
               let newItem = { ...item }
               let pollOptions = await PollingOption.findAll({
@@ -37,15 +37,11 @@ module.exports = async (req, res) => {
             }
           }
         }
-        
+
         res.status(200).json({
           code: 200,
           status: "success",
-          data: {
-            results: data,
-            next: result.next,
-            duration: result.duration,
-          },
+          data: data,
         });
       })
       .catch((err) => {

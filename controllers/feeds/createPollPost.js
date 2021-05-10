@@ -86,14 +86,13 @@ module.exports = async (req, res) => {
     if (duration_feed !== "never") {
       date = addDays(date, duration_feed);
       expiredAt = date.toISOString();
-    }
-
-    console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`);
-    if (pollsDurationMoment.valueOf() > date.getTime())
-      return res.status(403).json({
-        message: "Polling Duration cannot be more than post expiration date",
-        success: false,
+      console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`);
+    
+      if (pollsDurationMoment.valueOf() > date.getTime()) return res.status(403).json({
+          message: "Polling Duration cannot be more than post expiration date",
+          success: false,
       });
+    }
 
     // CHECK EXPIRATION DATE (END)
 
