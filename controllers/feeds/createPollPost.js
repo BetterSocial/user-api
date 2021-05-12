@@ -258,7 +258,7 @@ module.exports = async (req, res) => {
         });
       })
       .catch((err) => {
-        console.log(err);
+        console.log("error", err);
         res.status(403).json({
           code: 403,
           status: "failed create post",
