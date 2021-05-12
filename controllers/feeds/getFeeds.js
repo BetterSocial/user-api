@@ -9,10 +9,12 @@ const { Op } = require("sequelize");
 module.exports = async (req, res) => {
   try {
     const token = req.token;
+    console.log(req.query.id_lt);
 
     getstreamService
       .getFeeds(token, "main_feed", {
         limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
+        id_lt: req.query.id_lt || "",
       })
 
       .then(async (result) => {
