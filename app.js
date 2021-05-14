@@ -41,7 +41,27 @@ app.use("/api/v1/location", locationsRouter);
 app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerApiDocumentation));
+var options = {
+  swaggerOptions: {
+    authAction: {
+      JWT: {
+        name: "JWT",
+        schema: {
+          type: "apiKey",
+          in: "header",
+          name: "Authorization",
+          description: "",
+        },
+        value: "Bearer <JWT>",
+      },
+    },
+  },
+};
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerApiDocumentation, options)
+);
 app.use("/api/v1", indexRouter);
 
 module.exports = app;

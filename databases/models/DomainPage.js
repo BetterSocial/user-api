@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class UserFollowUser extends Model {
+  class DomainPage extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,22 +11,23 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  UserFollowUser.init(
+  DomainPage.init(
     {
-      follow_action_id: {
-        type: DataTypes.STRING,
+      domain_page_id: {
+        type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true,
       },
-      user_id_follower: { type: DataTypes.UUID, allowNull: false },
-      user_id_followed: { type: DataTypes.UUID, allowNull: false },
+      domain_name: { type: DataTypes.STRING },
+      logo: DataTypes.STRING,
+      short_description: DataTypes.TEXT,
     },
     {
       sequelize,
-      modelName: "UserFollowUser",
-      tableName: "user_follow_user",
-      timestamps: false,
+      modelName: "DomainPage",
+      tableName: "domain_page",
+      timestamps: true,
     }
   );
-  return UserFollowUser;
+  return DomainPage;
 };

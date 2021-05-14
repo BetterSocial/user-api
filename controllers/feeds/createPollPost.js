@@ -92,6 +92,9 @@ module.exports = async (req, res) => {
           message: "Polling Duration cannot be more than post expiration date",
           success: false,
       });
+    } else {
+      date = addDays(date, 100 * 365)
+      expiredAt = date.toISOString()
     }
 
     // CHECK EXPIRATION DATE (END)
@@ -255,7 +258,7 @@ module.exports = async (req, res) => {
         });
       })
       .catch((err) => {
-        console.log(err);
+        console.log("error", err);
         res.status(403).json({
           code: 403,
           status: "failed create post",
