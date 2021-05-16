@@ -6,9 +6,10 @@ const getReaction = require("./getReaction");
 const upvote = require("./upVote");
 const comment = require("./comment");
 const like = require("./like");
-const createPollPost = require('./createPollPost')
+const createPollPost = require("./createPollPost");
 const deleteFeed = require("./deleteFeed");
 const getFeedUser = require("./getFeedUser");
+const commentChild = require("./commentChild");
 
 module.exports = {
   createPost,
@@ -22,4 +23,5 @@ module.exports = {
   createPollPost,
   deleteFeed,
   getFeedUser,
+  commentChild,
 };
