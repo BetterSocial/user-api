@@ -4,6 +4,7 @@ const followUser = require("./followUser");
 const createReaction = require("./createReaction");
 const getReaction = require("./getReaction");
 const upvote = require("./upVote");
+const downvote = require("./downVote");
 const comment = require("./comment");
 const like = require("./like");
 const createPollPost = require("./createPollPost");
@@ -23,5 +24,6 @@ module.exports = {
   createPollPost,
   deleteFeed,
   getFeedUser,
+  downvote,
   commentChild,
 };

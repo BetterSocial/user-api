@@ -40,6 +40,7 @@ app.use("/api/v1/topics", topicsRouter);
 app.use("/api/v1/location", locationsRouter);
 app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
+app.use("/api/v1/feeds", feedRouter);
 
 var options = {
   swaggerOptions: {
