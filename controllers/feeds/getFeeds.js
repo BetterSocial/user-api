@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
       .getFeeds(token, "main_feed", {
         limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
         id_lt: req.query.id_lt || "",
+        reactions: { own: true, recent: true, counts: true },
       })
 
       .then(async (result) => {
