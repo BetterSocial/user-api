@@ -4,18 +4,19 @@ module.exports = async (req, res) => {
   console.log("test");
   try {
     let { activity_id } = req.body;
-    console.log(foreign_id);
     const upvote = await upVote(activity_id, req.token);
+    console.log(upvote);
     return res.status(200).json({
       code: 200,
       status: "success",
       data: null,
     });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
+  } catch (errors) {
+    const { detail, status_code } = errors.error;
+    return res.status(status_code).json({
       status: "error",
-      data: error,
+      data: "",
+      message: detail,
     });
   }
 };
