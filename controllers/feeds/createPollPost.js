@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
     }
 
     const schema = {
-      topics: "array|empty:false",
+      // topics: "array|empty:false",
       message: "string",
       verb: "string|empty:false",
       feedGroup: "string|empty:false",
