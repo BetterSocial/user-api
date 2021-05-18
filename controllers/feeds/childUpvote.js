@@ -1,12 +1,12 @@
-const { commentChild } = require("../../services/getstream");
+const { childUpvote } = require("../../services/getstream");
 module.exports = async (req, res) => {
   try {
-    let { reaction_id, message } = req.body;
+    let { reaction_id } = req.body;
 
-    let result = await commentChild(reaction_id, message, req.token);
+    let result = await childUpvote(reaction_id, req.token);
     return res.status(200).json({
       code: 200,
-      status: "Success comment child",
+      status: "Success child upvote",
       data: result,
     });
   } catch (err) {

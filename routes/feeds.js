@@ -20,5 +20,8 @@ router.post("/comment-child", feed.commentChild);
 router.post("/like", feed.like);
 router.post("/delete-feed", feed.deleteFeed);
 router.get("/user", feed.getFeedUser);
+router.post("/child-upvote", feed.childUpvote);
+router.post("/child-downvote", feed.childDownvote);
+router.post("/update-reaction", feed.updateReaction);
 
 module.exports = router;
