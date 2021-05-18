@@ -16,6 +16,7 @@ const commentChild = require("./commentChild");
 const childUpvote = require("./childUpvote");
 const childDownvote = require("./childDownvote");
 const updateReaction = require("./updateReaction");
+const deleteReaction = require("./deleteReaction");
 
 module.exports = {
   createUser,
@@ -36,4 +37,5 @@ module.exports = {
   childUpvote,
   childDownvote,
   updateReaction,
+  deleteReaction,
 };
