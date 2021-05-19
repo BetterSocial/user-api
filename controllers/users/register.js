@@ -46,13 +46,8 @@ module.exports = async (req, res) => {
     follows: "string[]|empty:false",
     follow_source: "string|empty:false",
   };
-  let {
-    users,
-    local_community,
-    topics,
-    follows,
-    follow_source,
-  } = req.body.data;
+  let { users, local_community, topics, follows, follow_source } =
+    req.body.data;
   const validate = v.validate(req.body.data, schema);
   if (validate.length) {
     return res.status(403).json({
@@ -256,7 +251,7 @@ module.exports = async (req, res) => {
     };
     const payload = {
       user_id: userId,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
     };
     const refresh_token = await jwt.sign(
       payload,
