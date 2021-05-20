@@ -16,7 +16,7 @@ router.post("/follow-user", feed.followUser);
 router.post("/upvote", feed.upvote);
 router.post("/downvote", feed.downvote);
 router.post("/comment", feed.comment);
-router.post("/comment-child", feed.commentChild);
+router.post("/child-comment", feed.commentChild);
 router.post("/like", feed.like);
 router.post("/delete-feed", feed.deleteFeed);
 router.get("/user", feed.getFeedUser);
