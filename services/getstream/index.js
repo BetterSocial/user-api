@@ -13,6 +13,10 @@ const followTopic = require("./followTopic");
 const followLocation = require("./followLocation");
 const deleteFeed = require("./deleteFeed");
 const commentChild = require("./commentChild");
+const childUpvote = require("./childUpvote");
+const childDownvote = require("./childDownvote");
+const updateReaction = require("./updateReaction");
+const deleteReaction = require("./deleteReaction");
 
 module.exports = {
   createUser,
@@ -30,4 +34,8 @@ module.exports = {
   followLocation,
   deleteFeed,
   commentChild,
+  childUpvote,
+  childDownvote,
+  updateReaction,
+  deleteReaction,
 };

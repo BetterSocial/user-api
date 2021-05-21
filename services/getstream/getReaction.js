@@ -1,7 +1,12 @@
 const stream = require("getstream");
-module.exports = async (token, activityId) => {
-  const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
-  return client.reactions.filter({
-    activity_id: activityId,
-  });
+
+module.exports = async (reactionId, token) => {
+  // const clientUser = stream.connect(
+  //   process.env.API_KEY,
+  //   token,
+  //   process.env.APP_ID
+  // );
+  // return await clientUser.reactions.get(reactionId);
+  const client = stream.connect(process.env.API_KEY, process.env.SECRET);
+  return client.reactions.get(reactionId);
 };

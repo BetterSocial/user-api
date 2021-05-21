@@ -1,5 +1,6 @@
 const getstreamService = require("../../services/getstream");
 const jwt = require("jsonwebtoken");
+const { createRefreshToken } = require("../../services/jwt");
 
 module.exports = async (req, res) => {
   let userId = req.userId;
@@ -9,12 +10,7 @@ module.exports = async (req, res) => {
     algorithm: "HS256",
     noTimestamp: true,
   };
-  const payload = { user_id: userId };
-  const refresh_token = await jwt.sign(
-    payload,
-    process.env.SECRET_REFRESH_TOKEN,
-    opts
-  );
+  const refresh_token = await createRefreshToken(userId);
   return res.json({
     code: 200,
     message: "Success refresh token",
