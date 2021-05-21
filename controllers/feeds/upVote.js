@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
     return res.status(status_code).json({
       status: "error",
       data: "",
-      message: "",
+      message: detail,
     });
   }
 };
