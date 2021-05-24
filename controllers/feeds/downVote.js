@@ -5,6 +5,14 @@ module.exports = async (req, res) => {
     let { activity_id } = req.body;
     let userId = req.userId;
     let result = await getReaction(activity_id, req.token);
+    if (result === false) {
+      const downvote = await downVote(activity_id, req.token);
+      return res.status(200).json({
+        code: 200,
+        status: "success",
+        data: downvote,
+      });
+    }
     let status = false;
     if (result.user.id === userId) {
       status = true;
