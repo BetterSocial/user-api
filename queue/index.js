@@ -1,3 +1,3 @@
-module.exports = {
-  ...require('./newsQueue')
-}
+const { initNewsQueue } = require('./newsQueue')
+
+initNewsQueue()

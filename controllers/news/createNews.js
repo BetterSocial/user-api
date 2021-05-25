@@ -12,18 +12,17 @@ function testIfValidURL(str) {
 const createQueueNews = async (req, res) => {
   try {
     const { v4: uuidv4 } = require('uuid');
-    const { newsQueue } = require('../../queue');
+    const Queue = require('bull');
+    const newsQueue = new Queue('newsQueue', process.env.REDIS_URL);
     const options = {
-      delay: 60000, // 1 min in ms
-      attempts: 2,
       jobId: uuidv4()
     };
-    if (req.body.url) {
-      if(testIfValidURL(req.body.url)) {
+    if (req.body.message) {
+      if(testIfValidURL(req.body.message)) {
         const getJob = await newsQueue.add({ body: req.body }, options);
         return res.status(200).json({
           code: 200,
-          status: `succes create news ${getJob.id}`,
+          status: `success created news with job id : ${getJob.id}`,
           data: req.body,
         });
       } else {

@@ -1,9 +1,9 @@
 const newsJob = (job) => {
   try {
-    console.info('Quotation job is working! with id' + job.id);
+    console.info('news job is working! with id' + job.id);
     const axios = require('axios');
     const cheerio = require('cheerio');
-    axios.get(job.data.body.url).then(resp => {
+    axios.get(job.data.body.message).then(resp => {
       const domain_page_id = resp.request.host;
       const $ = cheerio.load(resp.data);
       const title = $("title").text();
@@ -17,7 +17,7 @@ const newsJob = (job) => {
       const data = {
         domain_page_id, title, site_name, image, description, url, keywords, author
       }
-      console.info(data)
+      
       return data
     });
   } catch (error) {
