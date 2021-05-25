@@ -1,24 +1,39 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('DomainPages', {
-      id: {
+    await queryInterface.createTable('news_link', {
+      news_link_id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
+      },
+      news_url: {
+        type: Sequelize.TEXT
       },
       domain_page_id: {
+        type: Sequelize.BIGINT
+      },
+      site_name: {
         type: Sequelize.STRING
       },
-      domain_name: {
+      title: {
         type: Sequelize.STRING
       },
-      logo: {
+      image: {
         type: Sequelize.STRING
       },
-      short_description: {
+      description: {
         type: Sequelize.TEXT
+      },
+      url: {
+        type: Sequelize.TEXT
+      },
+      keyword: {
+        type: Sequelize.STRING
+      },
+      author: {
+        type: Sequelize.STRING
       },
       created_at: {
         allowNull: false,
@@ -31,6 +46,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('DomainPages');
+    await queryInterface.dropTable('news_link');
   }
 };

@@ -21,12 +21,14 @@ module.exports = (sequelize, DataTypes) => {
       domain_name: { type: DataTypes.STRING },
       logo: DataTypes.STRING,
       short_description: DataTypes.TEXT,
+      created_at: DataTypes.DATE,
+      updated_at: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "DomainPage",
       tableName: "domain_page",
-      timestamps: true,
+      timestamps: false,
     }
   );
   return DomainPage;
