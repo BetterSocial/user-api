@@ -5,6 +5,14 @@ module.exports = async (req, res) => {
     let { activity_id } = req.body;
     let userId = req.userId;
     let result = await getReaction(activity_id, req.token);
+    if (result === false) {
+      const data = await upVote(activity_id, req.token);
+      return res.status(200).json({
+        code: 200,
+        status: "success",
+        data: data,
+      });
+    }
     let status = false;
     if (result.user.id === userId) {
       status = true;
@@ -24,6 +32,7 @@ module.exports = async (req, res) => {
         data: data,
       });
     }
+    return res.status(200).json({ text: "sts" });
     // console.log(upvote);
   } catch (errors) {
     const { detail, status_code } = errors.error;
