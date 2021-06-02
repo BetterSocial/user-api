@@ -2,7 +2,6 @@ const { childDownvote } = require("../../services/getstream");
 module.exports = async (req, res) => {
   try {
     let { reaction_id } = req.body;
-
     let result = await childDownvote(reaction_id, req.token);
     return res.status(200).json({
       code: 200,

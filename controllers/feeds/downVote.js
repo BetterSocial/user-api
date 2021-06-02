@@ -1,4 +1,4 @@
-const { downVote } = require("../../services/getstream");
+const { downVote, getReaction } = require("../../services/getstream");
 
 module.exports = async (req, res) => {
   try {
@@ -33,11 +33,12 @@ module.exports = async (req, res) => {
       });
     }
   } catch (errors) {
+    console.log(errors);
     const { detail, status_code } = errors.error;
-    return res.status(status_code).json({
+    return res.status(500).json({
       status: "error",
       data: "",
-      message: detail,
+      message: "Internal Server Error",
     });
   }
 };

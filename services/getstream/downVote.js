@@ -6,7 +6,11 @@ module.exports = async (activityId, token) => {
     token,
     process.env.APP_ID
   );
-  return await clientUser.reactions.add("downvotes", activityId, {
-    count_downvote: 1,
-  });
+  return await clientUser.reactions.add(
+    "downvotes",
+    { id: activityId },
+    {
+      count_upvote: 1,
+    }
+  );
 };
