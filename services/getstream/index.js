@@ -17,8 +17,10 @@ const childUpvote = require("./childUpvote");
 const childDownvote = require("./childDownvote");
 const updateReaction = require("./updateReaction");
 const deleteReaction = require("./deleteReaction");
+const getDomain = require("./getDomain");
 
 module.exports = {
+  getDomain,
   createUser,
   createToken,
   createPost,
