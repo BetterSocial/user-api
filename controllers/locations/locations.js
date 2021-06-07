@@ -38,38 +38,22 @@ module.exports = async (req, res) => {
         [Op.or]: [
           {
             neighborhood: {
-<<<<<<< HEAD
               [Op.iLike]: `%${name}%`,
-=======
-              [Op.like]: `%${name}%`,
->>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
           {
             city: {
-<<<<<<< HEAD
               [Op.iLike]: `%${name}%`,
-=======
-              [Op.like]: `%${name}%`,
->>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
           {
             state: {
-<<<<<<< HEAD
               [Op.iLike]: `%${stringToCapitalize.toUpperCase()}%`,
-=======
-              [Op.like]: `%${stringToCapitalize.toUpperCase()}%`,
->>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
           {
             country: {
-<<<<<<< HEAD
               [Op.iLike]: `%${name}%`,
-=======
-              [Op.like]: `%${name}%`,
->>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
         ],
