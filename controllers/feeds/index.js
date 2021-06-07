@@ -11,6 +11,7 @@ const createPollPost = require("./createPollPost");
 const deleteFeed = require("./deleteFeed");
 const getFeedUser = require("./getFeedUser");
 const commentChild = require("./commentChild");
+const inputPoll = require("./inputPoll")
 
 module.exports = {
   createPost,
@@ -26,4 +27,5 @@ module.exports = {
   getFeedUser,
   downvote,
   commentChild,
+  inputPoll
 };
