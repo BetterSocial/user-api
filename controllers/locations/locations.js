@@ -36,20 +36,26 @@ module.exports = async (req, res) => {
         [Op.or]: [
           {
             neighborhood: {
-              [Op.like]: `%${stringToCapitalize}%`,
+              [Op.iLike]: `%${name}%`,
             },
           },
           {
-            neighborhood: {
-              [Op.like]: `%${name}%`,
+            city: {
+              [Op.iLike]: `%${name}%`,
             },
           },
           {
-            neighborhood: {
-              [Op.like]: `%${stringToLowerCase.toLowerCase()}%`,
+            state: {
+              [Op.iLike]: `%${stringToCapitalize.toUpperCase()}%`,
+            },
+          },
+          {
+            country: {
+              [Op.iLike]: `%${name}%`,
             },
           },
         ],
+        status: "Y",
       },
     })
       .then((list) => {
