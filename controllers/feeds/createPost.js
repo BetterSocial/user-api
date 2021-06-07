@@ -1,13 +1,24 @@
 const getstreamService = require("../../services/getstream");
+const { User } = require("../../databases/models");
 
 const Validator = require("fastest-validator");
 const v = new Validator();
 
 const cloudinary = require("cloudinary");
+const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
+const { POST_TYPE_STANDARD } = require("../../helpers/constants");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
 }
+
+const getUserDetail = async (userId) => {
+  try {
+    return await User.findByPk(userId);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 module.exports = async (req, res) => {
   try {
@@ -22,20 +33,19 @@ module.exports = async (req, res) => {
     }
 
     const schema = {
-      topics: "array|empty:false",
+      // topics: "array|empty:false",
       message: "string|empty:false",
       verb: "string|empty:false",
       feedGroup: "string|empty:false",
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
-      duration_feed: "number|empty:false",
+      duration_feed: "string|empty:false",
       images_url: "array",
     };
 
     const validate = v.validate(req.body, schema);
     if (validate.length) {
-      console.log(validate);
       return res.status(400).json({
         code: 400,
         status: "error",
@@ -55,7 +65,10 @@ module.exports = async (req, res) => {
       images_url,
     } = req.body;
 
+    let userDetail = await getUserDetail(req.userId);
+
     let expiredAt = null;
+    let TO = [];
 
     let resUrl;
     if (images_url) {
@@ -72,7 +85,6 @@ module.exports = async (req, res) => {
             );
             return returnCloudinary.url;
           } catch (error) {
-            console.log("error upload gambar");
             return res.status(500).json({
               code: 500,
               status: "error",
@@ -85,13 +97,32 @@ module.exports = async (req, res) => {
     if (duration_feed !== "never") {
       let date = new Date();
       date = addDays(date, duration_feed);
-      expiredAt = date.toISOString();
+      // 2021-04-20T09:02:15.000Z
+      let utc = new Date(date.toUTCString());
+      expiredAt = utc.toISOString();
+    }
+
+    TO.push("location:everywhare");
+    TO.push("user:" + req.userId);
+    if (topics !== null) {
+      topics.map((value) => {
+        TO.push("topic:" + value);
+      });
+    }
+
+    if (location !== null) {
+      let loc = formatLocationGetStream(location);
+      TO.push("location:" + loc);
     }
 
     let object = {
       verb: verb,
       message: message,
       topics: topics,
+      feed_group: feedGroup,
+      username: userDetail.username,
+      profile_pic_path: userDetail.profile_pic_path,
+      real_name: userDetail.real_name,
     };
 
     let data = {
@@ -107,7 +138,10 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
+      post_type: POST_TYPE_STANDARD,
+      to: TO,
     };
+
     getstreamService
       .createPost(token, feedGroup, data)
       .then(() => {

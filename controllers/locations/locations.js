@@ -18,10 +18,12 @@ module.exports = async (req, res) => {
 
     // check if name using string
     if (typeof name === "string") {
-      stringToCapitalize = name
-        .trim()
-        .toLowerCase()
-        .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
+      // stringToCapitalize = name
+      //   .trim()
+      //   .toLowerCase()
+      //   .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
+      // stringToLowerCase = name;
+      stringToCapitalize = name;
       stringToLowerCase = name;
     } else {
       return res.status(404).json({
@@ -36,22 +38,38 @@ module.exports = async (req, res) => {
         [Op.or]: [
           {
             neighborhood: {
+<<<<<<< HEAD
               [Op.iLike]: `%${name}%`,
+=======
+              [Op.like]: `%${name}%`,
+>>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
           {
             city: {
+<<<<<<< HEAD
               [Op.iLike]: `%${name}%`,
+=======
+              [Op.like]: `%${name}%`,
+>>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
           {
             state: {
+<<<<<<< HEAD
               [Op.iLike]: `%${stringToCapitalize.toUpperCase()}%`,
+=======
+              [Op.like]: `%${stringToCapitalize.toUpperCase()}%`,
+>>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
           {
             country: {
+<<<<<<< HEAD
               [Op.iLike]: `%${name}%`,
+=======
+              [Op.like]: `%${name}%`,
+>>>>>>> 268205c6864fec813f07eae1ac9819ac631d4227
             },
           },
         ],

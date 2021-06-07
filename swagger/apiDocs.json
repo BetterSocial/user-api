@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
+      "url": "http://localhost:8000"
     },
     {
       "url": "https://bettersocial-dev-user-api.herokuapp.com"
@@ -26,10 +26,21 @@
     {
       "name": "Profiles",
       "description": "Profiles"
+    },
+    {
+      "name": "Users",
+      "description": "Users"
     }
   ],
   "consumes": ["application/json"],
   "produces": ["application/json"],
+  "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
   "paths": {
     "/topics/list": {
       "get": {
@@ -360,6 +371,96 @@
             "schema": {
               "$ref": "#/definitions/Locations"
             }
+          }
+        }
+      }
+    },
+    "/users/blockuser":{
+      "post":{
+         "security":{
+           "Bearer": []
+         },
+        "tags":["Users"],
+        "description": "Blocking user",
+        "summary": "Blocking user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "example": "288d5679-6c68-41ec-be83-7f15a4e82d3d"
+                  },
+                  "postId": {
+                    "type": "string",
+                    "example": "288d5679-6c68-41ec-be83-7f15a4e82d3d"
+                  },
+                  "reason":{
+                    "type":"array",
+                    "example":["It’s spreading fake news","It’s phishing"]
+                  },
+                  "message":{
+                    "type":"string",
+                    "example":"Violence/threats against humans or animals"
+                  },
+                  "source":{
+                    "type":"string",
+                    "example":"screen_post_detail"
+                  }
+                }
+              }
+            }
+          }
+        },
+         "responses": {
+          "200": {
+            "description": "the user is already blocked"
+          }
+        }
+      }
+    },
+    "/users/block-domain":{
+      "post":{
+         "security":{
+           "Bearer": []
+         },
+        "tags":["Users"],
+        "description": "Blocking user",
+        "summary": "Blocking user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "domainId": {
+                    "type": "string",
+                    "example": "288d5679-6c68-41ec-be83-7f15a4e82d3d"
+                  },
+                  "reason":{
+                    "type":"array",
+                    "example":["It’s spreading fake news","It’s phishing"]
+                  },
+                  "message":{
+                    "type":"string",
+                    "example":"Violence/threats against humans or animals"
+                  },
+                  "source":{
+                    "type":"string",
+                    "example":"screen_post_detail"
+                  }
+                }
+              }
+            }
+          }
+        },
+         "responses": {
+          "200": {
+            "description": "the user is already blocked"
           }
         }
       }

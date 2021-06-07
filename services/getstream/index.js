@@ -9,8 +9,18 @@ const upVote = require("./upVote");
 const downVote = require("./downVote");
 const comment = require("./comment");
 const like = require("./like");
+const followTopic = require("./followTopic");
+const followLocation = require("./followLocation");
+const deleteFeed = require("./deleteFeed");
+const commentChild = require("./commentChild");
+const childUpvote = require("./childUpvote");
+const childDownvote = require("./childDownvote");
+const updateReaction = require("./updateReaction");
+const deleteReaction = require("./deleteReaction");
+const getDomain = require("./getDomain");
 
 module.exports = {
+  getDomain,
   createUser,
   createToken,
   createPost,
@@ -22,4 +32,12 @@ module.exports = {
   downVote,
   comment,
   like,
+  followTopic,
+  followLocation,
+  deleteFeed,
+  commentChild,
+  childUpvote,
+  childDownvote,
+  updateReaction,
+  deleteReaction,
 };

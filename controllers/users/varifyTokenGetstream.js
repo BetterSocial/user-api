@@ -4,7 +4,6 @@ module.exports = async (req, res) => {
       code: 200,
       data: true,
       message: "",
-      token: req.token,
     });
   } catch (error) {
     return res.status(500).json({

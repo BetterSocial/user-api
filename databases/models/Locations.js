@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      models.Locations.belongsToMany(models.User, { through: 'user_location', foreignKey: 'location_id' ,  as: 'users'});
+      models.Locations.belongsToMany(models.User, {
+        through: "user_location",
+        foreignKey: "location_id",
+        as: "users",
+      });
     }
   }
   Locations.init(
@@ -33,13 +37,13 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: {
         type: DataTypes.DATE,
         field: "updated_at",
-      }
+      },
     },
     {
       sequelize,
       modelName: "Locations",
       tableName: "location",
-      underscored: true
+      underscored: true,
     }
   );
   return Locations;

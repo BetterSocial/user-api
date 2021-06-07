@@ -1,5 +1,11 @@
-const { User, UserFollowUser } = require("../../databases/models");
-const checkMoreOrLess = require('../../helpers/checkMoreOrLess').checkMoreOrLess;
+const {
+  User,
+  UserFollowUser,
+  UserLocation,
+  Locations,
+} = require("../../databases/models");
+const checkMoreOrLess = require("../../helpers/checkMoreOrLess")
+  .checkMoreOrLess;
 module.exports = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id, {
@@ -11,6 +17,14 @@ module.exports = async (req, res) => {
         {
           model: UserFollowUser,
           as: "follower",
+        },
+        // {
+        //   model: UserLocation,
+        //   as: "user_locations",
+        // },
+        {
+          model: Locations,
+          as: "locations",
         },
       ],
     });
@@ -26,9 +40,13 @@ module.exports = async (req, res) => {
       delete copyUser.follower;
 
       copyUser.following = user.dataValues.following.length;
-      copyUser.following_symbol = checkMoreOrLess(user.dataValues.following.length)
+      copyUser.following_symbol = checkMoreOrLess(
+        user.dataValues.following.length
+      );
       copyUser.follower = user.dataValues.follower.length;
-      copyUser.follower_symbol = checkMoreOrLess(user.dataValues.follower.length)
+      copyUser.follower_symbol = checkMoreOrLess(
+        user.dataValues.follower.length
+      );
 
       return res.json({
         status: "success",
@@ -37,11 +55,11 @@ module.exports = async (req, res) => {
       });
     }
   } catch (error) {
-    const { status, data } = error.response;
+    // const { status, data } = error.response;
     return res.status(500).json({
-      code: status,
+      code: 500,
       status: "error",
-      message: data,
+      message: error,
     });
   }
 };
