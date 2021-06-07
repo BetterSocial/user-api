@@ -5,11 +5,13 @@ const {
 } = require("../../helpers/constants");
 const { PollingOption } = require("../../databases/models");
 const { Op } = require("sequelize");
+const { getListBlockUser } = require("../../services/blockUser");
 
 module.exports = async (req, res) => {
   try {
     const token = req.token;
-    console.log(req.query.id_lt);
+    const listBlockUser = await getListBlockUser(req.userId);
+    return res.json(listBlockUser);
 
     getstreamService
       .getFeeds(token, "main_feed", {
