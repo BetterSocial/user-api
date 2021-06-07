@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
     let { activity_id } = req.body;
     let result = await validationReaction(activity_id, "downvotes", req.token);
     if (result === true) {
-      const data = await upVote(activity_id, req.token);
+      const data = await downVote(activity_id, req.token);
       return res.status(200).json({
         code: 200,
         status: "success",
