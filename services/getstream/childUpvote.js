@@ -1,14 +1,14 @@
 const stream = require("getstream");
 
-module.exports = async (activityId, token) => {
+module.exports = async (reactionId, token) => {
   const clientUser = stream.connect(
     process.env.API_KEY,
     token,
     process.env.APP_ID
   );
-  return await clientUser.reactions.add(
+  return await clientUser.reactions.addChild(
     "upvotes",
-    { id: activityId },
+    { id: reactionId },
     {
       count_upvote: 1,
     }

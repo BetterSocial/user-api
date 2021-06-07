@@ -1,12 +1,12 @@
-const { commentChild } = require("../../services/getstream");
+const { updateReaction } = require("../../services/getstream");
 module.exports = async (req, res) => {
   try {
     let { reaction_id, message } = req.body;
 
-    let result = await commentChild(reaction_id, message, req.token);
+    let result = await updateReaction(reaction_id, message, req.token);
     return res.status(200).json({
       code: 200,
-      status: "Success comment child",
+      status: "Success update reaction",
       data: result,
     });
   } catch (err) {

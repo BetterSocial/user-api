@@ -17,6 +17,7 @@ const profilesRouter = require("./routes/profiles");
 const indexRouter = require("./routes/index");
 const verifyToken = require("./middlewares/verifyToken");
 const feedRouter = require("./routes/feeds");
+const domainRouter = require("./routes/domain");
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use("/api/v1/location", locationsRouter);
 app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
 app.use("/api/v1/feeds", feedRouter);
+app.use("/api/v1/domain", domainRouter);
 
 var options = {
   swaggerOptions: {

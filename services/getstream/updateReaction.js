@@ -6,13 +6,9 @@ module.exports = async (reactionId, message, token) => {
     token,
     process.env.APP_ID
   );
-  return await clientUser.reactions.addChild(
-    "comment",
-    { id: reactionId },
-    {
-      text: message,
-      count_upvote: 0,
-      count_downvote: 0,
-    }
-  );
+  return await clientUser.reactions.update(reactionId, {
+    count_downvote: 0,
+    count_upvote: 0,
+    text: message,
+  });
 };
