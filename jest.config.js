@@ -4,7 +4,7 @@
 const config = {
   verbose: true,
   setupFilesAfterEnv: [
-    "<rootDir>/__mocks__/getstream.js"
+    "<rootDir>/__mocks__/getstream-ori.js"
   ],
 };
 

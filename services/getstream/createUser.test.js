@@ -1,18 +1,18 @@
 
-jest.mock('getstream');
+jest.mock('createUser');
 
 const createUser = require('./createUser');
 
 
 test('createUser works well', async () => {
   const data = {
-    name: "Kevin"
+    name: "User"
   };
   const userId = "123";
   await createUser(data, userId);
 
   const dataError = {
-    name: "Kevinoo"
+    name: "U"
   };
   await createUser(dataError, userId);
 });
