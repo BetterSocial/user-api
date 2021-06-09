@@ -1,12 +1,25 @@
 const { UserBlockedUser } = require("../../databases/models");
+const { getValue, setValue } = require("../redis");
 module.exports = async (userId) => {
-  // ambil semua list data user yang di block dari server
-  // kembalikan semua data
-  console.log(userId);
-  return await UserBlockedUser.findAll({
-    attributes: ["user_id_blocked"],
-    where: {
-      user_id_blocker: userId,
-    },
-  });
+  try {
+    let cache = await getValue(userId);
+    console.log(cache);
+    if (cache === null || cache === false) {
+      console.log("from database");
+      let blockUser = await UserBlockedUser.findAll({
+        attributes: ["user_id_blocked"],
+        where: {
+          user_id_blocker: userId,
+        },
+      });
+      let userBlock = await JSON.stringify(blockUser);
+      await setValue(userId, userBlock);
+      return blockUser;
+    } else {
+      console.log("from cache");
+      return await JSON.parse(cache);
+    }
+  } catch (error) {
+    throw error;
+  }
 };

@@ -7,6 +7,8 @@ const { PollingOption } = require("../../databases/models");
 const { Op } = require("sequelize");
 const { getListBlockUser } = require("../../services/blockUser");
 const lodash = require("lodash");
+const { setData, getValue } = require("../../services/redis");
+const redis = require("redis");
 
 module.exports = async (req, res) => {
   try {
@@ -73,8 +75,9 @@ module.exports = async (req, res) => {
         });
       });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
-      code: status,
+      code: 500,
       data: null,
       message: "Internal server error",
       error: error,
