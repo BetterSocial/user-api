@@ -1,6 +1,6 @@
 const POST_TYPE_STANDARD = 0;
 const POST_TYPE_POLL = 1;
-const POST_TYPE_LINK = 1;
+const POST_TYPE_LINK = 2;
 
 const POST_VERB_POLL = "poll";
 

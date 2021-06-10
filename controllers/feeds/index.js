@@ -15,6 +15,7 @@ const childDownvote = require("./childDownvote");
 const childUpvote = require("./childUpvote");
 const updateReaction = require("./updateReaction");
 const deleteReaction = require("./deleteReaction");
+const { putMainFeed } = require("./updateActivity");
 
 module.exports = {
   createPost,
@@ -34,4 +35,5 @@ module.exports = {
   childUpvote,
   updateReaction,
   deleteReaction,
+  putMainFeed,
 };

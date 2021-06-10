@@ -20,6 +20,7 @@ const deleteReaction = require("./deleteReaction");
 const validationReaction = require("./ValidationReaction");
 const getDomain = require("./getDomain");
 const getDetailDomain = require("./getDetailDomain");
+const updateActivity = require("./updateActivity");
 
 module.exports = {
   getDetailDomain,
@@ -44,4 +45,5 @@ module.exports = {
   updateReaction,
   deleteReaction,
   validationReaction,
+  updateActivity,
 };
