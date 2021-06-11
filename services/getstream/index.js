@@ -9,7 +9,7 @@ const upVote = require("./upVote");
 const downVote = require("./downVote");
 const comment = require("./comment");
 const like = require("./like");
-const followTopic = require("./followTopic");
+const { followTopic, followTopics } = require("./followTopic");
 const followLocation = require("./followLocation");
 const deleteFeed = require("./deleteFeed");
 const commentChild = require("./commentChild");
@@ -36,6 +36,7 @@ module.exports = {
   comment,
   like,
   followTopic,
+  followTopics,
   followLocation,
   deleteFeed,
   commentChild,
