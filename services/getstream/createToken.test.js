@@ -5,14 +5,14 @@ const createToken = require('./createToken');
 
 
 test('create Token works well', async () => {
-    const data = {
-        name: "Kevin"
-    };
-    const userId = "123";
+    const userId = "d24f6c17-f20e-4cc9-8df1-45f1fa4dcf52";
     await createToken(userId);
 
-    // const dataError = {
-    //     name: "Kev"
-    // };
-    // await createUser(dataError, userId);
 });
+
+//uncomment to display failed Test
+// test('create Token failed - different sample Id', async () => {
+//     const userId = "d24f6c17";
+//     await createToken(userId);
+//
+// });

@@ -3,23 +3,6 @@
 const path = require('path');
 const getstream = jest.createMockFromModule('getstream');
 
-// function __connect(apiKey, token, apiSecret) {
-//     return {
-//         //createReaction
-//         reactions: {
-//             // ret {
-//             add: function (kind, activityId, message) {
-//                 console.log(kind);
-//                 console.log(activityId);
-//                 console.log(message);
-//
-//
-//                 return message;
-//             }
-//             // }
-//         }
-//     }
-// };
 
 function __connect (apiKey, apiSecret) {
     return {
@@ -103,6 +86,7 @@ function __connect (apiKey, apiSecret) {
 
             //updateReaction
             update: function (reactionId, data){
+                console.log(reactionId);
                 expect(reactionId).toBe("0676b81f-164a-4bea-899f-a286b4190af8",);
                 expect(data.text).toBe("message is here");
                 expect(data.count_upvote).toBe(0);
@@ -119,10 +103,21 @@ function __connect (apiKey, apiSecret) {
 
         },
 
-        //deleteFeed
+        //deleteFeed    //getfeed   //followLocation
         feed: function(feedGroup, userId, token){
-            expect(feedGroup).toBe("example_feed");
-            expect(token).toBe("XRT0XKwzedFMVzUZkcuJROk9Le3VGVj0");
+
+            //followLocation
+            if(feedGroup === "main_feed") {
+
+                expect(feedGroup).toBe("main_feed");
+                expect(token).toBe("Bi9jNv9TCv11TfjkbUz37I75zea2VFue");
+
+            } else {        //delete_feed, getfeed
+
+                expect(feedGroup).toBe("example_feed");
+                expect(token).toBe("XRT0XKwzedFMVzUZkcuJROk9Le3VGVj0");
+
+            }
 
           return {
               //deleteFeed
@@ -133,6 +128,34 @@ function __connect (apiKey, apiSecret) {
               //getFeed
               get: function (query){
                   expect(query).toBe("select_*_from_table");
+              },
+
+              //followLocation || followUser || followTopic
+              follow: function (targetSlug, id){
+                  //followLocation
+                  if( targetSlug === "location" ){
+                      expect(targetSlug).toBe("location");
+                      expect(id).toBe("90245907-f687-44af-b6bf-543701508840");
+                  }
+
+                  //followUser  --follow
+                  if( targetSlug === "follow-user" ){
+                      expect(targetSlug).toBe("follow-user");
+                      expect(id).toBe("90245907-f687-44af-b6bf-543701508840");
+                  }
+
+                  //followTopic
+                  if( targetSlug === "topic" ){
+                      expect(targetSlug).toBe("topic");
+                      expect(id).toBe("90245907-f687-44af-b6bf-543701508840");
+                  }
+
+              },
+
+              //followUser  --unfollow
+              unfollow: function (feedGroup, id){
+                  expect(feedGroup).toBe("unfollow-user");
+                  expect(id).toBe("90245907-f687-44af-b6bf-543701508840");
               }
 
           }
@@ -149,7 +172,13 @@ function __connect (apiKey, apiSecret) {
                     }
                 }
             }
-        }
+        },
+
+        //followLocation  &  followUser
+        followMany: function (follows){
+          console.log("follows")
+          console.log(follows)
+        },
 
     };
 
