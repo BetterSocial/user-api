@@ -9,8 +9,8 @@ module.exports = async (reactionId, token) => {
     );
     return await clientUser.reactions.get(reactionId);
   } catch (e) {
-    console.log(e);
-    return false;
+      console.log(e);
+      return false;
   }
   // try {
   //   const client = stream.connect(process.env.API_KEY, process.env.SECRET);
