@@ -1,44 +1,34 @@
-const { downVote, getReaction } = require("../../services/getstream");
+const {
+  downVote,
+  getReaction,
+  validationReaction,
+} = require("../../services/getstream");
 
 module.exports = async (req, res) => {
   try {
     let { activity_id } = req.body;
-    let userId = req.userId;
-    let result = await getReaction(activity_id, req.token);
-    if (result === false) {
-      const downvote = await downVote(activity_id, req.token);
+    let result = await validationReaction(activity_id, "downvotes", req.token);
+    if (result === true) {
+      const data = await downVote(activity_id, req.token);
       return res.status(200).json({
         code: 200,
         status: "success",
-        data: downvote,
+        data: data,
       });
-    }
-    let status = false;
-    if (result.user.id === userId) {
-      status = true;
-    }
-    if (status) {
+    } else {
       return res.status(400).json({
         code: 400,
         status: "failed",
         data: null,
-        message: "anda sudah melakukan downvote",
-      });
-    } else {
-      const downvote = await downVote(activity_id, req.token);
-      return res.status(200).json({
-        code: 200,
-        status: "success",
-        data: downvote,
+        message: "anda sudah melakukan downvotes",
       });
     }
   } catch (errors) {
-    console.log(errors);
     const { detail, status_code } = errors.error;
-    return res.status(500).json({
+    return res.status(status_code).json({
       status: "error",
       data: "",
-      message: "Internal Server Error",
+      message: detail,
     });
   }
 };

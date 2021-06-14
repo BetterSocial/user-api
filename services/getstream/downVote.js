@@ -10,7 +10,7 @@ module.exports = async (activityId, token) => {
     "downvotes",
     { id: activityId },
     {
-      count_upvote: 1,
+      count_downvote: 1,
     }
   );
 };
