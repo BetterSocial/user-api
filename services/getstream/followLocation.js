@@ -1,5 +1,5 @@
 const stream = require("getstream");
-exports.followLocation = async (token, userId) => {
+const followLocation = async (token, userId) => {
   let id = userId.toLowerCase();
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
   const user = client.feed("main_feed", client.userId, token);
@@ -13,7 +13,7 @@ const changeValue = (item) => {
   return item;
 };
 
-exports.followLocations = async (token, locations) => {
+const followLocations = async (token, locations) => {
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
   const clientServer = stream.connect(process.env.API_KEY, process.env.SECRET);
   const follows = [];
@@ -70,4 +70,9 @@ exports.followLocations = async (token, locations) => {
       : null;
   });
   return await clientServer.followMany(follows);
+};
+
+module.exports = {
+  followLocation,
+  followLocations,
 };
