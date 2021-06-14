@@ -21,6 +21,14 @@ module.exports = (sequelize, DataTypes) => {
       domain_name: { type: DataTypes.STRING },
       logo: DataTypes.STRING,
       short_description: DataTypes.TEXT,
+      createdAt: {
+        type: DataTypes.DATE,
+        field: "created_at",
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        field: "updated_at",
+      },
     },
     {
       sequelize,
