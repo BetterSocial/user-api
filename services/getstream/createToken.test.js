@@ -9,10 +9,3 @@ test('create Token works well', async () => {
     await createToken(userId);
 
 });
-
-//uncomment to display failed Test
-// test('create Token failed - different sample Id', async () => {
-//     const userId = "d24f6c17";
-//     await createToken(userId);
-//
-// });

@@ -86,7 +86,6 @@ function __connect (apiKey, apiSecret) {
 
             //updateReaction
             update: function (reactionId, data){
-                console.log(reactionId);
                 expect(reactionId).toBe("0676b81f-164a-4bea-899f-a286b4190af8",);
                 expect(data.text).toBe("message is here");
                 expect(data.count_upvote).toBe(0);
@@ -103,20 +102,25 @@ function __connect (apiKey, apiSecret) {
 
         },
 
-        //deleteFeed    //getfeed   //followLocation
+        //deleteFeed  ||  getfeed  ||  followLocation  || cretePost
         feed: function(feedGroup, userId, token){
 
             //followLocation
             if(feedGroup === "main_feed") {
-
                 expect(feedGroup).toBe("main_feed");
                 expect(token).toBe("Bi9jNv9TCv11TfjkbUz37I75zea2VFue");
+            }
 
-            } else {        //delete_feed, getfeed
+            //createPost
+            else if (feedGroup === "create-post") {
+                expect(feedGroup).toBe("create-post");
+                expect(token).toBe("G5ZwsYk6HZJMey2zCmDBetEBVOb8Ap1G");
+            }
 
+            //delete_feed, getfeed
+            else {
                 expect(feedGroup).toBe("example_feed");
                 expect(token).toBe("XRT0XKwzedFMVzUZkcuJROk9Le3VGVj0");
-
             }
 
           return {
@@ -156,12 +160,18 @@ function __connect (apiKey, apiSecret) {
               unfollow: function (feedGroup, id){
                   expect(feedGroup).toBe("unfollow-user");
                   expect(id).toBe("90245907-f687-44af-b6bf-543701508840");
+              },
+
+              //createPost
+              addActivity:function (data){
+                  expect(data).toHaveProperty('foreign_id');
+                  expect(data).toHaveProperty('actor');
               }
 
           }
         },
 
-        //createUser
+        //createUser  ||  createPost
         user: function(userId){
             return {
                 create: function(data){
@@ -170,14 +180,22 @@ function __connect (apiKey, apiSecret) {
                     } else {
                         return Promise.reject(); // catch
                     }
+                },
+
+                //createPost
+                ref: function (){
+
                 }
             }
         },
 
-        //followLocation  &  followUser
+        //followLocation  ||  followUser
         followMany: function (follows){
-          console.log("follows")
-          console.log(follows)
+            follows.map((item) => {
+                expect(item).toHaveProperty('source');
+                expect(item).toHaveProperty('target');
+            })
+
         },
 
     };

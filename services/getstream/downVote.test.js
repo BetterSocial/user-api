@@ -1,6 +1,4 @@
 
-// jest.mock('downVote');
-
 const downVote = require('./downVote');
 
 
