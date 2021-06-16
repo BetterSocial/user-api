@@ -1,5 +1,4 @@
 const redis = require("redis");
-const { connectClient } = require("./connect");
 const util = require("util");
 
 module.exports = async (key) => {

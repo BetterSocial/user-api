@@ -25,7 +25,6 @@ module.exports = async (req, res) => {
       .then(async (result) => {
         let data = [];
         let feeds = result.results;
-        console.log(feeds);
         let yFilter = listBlockUser.map((itemY) => {
           return itemY.user_id_blocked;
         });
