@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
       .then(async (result) => {
         let data = [];
         let feeds = result.results;
+        console.log(feeds);
         let yFilter = listBlockUser.map((itemY) => {
           return itemY.user_id_blocked;
         });
@@ -39,12 +40,11 @@ module.exports = async (req, res) => {
         }, []);
 
         // Change to conventional loop because map cannot handle await
-
         for (let i = 0; i < newArr.length; i++) {
           let item = newArr[i];
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
-          if (now < dateExpired) {
+          if (now < dateExpired || item.duration_feed == "never") {
             if (item.verb === POST_VERB_POLL) {
               let newItem = { ...item };
               let pollOptions = await PollingOption.findAll({
