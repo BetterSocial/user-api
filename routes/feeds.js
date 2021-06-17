@@ -25,5 +25,6 @@ router.post("/child-downvote", feed.childDownvote);
 router.post("/update-reaction", feed.updateReaction);
 router.post("/delete-reaction", feed.deleteReaction);
 router.post("/update-activity", feed.putMainFeed);
+router.get("/detail-feed", feed.detailFeed);
 
 module.exports = router;
