@@ -2,7 +2,7 @@ const createUser = require("./createUser");
 const createToken = require("./createToken");
 const createPost = require("./createPost");
 const getFeeds = require("./getFeeds");
-const followUser = require("./followUser");
+const { followUser, followUsers } = require("./followUser");
 const createReaction = require("./createReaction");
 const getReaction = require("./getReaction");
 const upVote = require("./upVote");
@@ -10,7 +10,7 @@ const downVote = require("./downVote");
 const comment = require("./comment");
 const like = require("./like");
 const { followTopic, followTopics } = require("./followTopic");
-const followLocation = require("./followLocation");
+const { followLocation, followLocations } = require("./followLocation");
 const deleteFeed = require("./deleteFeed");
 const commentChild = require("./commentChild");
 const childUpvote = require("./childUpvote");
@@ -30,6 +30,7 @@ module.exports = {
   createPost,
   getFeeds,
   followUser,
+  followUsers,
   createReaction,
   getReaction,
   upVote,
@@ -39,6 +40,7 @@ module.exports = {
   followTopic,
   followTopics,
   followLocation,
+  followLocations,
   deleteFeed,
   commentChild,
   childUpvote,
