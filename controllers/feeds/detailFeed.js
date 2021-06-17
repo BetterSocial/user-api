@@ -1,6 +1,5 @@
 const axios = require("axios");
 module.exports = async (req, res) => {
-  let locationServer = process.env.LOCATION_SERVER;
   let api_key = process.env.API_KEY;
   let id = req.query.id;
   const config = {
