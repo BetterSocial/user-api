@@ -25,6 +25,7 @@
     "notenv": "^2.0.3",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
+    "redis": "^3.1.2",
     "sequelize": "^6.5.1",
     "sequelize-cli": "^6.2.0",
     "swagger-ui-express": "^4.1.6",
