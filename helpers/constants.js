@@ -6,9 +6,12 @@ const POST_VERB_POLL = "poll";
 
 const MAX_FEED_FETCH_LIMIT = 10;
 
+const REDIS_TTL = 86400;
+
 module.exports = {
   POST_TYPE_STANDARD,
   POST_TYPE_POLL,
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
+  REDIS_TTL,
 };
