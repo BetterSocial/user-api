@@ -5,11 +5,15 @@ const {
 } = require("../../helpers/constants");
 const { PollingOption } = require("../../databases/models");
 const { Op } = require("sequelize");
+const { getListBlockUser } = require("../../services/blockUser");
+const lodash = require("lodash");
+const { setData, getValue } = require("../../services/redis");
+const redis = require("redis");
 
 module.exports = async (req, res) => {
   try {
     const token = req.token;
-    console.log(req.query.id_lt);
+    const listBlockUser = await getListBlockUser(req.userId);
 
     getstreamService
       .getFeeds(token, "main_feed", {
@@ -20,13 +24,26 @@ module.exports = async (req, res) => {
 
       .then(async (result) => {
         let data = [];
+        let feeds = result.results;
+        let yFilter = listBlockUser.map((itemY) => {
+          return itemY.user_id_blocked;
+        });
+        // let filteredX = feeds.filter(
+        //   (itemX) => !yFilter.includes(itemX.actor.id)
+        // );
+        let newArr = feeds.reduce((feed, current) => {
+          if (!yFilter.includes(current.actor.id)) {
+            feed.push(current);
+          }
+          return feed;
+        }, []);
 
         // Change to conventional loop because map cannot handle await
-        for (let i = 0; i < result.results.length; i++) {
-          let item = result.results[i];
+        for (let i = 0; i < newArr.length; i++) {
+          let item = newArr[i];
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
-          if (now < dateExpired) {
+          if (now < dateExpired || item.duration_feed == "never") {
             if (item.verb === POST_VERB_POLL) {
               let newItem = { ...item };
               let pollOptions = await PollingOption.findAll({
@@ -34,11 +51,7 @@ module.exports = async (req, res) => {
                   polling_option_id: item.polls,
                 },
               });
-
-              // console.log(pollOptions)
               newItem.pollOptions = pollOptions;
-              console.log(newItem);
-
               data.push(newItem);
             } else {
               data.push(item);
@@ -61,8 +74,9 @@ module.exports = async (req, res) => {
         });
       });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
-      code: status,
+      code: 500,
       data: null,
       message: "Internal server error",
       error: error,
