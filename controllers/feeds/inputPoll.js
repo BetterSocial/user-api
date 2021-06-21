@@ -42,8 +42,6 @@ module.exports = async(req, res) => {
     })
 
     let { flg_multiple, user_id } = polling.toJSON()
-    console.log("flg_multiple")
-    console.log(polling.toJSON())
 
     /*
         Check if polling user is author of the post

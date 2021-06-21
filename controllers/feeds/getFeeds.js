@@ -3,7 +3,7 @@ const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
 } = require("../../helpers/constants");
-const { PollingOption } = require("../../databases/models");
+const { PollingOption, LogPolling } = require("../../databases/models");
 const { Op } = require("sequelize");
 const { getListBlockUser } = require("../../services/blockUser");
 const lodash = require("lodash");
@@ -51,6 +51,21 @@ module.exports = async (req, res) => {
                   polling_option_id: item.polls,
                 },
               });
+
+              let pollingOptionsId = pollOptions.reduce((acc, current) => {
+                acc.push(current.polling_id)
+                return acc
+              },[])
+
+              let logPolling = await LogPolling.findOne({
+                where : {
+                  polling_id : pollingOptionsId, 
+                  user_id : req.userId}
+              })
+
+              if(logPolling) newItem.isalreadypolling = true
+              else newItem.isalreadypolling = false              
+              
               newItem.pollOptions = pollOptions;
               data.push(newItem);
             } else {
