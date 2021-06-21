@@ -57,14 +57,21 @@ module.exports = async (req, res) => {
                 return acc
               },[])
 
-              let logPolling = await LogPolling.findOne({
+              let logPolling = await LogPolling.findAll({
                 where : {
                   polling_id : pollingOptionsId, 
                   user_id : req.userId}
               })
 
-              if(logPolling) newItem.isalreadypolling = true
-              else newItem.isalreadypolling = false              
+              if(logPolling.length > 0) {
+                if(item.multiplechoice) newItem.mypolling = logPolling
+                else newItem.mypolling = logPolling[0];
+                newItem.isalreadypolling = true
+              }
+              else {
+                newItem.isalreadypolling = false
+                newItem.mypolling = []
+              }              
               
               newItem.pollOptions = pollOptions;
               data.push(newItem);
