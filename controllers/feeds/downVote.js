@@ -9,6 +9,8 @@ module.exports = async (req, res) => {
     let { activity_id } = req.body;
     let result = await validationReaction(activity_id, "downvotes", req.token);
     if (result === true) {
+      const { countProcess } = require("../../process");
+      await countProcess(activity_id, { downvote_count: +1 }, { downvote_count: 1 });
       const data = await downVote(activity_id, req.token);
       return res.status(200).json({
         code: 200,
