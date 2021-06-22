@@ -3,6 +3,8 @@ module.exports = async (req, res) => {
   try {
     let { reaction_id } = req.body;
     let result = await childUpvote(reaction_id, req.token);
+    const { upVotedProcess } = require("../../process");
+    await upVotedProcess(reaction_id, req.token);
     return res.status(200).json({
       code: 200,
       status: "Success child upvote",

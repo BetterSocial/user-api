@@ -3,6 +3,7 @@ const {
   getReaction,
   validationReaction,
 } = require("../../services/getstream");
+const { upVotedProcess } = require("../../process");
 
 module.exports = async (req, res) => {
   try {
@@ -10,6 +11,7 @@ module.exports = async (req, res) => {
     let result = await validationReaction(activity_id, "upvotes", req.token);
     if (result === true) {
       const data = await upVote(activity_id, req.token);
+      await upVotedProcess(activity_id, req.token);
       return res.status(200).json({
         code: 200,
         status: "success",
