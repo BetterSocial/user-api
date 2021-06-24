@@ -241,6 +241,7 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
+      polling_id : pollId,
       polls: pollsOptionUUIDs,
       post_type: POST_TYPE_POLL,
       polls_expired_at: pollsDurationInIso,

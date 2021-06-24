@@ -69,6 +69,8 @@ module.exports = async (req, res) => {
       return resultUserBlock;
     });
 
+    delCache(req.userId);
+
     await getstreamService.followUser.followUser(
       req.token,
       req.body.userId,

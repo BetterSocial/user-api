@@ -5,7 +5,7 @@ const { convertDotToSlug } = require("../../utils");
 module.exports = async (req, res) => {
   try {
     const query = {
-      name: req.params.name,
+      name: "domain",
       idFeed: convertDotToSlug(req.params.idfeed, ".", "-"),
       limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
       id_lt: req.query.id_lt || "",

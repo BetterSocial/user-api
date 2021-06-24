@@ -1,5 +1,5 @@
 const stream = require("getstream");
-exports.followUser = async (token, userId, feedGroup, status = 1) => {
+const followUser = async (token, userId, feedGroup, status = 1) => {
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
   const user = client.feed("main_feed", client.userId, token);
   if (status === 1) {
@@ -9,7 +9,7 @@ exports.followUser = async (token, userId, feedGroup, status = 1) => {
   }
 };
 
-exports.followUsers = async (token, userIds) => {
+const followUsers = async (token, userIds) => {
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
   const clientServer = stream.connect(process.env.API_KEY, process.env.SECRET);
   const follows = [];
@@ -21,4 +21,9 @@ exports.followUsers = async (token, userIds) => {
   });
 
   return await clientServer.followMany(follows);
+};
+
+module.exports = {
+  followUser,
+  followUsers,
 };

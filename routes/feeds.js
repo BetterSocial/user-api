@@ -8,6 +8,7 @@ const feed = require("../controllers/feeds");
 
 router.post("/post", feed.createPost);
 router.post("/post/poll", feed.createPollPost);
+router.post("/post/poll/input", feed.inputPoll);
 router.post("/create-token", feedController.createToken);
 router.get("/feeds", feed.getFeeds);
 router.post("/reaction", feed.createReaction);
@@ -24,5 +25,7 @@ router.post("/child-upvote", feed.childUpvote);
 router.post("/child-downvote", feed.childDownvote);
 router.post("/update-reaction", feed.updateReaction);
 router.post("/delete-reaction", feed.deleteReaction);
+router.post("/update-activity", feed.putMainFeed);
+router.get("/detail-feed", feed.detailFeed);
 
 module.exports = router;

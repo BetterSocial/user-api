@@ -11,10 +11,13 @@ const createPollPost = require("./createPollPost");
 const deleteFeed = require("./deleteFeed");
 const getFeedUser = require("./getFeedUser");
 const commentChild = require("./commentChild");
+const inputPoll = require("./inputPoll")
 const childDownvote = require("./childDownvote");
 const childUpvote = require("./childUpvote");
 const updateReaction = require("./updateReaction");
 const deleteReaction = require("./deleteReaction");
+const { putMainFeed } = require("./updateActivity");
+const detailFeed = require("./detailFeed");
 
 module.exports = {
   createPost,
@@ -30,8 +33,11 @@ module.exports = {
   getFeedUser,
   downvote,
   commentChild,
+  inputPoll,
   childDownvote,
   childUpvote,
   updateReaction,
   deleteReaction,
+  putMainFeed,
+  detailFeed,
 };
