@@ -17,9 +17,11 @@ const childUpvote = require("./childUpvote");
 const updateReaction = require("./updateReaction");
 const deleteReaction = require("./deleteReaction");
 const { putMainFeed } = require("./updateActivity");
+const { addQueuePostTime } = require("./createPostTime");
 const detailFeed = require("./detailFeed");
 
 module.exports = {
+  addQueuePostTime,
   createPost,
   getFeeds,
   followUser,

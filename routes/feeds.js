@@ -27,5 +27,6 @@ router.post("/update-reaction", feed.updateReaction);
 router.post("/delete-reaction", feed.deleteReaction);
 router.post("/update-activity", feed.putMainFeed);
 router.get("/detail-feed", feed.detailFeed);
+router.post("/add-queue", feed.addQueuePostTime);
 
 module.exports = router;
