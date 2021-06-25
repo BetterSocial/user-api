@@ -1,6 +1,4 @@
 
-jest.mock('createUser');
-
 const createUser = require('./createUser');
 
 

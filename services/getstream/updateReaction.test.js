@@ -1,6 +1,4 @@
 
-// jest.mock('updateReaction');
-
 const updateReaction = require('./updateReaction');
 
 

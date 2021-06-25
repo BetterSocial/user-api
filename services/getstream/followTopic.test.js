@@ -1,6 +1,4 @@
 
-// jest.mock('followTopic');
-
 const followTopic = require('./followTopic');
 
 test('create followTopic', async () => {

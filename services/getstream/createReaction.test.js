@@ -1,6 +1,4 @@
 
-// jest.mock('createReaction');
-
 const createReaction = require('./createReaction');
 
 
