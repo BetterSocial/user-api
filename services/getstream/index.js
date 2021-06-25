@@ -21,6 +21,7 @@ const validationReaction = require("./ValidationReaction");
 const getDomain = require("./getDomain");
 const getDetailDomain = require("./getDetailDomain");
 const updateActivity = require("./updateActivity");
+const getDetailFeed = require("./getDetailFeed");
 
 module.exports = {
   getDetailDomain,
@@ -49,4 +50,5 @@ module.exports = {
   deleteReaction,
   validationReaction,
   updateActivity,
+  getDetailFeed,
 };
