@@ -1,6 +1,4 @@
 
-// jest.mock('deleteReaction');
-
 const deleteReaction = require('./deleteReaction');
 
 

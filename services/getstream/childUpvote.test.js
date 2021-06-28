@@ -1,5 +1,4 @@
 
-// jest.mock('childUpvote');
 
 const childUpvote = require('./childUpvote');
 

@@ -2,7 +2,6 @@
 // jest.mock('createRefreshToken');
 
 const createRefreshToken = require('./createRefreshToken');
-// const followLocation = module.followLocation("", "");
 
 test('test createRefreshToken', async () => {
 
