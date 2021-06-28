@@ -6,4 +6,5 @@ module.exports = {
   setValue,
   getValue,
   delCache,
+  ...require('./queue')
 };
