@@ -29,5 +29,6 @@ router.post("/update-activity", feed.putMainFeed);
 router.get("/detail-feed", feed.detailFeed);
 router.post("/upvote-domain", feed.upVoteDomain);
 router.post("/downvote-domain", feed.downVoteDomain);
+router.post("/viewpost", feed.createQueuePostTime);
 
 module.exports = router;

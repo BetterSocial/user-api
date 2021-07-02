@@ -1,6 +1,4 @@
 
-// jest.mock('getFeeds');
-
 const getFeeds = require('./getFeeds');
 
 

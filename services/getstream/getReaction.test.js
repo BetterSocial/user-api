@@ -1,6 +1,4 @@
 
-// jest.mock('getReaction');
-
 const getReaction = require('./getReaction');
 
 

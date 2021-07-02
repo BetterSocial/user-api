@@ -2,6 +2,7 @@ const { User } = require("../../databases/models");
 const cloudinary = require("cloudinary");
 const Validator = require("fastest-validator");
 const moment = require("moment");
+const updateUser = require("../../services/getstream/updateUser");
 const v = new Validator();
 
 module.exports = async (req, res) => {
@@ -36,6 +37,13 @@ module.exports = async (req, res) => {
         });
         if (returnCloudinary) {
           let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+          console.log(req.params)
+          console.log(user.toJSON())
+          updateUser(req.params.id, {
+            username : user.username,
+            human_id : user.human_id,
+            profile_pic_url: returnCloudinary.url
+          })
           const [numberOfAffectedRows, affectedRows] = await User.update(
             {
               profile_pic_path: returnCloudinary.url

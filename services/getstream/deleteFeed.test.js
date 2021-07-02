@@ -1,5 +1,4 @@
 
-// jest.mock('deleteFeed');
 
 const deleteFeed = require('./deleteFeed');
 
