@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
           let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
           console.log(req.params)
           console.log(user.toJSON())
-          updateUser('88353551-b9bd-4cf5-a89e-ce6197b880c0', {
+          updateUser(req.params.id, {
             username : user.username,
             human_id : user.human_id,
             profile_pic_url: returnCloudinary.url
