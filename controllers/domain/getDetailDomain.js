@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
       id_lt: req.query.id_lt || "",
       reactions: { own: true, recent: true, counts: true },
     };
+    console.log(query);
     const resp = await getDetailDomain(query);
     res.status(200).json({
       code: 200,

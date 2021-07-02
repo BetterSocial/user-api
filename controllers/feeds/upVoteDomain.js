@@ -1,3 +1,4 @@
+const stream = require("getstream");
 const {
   upVote,
   getReaction,
@@ -5,14 +6,30 @@ const {
   getDetailFeed,
   deleteReaction,
 } = require("../../services/getstream");
+const { convertString } = require("../../utils");
 const { responseSuccess, responseError } = require("../../utils/Responses");
+
+const getDetail = async (feedGroup, id, activityId) => {
+  const client = stream.connect(
+    process.env.API_KEY,
+    process.env.SECRET,
+    process.env.APP_ID
+  );
+  return await client.feed(feedGroup, id).getActivityDetail(activityId, {
+    withRecentReactions: true,
+  });
+};
 
 module.exports = async (req, res) => {
   try {
     let token = req.token;
-    let { activity_id, status, feed_group } = req.body;
+    let { activity_id, status, feed_group, domain } = req.body;
     console.log(status);
-    let feeds = await getDetailFeed(token, activity_id, feed_group);
+    let feeds = await getDetail(
+      feed_group,
+      convertString(domain, ".", "-"),
+      activity_id
+    );
     let feed = feeds.results[0];
 
     if (status) {
@@ -27,7 +44,7 @@ module.exports = async (req, res) => {
           }
         }
       }
-      const data = await upVote(activity_id, req.token);
+      const data = await upVote(activity_id, token);
       const { countProcess } = require("../../process");
       countProcess(activity_id, { upvote_count: +1 }, { upvote_count: 1 });
       return res.status(200).json(responseSuccess("Success upvote", data));

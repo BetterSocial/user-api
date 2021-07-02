@@ -1,7 +1,5 @@
 const { getDomain } = require("../../services/getstream");
-const {
-  MAX_FEED_FETCH_LIMIT,
-} = require("../../helpers/constants");
+const { MAX_FEED_FETCH_LIMIT } = require("../../helpers/constants");
 
 module.exports = async (req, res) => {
   try {
@@ -9,7 +7,8 @@ module.exports = async (req, res) => {
       limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
       id_lt: req.query.id_lt || "",
       reactions: { own: true, recent: true, counts: true },
-    }
+    };
+    console.log(query);
     const resp = await getDomain(query);
     res.status(200).json({
       code: 200,

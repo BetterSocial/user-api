@@ -53,26 +53,26 @@ module.exports = async (req, res) => {
               });
 
               let pollingOptionsId = pollOptions.reduce((acc, current) => {
-                acc.push(current.polling_id)
-                return acc
-              },[])
+                acc.push(current.polling_id);
+                return acc;
+              }, []);
 
               let logPolling = await LogPolling.findAll({
-                where : {
-                  polling_id : pollingOptionsId, 
-                  user_id : req.userId}
-              })
+                where: {
+                  polling_id: pollingOptionsId,
+                  user_id: req.userId,
+                },
+              });
 
-              if(logPolling.length > 0) {
-                if(item.multiplechoice) newItem.mypolling = logPolling
+              if (logPolling.length > 0) {
+                if (item.multiplechoice) newItem.mypolling = logPolling;
                 else newItem.mypolling = logPolling[0];
-                newItem.isalreadypolling = true
+                newItem.isalreadypolling = true;
+              } else {
+                newItem.isalreadypolling = false;
+                newItem.mypolling = [];
               }
-              else {
-                newItem.isalreadypolling = false
-                newItem.mypolling = []
-              }              
-              
+
               newItem.pollOptions = pollOptions;
               data.push(newItem);
             } else {
