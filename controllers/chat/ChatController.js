@@ -22,6 +22,7 @@ module.exports = {
       .status(200)
       .json(responseSuccess("Success create channel", watch));
   },
+
   addMembers: async (req, res) => {
     console.log(req.userId);
     let members = [];

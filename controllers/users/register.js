@@ -240,11 +240,11 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    await getstreamService.followLocation.followLocations(token, dataLocations);
+    await getstreamService.followLocations(token, dataLocations);
 
-    await getstreamService.followUser.followUsers(token, follows);
+    await getstreamService.followUsers(token, follows);
 
-    await getstreamService.followTopic.followTopics(token, dataTopics);
+    await getstreamService.followTopics(token, dataTopics);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
@@ -255,7 +255,6 @@ module.exports = async (req, res) => {
       refresh_token: refresh_token,
     });
   } catch (error) {
-    console.log("isi err ", error);
     return res.status(500).json({
       status: "error",
       code: 500,
