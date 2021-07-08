@@ -44,7 +44,6 @@ app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
 app.use("/api/v1/feeds", feedRouter);
 app.use("/api/v1/domain", domainRouter);
-app.use("/api/v1/chat", chatRouter);
 
 var options = {
   swaggerOptions: {
