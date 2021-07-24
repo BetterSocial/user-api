@@ -3,7 +3,7 @@ const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
 } = require("../../helpers/constants");
-const { PollingOption, LogPolling } = require("../../databases/models");
+const { PollingOption, LogPolling, sequelize } = require("../../databases/models");
 const { Op } = require("sequelize");
 const { getListBlockUser } = require("../../services/blockUser");
 const lodash = require("lodash");
@@ -73,7 +73,13 @@ module.exports = async (req, res) => {
                 newItem.mypolling = [];
               }
 
+              let distinctPollingByUserId = await sequelize.query(`SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}'`);
+              let voteCount = distinctPollingByUserId[0].length
+              console.log('voteCount');
+              console.log(voteCount);
+
               newItem.pollOptions = pollOptions;
+              newItem.voteCount = voteCount;
               data.push(newItem);
             } else {
               data.push(item);
