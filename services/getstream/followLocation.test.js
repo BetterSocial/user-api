@@ -1,6 +1,4 @@
 
-// jest.mock('followLocation');
-
 const followLocation = require('./followLocation');
 // const followLocation = module.followLocation("", "");
 

@@ -1,5 +1,8 @@
 const getstreamService = require("../../services/getstream");
 
+const Validator = require("fastest-validator");
+const v = new Validator();
+
 module.exports = async (req, res) => {
   try {
     const schema = {
@@ -13,9 +16,10 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
+    let activity_id = req.body;
     const token = req.token;
     getstreamService
-      .getReaction(token, activity_id)
+      .getReaction(activity_id, token)
       .then((result) => {
         res.status(200).json({
           status: "success",
@@ -23,6 +27,7 @@ module.exports = async (req, res) => {
         });
       })
       .catch((err) => {
+        console.log(err);
         res.status(403).json({
           status: "failed",
           data: null,
@@ -30,8 +35,9 @@ module.exports = async (req, res) => {
         });
       });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
-      code: status,
+      code: 500,
       data: null,
       message: "Internal server error",
       error: error,

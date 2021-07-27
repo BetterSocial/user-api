@@ -3,7 +3,7 @@ const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
 } = require("../../helpers/constants");
-const { PollingOption, LogPolling } = require("../../databases/models");
+const { PollingOption, LogPolling, sequelize } = require("../../databases/models");
 const { Op } = require("sequelize");
 const { getListBlockUser } = require("../../services/blockUser");
 const lodash = require("lodash");
@@ -53,27 +53,33 @@ module.exports = async (req, res) => {
               });
 
               let pollingOptionsId = pollOptions.reduce((acc, current) => {
-                acc.push(current.polling_id)
-                return acc
-              },[])
+                acc.push(current.polling_id);
+                return acc;
+              }, []);
 
               let logPolling = await LogPolling.findAll({
-                where : {
-                  polling_id : pollingOptionsId, 
-                  user_id : req.userId}
-              })
+                where: {
+                  polling_id: pollingOptionsId,
+                  user_id: req.userId,
+                },
+              });
 
-              if(logPolling.length > 0) {
-                if(item.multiplechoice) newItem.mypolling = logPolling
+              if (logPolling.length > 0) {
+                if (item.multiplechoice) newItem.mypolling = logPolling;
                 else newItem.mypolling = logPolling[0];
-                newItem.isalreadypolling = true
+                newItem.isalreadypolling = true;
+              } else {
+                newItem.isalreadypolling = false;
+                newItem.mypolling = [];
               }
-              else {
-                newItem.isalreadypolling = false
-                newItem.mypolling = []
-              }              
-              
+
+              let distinctPollingByUserId = await sequelize.query(`SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}'`);
+              let voteCount = distinctPollingByUserId[0].length
+              console.log('voteCount');
+              console.log(voteCount);
+
               newItem.pollOptions = pollOptions;
+              newItem.voteCount = voteCount;
               data.push(newItem);
             } else {
               data.push(item);

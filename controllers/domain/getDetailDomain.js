@@ -1,16 +1,17 @@
 const { getDetailDomain } = require("../../services/getstream");
 const { MAX_FEED_FETCH_LIMIT } = require("../../helpers/constants");
-const { convertDotToSlug } = require("../../utils");
+const { convertString } = require("../../utils");
 
 module.exports = async (req, res) => {
   try {
     const query = {
       name: "domain",
-      idFeed: convertDotToSlug(req.params.idfeed, ".", "-"),
+      idFeed: convertString(req.params.idfeed, ".", "-"),
       limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
       id_lt: req.query.id_lt || "",
       reactions: { own: true, recent: true, counts: true },
     };
+    console.log(query);
     const resp = await getDetailDomain(query);
     res.status(200).json({
       code: 200,

@@ -4,7 +4,9 @@
 const config = {
   verbose: true,
   setupFilesAfterEnv: [
-    "<rootDir>/__mocks__/getstream-ori.js"
+    "<rootDir>/services/getstream/__mocks__/getstream.js",
+    "<rootDir>/services/jwt/__mocks__/jsonwebtoken.js",
+
   ],
 };
 

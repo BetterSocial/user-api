@@ -18,6 +18,7 @@ const indexRouter = require("./routes/index");
 const verifyToken = require("./middlewares/verifyToken");
 const feedRouter = require("./routes/feeds");
 const domainRouter = require("./routes/domain");
+const chatRouter = require("./routes/chat");
 
 const app = express();
 

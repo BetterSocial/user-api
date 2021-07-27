@@ -7,7 +7,7 @@ const whoToFollow = require("./whoToFollow");
 const topics = require("./topics");
 const locations = require("./locations");
 const auth = require("../middlewares/auth");
-
+const chat = require("../routes/chat");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -19,5 +19,6 @@ router.use("/users", users);
 router.use("/topics", topics);
 router.use("/location", locations);
 router.use("/who-to-follow", whoToFollow);
+router.use("/chat", chat);
 
 module.exports = router;

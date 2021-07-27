@@ -1,5 +1,4 @@
 
-// jest.mock('commentChild');
 
 const commentChild = require('./commentChild');
 
