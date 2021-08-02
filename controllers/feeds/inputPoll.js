@@ -8,6 +8,7 @@ const {
     Polling,
     PollingOption
  } = require("../../databases/models")
+const { NO_POLL_OPTION_UUID } = require("../../helpers/constants")
 
 const v = new Validator()
 
@@ -73,40 +74,45 @@ module.exports = async(req, res) => {
         A multiple choice : Check if there's a same log with same polling_option_id
     */
    if(flg_multiple) {
-        let logPolling = await LogPolling.findOne({
-            where : {polling_option_id, user_id : req.userId}
-        })
-
-        if(logPolling) return res.status(403).json({
-            code : 403,
-            message : "You have select this option for this post"
-        })
+        if(polling_option_id !== NO_POLL_OPTION_UUID) {
+            let logPolling = await LogPolling.findOne({
+                where : {polling_option_id, user_id : req.userId}
+            })
+    
+            if(logPolling) return res.status(403).json({
+                code : 403,
+                message : "You have select this option for this post"
+            })    
+        }
    }
 
     try {
         let transaction = await sequelize.transaction(async (t) => {
+            let currentTimeIsoString = moment().utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
+            console.log('currentTimeIsoString')
+            console.log(currentTimeIsoString)
             let logPolling = await LogPolling.create({
                 log_polling_id : uuidv4(),
                 polling_option_id,
                 polling_id,
                 user_id : req.userId,
-                created_at : currentDataIsoString,
+                created_at : currentTimeIsoString,
                 updated_at : currentDataIsoString
             }, {transaction : t})
 
-            let pollingOption = await PollingOption.findOne({
-                where : {
-                    polling_option_id
-                }
-            }, {transaction : t})
-
-            console.log(pollingOption.toJSON())
-
-            let { counter }= pollingOption.toJSON()
-
-            await pollingOption.update({
-                counter : parseInt(counter) + 1
-            })
+            if(polling_option_id !== NO_POLL_OPTION_UUID) {
+                let pollingOption = await PollingOption.findOne({
+                    where : {
+                        polling_option_id
+                    }
+                }, {transaction : t})
+    
+                let { counter }= pollingOption.toJSON()
+    
+                await pollingOption.update({
+                    counter : parseInt(counter) + 1
+                })
+            } 
         })
 
         return res.status(200).json({
