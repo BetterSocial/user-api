@@ -88,7 +88,7 @@ module.exports = async (req, res) => {
             ? users.real_name.toLowerCase()
             : users.real_name,
           profile_pic_path: users.profile_pic_path
-            ? returnCloudinary.url
+            ? returnCloudinary.secret_url
             : defaultImage,
           profile_pic_asset_id: users.profile_pic_path
             ? returnCloudinary.asset_id
