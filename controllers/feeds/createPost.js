@@ -83,7 +83,7 @@ module.exports = async (req, res) => {
                 invalidate: true,
               }
             );
-            return returnCloudinary.url;
+            return returnCloudinary.secure_url;
           } catch (error) {
             return res.status(500).json({
               code: 500,

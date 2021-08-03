@@ -114,7 +114,7 @@ module.exports = async (req, res) => {
                 invalidate: true,
               }
             );
-            return returnCloudinary.url;
+            return returnCloudinary.secret_url;
           } catch (error) {
             console.log("error upload gambar");
             return res.status(500).json({

@@ -2,6 +2,7 @@ const getstreamService = require("../../services/getstream");
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
+  NO_POLL_OPTION_UUID,
 } = require("../../helpers/constants");
 const { PollingOption, LogPolling, sequelize } = require("../../databases/models");
 const { Op } = require("sequelize");
@@ -73,7 +74,7 @@ module.exports = async (req, res) => {
                 newItem.mypolling = [];
               }
 
-              let distinctPollingByUserId = await sequelize.query(`SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}'`);
+              let distinctPollingByUserId = await sequelize.query(`SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}' AND polling_option_id !='${NO_POLL_OPTION_UUID}'`);
               let voteCount = distinctPollingByUserId[0].length
               console.log('voteCount');
               console.log(voteCount);

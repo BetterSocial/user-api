@@ -42,12 +42,12 @@ module.exports = async (req, res) => {
           updateUser(req.params.id, {
             username : user.username,
             human_id : user.human_id,
-            profile_pic_url: returnCloudinary.url
+            profile_pic_url: returnCloudinary.secure_url
           })
           const [numberOfAffectedRows, affectedRows] = await User.update(
             {
-              profile_pic_path: returnCloudinary.url
-                ? returnCloudinary.url
+              profile_pic_path: returnCloudinary.secure_url
+                ? returnCloudinary.secure_url
                 : null,
               profile_pic_asset_id: returnCloudinary.asset_id
                 ? returnCloudinary.asset_id
