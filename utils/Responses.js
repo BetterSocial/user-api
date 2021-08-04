@@ -7,7 +7,7 @@ module.exports = {
     };
   },
 
-  responseError: (message, data, code = 400) => {
+  responseError: (message, data = null, code = 400) => {
     return {
       code: code,
       status: message,

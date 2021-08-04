@@ -245,9 +245,9 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    /*
-                  @description options bull queue ref https://www.npmjs.com/package/bull
-                */
+    /**
+     * @description options bull queue ref https://www.npmjs.com/package/bull
+     */
     const options = {
       jobId: uuidv4(),
       removeOnComplete: true,
