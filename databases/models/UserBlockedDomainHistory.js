@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   UserBlockedDomainHistory.init(
     {
+      id: { type: DataTypes.UUID, primaryKey: true },
       user_id_blocker: { type: DataTypes.UUID, allowNull: false },
       domain_page_id: DataTypes.BIGINT,
       action: DataTypes.STRING(5),
