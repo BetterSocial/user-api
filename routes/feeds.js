@@ -5,6 +5,7 @@ var router = express.Router();
 const feedController = require("../controllers/feeds/FeedController");
 
 const feed = require("../controllers/feeds");
+const { isAuth } = require("../middlewares/auth");
 
 router.post("/post", feed.createPost);
 router.post("/post/poll", feed.createPollPost);
@@ -26,7 +27,7 @@ router.post("/child-downvote", feed.childDownvote);
 router.post("/update-reaction", feed.updateReaction);
 router.post("/delete-reaction", feed.deleteReaction);
 router.post("/update-activity", feed.putMainFeed);
-router.get("/detail-feed", feed.detailFeed);
+router.get("/detail-feed", isAuth, feed.detailFeed);
 router.post("/upvote-domain", feed.upVoteDomain);
 router.post("/downvote-domain", feed.downVoteDomain);
 router.post("/viewpost", feed.createQueuePostTime);
