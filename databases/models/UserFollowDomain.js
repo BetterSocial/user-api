@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class UserBlockedUserHistory extends Model {
+  class UserFollowDomain extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,24 +11,28 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  UserBlockedUserHistory.init(
+  UserFollowDomain.init(
     {
-      user_blocked_user_history_id: {
-        type: DataTypes.UUID,
+      follow_action_id: {
+        type: DataTypes.STRING,
         allowNull: false,
         primaryKey: true,
       },
-      user_id_blocker: { type: DataTypes.UUID, allowNull: false },
-      user_id_blocked: { type: DataTypes.UUID, allowNull: false },
-      action: DataTypes.STRING(5),
-      source: DataTypes.STRING(50),
+      user_id_follower: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      domain_id_followed: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
     },
     {
       sequelize,
-      modelName: "UserBlockedUserHistory",
-      tableName: "user_blocked_user_history",
+      modelName: "UserFollowDomain",
+      tableName: "user_follow_domain",
       timestamps: false,
     }
   );
-  return UserBlockedUserHistory;
+  return UserFollowDomain;
 };

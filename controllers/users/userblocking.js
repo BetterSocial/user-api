@@ -51,13 +51,14 @@ module.exports = async (req, res) => {
         transaction: t,
       });
 
-      // const userBlockHistory = {
-      //   user_id_blocker: req.userId,
-      //   user_id_blocked: req.body.userId,
-      //   action: "out",
-      //   source: req.body.source,
-      // };
-      // await UserBlockedUserHistory.create(userBlockHistory, { transaction: t });
+      const userBlockHistory = {
+        user_blocked_user_history_id: uuidv4(),
+        user_id_blocker: req.userId,
+        user_id_blocked: req.body.userId,
+        action: "out",
+        source: req.body.source,
+      };
+      await UserBlockedUserHistory.create(userBlockHistory, { transaction: t });
 
       const history = {
         user_id_follower: req.body.userId,

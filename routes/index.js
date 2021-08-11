@@ -1,32 +1,35 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 
-const feed = require('./feeds');
-const users = require('./users');
-const whoToFollow = require('./whoToFollow');
-const topics = require('./topics');
-const locations = require('./locations');
-const auth = require('../middlewares/auth');
-const chat = require('../routes/chat');
+const feed = require("./feeds");
+const users = require("./users");
+const whoToFollow = require("./whoToFollow");
+const topics = require("./topics");
+const locations = require("./locations");
+const auth = require("../middlewares/auth");
+const chat = require("../routes/chat");
+const domain = require("../routes/domain");
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get("/", function (req, res, next) {
+  res.render("index", { title: "Hello" });
 });
 
-router.use('/activity', auth.isAuth, feed);
-router.use('/users', users);
-router.use('/topics', topics);
-router.use('/location', locations);
-router.use('/who-to-follow', whoToFollow);
-router.use('/chat', chat);
-router.post('/test', async (req, res) => {
-  const { v4: uuidv4 } = require('uuid');
+router.use("/activity", auth.isAuth, feed);
+router.use("/users", users);
+router.use("/topics", topics);
+router.use("/location", locations);
+router.use("/who-to-follow", whoToFollow);
+router.use("/chat", chat);
+router.use("/domain", domain);
+
+router.post("/test", async (req, res) => {
+  const { v4: uuidv4 } = require("uuid");
   const {
     followLocationQueue,
     followTopicQueue,
     followUserQueue,
-  } = require('../services/redis');
+  } = require("../services/redis");
   /*
                   @description options bull queue ref https://www.npmjs.com/package/bull
                 */
@@ -35,7 +38,7 @@ router.post('/test', async (req, res) => {
     removeOnComplete: true,
   };
   let id = [];
-  const data = { id: '123', topic: 'ini follow location' };
+  const data = { id: "123", topic: "ini follow location" };
   const resultJob = await followLocationQueue.add(data, options);
   id.push(resultJob.id);
 
@@ -43,7 +46,7 @@ router.post('/test', async (req, res) => {
     jobId: uuidv4(),
     removeOnComplete: true,
   };
-  const dataUser = { id: '434', topic: 'ini follow user' };
+  const dataUser = { id: "434", topic: "ini follow user" };
   const resultJobUser = await followUserQueue.add(dataUser, optionsUser);
   id.push(resultJobUser.id);
 
@@ -51,7 +54,7 @@ router.post('/test', async (req, res) => {
     jobId: uuidv4(),
     removeOnComplete: true,
   };
-  const dataTopic = { id: '56', topic: 'ini follow topic' };
+  const dataTopic = { id: "56", topic: "ini follow topic" };
   const resultJobTopic = await followTopicQueue.add(dataTopic, optionsTopic);
 
   id.push(resultJobTopic.id);
