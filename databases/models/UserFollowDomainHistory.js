@@ -28,6 +28,16 @@ module.exports = (sequelize, DataTypes) => {
       },
       action: DataTypes.STRING(5),
       source: DataTypes.STRING(50),
+      createdAt: {
+        type: DataTypes.DATE,
+        field: "created_at",
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        field: "updated_at",
+        allowNull: false,
+      },
     },
     {
       sequelize,
