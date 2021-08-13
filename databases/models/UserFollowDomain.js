@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "UserFollowDomain",
       tableName: "user_follow_domain",
-      timestamps: false,
+      timestamps: true,
     }
   );
   return UserFollowDomain;

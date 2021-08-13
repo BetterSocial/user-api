@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "UserFollowDomainHistory",
       tableName: "user_follow_domain_history",
-      timestamps: false,
+      timestamps: true,
     }
   );
   return UserFollowDomainHistory;
