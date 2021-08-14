@@ -20,7 +20,7 @@ const followTopicQueue = new Bull('followTopicQueue', {
   redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
 });
 
-const addToChannelChatQueue = async (locations, token) => {
+const addToChannelChatQueue = async (locations, userId) => {
   let loc = locations.map((item) => {
     if (item.country === 'US') {
       let loc = [];
@@ -39,8 +39,8 @@ const addToChannelChatQueue = async (locations, token) => {
     redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
   });
   let data = {
-    token: token,
-    data: temp,
+    user_id: userId,
+    locations: temp,
   };
   const options = {
     jobId: uuidv4(),

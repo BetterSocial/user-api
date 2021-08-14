@@ -65,161 +65,162 @@ module.exports = async (req, res) => {
     });
   }
 
-  // if (users.profile_pic_path) {
-  //   try {
-  //     const uploadStr = 'data:image/jpeg;base64,' + users.profile_pic_path;
-  //     returnCloudinary = await cloudinary.v2.uploader.upload(uploadStr, {
-  //       overwrite: false,
-  //       invalidate: true,
-  //     });
-  //   } catch (error) {
-  //     return res.status(500).json({
-  //       code: 500,
-  //       status: 'error',
-  //       message: error,
-  //     });
-  //   }
-  // }
+  if (users.profile_pic_path) {
+    try {
+      const uploadStr = 'data:image/jpeg;base64,' + users.profile_pic_path;
+      returnCloudinary = await cloudinary.v2.uploader.upload(uploadStr, {
+        overwrite: false,
+        invalidate: true,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        code: 500,
+        status: 'error',
+        message: error,
+      });
+    }
+  }
 
   try {
-    // const result = await sequelize.transaction(async (t) => {
-    //   let myTs = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-    //   const user = await User.create(
-    //     {
-    //       //   generate UUID
-    //       user_id: uuidv4(),
-    //       human_id: users.human_id,
-    //       country_code: users.country_code.toUpperCase(),
-    //       username: users.username.toLowerCase(),
-    //       real_name: users.real_name
-    //         ? users.real_name.toLowerCase()
-    //         : users.real_name,
-    //       profile_pic_path: users.profile_pic_path
-    //         ? returnCloudinary.secret_url
-    //         : defaultImage,
-    //       profile_pic_asset_id: users.profile_pic_path
-    //         ? returnCloudinary.asset_id
-    //         : null,
-    //       profile_pic_public_id: users.profile_pic_path
-    //         ? returnCloudinary.public_id
-    //         : null,
-    //       created_at: myTs,
-    //       updated_at: myTs,
-    //       last_active_at: myTs,
-    //       status: 'Y',
-    //     },
-    //     { transaction: t }
-    //   );
+    const result = await sequelize.transaction(async (t) => {
+      let myTs = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+      const user = await User.create(
+        {
+          //   generate UUID
+          user_id: uuidv4(),
+          human_id: users.human_id,
+          country_code: users.country_code.toUpperCase(),
+          username: users.username.toLowerCase(),
+          real_name: users.real_name
+            ? users.real_name.toLowerCase()
+            : users.real_name,
+          profile_pic_path: users.profile_pic_path
+            ? returnCloudinary.secret_url
+            : defaultImage,
+          profile_pic_asset_id: users.profile_pic_path
+            ? returnCloudinary.asset_id
+            : null,
+          profile_pic_public_id: users.profile_pic_path
+            ? returnCloudinary.public_id
+            : null,
+          created_at: myTs,
+          updated_at: myTs,
+          last_active_at: myTs,
+          status: 'Y',
+        },
+        { transaction: t }
+      );
 
-    //   // local Comunity
-    //   let local_community_array_return = local_community.map((val, index) => {
-    //     return {
-    //       //   generate UUID
-    //       // user_location_id: uuidv4(),
-    //       // user_location_id: val,
-    //       user_id: user.user_id,
-    //       location_id: val,
-    //       created_at: myTs,
-    //       updated_at: myTs,
-    //     };
-    //   });
-    //   let returnUserLocation = await UserLocation.bulkCreate(
-    //     local_community_array_return,
-    //     { transaction: t, returning: true }
-    //   );
+      // local Comunity
+      let local_community_array_return = local_community.map((val, index) => {
+        return {
+          //   generate UUID
+          // user_location_id: uuidv4(),
+          // user_location_id: val,
+          user_id: user.user_id,
+          location_id: val,
+          created_at: myTs,
+          updated_at: myTs,
+        };
+      });
+      let returnUserLocation = await UserLocation.bulkCreate(
+        local_community_array_return,
+        { transaction: t, returning: true }
+      );
 
-    //   if (returnUserLocation.length > 0) {
-    //     let user_location_return = returnUserLocation.map((val) => {
-    //       return {
-    //         //   generate UUID
-    //         // user_location_id: uuidv4(),
-    //         // user_location_id: val.location_id,
-    //         user_id: val.user_id,
-    //         location_id: val.location_id,
-    //         action: 'in',
-    //         created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-    //       };
-    //     });
-    //     await UserLocationHistory.bulkCreate(user_location_return, {
-    //       transaction: t,
-    //     });
-    //   }
+      if (returnUserLocation.length > 0) {
+        let user_location_return = returnUserLocation.map((val) => {
+          return {
+            //   generate UUID
+            // user_location_id: uuidv4(),
+            // user_location_id: val.location_id,
+            user_id: val.user_id,
+            location_id: val.location_id,
+            action: 'in',
+            created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          };
+        });
+        await UserLocationHistory.bulkCreate(user_location_return, {
+          transaction: t,
+        });
+      }
 
-    //   // Topics
-    //   let topics_array_return = topics.map((val) => {
-    //     return {
-    //       //   generate UUID
-    //       user_topics_id: uuidv4(),
-    //       user_id: user.user_id,
-    //       topic_id: val,
-    //       created_at: myTs,
-    //       updated_at: myTs,
-    //     };
-    //   });
-    //   let returnTopic = await UserTopic.bulkCreate(topics_array_return, {
-    //     transaction: t,
-    //     returning: true,
-    //   });
+      // Topics
+      let topics_array_return = topics.map((val) => {
+        return {
+          //   generate UUID
+          user_topics_id: uuidv4(),
+          user_id: user.user_id,
+          topic_id: val,
+          created_at: myTs,
+          updated_at: myTs,
+        };
+      });
+      let returnTopic = await UserTopic.bulkCreate(topics_array_return, {
+        transaction: t,
+        returning: true,
+      });
 
-    //   if (returnTopic.length > 0) {
-    //     let topic_return = returnTopic.map((val) => {
-    //       return {
-    //         user_id: val.user_id,
-    //         topic_id: val.topic_id,
-    //         action: 'in',
-    //         created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-    //       };
-    //     });
-    //     await UserTopicHistory.bulkCreate(topic_return, {
-    //       transaction: t,
-    //     });
-    //   }
+      if (returnTopic.length > 0) {
+        let topic_return = returnTopic.map((val) => {
+          return {
+            user_id: val.user_id,
+            topic_id: val.topic_id,
+            action: 'in',
+            created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          };
+        });
+        await UserTopicHistory.bulkCreate(topic_return, {
+          transaction: t,
+        });
+      }
 
-    //   // User Follow User
-    //   let follows_array_return = follows.map((val) => {
-    //     return {
-    //       //   generate UUID
-    //       follow_action_id: uuidv4(),
-    //       user_id_follower: user.user_id,
-    //       user_id_followed: val,
-    //     };
-    //   });
+      // User Follow User
+      let follows_array_return = follows.map((val) => {
+        return {
+          //   generate UUID
+          follow_action_id: uuidv4(),
+          user_id_follower: user.user_id,
+          user_id_followed: val,
+        };
+      });
 
-    //   let returnUserFollowUser = await UserFollowUser.bulkCreate(
-    //     follows_array_return,
-    //     {
-    //       transaction: t,
-    //       returning: true,
-    //     }
-    //   );
+      let returnUserFollowUser = await UserFollowUser.bulkCreate(
+        follows_array_return,
+        {
+          transaction: t,
+          returning: true,
+        }
+      );
 
-    //   if (returnUserFollowUser.length > 0) {
-    //     let user_follow_user_return = returnUserFollowUser.map((val) => {
-    //       return {
-    //         user_id_follower: val.user_id_follower,
-    //         user_id_followed: val.user_id_followed,
-    //         action: 'in',
-    //         source: follow_source,
-    //       };
-    //     });
-    //     await UserFollowUserHistory.bulkCreate(user_follow_user_return, {
-    //       transaction: t,
-    //     });
-    //   }
-    //   return user;
-    // });
+      if (returnUserFollowUser.length > 0) {
+        let user_follow_user_return = returnUserFollowUser.map((val) => {
+          return {
+            user_id_follower: val.user_id_follower,
+            user_id_followed: val.user_id_followed,
+            action: 'in',
+            source: follow_source,
+          };
+        });
+        await UserFollowUserHistory.bulkCreate(user_follow_user_return, {
+          transaction: t,
+        });
+      }
+      return user;
+    });
 
-    // let data = {
-    //   human_id: result.human_id,
-    //   username: result.username,
-    //   profile_pic_url: result.profile_pic_path,
-    //   created_at: result.createdAt,
-    // };
-    // const user_id = result.user_id;
-    // let userId = user_id.toLowerCase();
+    let data = {
+      human_id: result.human_id,
+      username: result.username,
+      profile_pic_url: result.profile_pic_path,
+      created_at: result.createdAt,
+    };
+    const user_id = result.user_id;
+    let userId = user_id.toLowerCase();
 
-    // await getstreamService.createUser(data, userId);
-    // let token = await getstreamService.createToken(userId);
+    await getstreamService.createUser(data, userId);
+    let token = await getstreamService.createToken(userId);
+    getstreamService.createUserChat(data, token, userId);
     let dataLocations = await Locations.findAll({
       where: {
         location_id: local_community,
@@ -232,32 +233,32 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    // let dataTopics = await Topics.findAll({
-    //   where: {
-    //     topic_id: topics,
-    //   },
-    //   attributes: ['name'],
-    // })
-    //   .then((result) => {
-    //     let body = changeValue(result);
-    //     return body;
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     return res.status(400).json(error);
-    //   });
+    let dataTopics = await Topics.findAll({
+      where: {
+        topic_id: topics,
+      },
+      attributes: ['name'],
+    })
+      .then((result) => {
+        let body = changeValue(result);
+        return body;
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(400).json(error);
+      });
 
     /**
      * @description options bull queue ref https://www.npmjs.com/package/bull
      */
-    // const options = {
-    //   jobId: uuidv4(),
-    //   removeOnComplete: true,
-    // };
-    // const locationQueueData = { token, locations: dataLocations };
+    const options = {
+      jobId: uuidv4(),
+      removeOnComplete: true,
+    };
+    const locationQueueData = { token, locations: dataLocations };
 
-    let loc = await addToChannelChatQueue(dataLocations, 'ini token');
-    res.status(200).json(responseSuccess('success', loc));
+    addToChannelChatQueue(dataLocations, userId);
+
     // followLocationQueue.add(locationQueueData, options);
     // await getstreamService.followLocations(token, dataLocations);
 
@@ -285,14 +286,14 @@ module.exports = async (req, res) => {
     // };
     // followTopicQueue.add(topicQueue, optionsTopic);
 
-    // const refresh_token = await createRefreshToken(userId);
-    // return res.status(200).json({
-    //   status: 'success',
-    //   code: 200,
-    //   data: result,
-    //   token: token,
-    //   refresh_token: refresh_token,
-    // });
+    const refresh_token = await createRefreshToken(userId);
+    return res.status(200).json({
+      status: 'success',
+      code: 200,
+      data: result,
+      token: token,
+      refresh_token: refresh_token,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
