@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
         user_id_follower: req.userId,
         domain_id_followed: req.body.domainId,
       };
-      await UserFollowDomain.create(follow);
+      await UserFollowDomain.create(follow, { transaction: t });
       const history = {
         follow_domain_history_id: uuidv4(),
         user_id_follower: req.userId,
@@ -20,7 +20,9 @@ module.exports = async (req, res) => {
         action: "in",
         source: req.body.source,
       };
-      const resultHistory = await UserFollowDomainHistory.create(history);
+      const resultHistory = await UserFollowDomainHistory.create(history, {
+        transaction: t,
+      });
       return resultHistory;
     });
     res.json({
