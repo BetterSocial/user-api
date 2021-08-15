@@ -8,16 +8,21 @@ module.exports = async (req, res) => {
   try {
     const result = await sequelize.transaction(async (t) => {
       const follow = {
-        follow_action_id: uuidv4(),
         user_id_follower: req.userId,
         domain_id_followed: req.body.domainId,
       };
-      await UserFollowDomain.create(follow, { transaction: t });
+      await UserFollowDomain.destroy(
+        {
+          where: follow,
+        },
+        { transaction: t }
+      );
+
       const history = {
         follow_domain_history_id: uuidv4(),
         user_id_follower: req.userId,
         domain_id_followed: req.body.domainId,
-        action: "in",
+        action: "out",
         source: req.body.source,
       };
       const resultHistory = await UserFollowDomainHistory.create(history, {

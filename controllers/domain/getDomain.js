@@ -8,7 +8,6 @@ module.exports = async (req, res) => {
       id_lt: req.query.id_lt || "",
       reactions: { own: true, recent: true, counts: true },
     };
-    console.log(query);
     const resp = await getDomain(query);
     res.status(200).json({
       code: 200,

@@ -7,8 +7,17 @@ module.exports = async (req, res) => {
         user_id_follower: req.userId,
       },
     });
-    return res.json(result);
+    res.json({
+      code: 200,
+      status: "success",
+      data: result,
+    });
   } catch (error) {
-    return res.json(error);
+    return res.status(500).json({
+      code: 500,
+      data: null,
+      message: "Internal server error",
+      error: error,
+    });
   }
 };
