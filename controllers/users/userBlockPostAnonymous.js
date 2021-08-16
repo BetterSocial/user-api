@@ -62,24 +62,6 @@ module.exports = async (req, res) => {
     return res
       .status(201)
       .json(responseSuccess('Success block post anonymous'));
-
-    //   await UserBlockedPostAnonymous.destroy(
-    //     {
-    //       where: {
-    //         user_id_follower: req.body.userId,
-    //         user_id_followed: req.userId,
-    //       },
-    //     },
-    //     { transaction: t }
-    //   );
-
-    //   let resultUserBlock = await UserBlockedPostAnonymous.create(userBlock, {
-    //     transaction: t,
-    //   });
-
-    //   await UserFollowUserHistory.create(history, { transaction: t });
-    //   return resultUserBlock;
-    // });
   } catch (error) {
     res.status(500).json({
       code: 500,
