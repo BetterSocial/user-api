@@ -21,5 +21,6 @@ router.get(
 router.post('/blockuser', auth.isAuth, usersHandler.blockUser);
 router.post('/block-domain', auth.isAuth, usersHandler.blockDomain);
 router.get('/populate', auth.isAuth, usersHandler.populate);
+router.post('/block-post-anonymous', auth.isAuth, usersHandler.blockPostAnonymous)
 
 module.exports = router;

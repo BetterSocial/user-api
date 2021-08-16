@@ -8,6 +8,7 @@ const showingAudience = require('../users/showingAudienceEstimates');
 const blockUser = require('../users/userblocking');
 const blockDomain = require('../users/userBlockingDomain');
 const populate = require('./populateUser');
+const blockPostAnonymous = require('./userBlockPostAnonymous');
 
 module.exports = {
   checkUsername,
@@ -20,4 +21,5 @@ module.exports = {
   blockUser,
   blockDomain,
   populate,
+  blockPostAnonymous,
 };
