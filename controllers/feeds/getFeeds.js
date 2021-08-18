@@ -4,17 +4,23 @@ const {
   MAX_FEED_FETCH_LIMIT,
   NO_POLL_OPTION_UUID,
 } = require("../../helpers/constants");
-const { PollingOption, LogPolling, sequelize } = require("../../databases/models");
+const {
+  PollingOption,
+  LogPolling,
+  sequelize,
+} = require("../../databases/models");
 const { Op } = require("sequelize");
 const { getListBlockUser } = require("../../services/blockUser");
 const lodash = require("lodash");
 const { setData, getValue } = require("../../services/redis");
 const redis = require("redis");
-
+const getBlockDomain = require("../../services/domain/getBlockDomain");
+const _ = require("lodash");
 module.exports = async (req, res) => {
   try {
     const token = req.token;
     const listBlockUser = await getListBlockUser(req.userId);
+    const listBlockDomain = await getBlockDomain(req.userId);
 
     getstreamService
       .getFeeds(token, "main_feed", {
@@ -26,18 +32,23 @@ module.exports = async (req, res) => {
       .then(async (result) => {
         let data = [];
         let feeds = result.results;
-        let yFilter = listBlockUser.map((itemY) => {
-          return itemY.user_id_blocked;
-        });
+        let listBlock = listBlockUser + listBlockDomain;
+        // let yFilter = listBlockUser.map((itemY) => {
+        //   return itemY.user_id_blocked;
+        // });
         // let filteredX = feeds.filter(
         //   (itemX) => !yFilter.includes(itemX.actor.id)
         // );
-        let newArr = feeds.reduce((feed, current) => {
-          if (!yFilter.includes(current.actor.id)) {
-            feed.push(current);
-          }
-          return feed;
-        }, []);
+        // let newArr = feeds.reduce((feed, current) => {
+        //   if (!yFilter.includes(current.actor.id)) {
+        //     feed.push(current);
+        //   }
+        //   return feed;
+        // }, []);
+
+        let newArr = await _.filter(feeds, function (o) {
+          return !listBlock.includes(o.actor.id);
+        });
 
         // Change to conventional loop because map cannot handle await
         for (let i = 0; i < newArr.length; i++) {
@@ -74,9 +85,11 @@ module.exports = async (req, res) => {
                 newItem.mypolling = [];
               }
 
-              let distinctPollingByUserId = await sequelize.query(`SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}' AND polling_option_id !='${NO_POLL_OPTION_UUID}'`);
-              let voteCount = distinctPollingByUserId[0].length
-              console.log('voteCount');
+              let distinctPollingByUserId = await sequelize.query(
+                `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}' AND polling_option_id !='${NO_POLL_OPTION_UUID}'`
+              );
+              let voteCount = distinctPollingByUserId[0].length;
+              console.log("voteCount");
               console.log(voteCount);
 
               newItem.pollOptions = pollOptions;
