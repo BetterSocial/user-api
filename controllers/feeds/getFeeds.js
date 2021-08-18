@@ -17,11 +17,13 @@ const {
 const lodash = require('lodash');
 const { setData, getValue } = require('../../services/redis');
 const redis = require('redis');
-
+const getBlockDomain = require("../../services/domain/getBlockDomain");
+const _ = require("lodash");
 module.exports = async (req, res) => {
   try {
     const token = req.token;
     const listBlockUser = await getListBlockUser(req.userId);
+    const listBlockDomain = await getBlockDomain(req.userId);
     const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
 
     getstreamService
@@ -34,18 +36,23 @@ module.exports = async (req, res) => {
       .then(async (result) => {
         let data = [];
         let feeds = result.results;
-        let yFilter = listBlockUser.map((itemY) => {
-          return itemY.user_id_blocked;
-        });
+        let listBlock = listBlockUser + listBlockDomain;
+        // let yFilter = listBlockUser.map((itemY) => {
+        //   return itemY.user_id_blocked;
+        // });
         // let filteredX = feeds.filter(
         //   (itemX) => !yFilter.includes(itemX.actor.id)
         // );
-        let newArr = feeds.reduce((feed, current) => {
-          if (!yFilter.includes(current.actor.id)) {
-            feed.push(current);
-          }
-          return feed;
-        }, []);
+        // let newArr = feeds.reduce((feed, current) => {
+        //   if (!yFilter.includes(current.actor.id)) {
+        //     feed.push(current);
+        //   }
+        //   return feed;
+        // }, []);
+
+        let newArr = await _.filter(feeds, function (o) {
+          return !listBlock.includes(o.actor.id);
+        });
 
         let listAnonymous = listPostAnonymous.map((value) => {
           return value.post_anonymous_id_blocked;

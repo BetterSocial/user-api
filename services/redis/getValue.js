@@ -1,16 +1,21 @@
-const redis = require("redis");
-const util = require("util");
-
+const Redis = require("ioredis");
 module.exports = async (key) => {
   try {
-    const client = redis.createClient(process.env.REDIS_URL);
-    client.on("error", function (error) {
-      console.error(error);
+    const client = new Redis(process.env.REDIS_URL, {
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
-    client.get = util.promisify(client.get);
-    return await client.get(key);
+    return client.get(key, function (err, result) {
+      if (err) {
+        console.error(err);
+        return null;
+      } else {
+        return result;
+      }
+    });
   } catch (error) {
     console.log(error);
-    throw new Error("Error get data");
+    return null;
   }
 };
