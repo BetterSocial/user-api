@@ -22,7 +22,9 @@ const {
   followLocationQueue,
   followTopicQueue,
   followUserQueue,
+  addToChannelChatQueue,
 } = require('../../services/redis');
+const { responseSuccess } = require('../../utils/Responses');
 
 const changeValue = (items) => {
   return items.map((item, index) => {
@@ -218,6 +220,7 @@ module.exports = async (req, res) => {
 
     await getstreamService.createUser(data, userId);
     let token = await getstreamService.createToken(userId);
+    getstreamService.createUserChat(data, token, userId);
     let dataLocations = await Locations.findAll({
       where: {
         location_id: local_community,
@@ -245,40 +248,43 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    /*
-                  @description options bull queue ref https://www.npmjs.com/package/bull
-                */
+    /**
+     * @description options bull queue ref https://www.npmjs.com/package/bull
+     */
     const options = {
       jobId: uuidv4(),
       removeOnComplete: true,
     };
     const locationQueueData = { token, locations: dataLocations };
-    followLocationQueue.add(locationQueueData, options);
+
+    addToChannelChatQueue(dataLocations, userId);
+
+    // followLocationQueue.add(locationQueueData, options);
     // await getstreamService.followLocations(token, dataLocations);
 
-    const optionsUser = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
-    const userQueue = {
-      token,
-      users: follows,
-    };
-    followUserQueue.add(userQueue, optionsUser);
+    // const optionsUser = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
+    // const userQueue = {
+    //   token,
+    //   users: follows,
+    // };
+    // followUserQueue.add(userQueue, optionsUser);
 
     // await getstreamService.followUsers(token, follows);
 
     // await getstreamService.followTopics(token, dataTopics);
 
-    const topicQueue = {
-      token,
-      topics: dataTopics,
-    };
-    const optionsTopic = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
-    followTopicQueue.add(topicQueue, optionsTopic);
+    // const topicQueue = {
+    //   token,
+    //   topics: dataTopics,
+    // };
+    // const optionsTopic = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
+    // followTopicQueue.add(topicQueue, optionsTopic);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
@@ -289,6 +295,7 @@ module.exports = async (req, res) => {
       refresh_token: refresh_token,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: 'error',
       code: 500,
