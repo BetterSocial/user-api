@@ -62,63 +62,74 @@ module.exports = async (req, res) => {
     let result = []
     let duplicateUserChecker = [];
 
-    _.forEach(TopicsData, (value, index) => {
-      if(value.users){
-        result.push({
-          viewtype: 'label',
-          name : value.name,
-          id: value.topic_id,
-        });
 
+    _.forEach(TopicsData, (value, index) => {
+      let isTopicAdded = false;
+      if(value.users){
         let userToBeReturned = 0
         value.users.map((user, idx) => {
           if(duplicateUserChecker.includes(user.user_id) || userToBeReturned >= MAX_ITEM_PER_GROUP) return
-          duplicateUserChecker.push(user.user_id);
-          userToBeReturned++;
-          result.push({
-            viewtype: 'user',
-            user_id : user.user_id,
-            human_id : user.human_id,
-            username: user.username,
-            real_name: user.real_name,
-            profile_pic_path: user.profile_pic_path,
-            bio: user.bio,
-          })
+          else {
+            if(!isTopicAdded) {
+              isTopicAdded = true; 
+              result.push({
+                viewtype: 'label',
+                name : value.name,
+                id: value.topic_id,
+              });
+            } 
+            duplicateUserChecker.push(user.user_id);
+            userToBeReturned++;
+            result.push({
+              viewtype: 'user',
+              user_id : user.user_id,
+              human_id : user.human_id,
+              username: user.username,
+              real_name: user.real_name,
+              profile_pic_path: user.profile_pic_path,
+              bio: user.bio,
+            })           
+          }
         })
       }
     })
 
     _.forEach(LocationsData, (value, index) => {
+      let isLocationsAdded = false;
       if(value.users) {
-        result.push({
-          viewtype: 'label',
-          name : value.city,
-          location_id: value.location_id,
-          zip: value.zip,
-          neighborhood: value.neighborhood,
-          city: value.city,
-          state: value.state,
-          country: value.country,
-          location_level: value.location_level,
-          status: value.status,
-          slug_name: value.slug_name,
-        });
-
         let userToBeReturned = 0
         value.users.map((user, idx) => {
           if(duplicateUserChecker.includes(user.user_id) || userToBeReturned >= MAX_ITEM_PER_GROUP) return
-          duplicateUserChecker.push(user.user_id);
-          userToBeReturned++;
-          
-          result.push({
-            viewtype: 'user',
-            user_id : user.user_id,
-            human_id : user.human_id,
-            username: user.username,
-            real_name: user.real_name,
-            profile_pic_path: user.profile_pic_path,
-            bio: user.bio,
-          })
+          else {
+            if(!isLocationsAdded) {
+              isLocationsAdded = true;
+              result.push({
+                viewtype: 'label',
+                name : value.city,
+                location_id: value.location_id,
+                zip: value.zip,
+                neighborhood: value.neighborhood,
+                city: value.city,
+                state: value.state,
+                country: value.country,
+                location_level: value.location_level,
+                status: value.status,
+                slug_name: value.slug_name,
+              });
+            }
+            duplicateUserChecker.push(user.user_id);
+            userToBeReturned++;
+            
+            result.push({
+              viewtype: 'user',
+              user_id : user.user_id,
+              human_id : user.human_id,
+              username: user.username,
+              real_name: user.real_name,
+              profile_pic_path: user.profile_pic_path,
+              bio: user.bio,
+            })
+          }
         })
       }
     })
