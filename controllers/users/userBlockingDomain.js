@@ -5,6 +5,8 @@ const {
 } = require("../../databases/models");
 const { v4: uuidv4 } = require("uuid");
 const Validator = require("fastest-validator");
+const delCache = require("../../services/redis/delCache");
+const { BLOCK_DOMAIN_KEY } = require("../../helpers/constants");
 const v = new Validator();
 module.exports = async (req, res) => {
   try {
@@ -51,7 +53,8 @@ module.exports = async (req, res) => {
       );
       return history;
     });
-
+    const MY_KEY = BLOCK_DOMAIN_KEY + req.userId;
+    delCache(MY_KEY);
     res.json({
       message: "The domain has been successfully blocked",
       code: 200,
