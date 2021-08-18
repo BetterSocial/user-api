@@ -3,6 +3,8 @@ const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
   NO_POLL_OPTION_UUID,
+  BLOCK_FEED_KEY,
+  BLOCK_POST_ANONYMOUS,
 } = require('../../helpers/constants');
 const {
   PollingOption,
@@ -15,12 +17,15 @@ const {
   getListBlockPostAnonymous,
 } = require('../../services/blockUser');
 const lodash = require('lodash');
-const { setData, getValue } = require('../../services/redis');
+const { setData, getValue, delCache } = require('../../services/redis');
 const redis = require('redis');
-const getBlockDomain = require("../../services/domain/getBlockDomain");
-const _ = require("lodash");
+const getBlockDomain = require('../../services/domain/getBlockDomain');
+const _ = require('lodash');
 module.exports = async (req, res) => {
   try {
+    console.log(req.userId);
+    delCache(BLOCK_FEED_KEY + req.userId);
+    delCache(BLOCK_POST_ANONYMOUS + req.userId);
     const token = req.token;
     const listBlockUser = await getListBlockUser(req.userId);
     const listBlockDomain = await getBlockDomain(req.userId);
@@ -36,6 +41,9 @@ module.exports = async (req, res) => {
       .then(async (result) => {
         let data = [];
         let feeds = result.results;
+        console.log('block =====');
+        console.log(listBlockUser);
+        console.log(listBlockDomain);
         let listBlock = listBlockUser + listBlockDomain;
         // let yFilter = listBlockUser.map((itemY) => {
         //   return itemY.user_id_blocked;
@@ -57,6 +65,8 @@ module.exports = async (req, res) => {
         let listAnonymous = listPostAnonymous.map((value) => {
           return value.post_anonymous_id_blocked;
         });
+
+        console.log(listAnonymous);
 
         let feedWithAnonymous = newArr.reduce((feed, current) => {
           if (!listAnonymous.includes(current.id)) {

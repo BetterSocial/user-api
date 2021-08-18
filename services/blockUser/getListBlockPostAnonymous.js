@@ -1,12 +1,11 @@
 const { UserBlockedPostAnonymous } = require('../../databases/models');
-const { getValue, setValue } = require('../redis');
+const { BLOCK_POST_ANONYMOUS } = require('../../helpers/constants');
+const { getValue, setValue, delCache } = require('../redis');
 module.exports = async (userId) => {
   try {
-    let key = `${userId}-anonymous`;
-    let cache = await getValue(key);
-    console.log(cache);
+    let KEY = BLOCK_POST_ANONYMOUS + userId;
+    let cache = await getValue(KEY);
     if (cache === null || cache === false) {
-      console.log('from database post anonymous');
       let blockPost = await UserBlockedPostAnonymous.findAll({
         attributes: ['post_anonymous_id_blocked'],
         where: {
@@ -14,10 +13,9 @@ module.exports = async (userId) => {
         },
       });
       let userBlock = await JSON.stringify(blockPost);
-      await setValue(key, userBlock);
+      await setValue(KEY, userBlock);
       return blockPost;
     } else {
-      console.log('from cache post anonymous');
       return await JSON.parse(cache);
     }
     // let blockUser = await UserBlockedPostAnonymous.findAll({
