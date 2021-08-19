@@ -1,14 +1,10 @@
-const Redis = require("ioredis");
+const client = require("./connectionRedis");
 module.exports = async (key) => {
   try {
-    const client = new Redis(process.env.REDIS_URL, {
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
     return client.get(key, function (err, result) {
+      console.log("get data cache ", result);
       if (err) {
-        console.error(err);
+        console.error("errror get", err);
         return null;
       } else {
         return result;

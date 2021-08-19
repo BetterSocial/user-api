@@ -1,22 +1,19 @@
-const getstreamService = require('../../services/getstream');
+const getstreamService = require("../../services/getstream");
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
   NO_POLL_OPTION_UUID,
-} = require('../../helpers/constants');
+} = require("../../helpers/constants");
 const {
   PollingOption,
   LogPolling,
   sequelize,
-} = require('../../databases/models');
-const { Op } = require('sequelize');
+} = require("../../databases/models");
+const { Op } = require("sequelize");
 const {
   getListBlockUser,
   getListBlockPostAnonymous,
-} = require('../../services/blockUser');
-const lodash = require('lodash');
-const { setData, getValue } = require('../../services/redis');
-const redis = require('redis');
+} = require("../../services/blockUser");
 const getBlockDomain = require("../../services/domain/getBlockDomain");
 const _ = require("lodash");
 module.exports = async (req, res) => {
@@ -27,9 +24,9 @@ module.exports = async (req, res) => {
     const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
 
     getstreamService
-      .getFeeds(token, 'main_feed', {
+      .getFeeds(token, "main_feed", {
         limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
-        id_lt: req.query.id_lt || '',
+        id_lt: req.query.id_lt || "",
         reactions: { own: true, recent: true, counts: true },
       })
 
@@ -70,7 +67,7 @@ module.exports = async (req, res) => {
           let item = feedWithAnonymous[i];
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
-          if (now < dateExpired || item.duration_feed == 'never') {
+          if (now < dateExpired || item.duration_feed == "never") {
             if (item.verb === POST_VERB_POLL) {
               let newItem = { ...item };
               let pollOptions = await PollingOption.findAll({
@@ -116,14 +113,14 @@ module.exports = async (req, res) => {
 
         res.status(200).json({
           code: 200,
-          status: 'success',
+          status: "success",
           data: data,
         });
       })
       .catch((err) => {
         console.log(err);
         res.status(403).json({
-          status: 'failed',
+          status: "failed",
           data: null,
           error: err,
         });
@@ -133,7 +130,7 @@ module.exports = async (req, res) => {
     return res.status(500).json({
       code: 500,
       data: null,
-      message: 'Internal server error',
+      message: "Internal server error",
       error: error,
     });
   }

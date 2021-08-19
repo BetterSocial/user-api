@@ -1,11 +1,6 @@
-const Redis = require("ioredis");
+const client = require("./connectionRedis");
 module.exports = async (key) => {
   try {
-    const client = new Redis(process.env.REDIS_URL, {
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
     await client.del(key);
   } catch (error) {
     console.log(error);

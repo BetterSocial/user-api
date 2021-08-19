@@ -1,6 +1,6 @@
-const { UserBlockedUser } = require('../../databases/models');
+const { UserBlockedUser } = require("../../databases/models");
 const { BLOCK_FEED_KEY } = require("../../helpers/constants");
-const { getValue, setValue } = require('../redis');
+const { getValue, setValue } = require("../redis");
 module.exports = async (userId) => {
   try {
     const MY_KEY = BLOCK_FEED_KEY + userId;
