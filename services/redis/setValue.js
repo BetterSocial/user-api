@@ -3,7 +3,7 @@ const { REDIS_TTL } = require("../../helpers/constants");
 module.exports = async (key, value) => {
   try {
     client.set(key, value, (err, reply) => {
-      console.log("errr set  ", err, " hi ", reply);
+      console.log("errr set  ", err, " save : ", reply);
     });
     client.expire(key, REDIS_TTL);
   } catch (error) {

@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
       .then(async (result) => {
         let data = [];
         let feeds = result.results;
-        let listBlock = listBlockUser + listBlockDomain;
+        let listBlock = String(listBlockUser + listBlockDomain);
         // let yFilter = listBlockUser.map((itemY) => {
         //   return itemY.user_id_blocked;
         // });
