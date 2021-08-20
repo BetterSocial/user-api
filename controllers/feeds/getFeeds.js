@@ -1,20 +1,23 @@
-const getstreamService = require('../../services/getstream');
+const getstreamService = require("../../services/getstream");
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
   NO_POLL_OPTION_UUID,
   BLOCK_FEED_KEY,
   BLOCK_POST_ANONYMOUS,
-} = require('../../helpers/constants');
+} = require("../../helpers/constants");
 const {
   PollingOption,
   LogPolling,
   sequelize,
-} = require('../../databases/models');
-const { Op } = require('sequelize');
+} = require("../../databases/models");
+const { Op } = require("sequelize");
 const {
   getListBlockUser,
   getListBlockPostAnonymous,
+} = require("../../services/blockUser");
+const getBlockDomain = require("../../services/domain/getBlockDomain");
+const _ = require("lodash");
 } = require('../../services/blockUser');
 const lodash = require('lodash');
 const { setData, getValue, delCache } = require('../../services/redis');
@@ -23,18 +26,15 @@ const getBlockDomain = require('../../services/domain/getBlockDomain');
 const _ = require('lodash');
 module.exports = async (req, res) => {
   try {
-    console.log(req.userId);
-    delCache(BLOCK_FEED_KEY + req.userId);
-    delCache(BLOCK_POST_ANONYMOUS + req.userId);
     const token = req.token;
     const listBlockUser = await getListBlockUser(req.userId);
     const listBlockDomain = await getBlockDomain(req.userId);
     const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
 
     getstreamService
-      .getFeeds(token, 'main_feed', {
+      .getFeeds(token, "main_feed", {
         limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
-        id_lt: req.query.id_lt || '',
+        id_lt: req.query.id_lt || "",
         reactions: { own: true, recent: true, counts: true },
       })
 
@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
         console.log('block =====');
         console.log(listBlockUser);
         console.log(listBlockDomain);
-        let listBlock = listBlockUser + listBlockDomain;
+        let listBlock = String(listBlockUser + listBlockDomain);
         // let yFilter = listBlockUser.map((itemY) => {
         //   return itemY.user_id_blocked;
         // });
@@ -66,8 +66,6 @@ module.exports = async (req, res) => {
           return value.post_anonymous_id_blocked;
         });
 
-        console.log(listAnonymous);
-
         let feedWithAnonymous = newArr.reduce((feed, current) => {
           if (!listAnonymous.includes(current.id)) {
             feed.push(current);
@@ -80,7 +78,7 @@ module.exports = async (req, res) => {
           let item = feedWithAnonymous[i];
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
-          if (now < dateExpired || item.duration_feed == 'never') {
+          if (now < dateExpired || item.duration_feed == "never") {
             if (item.verb === POST_VERB_POLL) {
               let newItem = { ...item };
               let pollOptions = await PollingOption.findAll({
@@ -126,14 +124,14 @@ module.exports = async (req, res) => {
 
         res.status(200).json({
           code: 200,
-          status: 'success',
+          status: "success",
           data: data,
         });
       })
       .catch((err) => {
         console.log(err);
         res.status(403).json({
-          status: 'failed',
+          status: "failed",
           data: null,
           error: err,
         });
@@ -143,7 +141,7 @@ module.exports = async (req, res) => {
     return res.status(500).json({
       code: 500,
       data: null,
-      message: 'Internal server error',
+      message: "Internal server error",
       error: error,
     });
   }

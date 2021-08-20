@@ -1,4 +1,4 @@
-const { getValue, setValue } = require("../redis");
+const { getValue, setValue, delCache } = require("../redis");
 const { UserBlockedDomain } = require("../../databases/models");
 const { BLOCK_DOMAIN_KEY } = require("../../helpers/constants");
 
@@ -6,6 +6,7 @@ module.exports = async (userID) => {
   const MY_KEY = BLOCK_DOMAIN_KEY + userID;
   const cache = await getValue(MY_KEY);
   if (cache) {
+    console.log("domain block dari cache");
     return cache;
   }
   const domainBlock = await UserBlockedDomain.findAll({
