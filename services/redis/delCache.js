@@ -1,4 +1,4 @@
-const client = require("./connectionRedis");
+// const client = require("./connectionRedis");
 // const Redis = require('ioredis');
 // module.exports = async (key) => {
 //   try {

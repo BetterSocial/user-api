@@ -26,6 +26,8 @@ const {
 } = require('../../services/redis');
 const { responseSuccess } = require('../../utils/Responses');
 
+const StreamChat = require('stream-chat').StreamChat;
+
 const changeValue = (items) => {
   return items.map((item, index) => {
     let temp = Object.assign({}, item.dataValues);
@@ -34,6 +36,22 @@ const changeValue = (items) => {
     }
     return temp.name;
   });
+};
+
+const createTokenChat = async (userId) => {
+  const serverClient = new StreamChat(process.env.API_KEY, process.env.SECRET);
+  return serverClient.createToken(userId);
+};
+
+const syncUser = async (userId) => {
+  const serverClient = new StreamChat(process.env.API_KEY, process.env.SECRET);
+  const res = await serverClient.upsertUsers([
+    {
+      id: userId,
+      role: 'user',
+    },
+  ]);
+  console.log(res);
 };
 
 module.exports = async (req, res) => {
@@ -220,7 +238,9 @@ module.exports = async (req, res) => {
 
     await getstreamService.createUser(data, userId);
     let token = await getstreamService.createToken(userId);
-    getstreamService.createUserChat(data, token, userId);
+    let tokenChat = await createTokenChat(userId);
+    await syncUser(userId);
+    await getstreamService.createUserChat(data, token, userId);
     let dataLocations = await Locations.findAll({
       where: {
         location_id: local_community,

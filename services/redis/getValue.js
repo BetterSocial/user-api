@@ -1,5 +1,5 @@
-const client = require("./connectionRedis");
-const Redis = require('ioredis');
+// const client = require("./connectionRedis");
+// const Redis = require('ioredis');
 const redis = require('redis');
 const util = require('util');
 module.exports = async (key) => {
@@ -23,13 +23,13 @@ module.exports = async (key) => {
   //   return null;
   // }
   try {
-//    return client.get(key, function (err, result) {
-//      if (err) {
-//        return null;
-//      } else {
-//        return result;
-//      }
-//    });
+    //    return client.get(key, function (err, result) {
+    //      if (err) {
+    //        return null;
+    //      } else {
+    //        return result;
+    //      }
+    //    });
     const client = redis.createClient(process.env.REDIS_URL);
     client.on('error', function (error) {
       console.error(error);
