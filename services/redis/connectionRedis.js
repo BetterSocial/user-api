@@ -1,10 +1,3 @@
-// const redis = require("redis");
-// const fs = require("fs");
-// const client = redis.createClient(String(process.env.REDIS_URL), {
-//   tls: {
-//     rejectUnauthorized: false,
-//   },
-// });
 const Redis = require("ioredis");
 const client = new Redis(String(process.env.REDIS_URL), {
   tls: {
