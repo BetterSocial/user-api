@@ -1,28 +1,30 @@
-const getstreamService = require("../../services/getstream");
+const getstreamService = require('../../services/getstream');
 const {
   UserFollowUser,
   UserFollowUserHistory,
   UserBlockedUser,
   UserBlockedUserHistory,
   sequelize,
-} = require("../../databases/models");
-const { v4: uuidv4 } = require("uuid");
-const Validator = require("fastest-validator");
+} = require('../../databases/models');
+const { v4: uuidv4 } = require('uuid');
+const Validator = require('fastest-validator');
+const { delCache } = require('../../services/redis');
+const { BLOCK_FEED_KEY } = require('../../helpers/constants');
 const v = new Validator();
 module.exports = async (req, res) => {
   try {
     const schema = {
-      userId: "string",
-      postId: "string",
-      reason: "array|optional:true",
-      message: "string|optional:true",
-      source: "string",
+      userId: 'string',
+      postId: 'string',
+      reason: 'array|optional:true',
+      message: 'string|optional:true',
+      source: 'string',
     };
     const validate = await v.validate(req.body, schema);
     if (validate.length) {
       return res.status(403).json({
         code: 403,
-        status: "error",
+        status: 'error',
         message: validate,
       });
     }
@@ -55,7 +57,7 @@ module.exports = async (req, res) => {
         user_blocked_user_history_id: uuidv4(),
         user_id_blocker: req.userId,
         user_id_blocked: req.body.userId,
-        action: "out",
+        action: 'out',
         source: req.body.source,
       };
       await UserBlockedUserHistory.create(userBlockHistory, { transaction: t });
@@ -63,33 +65,34 @@ module.exports = async (req, res) => {
       const history = {
         user_id_follower: req.body.userId,
         user_id_followed: req.userId,
-        action: "out",
+        action: 'out',
         source: `postId:${req.body.postId}`,
       };
       await UserFollowUserHistory.create(history, { transaction: t });
       return resultUserBlock;
     });
 
-    delCache(req.userId);
+    const key = BLOCK_FEED_KEY + req.userId;
+    delCache(key);
 
     await getstreamService.followUser.followUser(
       req.token,
       req.body.userId,
-      "user",
+      'user',
       0
     );
     res.json({
-      message: "The user has been successfully blocked",
+      message: 'The user has been successfully blocked',
       code: 200,
       data: result,
-      status: "success",
+      status: 'success',
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
       message: error,
-      data: "",
-      status: "error",
+      data: '',
+      status: 'error',
     });
   }
 };

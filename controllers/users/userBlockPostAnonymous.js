@@ -14,6 +14,8 @@ const {
 const v = new Validator();
 
 const Responses = require('../../utils/Responses');
+const { delCache } = require('../../services/redis');
+const { BLOCK_POST_ANONYMOUS } = require('../../helpers/constants');
 
 module.exports = async (req, res) => {
   const schema = {
@@ -59,10 +61,14 @@ module.exports = async (req, res) => {
         });
     });
 
+    let key = BLOCK_POST_ANONYMOUS + req.userId;
+    delCache(key);
+
     return res
       .status(201)
       .json(responseSuccess('Success block post anonymous'));
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       code: 500,
       message: error,
