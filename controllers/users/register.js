@@ -8,31 +8,33 @@ const {
   UserFollowUserHistory,
   Locations,
   Topics,
-} = require('../../databases/models');
-const sequelize = require('../../databases/models').sequelize;
-const cloudinary = require('cloudinary');
-const Validator = require('fastest-validator');
-const moment = require('moment');
+} = require("../../databases/models");
+const sequelize = require("../../databases/models").sequelize;
+const cloudinary = require("cloudinary");
+const Validator = require("fastest-validator");
+const moment = require("moment");
 const v = new Validator();
-const getstreamService = require('../../services/getstream');
-const jwt = require('jsonwebtoken');
-const { createRefreshToken } = require('../../services/jwt');
-const { v4: uuidv4 } = require('uuid');
+const getstreamService = require("../../services/getstream");
+const jwt = require("jsonwebtoken");
+const { createRefreshToken } = require("../../services/jwt");
+const { v4: uuidv4 } = require("uuid");
 const {
   followLocationQueue,
   followTopicQueue,
   followUserQueue,
   addToChannelChatQueue,
-} = require('../../services/redis');
-const { responseSuccess } = require('../../utils/Responses');
+} = require("../../services/redis");
+const { responseSuccess } = require("../../utils/Responses");
 
-const StreamChat = require('stream-chat').StreamChat;
+const { addUserToLocation, addUserToTopic } = require("../../services/chat");
+
+const StreamChat = require("stream-chat").StreamChat;
 
 const changeValue = (items) => {
   return items.map((item, index) => {
     let temp = Object.assign({}, item.dataValues);
     if (/\s/.test(temp.name)) {
-      return temp.name.split(' ').join('-');
+      return temp.name.split(" ").join("-");
     }
     return temp.name;
   });
@@ -48,7 +50,7 @@ const syncUser = async (userId) => {
   const res = await serverClient.upsertUsers([
     {
       id: userId,
-      role: 'user',
+      role: "user",
     },
   ]);
   console.log(res);
@@ -57,20 +59,20 @@ const syncUser = async (userId) => {
 module.exports = async (req, res) => {
   var returnCloudinary = null;
   let defaultImage =
-    'https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png';
+    "https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png";
   const schema = {
     users: {
-      $$type: 'object|empty:false',
-      username: 'string|empty:false',
-      human_id: 'string|empty:false',
-      country_code: 'string|empty:false',
-      real_name: 'string|optional: true',
-      profile_pic_path: 'string|base64|optional: true',
+      $$type: "object|empty:false",
+      username: "string|empty:false",
+      human_id: "string|empty:false",
+      country_code: "string|empty:false",
+      real_name: "string|optional: true",
+      profile_pic_path: "string|base64|optional: true",
     },
-    local_community: 'string[]',
-    topics: 'string[]|empty:false',
-    follows: 'string[]|empty:false',
-    follow_source: 'string|empty:false',
+    local_community: "string[]",
+    topics: "string[]|empty:false",
+    follows: "string[]|empty:false",
+    follow_source: "string|empty:false",
   };
   let { users, local_community, topics, follows, follow_source } =
     req.body.data;
@@ -78,14 +80,14 @@ module.exports = async (req, res) => {
   if (validate.length) {
     return res.status(403).json({
       code: 403,
-      status: 'error',
+      status: "error",
       message: validate,
     });
   }
 
   if (users.profile_pic_path) {
     try {
-      const uploadStr = 'data:image/jpeg;base64,' + users.profile_pic_path;
+      const uploadStr = "data:image/jpeg;base64," + users.profile_pic_path;
       returnCloudinary = await cloudinary.v2.uploader.upload(uploadStr, {
         overwrite: false,
         invalidate: true,
@@ -93,7 +95,7 @@ module.exports = async (req, res) => {
     } catch (error) {
       return res.status(500).json({
         code: 500,
-        status: 'error',
+        status: "error",
         message: error,
       });
     }
@@ -101,7 +103,7 @@ module.exports = async (req, res) => {
 
   try {
     const result = await sequelize.transaction(async (t) => {
-      let myTs = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+      let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
       const user = await User.create(
         {
           //   generate UUID
@@ -124,7 +126,7 @@ module.exports = async (req, res) => {
           created_at: myTs,
           updated_at: myTs,
           last_active_at: myTs,
-          status: 'Y',
+          status: "Y",
         },
         { transaction: t }
       );
@@ -154,8 +156,8 @@ module.exports = async (req, res) => {
             // user_location_id: val.location_id,
             user_id: val.user_id,
             location_id: val.location_id,
-            action: 'in',
-            created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            action: "in",
+            created_at: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
           };
         });
         await UserLocationHistory.bulkCreate(user_location_return, {
@@ -184,8 +186,8 @@ module.exports = async (req, res) => {
           return {
             user_id: val.user_id,
             topic_id: val.topic_id,
-            action: 'in',
-            created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            action: "in",
+            created_at: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
           };
         });
         await UserTopicHistory.bulkCreate(topic_return, {
@@ -216,7 +218,7 @@ module.exports = async (req, res) => {
           return {
             user_id_follower: val.user_id_follower,
             user_id_followed: val.user_id_followed,
-            action: 'in',
+            action: "in",
             source: follow_source,
           };
         });
@@ -257,7 +259,7 @@ module.exports = async (req, res) => {
       where: {
         topic_id: topics,
       },
-      attributes: ['name'],
+      attributes: ["name"],
     })
       .then((result) => {
         let body = changeValue(result);
@@ -268,47 +270,38 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    /**
-     * @description options bull queue ref https://www.npmjs.com/package/bull
-     */
-    const options = {
+    addUserToLocation(dataLocations, userId);
+    addUserToTopic(dataTopics, userId);
+
+    await getstreamService.followLocations(token, dataLocations);
+
+    const optionsUser = {
       jobId: uuidv4(),
       removeOnComplete: true,
     };
-    const locationQueueData = { token, locations: dataLocations };
-
-    addToChannelChatQueue(dataLocations, userId);
-
-    // followLocationQueue.add(locationQueueData, options);
-    // await getstreamService.followLocations(token, dataLocations);
-
-    // const optionsUser = {
-    //   jobId: uuidv4(),
-    //   removeOnComplete: true,
-    // };
-    // const userQueue = {
-    //   token,
-    //   users: follows,
-    // };
-    // followUserQueue.add(userQueue, optionsUser);
+    const userQueue = {
+      token,
+      users: follows,
+    };
+    followUserQueue.add(userQueue, optionsUser);
 
     // await getstreamService.followUsers(token, follows);
 
     // await getstreamService.followTopics(token, dataTopics);
 
-    // const topicQueue = {
-    //   token,
-    //   topics: dataTopics,
-    // };
-    // const optionsTopic = {
-    //   jobId: uuidv4(),
-    //   removeOnComplete: true,
-    // };
-    // followTopicQueue.add(topicQueue, optionsTopic);
+    const topicQueue = {
+      token,
+      topics: dataTopics,
+    };
+    const optionsTopic = {
+      jobId: uuidv4(),
+      removeOnComplete: true,
+    };
+    followTopicQueue.add(topicQueue, optionsTopic);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
-      status: 'success',
+      status: "success",
       code: 200,
       data: result,
       token: token,
@@ -317,7 +310,7 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      status: 'error',
+      status: "error",
       code: 500,
       message: error,
     });
