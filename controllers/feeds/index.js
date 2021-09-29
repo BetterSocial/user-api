@@ -21,6 +21,7 @@ const { createQueuePostTime } = require("./createPostTime");
 const detailFeed = require("./detailFeed");
 const upVoteDomain = require("./upVoteDomain");
 const downVoteDomain = require("./downVoteDomain");
+const voteComment = require("./voteComment");
 
 module.exports = {
   createQueuePostTime,
@@ -46,4 +47,5 @@ module.exports = {
   detailFeed,
   upVoteDomain,
   downVoteDomain,
+  voteComment,
 };
