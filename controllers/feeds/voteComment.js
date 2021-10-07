@@ -1,10 +1,15 @@
-const { voteComment, downVote } = require("../../services/getstream");
+const { voteComment, getReaction } = require("../../services/getstream");
 const { responseSuccess, responseError } = require("../../utils/Responses");
 const { VoteComments } = require("../../databases/models");
 const uuid = require("uuid");
 module.exports = async (req, res) => {
   try {
-    let { activity_id, count_downvote, count_upvote, text, status } = req.body;
+    let { activity_id, status } = req.body;
+    let dataReaction = await getReaction(activity_id);
+    let count_downvote = dataReaction.data.count_downvote;
+    let count_upvote = dataReaction.data.count_upvote;
+    let text = dataReaction.data.text;
+
     let dataVote = await VoteComments.findOne({
       where: { comment_id: activity_id, user_id: req.userId },
     });
@@ -63,9 +68,9 @@ module.exports = async (req, res) => {
       text,
     };
     const data = await voteComment(activity_id, req.token, newData);
-    return res.status(200).json(responseSuccess("Success upvote", data));
+    return res.status(200).json(responseSuccess("Success vote comment", data));
   } catch (error) {
     console.log("errro ", error);
-    return res.status(500).json(responseError("Failed upvote", null, 500));
+    return res.status(500).json(responseError("Failed vote", null, 500));
   }
 };

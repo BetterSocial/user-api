@@ -32,5 +32,6 @@ router.post("/upvote-domain", feed.upVoteDomain);
 router.post("/downvote-domain", feed.downVoteDomain);
 router.post("/viewpost", feed.createQueuePostTime);
 router.post("/vote_comment", isAuth, feed.voteComment);
+router.get("/i_vote_comment", isAuth, feed.iVoteComment);
 
 module.exports = router;
