@@ -3,7 +3,7 @@ const { VoteComments } = require("../../databases/models");
 module.exports = async (req, res) => {
   try {
     let data = {};
-    let { activity_id } = req.body;
+    let activity_id = req.query.id;
     let dataVote = await VoteComments.findOne({
       where: { comment_id: activity_id, user_id: req.userId },
     });
