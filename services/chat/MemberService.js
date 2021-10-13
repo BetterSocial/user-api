@@ -22,6 +22,7 @@ const addUserToTopic = async (topics, userId) => {
 };
 
 const addUserToLocation = async (locations, userId) => {
+  console.log("addUserToLocation");
   let loc = locations.map((item) => {
     if (item.country === "US") {
       let loc = [];
@@ -46,6 +47,8 @@ const addUserToLocation = async (locations, userId) => {
   };
 
   const resultJob = await addUserToChannelQueue(data, options);
+  console.log("***********************");
+  console.log(resultJob);
   return resultJob;
 };
 

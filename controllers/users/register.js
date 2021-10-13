@@ -53,7 +53,6 @@ const syncUser = async (userId) => {
       role: "user",
     },
   ]);
-  console.log(res);
 };
 
 module.exports = async (req, res) => {
@@ -242,7 +241,7 @@ module.exports = async (req, res) => {
     let token = await getstreamService.createToken(userId);
     let tokenChat = await createTokenChat(userId);
     await syncUser(userId);
-    await getstreamService.createUserChat(data, token, userId);
+    // await getstreamService.createUserChat(data, token, userId);
     let dataLocations = await Locations.findAll({
       where: {
         location_id: local_community,
@@ -271,7 +270,7 @@ module.exports = async (req, res) => {
       });
 
     addUserToLocation(dataLocations, userId);
-    addUserToTopic(dataTopics, userId);
+    // addUserToTopic(dataTopics, userId);
 
     await getstreamService.followLocations(token, dataLocations);
 
