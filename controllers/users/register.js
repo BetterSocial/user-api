@@ -284,9 +284,9 @@ module.exports = async (req, res) => {
     };
     followUserQueue.add(userQueue, optionsUser);
 
-    // await getstreamService.followUsers(token, follows);
+    await getstreamService.followUsers(token, follows);
 
-    // await getstreamService.followTopics(token, dataTopics);
+    await getstreamService.followTopics(token, dataTopics);
 
     const topicQueue = {
       token,
