@@ -17,7 +17,6 @@ module.exports = async (userId) => {
       await setValue(KEY, userBlock);
       return blockPost;
     } else {
-      console.log("from cache post anonymous");
       return await JSON.parse(cache);
     }
     // let blockUser = await UserBlockedPostAnonymous.findAll({
