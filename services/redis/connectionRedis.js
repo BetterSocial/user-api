@@ -1,8 +1,19 @@
 const Redis = require("ioredis");
-const client = new Redis({
-  port: 6379,
-  host: "localhost",
-  connectTimeout: 10000,
+/**
+ * this is for local
+ */
+// const client = new Redis({
+//   port: 6379,
+//   host: "localhost",
+//   connectTimeout: 10000,
+// });
+/**
+ * this is for production
+ */
+const client = new Redis(String(process.env.REDIS_URL), {
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 client.on("connect", function () {
   console.error("redis connect");
