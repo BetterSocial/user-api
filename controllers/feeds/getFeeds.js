@@ -20,6 +20,8 @@ const getBlockDomain = require("../../services/domain/getBlockDomain");
 const _ = require("lodash");
 const lodash = require("lodash");
 const { setData, getValue, delCache } = require("../../services/redis");
+const { convertString } = require("../../utils/custom");
+
 module.exports = async (req, res) => {
   try {
     const token = req.token;

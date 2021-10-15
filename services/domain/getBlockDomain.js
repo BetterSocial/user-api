@@ -13,7 +13,7 @@ module.exports = async (userId) => {
   const domainBlock = await UserBlockedDomain.findAll({
     attributes: ["domain_page_id"],
     where: {
-      user_id_blocker: userID,
+      user_id_blocker: userId,
     },
   });
   const valueString = JSON.stringify(domainBlock);
