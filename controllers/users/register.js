@@ -270,7 +270,7 @@ module.exports = async (req, res) => {
       });
 
     addUserToLocation(dataLocations, userId);
-    // addUserToTopic(dataTopics, userId);
+    addUserToTopic(dataTopics, userId);
 
     await getstreamService.followLocations(token, dataLocations);
 

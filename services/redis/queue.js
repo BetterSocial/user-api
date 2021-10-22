@@ -28,6 +28,16 @@ const addUserToChannelQueue = async (data, options) => {
   queue.add(data, options);
   return queue;
 };
+
+const addUserToTopicChannel = async (data, options) => {
+  const queue = new Bull("addUserToTopicChannelQueue", {
+    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  });
+
+  queue.add(data, options);
+  return queue;
+};
+
 const addToChannelChatQueue = async (locations, userId) => {
   let loc = locations.map((item) => {
     if (item.country === "US") {
@@ -65,4 +75,5 @@ module.exports = {
   followTopicQueue,
   addToChannelChatQueue,
   addUserToChannelQueue,
+  addUserToTopicChannel,
 };

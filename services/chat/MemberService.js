@@ -1,9 +1,13 @@
-const { addUserToChannelQueue } = require("../../services/redis");
+const {
+  addUserToChannelQueue,
+  addUserToTopicChannel,
+} = require("../../services/redis");
 const { v4: uuidv4 } = require("uuid");
 const { convertString } = require("../../utils/custom");
 const _ = require("lodash");
 
 const addUserToTopic = async (topics, userId) => {
+  console.log("***********************************************************");
   const options = {
     jobId: uuidv4(),
     removeOnComplete: true,
@@ -17,12 +21,13 @@ const addUserToTopic = async (topics, userId) => {
     user_id: userId,
     channelIds: newDataTopic,
   };
-  const resultJob = await addUserToChannelQueue(data, options);
+  console.log(data);
+  console.log("addUserToTopic");
+  const resultJob = await addUserToTopicChannel(data, options);
   return resultJob;
 };
 
 const addUserToLocation = async (locations, userId) => {
-  console.log("addUserToLocation");
   let loc = locations.map((item) => {
     if (item.country === "US") {
       let loc = [];
@@ -47,8 +52,6 @@ const addUserToLocation = async (locations, userId) => {
   };
 
   const resultJob = await addUserToChannelQueue(data, options);
-  console.log("***********************");
-  console.log(resultJob);
   return resultJob;
 };
 
