@@ -52,6 +52,8 @@ const addUserToLocation = async (locations, userId) => {
   };
 
   const resultJob = await addUserToChannelQueue(data, options);
+  console.log(resultJob);
+  console.log("job add user to channel queue");
   return resultJob;
 };
 
