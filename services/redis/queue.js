@@ -21,7 +21,6 @@ const followTopicQueue = new Bull("followTopicQueue", {
 });
 
 const addUserToChannelQueue = async (data, options) => {
-  console.log("addUserToChannelQueue");
   const queue = new Bull("addUserToChannelQueue", {
     redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
   });

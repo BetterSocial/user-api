@@ -7,7 +7,6 @@ const { convertString } = require("../../utils/custom");
 const _ = require("lodash");
 
 const addUserToTopic = async (topics, userId) => {
-  console.log("***********************************************************");
   const options = {
     jobId: uuidv4(),
     removeOnComplete: true,
@@ -21,8 +20,6 @@ const addUserToTopic = async (topics, userId) => {
     user_id: userId,
     channelIds: newDataTopic,
   };
-  console.log(data);
-  console.log("addUserToTopic");
   const resultJob = await addUserToTopicChannel(data, options);
   return resultJob;
 };
@@ -52,8 +49,6 @@ const addUserToLocation = async (locations, userId) => {
   };
 
   const resultJob = await addUserToChannelQueue(data, options);
-  console.log(resultJob);
-  console.log("job add user to channel queue");
   return resultJob;
 };
 

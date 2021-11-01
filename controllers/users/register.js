@@ -284,10 +284,6 @@ module.exports = async (req, res) => {
     };
     followUserQueue.add(userQueue, optionsUser);
 
-    await getstreamService.followUsers(token, follows);
-
-    await getstreamService.followTopics(token, dataTopics);
-
     const topicQueue = {
       token,
       topics: dataTopics,
@@ -297,6 +293,18 @@ module.exports = async (req, res) => {
       removeOnComplete: true,
     };
     followTopicQueue.add(topicQueue, optionsTopic);
+
+    const locationQueue = {
+      token,
+      locations: dataLocations,
+    };
+
+    const optionLocation = {
+      jobId: uuidv4(),
+      removeOnComplete: true,
+    };
+
+    followLocationQueue.add(locationQueue, optionLocation);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
