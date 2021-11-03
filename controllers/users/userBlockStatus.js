@@ -26,6 +26,7 @@ module.exports = async(req,res) => {
 
     try {
         let {user_id} = req.body
+        let myUserId = req.userId
         let userIdBlockedStatus = await UserBlockedUser.findAll({
             where : {
                 user_id_blocked : user_id,
