@@ -5,7 +5,7 @@ const Redis = require("ioredis");
 // const client = new Redis({
 //   port: 6379,
 //   host: "localhost",
-//   connectTimeout: 10000,
+//   connectTimeout: 100,
 // });
 /**
  * this is for production
