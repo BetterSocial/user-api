@@ -20,7 +20,10 @@ const followUsers = async (token, userIds) => {
     });
   });
 
-  return await clientServer.followMany(follows);
+  let res = await clientServer.followMany(follows);
+  console.log("follow Users");
+  console.log(res);
+  return res;
 };
 
 module.exports = {

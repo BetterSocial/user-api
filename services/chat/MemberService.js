@@ -1,4 +1,7 @@
-const { addUserToChannelQueue } = require("../../services/redis");
+const {
+  addUserToChannelQueue,
+  addUserToTopicChannel,
+} = require("../../services/redis");
 const { v4: uuidv4 } = require("uuid");
 const { convertString } = require("../../utils/custom");
 const _ = require("lodash");
@@ -17,7 +20,7 @@ const addUserToTopic = async (topics, userId) => {
     user_id: userId,
     channelIds: newDataTopic,
   };
-  const resultJob = await addUserToChannelQueue(data, options);
+  const resultJob = await addUserToTopicChannel(data, options);
   return resultJob;
 };
 

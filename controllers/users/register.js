@@ -53,7 +53,6 @@ const syncUser = async (userId) => {
       role: "user",
     },
   ]);
-  console.log(res);
 };
 
 module.exports = async (req, res) => {
@@ -242,7 +241,7 @@ module.exports = async (req, res) => {
     let token = await getstreamService.createToken(userId);
     let tokenChat = await createTokenChat(userId);
     await syncUser(userId);
-    await getstreamService.createUserChat(data, token, userId);
+    // await getstreamService.createUserChat(data, token, userId);
     let dataLocations = await Locations.findAll({
       where: {
         location_id: local_community,
@@ -285,10 +284,6 @@ module.exports = async (req, res) => {
     };
     followUserQueue.add(userQueue, optionsUser);
 
-    // await getstreamService.followUsers(token, follows);
-
-    // await getstreamService.followTopics(token, dataTopics);
-
     const topicQueue = {
       token,
       topics: dataTopics,
@@ -298,6 +293,18 @@ module.exports = async (req, res) => {
       removeOnComplete: true,
     };
     followTopicQueue.add(topicQueue, optionsTopic);
+
+    const locationQueue = {
+      token,
+      locations: dataLocations,
+    };
+
+    const optionLocation = {
+      jobId: uuidv4(),
+      removeOnComplete: true,
+    };
+
+    followLocationQueue.add(locationQueue, optionLocation);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
