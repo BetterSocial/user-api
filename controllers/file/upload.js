@@ -23,26 +23,35 @@ module.exports = async(req, res) => {
             message: "e",
         })
     }
-    const uploadStr = req.body.picture;
-    let returnCloudinary = await cloudinary.v2.uploader.upload(uploadStr, {
-      overwrite: false,
-      invalidate: true,
-    });
 
-    if(returnCloudinary) {
+    try {
+        const uploadStr = req.body.picture;
+        let returnCloudinary = await cloudinary.v2.uploader.upload(uploadStr, {
+          overwrite: false,
+          invalidate: true,
+        });
+    
+        if(returnCloudinary) {
+            return res.status(200).json({
+                code: 200,
+                status: "success",
+                message: "Picture has been successfully uploaded",
+                data : {
+                    url : returnCloudinary.secure_url
+                }
+            })
+        }  
+
         return res.status(403).json({
-            code: 200,
-            status: "success",
-            message: "Picture has been successfully uploaded",
-            data : {
-                url : returnCloudinary.secure_url
-            }
+            code: 403,
+            status: "error",
+            message: "Error uploading picture",
         })
-    }
-
-    return res.status(403).json({
-        code: 403,
-        status: "error",
-        message: "Error uploading picture",
-    })
+    } catch(e) {
+        return res.status(403).json({
+            code: 403,
+            status: "error",
+            message: e,
+        })
+    } 
 }
