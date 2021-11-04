@@ -24,10 +24,12 @@ const updateActivity = require("./updateActivity");
 const getDetailFeed = require("./getDetailFeed");
 const createUserChat = require("./createUserChat");
 const voteComment = require("./voteComment");
+const getOtherFeeds = require("./getOtherFeeds");
 
 module.exports = {
   getDetailDomain,
   getDomain,
+  getOtherFeeds,
   createUser,
   createToken,
   createPost,

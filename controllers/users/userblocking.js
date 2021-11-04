@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   try {
     const schema = {
       userId: "string",
-      postId: "string",
+      postId: "string|optional:true",
       reason: "array|optional:true",
       message: "string|optional:true",
       source: "string",
