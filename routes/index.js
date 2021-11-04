@@ -9,6 +9,7 @@ const locations = require("./locations");
 const auth = require("../middlewares/auth");
 const chat = require("../routes/chat");
 const domain = require("../routes/domain");
+const fileRouter = require("../routes/file")
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -22,6 +23,7 @@ router.use("/location", locations);
 router.use("/who-to-follow", whoToFollow);
 router.use("/chat", chat);
 router.use("/domain", domain);
+router.use("/file", fileRouter);
 
 router.post("/test", async (req, res) => {
   const { v4: uuidv4 } = require("uuid");
