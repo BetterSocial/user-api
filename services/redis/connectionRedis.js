@@ -16,6 +16,7 @@ const client = new Redis(String(process.env.REDIS_URL), {
   },
 });
 client.on("connect", function () {
+  console.log(process.env.REDIS_URL);
   console.error("redis connect");
 });
 client.on("error", function (error) {
