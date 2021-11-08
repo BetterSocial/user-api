@@ -109,7 +109,7 @@ module.exports = async (req, res) => {
           user_id: uuidv4(),
           human_id: users.human_id,
           country_code: users.country_code.toUpperCase(),
-          username: users.username.toLowerCase(),
+          username: users.username,
           real_name: users.real_name
             ? users.real_name.toLowerCase()
             : users.real_name,
