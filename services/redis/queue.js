@@ -5,25 +5,66 @@ const _ = require("lodash");
 const { convertString } = require("../../utils/custom");
 
 const postTimeQueue = new Bull("addQueuePostTime", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: {
+    password: process.env.REDIS_PASSWORD,
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    tls: {
+      rejectUnauthorized: false,
+      servername: process.env.REDIS_HOST
+    }
+  },
 });
 
 const followLocationQueue = new Bull("followLocationQueue", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: {
+    password: process.env.REDIS_PASSWORD,
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    tls: {
+      rejectUnauthorized: false,
+      servername: process.env.REDIS_HOST
+    }
+  },
 });
 
 const followUserQueue = new Bull("followUserQueue", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: {
+    password: process.env.REDIS_PASSWORD,
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    tls: {
+      rejectUnauthorized: false,
+      servername: process.env.REDIS_HOST
+    }
+  },
 });
 
 const followTopicQueue = new Bull("followTopicQueue", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: {
+    password: process.env.REDIS_PASSWORD,
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    tls: {
+      rejectUnauthorized: false,
+      servername: process.env.REDIS_HOST
+    }
+  },
 });
 
 const addUserToChannelQueue = async (data, options) => {
-  const queue = new Bull("addUserToChannelQueue", {
-    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
-  });
+  const queue = new Bull("addUserToChannelQueue",
+    {
+      redis: {
+        password: 'p2fd676e97e776358ee7eeddb92833f11ac1c88785ac43c2dd57e117339ba024e',
+        host: 'ec2-23-20-134-49.compute-1.amazonaws.com',
+        port: 24799,
+        tls: {
+          rejectUnauthorized: false,
+          servername: 'ec2-23-20-134-49.compute-1.amazonaws.com'
+        }
+      },
+    });
 
   queue.add(data, options);
   return queue;
@@ -31,7 +72,15 @@ const addUserToChannelQueue = async (data, options) => {
 
 const addUserToTopicChannel = async (data, options) => {
   const queue = new Bull("addUserToTopicChannelQueue", {
-    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+    redis: {
+      password: 'p2fd676e97e776358ee7eeddb92833f11ac1c88785ac43c2dd57e117339ba024e',
+      host: 'ec2-23-20-134-49.compute-1.amazonaws.com',
+      port: 24799,
+      tls: {
+        rejectUnauthorized: false,
+        servername: 'ec2-23-20-134-49.compute-1.amazonaws.com'
+      }
+    },
   });
 
   queue.add(data, options);
@@ -53,9 +102,19 @@ const addToChannelChatQueue = async (locations, userId) => {
   });
   let temp = _.union(...loc);
 
-  const locationQueue = new Bull("addUserToChannelQueue", {
-    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
-  });
+  const locationQueue = new Bull(
+    "addUserToChannelQueue",
+    {
+      redis: {
+        password: 'p2fd676e97e776358ee7eeddb92833f11ac1c88785ac43c2dd57e117339ba024e',
+        host: 'ec2-23-20-134-49.compute-1.amazonaws.com',
+        port: 24799,
+        tls: {
+          rejectUnauthorized: false,
+          servername: 'ec2-23-20-134-49.compute-1.amazonaws.com'
+        }
+      },
+    });
   let data = {
     user_id: userId,
     locations: temp,
