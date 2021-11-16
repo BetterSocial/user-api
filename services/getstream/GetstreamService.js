@@ -6,14 +6,13 @@ class GetstreamService {
 
   constructor(client) {
     this._client = client;
-    this.getTopicById = this.getTopicById.bind(this);
+    this.getTopicPages = this.getTopicPages.bind(this);
   }
 
-  async getTopicById(id, id_lt) {
+  async getTopicPages(id,) {
     const query = {
       limit: MAX_FEED_FETCH_LIMIT,
-      id_lt: id_lt || "",
-      // reactions: { own: true, recent: true, counts: true },
+      reactions: { own: true, recent: true, counts: true },
     };
     const res = await this._client.feed("topic", id).get(query);
     let data = res.results
@@ -21,6 +20,27 @@ class GetstreamService {
       throw new InvariantError('Topic page not found');
     }
     return data;
+  }
+
+  async getTopicPageById(id, id_lt) {
+    try {
+      const query = {
+        limit: 1,
+        id_gte: id_lt || "",
+        reactions: { own: true, recent: true, counts: true },
+      };
+      const res = await this._client.feed("topic", id).get(query);
+      let data = res.results
+      if (!data.length) {
+        throw new InvariantError('Topic page not found');
+      }
+      return data[0];
+
+    } catch (error) {
+      console.log(error.error);
+      throw new InvariantError(error.error.detail);
+    }
+
   }
 }
 
