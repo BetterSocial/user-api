@@ -2,6 +2,7 @@ var express = require('express');
 const TopicPage = require('../controllers/topicPage/TopicPage');
 var router = express.Router();
 const cloudinary = require("cloudinary");
+const auth = require("../middlewares/auth")
 
 // controller
 const { API_PREFIX_V1 } = require('../helpers/constants');

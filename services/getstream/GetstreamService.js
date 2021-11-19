@@ -9,7 +9,7 @@ class GetstreamService {
     this.getTopicPages = this.getTopicPages.bind(this);
   }
 
-  async getTopicPages(id,) {
+  async getTopicPages(id) {
     const query = {
       limit: MAX_FEED_FETCH_LIMIT,
       reactions: { own: true, recent: true, counts: true },
