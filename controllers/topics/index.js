@@ -20,7 +20,7 @@ const getFollowTopic = async (req, res) => {
         res.status(200).json({
             status: "success",
             code: 200,
-            body: result,
+            data: result,
         });
 
     } catch (error) {
@@ -57,7 +57,7 @@ const putFollowTopic = async (req, res) => {
         res.status(200).json({
             status: "success",
             code: 200,
-            body: null,
+            data: !result,
             message
         });
 
