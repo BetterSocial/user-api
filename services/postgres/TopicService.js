@@ -1,4 +1,7 @@
+
+const { Op } = require("sequelize");
 const NotFoundError = require("../../exceptions/NotFoundError");
+
 
 class TopicService {
   constructor(topicModel) {
@@ -9,7 +12,9 @@ class TopicService {
     try {
       let result = await this._topic.findOne({
         where: {
-          name: name
+          name: {
+            [Op.iLike]: `%${name}%`
+          }
         },
 
       })
