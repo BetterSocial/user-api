@@ -10,6 +10,7 @@ const auth = require("../middlewares/auth");
 const chat = require("../routes/chat");
 const domain = require("../routes/domain");
 const fileRouter = require("../routes/file")
+const topicPage = require("./topicPages");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {

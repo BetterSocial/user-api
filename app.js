@@ -19,6 +19,8 @@ const verifyToken = require("./middlewares/verifyToken");
 const feedRouter = require("./routes/feeds");
 const domainRouter = require("./routes/domain");
 const chatRouter = require("./routes/chat");
+const topicPage = require("./routes/topicPages");
+const auth = require("./middlewares/auth");
 
 const app = express();
 
@@ -44,6 +46,7 @@ app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
 app.use("/api/v1/feeds", feedRouter);
 app.use("/api/v1/domain", domainRouter);
+app.use(auth.isAuth, topicPage);
 
 var options = {
   swaggerOptions: {
