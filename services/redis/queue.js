@@ -56,12 +56,12 @@ const addUserToChannelQueue = async (data, options) => {
   const queue = new Bull("addUserToChannelQueue",
     {
       redis: {
-        password: 'p2fd676e97e776358ee7eeddb92833f11ac1c88785ac43c2dd57e117339ba024e',
-        host: 'ec2-23-20-134-49.compute-1.amazonaws.com',
-        port: 24799,
+        password: process.env.REDIS_PASSWORD,
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
         tls: {
           rejectUnauthorized: false,
-          servername: 'ec2-23-20-134-49.compute-1.amazonaws.com'
+          servername: process.env.REDIS_HOST
         }
       },
     });
@@ -73,12 +73,12 @@ const addUserToChannelQueue = async (data, options) => {
 const addUserToTopicChannel = async (data, options) => {
   const queue = new Bull("addUserToTopicChannelQueue", {
     redis: {
-      password: 'p2fd676e97e776358ee7eeddb92833f11ac1c88785ac43c2dd57e117339ba024e',
-      host: 'ec2-23-20-134-49.compute-1.amazonaws.com',
-      port: 24799,
+      password: process.env.REDIS_PASSWORD,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
       tls: {
         rejectUnauthorized: false,
-        servername: 'ec2-23-20-134-49.compute-1.amazonaws.com'
+        servername: process.env.REDIS_HOST
       }
     },
   });
@@ -106,12 +106,12 @@ const addToChannelChatQueue = async (locations, userId) => {
     "addUserToChannelQueue",
     {
       redis: {
-        password: 'p2fd676e97e776358ee7eeddb92833f11ac1c88785ac43c2dd57e117339ba024e',
-        host: 'ec2-23-20-134-49.compute-1.amazonaws.com',
-        port: 24799,
+        password: process.env.REDIS_PASSWORD,
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
         tls: {
           rejectUnauthorized: false,
-          servername: 'ec2-23-20-134-49.compute-1.amazonaws.com'
+          servername: process.env.REDIS_HOST
         }
       },
     });

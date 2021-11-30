@@ -3,8 +3,8 @@ const Redis = require("ioredis");
  * this is for local
  */
 // const client = new Redis({
-//   port: 6379,
-//   host: "localhost",
+//   port: process.env.REDIS_PORT,
+//   host: process.env.REDIS_HOST,
 //   connectTimeout: 100,
 // });
 /**
