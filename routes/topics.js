@@ -7,6 +7,7 @@ const { isAuth } = require('../middlewares/auth');
 
 /* GET locations listing. */
 router.get('/list', topicsController.topics);
+router.get('/followed', isAuth, topicsController.getFollowedTopic);
 router.get("/follow", isAuth, topicsController.getFollowTopic)
 router.put("/follow", isAuth, topicsController.putFollowTopic)
 

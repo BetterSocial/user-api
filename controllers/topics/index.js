@@ -2,6 +2,7 @@ const ClientError = require("../../exceptions/ClientError");
 const TopicService = require("../../services/postgres/TopicService");
 const TopicValidator = require("../../validators/topic");
 const topics = require("./topics");
+const getFollowedTopic = require("./getFollowedTopic");
 const { Topics, UserTopic, UserTopicHistory } = require("../../databases/models");
 const UserTopicService = require("../../services/postgres/UserTopicService");
 
@@ -84,4 +85,5 @@ module.exports = {
     topics,
     putFollowTopic,
     getFollowTopic,
+    getFollowedTopic
 };
