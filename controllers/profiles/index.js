@@ -1,27 +1,29 @@
-const changeRealName = require("./changeRealName");
-const getMyProfile = require("./getMyProfile");
-const getOtherProfile = require("./getOtherProfile");
-const updateBio = require("./updateBio");
 const changeImageProfile = require("./changeImageProfile");
-const removeImageProfile = require("./removeImageProfile");
+const changeRealName = require("./changeRealName");
 const following = require("./following");
-const setFollowing = require("./setFollowing");
-const unSetFollowing = require("./unSetFollowing");
+const getMyProfile = require("./getMyProfile");
+const getOtherFeedsInProfile = require("./getOtherFeedsInProfile")
+const getOtherProfile = require("./getOtherProfile");
+const getOtherProfilebyUsername = require("./getOtherProfileByUsername");
 const getProfileByName = require("./getProfileByName")
 const getSelfFeedsInProfile = require("./getSelfFeedsInProfile")
-const getOtherFeedsInProfile = require("./getOtherFeedsInProfile")
+const removeImageProfile = require("./removeImageProfile");
+const setFollowing = require("./setFollowing");
+const unSetFollowing = require("./unSetFollowing");
+const updateBio = require("./updateBio");
 
 module.exports = {
-  changeRealName,
-  getMyProfile,
   changeImageProfile,
+  changeRealName,
   following,
-  setFollowing,
-  unSetFollowing,
-  removeImageProfile,
+  getMyProfile,
+  getOtherFeedsInProfile,
   getOtherProfile,
-  updateBio,
+  getOtherProfilebyUsername,
   getProfileByName,
   getSelfFeedsInProfile,
-  getOtherFeedsInProfile
+  removeImageProfile,
+  setFollowing,
+  unSetFollowing,
+  updateBio,
 };
