@@ -4,84 +4,51 @@ const _ = require("lodash");
 
 const { convertString } = require("../../utils/custom");
 
-const postTimeQueue = new Bull("addQueuePostTime", {
-  redis: {
-    password: process.env.REDIS_PASSWORD,
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    tls: {
-      rejectUnauthorized: false,
-      servername: process.env.REDIS_HOST
-    }
-  },
-});
+const connectRedis = process.env.REDIS_URL;
 
-const followLocationQueue = new Bull("followLocationQueue", {
-  redis: {
-    password: process.env.REDIS_PASSWORD,
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    tls: {
-      rejectUnauthorized: false,
-      servername: process.env.REDIS_HOST
-    }
-  },
-});
+const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+postTimeQueue.on('error', (err) => console.log('posttimeque', err));
 
-const followUserQueue = new Bull("followUserQueue", {
-  redis: {
-    password: process.env.REDIS_PASSWORD,
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    tls: {
-      rejectUnauthorized: false,
-      servername: process.env.REDIS_HOST
-    }
-  },
-});
+const followLocationQueue = new Bull("followLocationQueue", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+followLocationQueue.on('error', (err) => console.log('followLocationQueue', err));
 
-const followTopicQueue = new Bull("followTopicQueue", {
-  redis: {
-    password: process.env.REDIS_PASSWORD,
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    tls: {
-      rejectUnauthorized: false,
-      servername: process.env.REDIS_HOST
-    }
-  },
-});
+const followUserQueue = new Bull("followUserQueue", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+followUserQueue.on('error', (err) => console.log('followUserQueue', err));
+
+const followTopicQueue = new Bull("followTopicQueue", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
 
 const addUserToChannelQueue = async (data, options) => {
   const queue = new Bull("addUserToChannelQueue",
+    connectRedis,
     {
-      redis: {
-        password: process.env.REDIS_PASSWORD,
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        tls: {
-          rejectUnauthorized: false,
-          servername: process.env.REDIS_HOST
-        }
-      },
+      redis: { tls: { rejectUnauthorized: false } }
     });
+  queue.on('error', (err) => console.log('addUserToChannelQueue', err));
+
 
   queue.add(data, options);
   return queue;
 };
 
 const addUserToTopicChannel = async (data, options) => {
-  const queue = new Bull("addUserToTopicChannelQueue", {
-    redis: {
-      password: process.env.REDIS_PASSWORD,
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
-      tls: {
-        rejectUnauthorized: false,
-        servername: process.env.REDIS_HOST
-      }
-    },
-  });
+  const queue = new Bull("addUserToTopicChannelQueue", connectRedis,
+    {
+      redis: { tls: { rejectUnauthorized: false } }
+    });
+  queue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
 
   queue.add(data, options);
   return queue;
@@ -104,17 +71,11 @@ const addToChannelChatQueue = async (locations, userId) => {
 
   const locationQueue = new Bull(
     "addUserToChannelQueue",
+    connectRedis,
     {
-      redis: {
-        password: process.env.REDIS_PASSWORD,
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        tls: {
-          rejectUnauthorized: false,
-          servername: process.env.REDIS_HOST
-        }
-      },
+      redis: { tls: { rejectUnauthorized: false } }
     });
+  locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
   let data = {
     user_id: userId,
     locations: temp,
@@ -126,6 +87,8 @@ const addToChannelChatQueue = async (locations, userId) => {
   locationQueue.add(data, options);
   return locations;
 };
+
+
 
 module.exports = {
   postTimeQueue,
