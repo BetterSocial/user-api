@@ -175,6 +175,7 @@ module.exports = async (req, res) => {
           updated_at: myTs,
         };
       });
+
       let returnTopic = await UserTopic.bulkCreate(topics_array_return, {
         transaction: t,
         returning: true,
@@ -283,7 +284,6 @@ module.exports = async (req, res) => {
       users: follows,
     };
     followUserQueue.add(userQueue, optionsUser);
-    console.log(followUserQueue);
 
     const topicQueue = {
       token,
@@ -294,7 +294,6 @@ module.exports = async (req, res) => {
       removeOnComplete: true,
     };
     followTopicQueue.add(topicQueue, optionsTopic);
-    console.log(followTopicQueue);
 
     const locationQueue = {
       token,
@@ -307,7 +306,6 @@ module.exports = async (req, res) => {
     };
 
     followLocationQueue.add(locationQueue, optionLocation);
-    console.log(followLocationQueue);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
