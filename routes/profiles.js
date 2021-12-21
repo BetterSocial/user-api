@@ -8,7 +8,7 @@ router.post("/changes-image/:id", profileController.changeImageProfile);
 router.delete("/remove-image/:id", profileController.removeImageProfile);
 router.get("/get-my-profile/:id", profileController.getMyProfile);
 router.get("/get-other-profile/:id", profileController.getOtherProfile);
-router.get("/get-other-profile-by-username/:username", profileController.getOtherProfilebyUsername);
+router.get("/get-other-profile-by-username/:username", Auth.isAuth, profileController.getOtherProfilebyUsername);
 router.get("/get-profile/:username", profileController.getProfileByName);
 router.post("/update-bio/:id", profileController.updateBio);
 router.get("/following/:id", profileController.following);
