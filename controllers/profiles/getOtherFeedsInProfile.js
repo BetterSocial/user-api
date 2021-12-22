@@ -42,6 +42,7 @@ module.exports = async (req, res) => {
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
           if (now < dateExpired || item.duration_feed == "never") {
+            if(item.anonimity) continue
             if (item.verb === POST_VERB_POLL) {
               let newItem = { ...item };
               let pollOptions = await PollingOption.findAll({
