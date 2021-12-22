@@ -38,7 +38,7 @@ app.use("/topics", topicsRouter);
 app.use("/location", locationsRouter);
 app.use("/who-to-follow", whoToFollowRouter);
 app.use("/profiles", profilesRouter);
-app.use("/links", linkRouter);
+app.use("/u", linkRouter);
 
 // app.use("/", indexRouter);
 app.use("/api/v1/users", usersRouter);
@@ -48,7 +48,7 @@ app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
 app.use("/api/v1/feeds", feedRouter);
 app.use("/api/v1/domain", domainRouter);
-app.use("/api/v1/links", linkRouter);
+app.use("/api/v1/u", linkRouter);
 app.use(auth.isAuth, topicPage);
 
 var options = {
