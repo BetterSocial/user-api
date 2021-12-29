@@ -11,6 +11,7 @@ const removeImageProfile = require("./removeImageProfile");
 const setFollowing = require("./setFollowing");
 const unSetFollowing = require("./unSetFollowing");
 const updateBio = require("./updateBio");
+const {handleBlock} = require("./blocking")
 
 module.exports = {
   changeImageProfile,
@@ -26,4 +27,5 @@ module.exports = {
   setFollowing,
   unSetFollowing,
   updateBio,
+  handleBlock
 };

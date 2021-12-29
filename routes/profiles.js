@@ -12,6 +12,7 @@ router.get("/get-other-profile-by-username/:username", Auth.isAuth, profileContr
 router.get("/get-profile/:username", profileController.getProfileByName);
 router.post("/update-bio/:id", profileController.updateBio);
 router.get("/following/:id", profileController.following);
+router.get("/block/", Auth.isAuth, profileController.handleBlock);
 router.post("/set-following", profileController.setFollowing);
 router.post("/unset-following", profileController.unSetFollowing);
 router.get("/self-feeds", Auth.isAuth, profileController.getSelfFeedsInProfile);
