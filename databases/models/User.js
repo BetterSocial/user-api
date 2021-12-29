@@ -20,6 +20,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id_followed",
         as: "follower",
       });
+      models.User.hasMany(models.UserBlockedUser, {
+        foreignKey: "user_id_blocker",
+        as: "blocker"
+      });
+      models.User.hasMany(models.UserBlockedUser, {
+        foreignKey: "user_id_blocked",
+        as: "blocked"
+      });
 
       models.User.belongsToMany(models.Topics, {
         through: "user_topics",
