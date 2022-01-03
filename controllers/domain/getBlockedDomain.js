@@ -5,7 +5,7 @@ const getBlockedDomain = async (req, res) => {
         let domainsBlocked = await sequelize.query(
             `SELECT * FROM public.domain_page A INNER JOIN public.user_blocked_domain B
             ON A.domain_page_id = B.domain_page_id
-            WHERE B.user_blocked_domain_id = :userId`,
+            WHERE B.user_id_blocker = :userId`,
             {
                 replacements : {userId : req.userId},
                 raw : true
