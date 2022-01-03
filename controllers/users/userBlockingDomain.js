@@ -10,12 +10,13 @@ const { BLOCK_DOMAIN_KEY } = require("../../helpers/constants");
 const { getIdBlockDomain } = require("../../utils/block");
 const v = new Validator();
 module.exports = async (req, res) => {
+  console.log(req.body, 'makal')
   try {
     const schema = {
-      domainId: "string",
-      reason: "array|optional:true",
-      message: "string|optional:true",
-      source: "string",
+      domainId: {type: "string"},
+      reason: {type: "array", optional: true},
+      message: {type: "string", optional: true},
+      source: {type: "string"},
     };
     const validate = await v.validate(req.body, schema);
     if (validate.length) {
