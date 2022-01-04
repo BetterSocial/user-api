@@ -9,7 +9,10 @@ const {
   followDomain,
   iFollow,
   unfollowDomain,
-  getBlockedDomain
+  getBlockedDomain,
+  unblockDomain
+
+
 } = require("../controllers/domain");
 const { isAuth } = require("../middlewares/auth");
 
@@ -21,5 +24,6 @@ router.get("/profile-domain/:name", getProfileDomain);
 router.post("/follow", isAuth, followDomain);
 router.post("/unfollow", isAuth, unfollowDomain);
 router.get("/ifollow", isAuth, iFollow);
+router.post("/unblock", isAuth, unblockDomain);
 
 module.exports = router;
