@@ -10,7 +10,8 @@ const {
   iFollow,
   unfollowDomain,
   getBlockedDomain,
-  unblockDomain
+  unblockDomain,
+  getSingleBlockedDomain
 
 
 } = require("../controllers/domain");
@@ -25,5 +26,6 @@ router.post("/follow", isAuth, followDomain);
 router.post("/unfollow", isAuth, unfollowDomain);
 router.get("/ifollow", isAuth, iFollow);
 router.post("/unblock", isAuth, unblockDomain);
+router.get("/check-blocked/:domainId", isAuth, getSingleBlockedDomain);
 
 module.exports = router;
