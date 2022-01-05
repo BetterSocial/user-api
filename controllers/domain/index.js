@@ -7,6 +7,7 @@ const iFollow = require("./iFollow");
 const getFollowedDomain = require('./getFollowedDomain')
 const {getBlockedDomain} = require("./getBlockedDomain")
 const {unblockDomain} = require("./unblockDomain")
+const {getSingleBlockedDomain} = require("./getSingleBlockedDomain")
 
 module.exports = {
   getDomain,
@@ -17,5 +18,6 @@ module.exports = {
   followDomain,
   iFollow,
   getBlockedDomain,
-  unblockDomain
+  unblockDomain,
+  getSingleBlockedDomain
 };
