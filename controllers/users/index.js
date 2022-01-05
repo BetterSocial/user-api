@@ -11,6 +11,7 @@ const populate = require('./populateUser');
 const blockPostAnonymous = require('./userBlockPostAnonymous');
 const userBlockStatus = require('./userBlockStatus');
 const userUnblock = require('./userUnblock');
+const deleteUser = require('./deleteUser');
 
 module.exports = {
   checkUsername,
@@ -25,5 +26,6 @@ module.exports = {
   populate,
   blockPostAnonymous,
   userBlockStatus,
-  userUnblock
+  userUnblock,
+  deleteUser,
 };
