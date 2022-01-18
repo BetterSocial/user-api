@@ -90,7 +90,7 @@ const addToChannelChatQueue = async (locations, userId) => {
 };
 
 
-const prepopulatedDmQueue = (id, ids) => {
+const prepopulatedDmQueue = async (id, ids) => {
   const queue = new Bull(
     "prepopulatedDmQueue",
     connectRedis,
@@ -98,6 +98,8 @@ const prepopulatedDmQueue = (id, ids) => {
       redis: { tls: { rejectUnauthorized: false } }
     }
   );
+
+  queue.on('error', (err) => console.log('addUserToChannelQueue', err));
 
   let data = {
     id,
