@@ -23,6 +23,7 @@ const {
   followTopicQueue,
   followUserQueue,
   addToChannelChatQueue,
+  prepopulatedDmQueue,
 } = require("../../services/redis");
 const { responseSuccess } = require("../../utils/Responses");
 
@@ -306,6 +307,8 @@ module.exports = async (req, res) => {
     };
 
     followLocationQueue.add(locationQueue, optionLocation);
+
+    prepopulatedDmQueue(userId, follows);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({

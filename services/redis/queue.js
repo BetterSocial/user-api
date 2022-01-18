@@ -74,7 +74,8 @@ const addToChannelChatQueue = async (locations, userId) => {
     connectRedis,
     {
       redis: { tls: { rejectUnauthorized: false } }
-    });
+    }
+  );
   locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
   let data = {
     user_id: userId,
@@ -89,6 +90,30 @@ const addToChannelChatQueue = async (locations, userId) => {
 };
 
 
+const prepopulatedDmQueue = (id, ids) => {
+  const queue = new Bull(
+    "prepopulatedDmQueue",
+    connectRedis,
+    {
+      redis: { tls: { rejectUnauthorized: false } }
+    }
+  );
+
+  let data = {
+    id,
+    ids,
+  }
+
+  const options = {
+    jobId: uuidv4(),
+    removeOnComplete: true,
+  };
+
+  queue.add(data, options);
+  return queue;
+}
+
+
 
 module.exports = {
   postTimeQueue,
@@ -98,4 +123,5 @@ module.exports = {
   addToChannelChatQueue,
   addUserToChannelQueue,
   addUserToTopicChannel,
+  prepopulatedDmQueue,
 };
