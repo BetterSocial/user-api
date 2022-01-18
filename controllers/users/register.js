@@ -308,7 +308,8 @@ module.exports = async (req, res) => {
 
     followLocationQueue.add(locationQueue, optionLocation);
 
-    prepopulatedDmQueue(userId, follows);
+    let statusQueuePrepopulatedDm = await prepopulatedDmQueue(userId, follows);
+    console.log(statusQueuePrepopulatedDm);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
