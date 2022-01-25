@@ -275,7 +275,7 @@ module.exports = async (req, res) => {
 
     addUserToTopic(dataTopics, userId);
 
-    let statusQueuePrepopulatedDm = await prepopulatedDmQueue(userId, follows);
+    prepopulatedDmQueue(userId, follows);
     console.log("===============end queue prepopulated dm ========================");
 
     await getstreamService.followLocations(token, dataLocations);
