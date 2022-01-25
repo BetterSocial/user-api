@@ -4,31 +4,31 @@ const _ = require("lodash");
 
 const { convertString } = require("../../utils/custom");
 
-// const connectRedis = String(process.env.REDIS_UR)L;
+const connectRedis = String('redis://:p2fd676e97e776358ee7eeddb92833f11ac1c88785ac43c2dd57e117339ba024e@ec2-3-216-114-120.compute-1.amazonaws.com:15309');
 
 const postTimeQueue = new Bull("addQueuePostTime", {
-  redis: String(process.env.REDIS_URL),
+  redis: connectRedis,
 });
 postTimeQueue.on('error', (err) => console.log('posttimeque', err));
 
 const followLocationQueue = new Bull("followLocationQueue", {
-  redis: String(process.env.REDIS_URL),
+  redis: connectRedis,
 });
 followLocationQueue.on('error', (err) => console.log('followLocationQueue', err));
 
 const followUserQueue = new Bull("followUserQueue", {
-  redis: String(process.env.REDIS_URL),
+  redis: connectRedis,
 });
 followUserQueue.on('error', (err) => console.log('followUserQueue', err));
 
 const followTopicQueue = new Bull("followTopicQueue", {
-  redis: String(process.env.REDIS_URL),
+  redis: connectRedis,
 });
 followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
 
 const addUserToChannelQueue = async (data, options) => {
   const queue = new Bull("addUserToChannelQueue", {
-    redis: String(process.env.REDIS_URL),
+    redis: connectRedis,
   });
   queue.on('error', (err) => console.log('addUserToChannelQueue', err));
 
@@ -39,7 +39,7 @@ const addUserToChannelQueue = async (data, options) => {
 
 const addUserToTopicChannel = async (data, options) => {
   const queue = new Bull("addUserToTopicChannelQueue", {
-    redis: String(process.env.REDIS_URL),
+    redis: connectRedis,
   });
   queue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
 
@@ -65,7 +65,7 @@ const addToChannelChatQueue = async (locations, userId) => {
   const locationQueue = new Bull(
     "addUserToChannelQueue",
     {
-      redis: String(process.env.REDIS_URL),
+      redis: connectRedis,
     }
   );
   locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
@@ -86,7 +86,7 @@ const prepopulatedDmQueue = async (id, ids) => {
   const queue = new Bull(
     "prepopulatedDmQueue",
     {
-      redis: String(process.env.REDIS_URL),
+      redis: connectRedis,
     }
   );
 
