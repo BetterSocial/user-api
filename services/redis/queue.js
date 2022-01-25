@@ -43,15 +43,15 @@ const addUserToChannelQueue = async (data, options) => {
   return queue;
 };
 
-const addUserToTopicChannel = async (data, options) => {
-  const queue = new Bull("addUserToTopicChannelQueue", connectRedis,
-    {
-      redis: { tls: { rejectUnauthorized: false } }
-    });
-  queue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
+const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+addUserToTopicChannelQueue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
 
-  queue.add(data, options);
-  return queue;
+const addUserToTopicChannel = async (data, options) => {
+  addUserToTopicChannelQueue.add(data, options);
+  return addUserToTopicChannelQueue;
 };
 
 const addToChannelChatQueue = async (locations, userId) => {
