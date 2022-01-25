@@ -99,7 +99,7 @@ const prepopulatedDmQueue = async (id, ids) => {
     }
   );
 
-  queue.on('error', (err) => console.log('addUserToChannelQueue', err));
+  queue.on('error', (err) => console.log('Pre populated dm', err));
 
   let data = {
     id,

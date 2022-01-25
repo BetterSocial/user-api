@@ -271,7 +271,7 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    addUserToLocation(dataLocations, userId);
+    await addUserToLocation(dataLocations, userId);
 
     addUserToTopic(dataTopics, userId);
 
