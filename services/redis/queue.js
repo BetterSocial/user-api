@@ -115,6 +115,12 @@ const prepopulatedDmQueue = async (id, ids) => {
   return prepopulatedQueue;
 }
 
+const prepopulatedQueue = new Bull("prepopulatedDmQueue", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+prepopulatedQueue.on('error', (err) => console.log('prepopulatedDmQueue', err));
+
 
 
 module.exports = {
@@ -126,4 +132,5 @@ module.exports = {
   addUserToChannelQueue,
   addUserToTopicChannel,
   prepopulatedDmQueue,
+  prepopulatedQueue,
 };
