@@ -6,36 +6,30 @@ const { convertString } = require("../../utils/custom");
 
 const connectRedis = process.env.REDIS_URL;
 
-const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
-  {
-    redis: { tls: { rejectUnauthorized: false } }
-  });
+const postTimeQueue = new Bull("addQueuePostTime", {
+  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+});
 postTimeQueue.on('error', (err) => console.log('posttimeque', err));
 
-const followLocationQueue = new Bull("followLocationQueue", connectRedis,
-  {
-    redis: { tls: { rejectUnauthorized: false } }
-  });
+const followLocationQueue = new Bull("followLocationQueue", {
+  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+});
 followLocationQueue.on('error', (err) => console.log('followLocationQueue', err));
 
-const followUserQueue = new Bull("followUserQueue", connectRedis,
-  {
-    redis: { tls: { rejectUnauthorized: false } }
-  });
+const followUserQueue = new Bull("followUserQueue", {
+  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+});
 followUserQueue.on('error', (err) => console.log('followUserQueue', err));
 
-const followTopicQueue = new Bull("followTopicQueue", connectRedis,
-  {
-    redis: { tls: { rejectUnauthorized: false } }
-  });
+const followTopicQueue = new Bull("followTopicQueue", {
+  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+});
 followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
 
 const addUserToChannelQueue = async (data, options) => {
-  const queue = new Bull("addUserToChannelQueue",
-    connectRedis,
-    {
-      redis: { tls: { rejectUnauthorized: false } }
-    });
+  const queue = new Bull("addUserToChannelQueue", {
+    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  });
   queue.on('error', (err) => console.log('addUserToChannelQueue', err));
 
 
@@ -44,10 +38,9 @@ const addUserToChannelQueue = async (data, options) => {
 };
 
 const addUserToTopicChannel = async (data, options) => {
-  const queue = new Bull("addUserToTopicChannelQueue", connectRedis,
-    {
-      redis: { tls: { rejectUnauthorized: false } }
-    });
+  const queue = new Bull("addUserToTopicChannelQueue", {
+    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  });
   queue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
 
   queue.add(data, options);
@@ -71,9 +64,8 @@ const addToChannelChatQueue = async (locations, userId) => {
 
   const locationQueue = new Bull(
     "addUserToChannelQueue",
-    connectRedis,
     {
-      redis: { tls: { rejectUnauthorized: false } }
+      redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
     }
   );
   locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
@@ -93,9 +85,8 @@ const addToChannelChatQueue = async (locations, userId) => {
 const prepopulatedDmQueue = async (id, ids) => {
   const queue = new Bull(
     "prepopulatedDmQueue",
-    connectRedis,
     {
-      redis: { tls: { rejectUnauthorized: false } }
+      redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
     }
   );
 
