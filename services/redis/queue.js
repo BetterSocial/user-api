@@ -91,7 +91,7 @@ const addToChannelChatQueue = async (locations, userId) => {
 
 
 const prepopulatedDmQueue = async (id, ids) => {
-  const queue = new Bull(
+  const prepopulatedQueue = new Bull(
     "prepopulatedDmQueue",
     connectRedis,
     {
@@ -99,7 +99,7 @@ const prepopulatedDmQueue = async (id, ids) => {
     }
   );
 
-  queue.on('error', (err) => console.log('Pre populated dm', err));
+  prepopulatedQueue.on('error', (err) => console.log('Pre populated dm', err));
 
   let data = {
     id,
@@ -111,9 +111,15 @@ const prepopulatedDmQueue = async (id, ids) => {
     removeOnComplete: true,
   };
 
-  queue.add(data, options);
-  return queue;
+  await prepopulatedQueue.add(data, options);
+  return prepopulatedQueue;
 }
+
+const prepopulatedQueue = new Bull("prepopulatedDmQueue", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+prepopulatedQueue.on('error', (err) => console.log('prepopulatedDmQueue', err));
 
 
 
@@ -126,4 +132,5 @@ module.exports = {
   addUserToChannelQueue,
   addUserToTopicChannel,
   prepopulatedDmQueue,
+  prepopulatedQueue,
 };
