@@ -272,7 +272,11 @@ module.exports = async (req, res) => {
       });
 
     addUserToLocation(dataLocations, userId);
+
     addUserToTopic(dataTopics, userId);
+
+    let statusQueuePrepopulatedDm = await prepopulatedDmQueue(userId, follows);
+    console.log("===============end queue prepopulated dm ========================");
 
     await getstreamService.followLocations(token, dataLocations);
 
@@ -285,6 +289,7 @@ module.exports = async (req, res) => {
       users: follows,
     };
     followUserQueue.add(userQueue, optionsUser);
+    console.log("===============end queue follow user queue ========================");
 
     const topicQueue = {
       token,
@@ -295,6 +300,8 @@ module.exports = async (req, res) => {
       removeOnComplete: true,
     };
     followTopicQueue.add(topicQueue, optionsTopic);
+    console.log("===============end queue follow topic queue ========================");
+
 
     const locationQueue = {
       token,
@@ -307,9 +314,9 @@ module.exports = async (req, res) => {
     };
 
     followLocationQueue.add(locationQueue, optionLocation);
+    console.log("===============end queue follow location queue ========================");
 
-    let statusQueuePrepopulatedDm = await prepopulatedDmQueue(userId, follows);
-    console.log(statusQueuePrepopulatedDm);
+
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
