@@ -4,31 +4,31 @@ const _ = require("lodash");
 
 const { convertString } = require("../../utils/custom");
 
-const connectRedis = process.env.REDIS_URL;
+// const connectRedis = String(process.env.REDIS_UR)L;
 
 const postTimeQueue = new Bull("addQueuePostTime", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: String(process.env.REDIS_URL),
 });
 postTimeQueue.on('error', (err) => console.log('posttimeque', err));
 
 const followLocationQueue = new Bull("followLocationQueue", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: String(process.env.REDIS_URL),
 });
 followLocationQueue.on('error', (err) => console.log('followLocationQueue', err));
 
 const followUserQueue = new Bull("followUserQueue", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: String(process.env.REDIS_URL),
 });
 followUserQueue.on('error', (err) => console.log('followUserQueue', err));
 
 const followTopicQueue = new Bull("followTopicQueue", {
-  redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+  redis: String(process.env.REDIS_URL),
 });
 followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
 
 const addUserToChannelQueue = async (data, options) => {
   const queue = new Bull("addUserToChannelQueue", {
-    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+    redis: String(process.env.REDIS_URL),
   });
   queue.on('error', (err) => console.log('addUserToChannelQueue', err));
 
@@ -39,7 +39,7 @@ const addUserToChannelQueue = async (data, options) => {
 
 const addUserToTopicChannel = async (data, options) => {
   const queue = new Bull("addUserToTopicChannelQueue", {
-    redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+    redis: String(process.env.REDIS_URL),
   });
   queue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
 
@@ -65,7 +65,7 @@ const addToChannelChatQueue = async (locations, userId) => {
   const locationQueue = new Bull(
     "addUserToChannelQueue",
     {
-      redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+      redis: String(process.env.REDIS_URL),
     }
   );
   locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
@@ -86,7 +86,7 @@ const prepopulatedDmQueue = async (id, ids) => {
   const queue = new Bull(
     "prepopulatedDmQueue",
     {
-      redis: process.env.REDIS_URL || process.env.REDIS_TLS_URL,
+      redis: String(process.env.REDIS_URL),
     }
   );
 
