@@ -31,6 +31,8 @@ const { responseSuccess } = require("../../utils/Responses");
 const { addUserToLocation, addUserToTopic } = require("../../services/chat");
 
 const StreamChat = require("stream-chat").StreamChat;
+const { addForCreateAccount } = require("../../services/score");
+
 
 const changeValue = (items) => {
   return items.map((item, index) => {
@@ -326,7 +328,15 @@ module.exports = async (req, res) => {
     followLocationQueue.add(locationQueue, optionLocation);
     console.log("===============end queue follow location queue ========================");
 
-
+    const scoringProcessData = {
+      user_id: result.user_id,
+      register_time: result.createdAt,
+      emails: [],
+      twitter_acc: "",
+      topics: topics,
+      follow_users: follows
+    };
+    await addForCreateAccount(scoringProcessData);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({
