@@ -30,6 +30,12 @@ const followTopicQueue = new Bull("followTopicQueue", connectRedis,
   });
 followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
 
+const scoringProcessQueue = new Bull("scoringProcessQueue", connectRedis,
+  {
+    redis: { tls: { rejectUnauthorized: false } }
+  });
+  scoringProcessQueue.on('error', (err) => console.log('scoringProcessQueue', err));
+
 const addUserToChannelQueue = async (data, options) => {
   const queue = new Bull("addUserToChannelQueue",
     connectRedis,
