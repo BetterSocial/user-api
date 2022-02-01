@@ -21,6 +21,7 @@ const domainRouter = require("./routes/domain");
 const chatRouter = require("./routes/chat");
 const topicPage = require("./routes/topicPages");
 const linkRouter = require("./routes/link");
+const discovery = require('./routes/discovery')
 const auth = require("./middlewares/auth");
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/v1/who-to-follow", whoToFollowRouter);
 app.use("/api/v1/profiles", profilesRouter);
 app.use("/api/v1/feeds", feedRouter);
 app.use("/api/v1/domain", domainRouter);
+app.use("/api/v1/discovery", discovery);
 app.use("/api/v1/u", linkRouter);
 app.use(auth.isAuth, topicPage);
 
