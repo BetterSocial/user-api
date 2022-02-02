@@ -8,10 +8,8 @@ const client = stream.connect(
   );
 
 const notificationCommentFeed = async (body) => {
-    console.log(body, 'hampa')
-    const processNotif =  client.reactions.add(body.kind, body.activityId, { text: body.message }, {targetFeeds: [`notification:${body.userid}`], userId: body.userid})
+    const processNotif =  client.reactions.add(body.kind, body.activityId, { text: body.message }, {targetFeeds: [`notification:${body.useridFeed}`], userId: body.userid})
     return processNotif
-
 }
 
 module.exports = {

@@ -12,7 +12,7 @@ const notificationGetNewFeed = (userid) => {
         withRecentReactions:true,
         withReactionCounts: true,
         withOwnReactions: true,
-        mark_seen: false
+        mark_seen: false,
     })
 }
 

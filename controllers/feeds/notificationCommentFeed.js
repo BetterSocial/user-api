@@ -4,8 +4,9 @@ module.exports = async (req, res) => {
     let body = req.body
     body = {
         ...body,
-        userid: req.body.userid,
-        kind: req.params.kind
+        userid: req.userId,
+        kind: req.params.kind,
+        useridFeed: req.body.userid
     }
     try {
         
