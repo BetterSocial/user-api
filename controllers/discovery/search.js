@@ -68,6 +68,8 @@ const Search = async(req, res) => {
             `SELECT 
                 "Domain"."domain_page_id",
                 "Domain"."domain_name",
+				"Domain"."logo",
+				"Domain"."short_description",
                 count("domainFollower"."user_id_follower") 
                     AS "followersCount",
                 (SELECT "f"."user_id_follower" AS "user_id_follower" FROM "user_follow_domain" AS "f" WHERE "f"."user_id_follower" ='${userId}' AND "f"."domain_id_followed" = "Domain"."domain_page_id")
@@ -81,7 +83,9 @@ const Search = async(req, res) => {
                 "Domain"."domain_name" ILIKE '%${q}%' 
             GROUP BY 
                 "Domain"."domain_page_id",
-                "Domain"."domain_name"
+                "Domain"."domain_name",
+				"Domain"."logo",
+				"Domain"."short_description"
             ORDER BY
                 "user_id_follower" ASC,
                 "followersCount" DESC
