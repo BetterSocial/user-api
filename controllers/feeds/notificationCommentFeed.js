@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
         ...body,
         userid: req.userId,
         kind: req.params.kind,
-        useridFeed: req.body.userid
+        useridFeed: req.body.useridFeed
     }
     try {
         
