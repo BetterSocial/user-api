@@ -8,7 +8,7 @@ const client = stream.connect(
   );
 
 const notificationCommentFeed = async (body) => {
-    const processNotif =  client.reactions.add(body.kind, body.activityId, { text: body.message }, {targetFeeds: [`notification:${body.useridFeed}`], userId: body.userid})
+    const processNotif =  client.reactions.add(body.kind, body.activity_id, { text: body.message }, {targetFeeds: [`notification:${body.useridFeed}`], userId: body.userid})
     return processNotif
 }
 
