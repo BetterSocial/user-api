@@ -25,7 +25,9 @@ const getDetailFeed = require("./getDetailFeed");
 const createUserChat = require("./createUserChat");
 const voteComment = require("./voteComment");
 const getOtherFeeds = require("./getOtherFeeds");
-
+const {notificationGetNewFeed} = require("./notificationFeed")
+const {notificationFollowFeed} = require("./notificationFollowFeed")
+const {notificationCommentFeed} = require("./notificationActionFeed")
 module.exports = {
   getDetailDomain,
   getDomain,
@@ -57,4 +59,7 @@ module.exports = {
   getDetailFeed,
   createUserChat,
   voteComment,
+  notificationGetNewFeed,
+  notificationFollowFeed,
+  notificationCommentFeed
 };
