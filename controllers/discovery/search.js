@@ -1,5 +1,8 @@
 const { User, Topics, UserFollowUser, sequelize, Sequelize } = require('../../databases/models')
 const { Op, fn, col, QueryTypes } = require('sequelize')
+const _ = require('lodash')
+const { getDomain } = require('../../services/getstream')
+const { getBlockDomain } = require('../../services/domain')
 
 /**
  * 
@@ -16,7 +19,19 @@ const Search = async(req, res) => {
     })
 
     try {
-        const users = await sequelize.query(
+        const query = {
+            limit: 20,
+            id_lt: req.query.id_lt || "",
+            reactions: { own: true, recent: true, counts: true },
+        };
+        const resp = await getDomain(query);
+        const blockDomain = await getBlockDomain(req.userId);
+    
+        let news = await _.filter(resp.results, function (o) {
+            return !blockDomain.includes(o.content.domain_page_id) && (o.content.title.toLowerCase().indexOf(q) > -1);
+        });
+
+        let users = await sequelize.query(
             `SELECT 
                 "User".*,
                 count("follower"."user_id_follower") 
@@ -43,7 +58,7 @@ const Search = async(req, res) => {
                 "followersCount" DESC
             LIMIT 10`, { type: QueryTypes.SELECT})
 
-        const topics = await sequelize.query(
+        let topics = await sequelize.query(
         `SELECT 
             "Topic".*,
             count("topicFollower"."user_id") 
@@ -62,9 +77,9 @@ const Search = async(req, res) => {
         ORDER BY
             "user_id_follower" ASC,
             "followersCount" DESC
-        LIMIT 10`, { type: QueryTypes.SELECT })
+            LIMIT 10`, { type: QueryTypes.SELECT })
 
-        const domains = await sequelize.query(
+        let domains = await sequelize.query(
             `SELECT 
                 "Domain"."domain_page_id",
                 "Domain"."domain_name",
@@ -90,20 +105,48 @@ const Search = async(req, res) => {
                 "user_id_follower" ASC,
                 "followersCount" DESC
             LIMIT 10`, { type: QueryTypes.SELECT })
+
+        let followedDomains = domains.filter((item, index) => {
+            return item.user_id_follower !== null
+        })
+
+        let unfollowedDomains = domains.filter((item, index) => {
+            return item.user_id_follower === null
+        })
+
+        let followedUsers = users.filter((item, index) => {
+            return item.user_id_follower !== null
+        })
+
+        let unfollowedUsers = users.filter((item, index) => {
+            return item.user_id_follower === null
+        })
+
+        let followedTopic = topics.filter((item, index) => {
+            return item.user_id_follower !== null
+        })
+
+        let unfollowedTopic = topics.filter((item, index) => {
+            return item.user_id_follower === null
+        })
+
+        return res.status(200).json({
+            success: true,
+            message: `Search ${q}`,
+            followedDomains,
+            unfollowedDomains,
+            followedUsers,
+            unfollowedUsers,
+            followedTopic,
+            unfollowedTopic,
+            news
+        })
     }catch(e) {
         return res.status(200).json({
             success: false,
             message: e,
         })
     }
-
-    return res.status(200).json({
-        success: true,
-        message: `Search ${q}`,
-        users,
-        topics,
-        domains
-    })
 }
 
 module.exports =  Search
