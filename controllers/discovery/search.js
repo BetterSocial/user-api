@@ -1,6 +1,8 @@
 const { User, Topics, UserFollowUser, sequelize, Sequelize } = require('../../databases/models')
 const { Op, fn, col, QueryTypes } = require('sequelize')
-const { lte } = require('lodash')
+const _ = require('lodash')
+const { getDomain } = require('../../services/getstream')
+const { getBlockDomain } = require('../../services/domain')
 
 /**
  * 
@@ -17,6 +19,18 @@ const Search = async(req, res) => {
     })
 
     try {
+        const query = {
+            limit: 20,
+            id_lt: req.query.id_lt || "",
+            reactions: { own: true, recent: true, counts: true },
+        };
+        const resp = await getDomain(query);
+        const blockDomain = await getBlockDomain(req.userId);
+    
+        let news = await _.filter(resp.results, function (o) {
+            return !blockDomain.includes(o.content.domain_page_id) && (o.content.title.toLowerCase().indexOf(q) > -1);
+        });
+
         let users = await sequelize.query(
             `SELECT 
                 "User".*,
@@ -63,7 +77,7 @@ const Search = async(req, res) => {
         ORDER BY
             "user_id_follower" ASC,
             "followersCount" DESC
-        LIMIT 10`, { type: QueryTypes.SELECT })
+            LIMIT 10`, { type: QueryTypes.SELECT })
 
         let domains = await sequelize.query(
             `SELECT 
@@ -125,6 +139,7 @@ const Search = async(req, res) => {
             unfollowedUsers,
             followedTopic,
             unfollowedTopic,
+            news
         })
     }catch(e) {
         return res.status(200).json({
