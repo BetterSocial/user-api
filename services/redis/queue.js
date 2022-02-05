@@ -29,7 +29,8 @@ const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     },
   }
 );
@@ -41,7 +42,8 @@ const followLocationQueue = new Bull("followLocationQueue", connectRedis,
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     }
   }
 );
@@ -53,7 +55,8 @@ const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     }
   }
 );
@@ -64,7 +67,8 @@ const followUserQueue = new Bull("followUserQueue", connectRedis,
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     }
   }
 );
@@ -75,7 +79,8 @@ const followTopicQueue = new Bull("followTopicQueue", connectRedis,
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     }
   }
 );
@@ -88,7 +93,8 @@ const addUserToChannel = new Bull("addUserToChannelQueue",
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     }
   }
 );
@@ -104,7 +110,8 @@ const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connec
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     }
   }
 );
@@ -123,7 +130,8 @@ const locationQueue = new Bull(
     redis: {
       tls: {
 
-      }
+      },
+      connectTimeout: 3000
     }
   }
 );
