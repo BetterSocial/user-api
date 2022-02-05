@@ -8,13 +8,29 @@ const REDIS_URL = process.env.REDIS_URL;
 const redis_uri = url.parse(REDIS_URL);
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
-const redisOptions = {
-  tls: {}
-};
+const {
+  tls: {
+
+  }
+} = REDIS_URL.includes("rediss://")
+    ? {
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
+      tls: {
+        rejectUnauthorized: false,
+      },
+    }
+    : REDIS_URL;
 
 const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
   {
-    redis: redisOptions,
+    redis: {
+      tls: {
+
+      }
+    },
   }
 );
 postTimeQueue.on('error', (err) => console.log('posttimeque', err));
@@ -22,7 +38,11 @@ postTimeQueue.on('waiting', (e) => console.log('postime: ', e));
 
 const followLocationQueue = new Bull("followLocationQueue", connectRedis,
   {
-    redis: redisOptions
+    redis: {
+      tls: {
+
+      }
+    }
   }
 );
 followLocationQueue.on('error', (err) => console.log('followLocationQueue', err));
@@ -30,21 +50,33 @@ followLocationQueue.on('error', (err) => console.log('followLocationQueue', err)
 
 const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
   {
-    redis: redisOptions
+    redis: {
+      tls: {
+
+      }
+    }
   }
 );
 prepopulatedDmQueue.on('error', (err) => console.log('prepopulatedDmQueue', err));
 
 const followUserQueue = new Bull("followUserQueue", connectRedis,
   {
-    redis: redisOptions
+    redis: {
+      tls: {
+
+      }
+    }
   }
 );
 followUserQueue.on('error', (err) => console.log('followUserQueue', err));
 
 const followTopicQueue = new Bull("followTopicQueue", connectRedis,
   {
-    redis: redisOptions
+    redis: {
+      tls: {
+
+      }
+    }
   }
 );
 followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
@@ -53,7 +85,11 @@ followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
 const addUserToChannel = new Bull("addUserToChannelQueue",
   connectRedis,
   {
-    redis: redisOptions
+    redis: {
+      tls: {
+
+      }
+    }
   }
 );
 addUserToChannel.on('error', (err) => console.log('addUserToChannelQueue', err));
@@ -65,7 +101,11 @@ const addUserToChannelQueue = async (data, options) => {
 
 const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connectRedis,
   {
-    redis: redisOptions
+    redis: {
+      tls: {
+
+      }
+    }
   }
 );
 addUserToTopicChannelQueue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
@@ -80,7 +120,11 @@ const locationQueue = new Bull(
   "addUserToChannelQueue",
   connectRedis,
   {
-    redis: redisOptions
+    redis: {
+      tls: {
+
+      }
+    }
   }
 );
 locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
