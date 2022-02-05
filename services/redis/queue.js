@@ -7,28 +7,13 @@ const { convertString } = require("../../utils/custom");
 const REDIS_URL = process.env.REDIS_URL;
 const redis_uri = url.parse(REDIS_URL);
 
-const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
-const {
-  tls: {
-
-  }
-} = REDIS_URL.includes("rediss://")
-    ? {
-      port: Number(redis_uri.port),
-      host: redis_uri.hostname,
-      password: redis_uri.auth.split(":")[1],
-      db: 0,
-      tls: {
-        rejectUnauthorized: false,
-      },
-    }
-    : REDIS_URL;
+const connectRedis = process.env.REDIS_URL;
 
 const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     },
@@ -41,7 +26,7 @@ const followLocationQueue = new Bull("followLocationQueue", connectRedis,
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     }
@@ -54,7 +39,7 @@ const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     }
@@ -66,7 +51,7 @@ const followUserQueue = new Bull("followUserQueue", connectRedis,
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     }
@@ -78,7 +63,7 @@ const followTopicQueue = new Bull("followTopicQueue", connectRedis,
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     }
@@ -92,7 +77,7 @@ const addUserToChannel = new Bull("addUserToChannelQueue",
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     }
@@ -109,7 +94,7 @@ const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connec
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     }
@@ -129,7 +114,7 @@ const locationQueue = new Bull(
   {
     redis: {
       tls: {
-
+        rejectUnauthorized: false,
       },
       connectTimeout: 3000
     }
