@@ -1,6 +1,7 @@
 const Bull = require("bull");
 const { v4: uuidv4 } = require("uuid");
 const _ = require("lodash");
+const url = require('url');
 
 const { convertString } = require("../../utils/custom");
 const REDIS_URL = process.env.REDIS_URL;
