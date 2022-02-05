@@ -3,15 +3,23 @@ const { v4: uuidv4 } = require("uuid");
 const _ = require("lodash");
 
 const { convertString } = require("../../utils/custom");
+const REDIS_URL = process.env.REDIS_URL;
+const redis_uri = url.parse(REDIS_URL);
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
 
 const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
+
     }
   }
 );
@@ -21,9 +29,14 @@ postTimeQueue.on('waiting', (e) => console.log('postime: ', e));
 const followLocationQueue = new Bull("followLocationQueue", connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     }
   }
 );
@@ -33,9 +46,14 @@ followLocationQueue.on('error', (err) => console.log('followLocationQueue', err)
 const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     }
   }
 );
@@ -44,9 +62,14 @@ prepopulatedDmQueue.on('error', (err) => console.log('prepopulatedDmQueue', err)
 const followUserQueue = new Bull("followUserQueue", connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     }
   }
 );
@@ -55,9 +78,14 @@ followUserQueue.on('error', (err) => console.log('followUserQueue', err));
 const followTopicQueue = new Bull("followTopicQueue", connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     }
   }
 );
@@ -68,9 +96,14 @@ const addUserToChannel = new Bull("addUserToChannelQueue",
   connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     }
   }
 );
@@ -84,9 +117,14 @@ const addUserToChannelQueue = async (data, options) => {
 const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     }
   }
 );
@@ -103,9 +141,14 @@ const locationQueue = new Bull(
   connectRedis,
   {
     redis: {
+      // rejectUnauthorized: false
+      port: Number(redis_uri.port),
+      host: redis_uri.hostname,
+      password: redis_uri.auth.split(":")[1],
+      db: 0,
       tls: {
-        // rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     }
   }
 );
