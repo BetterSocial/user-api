@@ -3,7 +3,6 @@ const getstreamService = require("../../services/getstream");
 
 const getFeedChatService = async (req, res) => {
     try {
-        console.log(req.userId, 'jamanlu')
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
         for (let i = 0; i < data.results.length; i++) {
@@ -16,6 +15,8 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
                     titlePost: b.object.message,
+                    downvote: b.object.count_downvote, 
+                    upvote: b.object.count_upvote,
                     comments: []
                 }
                 a.push(newGroup[activity_id])
@@ -26,7 +27,7 @@ const getFeedChatService = async (req, res) => {
         res.status(200).send({
             success: true,
             data: groupingFeed,
-            message: "Success get data"
+            message: "Success get data",
         })
     } catch (e) {
         res.status(400).json({
