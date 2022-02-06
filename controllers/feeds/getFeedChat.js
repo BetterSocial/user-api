@@ -5,13 +5,12 @@ const getstreamService = require("../../services/getstream");
 
 const getFeedChatService = async (req, res) => {
     try {
-        const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
-        const blockList = await UserBlockedUser.findAll({
+        const blockList = UserBlockedUser.count({
             where: {
                 user_id_blocker: req.userId
             }
         })
-        console.log(blockList, 'mantap')
+        const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
         for (let i = 0; i < data.results.length; i++) {
             newFeed.push(...data.results[i].activities)
@@ -25,7 +24,7 @@ const getFeedChatService = async (req, res) => {
                     titlePost: b.object.message,
                     downvote: b.object.count_downvote, 
                     upvote: b.object.count_upvote,
-                    block: blockList.length,
+                    block: blockList,
                     comments: []
                 }
                 a.push(newGroup[activity_id])
