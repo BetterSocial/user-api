@@ -35,7 +35,7 @@ const getFeedChatService = async (req, res) => {
         }, [])
         res.status(200).send({
             success: true,
-            data: data,
+            data: groupingFeed,
             message: "Success get data",
         })
     } catch (e) {
