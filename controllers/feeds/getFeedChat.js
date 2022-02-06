@@ -5,13 +5,14 @@ const getstreamService = require("../../services/getstream");
 
 const getFeedChatService = async (req, res) => {
     try {
-        const blockList = UserBlockedUser.count({
+        const blockList = await UserBlockedUser.count({
             where: {
                 user_id_blocker: req.userId
             }
         })
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
+        console.log(blockList,'sumba')
         for (let i = 0; i < data.results.length; i++) {
             newFeed.push(...data.results[i].activities)
         }
