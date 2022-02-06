@@ -30,14 +30,12 @@ const getFeedChatService = async (req, res) => {
                 }
                 a.push(newGroup[activity_id])
             }
-            if(newGroup[activity_id].comments.length <= 0) {
-                newGroup[activity_id].comments.push({reaction: b.reaction, actor: b.actor})
-            }
+            newGroup[activity_id].comments.push({reaction: b.reaction, actor: b.actor})
             return a
         }, [])
         res.status(200).send({
             success: true,
-            data: groupingFeed,
+            data: data,
             message: "Success get data",
         })
     } catch (e) {
