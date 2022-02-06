@@ -1,8 +1,15 @@
+const {UserBlockedUser} = require ('../../databases/models')
 const getstreamService = require("../../services/getstream");
+
 
 
 const getFeedChatService = async (req, res) => {
     try {
+        const blockList = UserBlockedUser.count({
+            where: {
+                user_id_blocker: req.userId
+            }
+        })
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
         for (let i = 0; i < data.results.length; i++) {
@@ -17,11 +24,14 @@ const getFeedChatService = async (req, res) => {
                     titlePost: b.object.message,
                     downvote: b.object.count_downvote, 
                     upvote: b.object.count_upvote,
+                    block: blockList,
                     comments: []
                 }
                 a.push(newGroup[activity_id])
             }
-            newGroup[activity_id].comments.push({reaction: b.reaction, actor: b.actor})
+            if(newGroup[activity_id].comments.length <= 0) {
+                newGroup[activity_id].comments.push({reaction: b.reaction, actor: b.actor})
+            }
             return a
         }, [])
         res.status(200).send({
