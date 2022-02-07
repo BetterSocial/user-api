@@ -1,10 +1,9 @@
-const { comment, notificationCommentFeed } = require("../../services/getstream");
+const { comment } = require("../../services/getstream");
 module.exports = async (req, res) => {
   try {
     let body = req.body;
     body = {...body, kind: 'comment', userid: req.userId}
-    let result = await comment(body.activity_id, body.message, req.token);
-    await notificationCommentFeed(body)
+    let result = await comment(body.activity_id, req.userId,body.useridFeed, body.message, req.token);
     const { countProcess } = require("../../process");
     // save to db if character message > 80
     if (body.message.length > 80){
