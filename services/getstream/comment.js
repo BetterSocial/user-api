@@ -1,6 +1,6 @@
 const stream = require("getstream");
 
-module.exports = async (activityId, message, token) => {
+module.exports = async (activityId, userId, useridFeed, message, token) => {
   const clientUser = stream.connect(
     process.env.API_KEY,
     token,
@@ -10,5 +10,5 @@ module.exports = async (activityId, message, token) => {
     text: message,
     count_upvote: 0,
     count_downvote: 0,
-  });
+  }, {targetFeeds: [`notification:${useridFeed}`], userId});
 };
