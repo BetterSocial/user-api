@@ -7,11 +7,15 @@ const { convertString } = require("../../utils/custom");
 const REDIS_URL = process.env.REDIS_URL;
 const redis_uri = url.parse(REDIS_URL);
 
-const connectRedis = process.env.REDIS_URL;
+const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
 
 const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
   {
-    redis: { tls: { rejectUnauthorized: false }, connectTimeout: 30000 }
+    redis: {
+      tls: { rejectUnauthorized: false },
+      maxRetriesPerRequest: 100,
+      connectTimeout: 30000
+    }
   }
 );
 postTimeQueue.on('error', (err) => console.log('posttimeque', err));
@@ -20,9 +24,10 @@ postTimeQueue.on('waiting', (e) => console.log('postime: ', e));
 const followLocationQueue = new Bull("followLocationQueue", connectRedis,
   {
     redis: {
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
+      tls: {
+        rejectUnauthorized: false
+      },
+      maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }
   }
@@ -33,9 +38,10 @@ followLocationQueue.on('error', (err) => console.log('followLocationQueue', err)
 const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
   {
     redis: {
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
+      tls: {
+        rejectUnauthorized: false
+      },
+      maxRetriesPerRequest: 100,
       commandTimeout: 30000
     }
   }
@@ -45,9 +51,10 @@ prepopulatedDmQueue.on('error', (err) => console.log('prepopulatedDmQueue', err)
 const followUserQueue = new Bull("followUserQueue", connectRedis,
   {
     redis: {
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
+      tls: {
+        rejectUnauthorized: false
+      },
+      maxRetriesPerRequest: 100,
       commandTimeout: 30000
     }
   }
@@ -57,9 +64,10 @@ followUserQueue.on('error', (err) => console.log('followUserQueue', err));
 const followTopicQueue = new Bull("followTopicQueue", connectRedis,
   {
     redis: {
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
+      tls: {
+        rejectUnauthorized: false
+      },
+      maxRetriesPerRequest: 100,
       commandTimeout: 30000
     }
   }
@@ -70,9 +78,10 @@ followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
 const addUserToChannel = new Bull("addUserToChannelQueue", connectRedis,
   {
     redis: {
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
+      tls: {
+        rejectUnauthorized: false
+      },
+      maxRetriesPerRequest: 100,
       commandTimeout: 30000
     }
   }
@@ -87,9 +96,10 @@ const addUserToChannelQueue = async (data, options) => {
 const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connectRedis,
   {
     redis: {
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
+      tls: {
+        rejectUnauthorized: false
+      },
+      maxRetriesPerRequest: 100,
       commandTimeout: 30000
     }
   }
@@ -105,9 +115,10 @@ const addUserToTopicChannel = async (data, options) => {
 const locationQueue = new Bull("addUserToChannelQueue", connectRedis,
   {
     redis: {
-      // tls: {
-      //   rejectUnauthorized: false
-      // },
+      tls: {
+        rejectUnauthorized: false
+      },
+      maxRetriesPerRequest: 100,
       commandTimeout: 30000
     }
   }
