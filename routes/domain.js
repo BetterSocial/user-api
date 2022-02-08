@@ -11,9 +11,8 @@ const {
   unfollowDomain,
   getBlockedDomain,
   unblockDomain,
-  getSingleBlockedDomain
-
-
+  getSingleBlockedDomain,
+  localUploadDomain,
 } = require("../controllers/domain");
 const { isAuth } = require("../middlewares/auth");
 
@@ -27,5 +26,6 @@ router.post("/unfollow", isAuth, unfollowDomain);
 router.get("/ifollow", isAuth, iFollow);
 router.post("/unblock", isAuth, unblockDomain);
 router.get("/check-blocked/:domainId", isAuth, getSingleBlockedDomain);
+router.get("/local/upload-domain", localUploadDomain)
 
 module.exports = router;
