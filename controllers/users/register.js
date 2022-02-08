@@ -271,59 +271,59 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    await addUserToLocation(dataLocations, userId);
+    // await addUserToLocation(dataLocations, userId);
 
-    addUserToTopic(dataTopics, userId);
+    // addUserToTopic(dataTopics, userId);
 
-    // await prepopulatedDmQueue(userId, follows);
-    const optionsPrepopulated = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    }
-    let dataPrepoluated = {
-      userId,
-      follows,
-    }
-    prepopulatedDmQueue.add(dataPrepoluated, optionsPrepopulated);
-    console.log("===============end queue prepopulated dm ========================");
+    // // await prepopulatedDmQueue(userId, follows);
+    // const optionsPrepopulated = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // }
+    // let dataPrepoluated = {
+    //   userId,
+    //   follows,
+    // }
+    // prepopulatedDmQueue.add(dataPrepoluated, optionsPrepopulated);
+    // console.log("===============end queue prepopulated dm ========================");
 
-    await getstreamService.followLocations(token, dataLocations);
+    // await getstreamService.followLocations(token, dataLocations);
 
-    const optionsUser = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
-    const userQueue = {
-      token,
-      users: follows,
-    };
-    followUserQueue.add(userQueue, optionsUser);
-    console.log("===============end queue follow user queue ========================");
+    // const optionsUser = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
+    // const userQueue = {
+    //   token,
+    //   users: follows,
+    // };
+    // followUserQueue.add(userQueue, optionsUser);
+    // console.log("===============end queue follow user queue ========================");
 
-    const topicQueue = {
-      token,
-      topics: dataTopics,
-    };
-    const optionsTopic = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
-    followTopicQueue.add(topicQueue, optionsTopic);
-    console.log("===============end queue follow topic queue ========================");
+    // const topicQueue = {
+    //   token,
+    //   topics: dataTopics,
+    // };
+    // const optionsTopic = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
+    // followTopicQueue.add(topicQueue, optionsTopic);
+    // console.log("===============end queue follow topic queue ========================");
 
 
-    const locationQueue = {
-      token,
-      locations: dataLocations,
-    };
+    // const locationQueue = {
+    //   token,
+    //   locations: dataLocations,
+    // };
 
-    const optionLocation = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
+    // const optionLocation = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
 
-    followLocationQueue.add(locationQueue, optionLocation);
-    console.log("===============end queue follow location queue ========================");
+    // followLocationQueue.add(locationQueue, optionLocation);
+    // console.log("===============end queue follow location queue ========================");
 
 
 
