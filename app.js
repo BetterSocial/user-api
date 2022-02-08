@@ -75,5 +75,4 @@ app.use(
   swaggerUi.setup(swaggerApiDocumentation, options)
 );
 app.use("/api/v1", indexRouter);
-
 module.exports = app;
