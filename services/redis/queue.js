@@ -153,9 +153,9 @@ const addToChannelChatQueue = async (locations, userId) => {
 
 module.exports = {
   postTimeQueue,
-  followLocationQueue,
-  followUserQueue,
-  followTopicQueue,
+  // followLocationQueue,
+  // followUserQueue,
+  // followTopicQueue,
   addToChannelChatQueue,
   addUserToChannelQueue,
   addUserToTopicChannel,
