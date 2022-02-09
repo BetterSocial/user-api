@@ -272,7 +272,7 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    await getstreamService.followLocations(token, dataLocations);
+    // await getstreamService.followLocations(token, dataLocations);
     await registerServiceQueue(token, userId, follows, dataTopics, dataLocations);
 
     // await addUserToLocation(dataLocations, userId);
