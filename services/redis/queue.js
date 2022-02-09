@@ -33,18 +33,18 @@ postTimeQueue.on('waiting', (e) => console.log('postime: ', e));
 // followLocationQueue.on('error', (err) => console.log('followLocationQueue', err));
 
 
-const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
-  {
-    redis: {
-      tls: {
-        rejectUnauthorized: false
-      },
-      maxRetriesPerRequest: 100,
-      commandTimeout: 30000
-    }
-  }
-);
-prepopulatedDmQueue.on('error', (err) => console.log('prepopulatedDmQueue', err));
+// const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
+//   {
+//     redis: {
+//       tls: {
+//         rejectUnauthorized: false
+//       },
+//       maxRetriesPerRequest: 100,
+//       commandTimeout: 30000
+//     }
+//   }
+// );
+// prepopulatedDmQueue.on('error', (err) => console.log('prepopulatedDmQueue', err));
 
 // const followUserQueue = new Bull("followUserQueue", connectRedis,
 //   {
@@ -150,6 +150,67 @@ const addToChannelChatQueue = async (locations, userId) => {
   return locations;
 };
 
+const registerQueue = new Bull("registerQueue", connectRedis,
+  {
+    redis: {
+      tls: { rejectUnauthorized: false },
+      maxRetriesPerRequest: 100,
+      connectTimeout: 30000
+    }
+  }
+);
+registerQueue.on('error', (err) => console.log('posttimeque', err));
+registerQueue.on('waiting', (e) => console.log('postime: ', e));
+
+const convertingUserFormatForLocation = (locations) => {
+  let loc = locations.map((item) => {
+    if (item.country === "US") {
+      let loc = [];
+      loc.push(convertString(item.neighborhood.toLowerCase(), " ", "-"));
+      loc.push(convertString(item.city.toLowerCase(), " ", "-"));
+      return loc;
+    } else {
+      let loc = [];
+      loc.push(convertString(item.country.toLowerCase(), " ", "-"));
+      return loc;
+    }
+  });
+  let temp = _.union(...loc);
+  return temp;
+}
+const registerServiceQueue = async (token, userId, follows, topics, locations) => {
+  // add user To locaitons
+  let locationsChannel = convertingUserFormatForLocation(locations);
+
+  // add user to topics
+
+  // created prepopulated dm
+
+
+  // following user
+
+  // following topic
+
+  // following locations
+
+  let data = {
+    token,
+    userId,
+    locationsChannel,
+    follows,
+    topics,
+    locations
+  }
+
+  const options = {
+    jobId: uuidv4(),
+    removeOnComplete: true,
+  };
+
+  let status = await registerQueue.add(data, options);
+  return status;
+}
+
 
 module.exports = {
   postTimeQueue,
@@ -159,5 +220,6 @@ module.exports = {
   addToChannelChatQueue,
   addUserToChannelQueue,
   addUserToTopicChannel,
-  prepopulatedDmQueue,
+  // prepopulatedDmQueue,
+  registerServiceQueue,
 };

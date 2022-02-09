@@ -24,6 +24,7 @@ const {
   followUserQueue,
   addToChannelChatQueue,
   prepopulatedDmQueue,
+  registerServiceQueue,
 } = require("../../services/redis");
 const { responseSuccess } = require("../../utils/Responses");
 
@@ -271,8 +272,10 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    // await addUserToLocation(dataLocations, userId);
+    await getstreamService.followLocations(token, dataLocations);
+    await registerServiceQueue(token, userId, follows, dataTopics, dataLocations);
 
+    // await addUserToLocation(dataLocations, userId);
     // addUserToTopic(dataTopics, userId);
 
     // // await prepopulatedDmQueue(userId, follows);
@@ -287,7 +290,6 @@ module.exports = async (req, res) => {
     // prepopulatedDmQueue.add(dataPrepoluated, optionsPrepopulated);
     // console.log("===============end queue prepopulated dm ========================");
 
-    // await getstreamService.followLocations(token, dataLocations);
 
     // const optionsUser = {
     //   jobId: uuidv4(),
