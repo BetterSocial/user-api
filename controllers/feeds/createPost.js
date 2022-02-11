@@ -7,6 +7,7 @@ const v = new Validator();
 const cloudinary = require("cloudinary");
 const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 const { POST_TYPE_STANDARD } = require("../../helpers/constants");
+const { addForCreatePost } = require("../../services/score");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -144,7 +145,25 @@ module.exports = async (req, res) => {
 
     getstreamService
       .createPost(token, feedGroup, data)
-      .then(() => {
+      .then((result) => {
+    
+        // send queue for scoring processing on create post
+        const scoringProcessData = {
+          feed_id: result.id,
+          foreign_id : data.foreign_id,
+          time: result.time,
+          user_id: userDetail.user_id,
+          message: data.message,
+          topics: data.topics,
+          privacy: data.privacy,
+          anonimity: data.anonimity,
+          location_level: data.location_level,
+          duration_feed: data.duration_feed,
+          images_url: data.images_url,
+          created_at: moment.utc(data.time, "YYYY-MM-DDTHH:mm:ss.SSS", true).format("YYYY-MM-DD HH:mm:ss"),
+        };
+        addForCreatePost(scoringProcessData);
+        
         res.status(200).json({
           code: 200,
           status: "success create post",
