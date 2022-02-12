@@ -105,8 +105,9 @@ module.exports = async (req, res) => {
   }
 
   try {
+    let myTs = moment.utc().format("YYYY-MM-DD HH:mm:ss");
     const result = await sequelize.transaction(async (t) => {
-      let myTs = moment.utc().format("YYYY-MM-DD HH:mm:ss");
+      console.log("timestamp: " + myTs);
       const user = await User.create(
         {
           //   generate UUID
@@ -241,7 +242,7 @@ module.exports = async (req, res) => {
     };
     const user_id = result.user_id;
     let userId = user_id.toLowerCase();
-
+    
     await getstreamService.createUser(data, userId);
     let token = await getstreamService.createToken(userId);
     let tokenChat = await createTokenChat(userId);
@@ -330,7 +331,7 @@ module.exports = async (req, res) => {
 
     const scoringProcessData = {
       user_id: result.user_id,
-      register_time: result.createdAt,
+      register_time: myTs,
       emails: [],
       twitter_acc: "",
       topics: topics,

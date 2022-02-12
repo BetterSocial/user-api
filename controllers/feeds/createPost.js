@@ -4,6 +4,7 @@ const { User } = require("../../databases/models");
 const Validator = require("fastest-validator");
 const v = new Validator();
 
+const moment = require("moment");
 const cloudinary = require("cloudinary");
 const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 const { POST_TYPE_STANDARD } = require("../../helpers/constants");
@@ -41,6 +42,7 @@ module.exports = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
+      location_level: "string|empty:false",
       duration_feed: "string|empty:false",
       images_url: "array",
     };
@@ -62,6 +64,7 @@ module.exports = async (req, res) => {
       topics,
       anonimity,
       location,
+      location_level,
       duration_feed,
       images_url,
     } = req.body;
@@ -157,10 +160,11 @@ module.exports = async (req, res) => {
           topics: data.topics,
           privacy: data.privacy,
           anonimity: data.anonimity,
-          location_level: data.location_level,
+          location_level: location_level,
           duration_feed: data.duration_feed,
+          expired_at: moment.utc(data.expired_at).format("YYYY-MM-DD HH:mm:ss"),
           images_url: data.images_url,
-          created_at: moment.utc(data.time, "YYYY-MM-DDTHH:mm:ss.SSS", true).format("YYYY-MM-DD HH:mm:ss"),
+          created_at: moment.utc(data.time).format("YYYY-MM-DD HH:mm:ss"),
         };
         addForCreatePost(scoringProcessData);
         
