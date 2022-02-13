@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
-      location_id: "string|empty:false",
+      // location_id: "string|empty:false",
       duration_feed: "string|empty:false",
       images_url: "array",
     };
