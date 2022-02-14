@@ -51,6 +51,32 @@ const addForCreatePost = async(data) => {
 }
 
 /*
+ * Called when someone upvote a feed.
+ * Needed data:
+ *   - user_id: text, id of the user who doing the upvote action
+ *   - feed_id: text, id of the feed which being upvoted
+ *   - activity_time: text, date and time when activity is done in format "YYYY-MM-DD HH:mm:ss"
+ */
+const addForUpvoteFeed = async(data) => {
+  console.debug("addForUpvoteFeed called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_UPVOTE_POST, data);
+  return 1;
+}
+
+/*
+ * Called when someone undo/cancel upvote a feed.
+ * Needed data:
+ *   - user_id: text, id of the user who doing the action
+ *   - feed_id: text, id of the feed which being cancel-upvoted
+ *   - activity_time: text, date and time when activity is done in format "YYYY-MM-DD HH:mm:ss"
+ */
+const addForCancelUpvoteFeed = async(data) => {
+  console.debug("addForCancelUpvoteFeed called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_CANCEL_UPVOTE_POST, data);
+  return 1;
+}
+
+/*
  * Called when create comment event.
  * Needed data:
  *   - comment_id : text, id of the created comment
@@ -69,5 +95,7 @@ const addForCreateComment = async(data) => {
 module.exports = {
   addForCreateAccount,
   addForCreatePost,
+  addForUpvoteFeed,
+  addForCancelUpvoteFeed,
   addForCreateComment,
 };
