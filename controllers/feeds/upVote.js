@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
       if (JSON.stringify(latestReactions) !== "{}") {
         let downvotes = latestReactions.downvotes;
         if (downvotes !== undefined) {
-          downvotes.filter((item, i, arr) => item.user.id === req.userId);
+          downvotes.filter((item, i, arr) => item.user_id === req.userId);
           if (downvotes.length > 0) {
             let reaction = downvotes[0];
             deleteReaction(reaction.id);
