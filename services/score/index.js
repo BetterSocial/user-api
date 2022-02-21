@@ -1,7 +1,7 @@
 const {
   EVENT_CREATE_ACCOUNT,
   EVENT_CREATE_POST,
-  EVENT_CREATE_COMMENT,
+  EVENT_COMMENT_POST,
   EVENT_UPVOTE_POST,
   EVENT_CANCEL_UPVOTE_POST,
   EVENT_DOWNVOTE_POST,
@@ -135,15 +135,14 @@ const addForBlockAnonymousPost = async(data) => {
  * Called when create comment event.
  * Needed data:
  *   - comment_id : text, id of the created comment
- *   - post_id : text, id of the created post
- *   - author_id : text, user id of the author
- *   - content : text, content of the post
- *   - posting_time : time, when the author submit the comment
- * 
+ *   - feed_id : text, id of the post/feed which commented
+ *   - user_id : text, user id who commented
+ *   - message : text, content of the comment
+ *   - activity_time : time, when the user comment the post/feed
  */
-const addForCreateComment = async(data) => {
-  console.debug("addForCreateComment called with data [" + JSON.stringify(data) + "]");
-  scoringProcessQueue.sendQueue(EVENT_CREATE_COMMENT, data);
+const addForCommentPost = async(data) => {
+  console.debug("addForCommentPost called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_COMMENT_POST, data);
   return 1;
 }
 
@@ -156,5 +155,5 @@ module.exports = {
   addForCancelDownvoteFeed,
   addForBlockUser,
   addForBlockAnonymousPost,
-  addForCreateComment,
+  addForCommentPost,
 };
