@@ -3,7 +3,6 @@ var router = express.Router();
 
 const {
   getDomain,
-  getDetailDomain,
   getFollowedDomain,
   getProfileDomain,
   followDomain,
@@ -11,10 +10,12 @@ const {
   unfollowDomain,
   getBlockedDomain,
   unblockDomain,
-  getSingleBlockedDomain
+  getSingleBlockedDomain,
+  getDetailDomain
 
 
 } = require("../controllers/domain");
+const { getDetailDomainHandle } = require("../controllers/domain/detailDomain");
 const { isAuth } = require("../middlewares/auth");
 
 router.get("/", isAuth, getDomain);
@@ -27,5 +28,6 @@ router.post("/unfollow", isAuth, unfollowDomain);
 router.get("/ifollow", isAuth, iFollow);
 router.post("/unblock", isAuth, unblockDomain);
 router.get("/check-blocked/:domainId", isAuth, getSingleBlockedDomain);
+router.get("/detail/:domainId", isAuth, getDetailDomainHandle);
 
 module.exports = router;

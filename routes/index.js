@@ -1,16 +1,17 @@
 var express = require("express");
 var router = express.Router();
 
-const feed = require("./feeds");
-const users = require("./users");
-const whoToFollow = require("./whoToFollow");
-const topics = require("./topics");
-const locations = require("./locations");
 const auth = require("../middlewares/auth");
 const chat = require("../routes/chat");
+const discovery = require("./discovery")
 const domain = require("../routes/domain");
+const feed = require("./feeds");
 const fileRouter = require("../routes/file")
+const locations = require("./locations");
 const topicPage = require("./topicPages");
+const topics = require("./topics");
+const users = require("./users");
+const whoToFollow = require("./whoToFollow");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -18,6 +19,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.use("/activity", auth.isAuth, feed);
+router.use("/discovery", discovery);
 router.use("/users", users);
 router.use("/topics", topics);
 router.use("/location", locations);
@@ -25,6 +27,7 @@ router.use("/who-to-follow", whoToFollow);
 router.use("/chat", chat);
 router.use("/domain", domain);
 router.use("/file", fileRouter);
+
 
 router.post("/test", async (req, res) => {
   const { v4: uuidv4 } = require("uuid");
