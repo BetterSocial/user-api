@@ -31,6 +31,8 @@ const { responseSuccess } = require("../../utils/Responses");
 const { addUserToLocation, addUserToTopic } = require("../../services/chat");
 
 const StreamChat = require("stream-chat").StreamChat;
+const { addForCreateAccount } = require("../../services/score");
+
 
 const changeValue = (items) => {
   return items.map((item, index) => {
@@ -103,8 +105,9 @@ module.exports = async (req, res) => {
   }
 
   try {
+    let myTs = moment.utc().format("YYYY-MM-DD HH:mm:ss");
     const result = await sequelize.transaction(async (t) => {
-      let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+      console.log("timestamp: " + myTs);
       const user = await User.create(
         {
           //   generate UUID
@@ -158,7 +161,7 @@ module.exports = async (req, res) => {
             user_id: val.user_id,
             location_id: val.location_id,
             action: "in",
-            created_at: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+            created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
           };
         });
         await UserLocationHistory.bulkCreate(user_location_return, {
@@ -189,7 +192,7 @@ module.exports = async (req, res) => {
             user_id: val.user_id,
             topic_id: val.topic_id,
             action: "in",
-            created_at: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+            created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
           };
         });
         await UserTopicHistory.bulkCreate(topic_return, {
@@ -239,7 +242,7 @@ module.exports = async (req, res) => {
     };
     const user_id = result.user_id;
     let userId = user_id.toLowerCase();
-
+    
     await getstreamService.createUser(data, userId);
     let token = await getstreamService.createToken(userId);
     let tokenChat = await createTokenChat(userId);
@@ -327,7 +330,15 @@ module.exports = async (req, res) => {
     // followLocationQueue.add(locationQueue, optionLocation);
     // console.log("===============end queue follow location queue ========================");
 
-
+    const scoringProcessData = {
+      user_id: result.user_id,
+      register_time: myTs,
+      emails: [],
+      twitter_acc: "",
+      topics: topics,
+      follow_users: follows
+    };
+    await addForCreateAccount(scoringProcessData);
 
     const refresh_token = await createRefreshToken(userId);
     return res.status(200).json({

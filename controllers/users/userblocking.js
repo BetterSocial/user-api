@@ -11,7 +11,10 @@ const Validator = require("fastest-validator");
 const { delCache } = require("../../services/redis");
 const { BLOCK_FEED_KEY } = require("../../helpers/constants");
 const { getIdBlockFeed } = require("../../utils/block");
+const { addForBlockUser } = require("../../services/score");
 const v = new Validator();
+const moment = require("moment");
+
 module.exports = async (req, res) => {
   try {
     const schema = {
@@ -77,6 +80,15 @@ module.exports = async (req, res) => {
     delCache(key);
 
     await getstreamService.followUser(req.token, req.body.userId, "user", 0);
+    
+    const scoringProcessData = {
+      user_id: req.userId,
+      feed_id: req.body.postId,
+      blocked_user_id: req.body.userId,
+      activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+    };
+    await addForBlockUser(scoringProcessData);
+
     res.json({
       message: "The user has been successfully blocked",
       code: 200,
