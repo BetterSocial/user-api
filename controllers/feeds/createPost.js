@@ -1,5 +1,5 @@
 const getstreamService = require("../../services/getstream");
-const { User } = require("../../databases/models");
+const { User, Locations } = require("../../databases/models");
 
 const Validator = require("fastest-validator");
 const v = new Validator();
@@ -17,6 +17,14 @@ function addDays(theDate, days) {
 const getUserDetail = async (userId) => {
   try {
     return await User.findByPk(userId);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const getLocationDetail = async (locationId) => {
+  try {
+    return await Locations.findByPk(locationId);
   } catch (err) {
     console.log(err);
   }
@@ -72,6 +80,11 @@ module.exports = async (req, res) => {
 
     console.log('location id: ', location_id);
     let userDetail = await getUserDetail(req.userId);
+    let location_level = "";
+    if (location_id) {
+      const locationDetail = await getLocationDetail(location_id);
+      location_level = locationDetail.location_level;
+    }
 
     let expiredAt = null;
     let TO = [];

@@ -12,10 +12,19 @@ const v = new Validator();
 const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
+const { Locations } = require("../../databases/models");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
 }
+
+const getLocationDetail = async (locationId) => {
+  try {
+    return await Locations.findByPk(locationId);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 module.exports = async (req, res) => {
   try {
@@ -38,7 +47,7 @@ module.exports = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
-      location_level: "string|empty:false",
+      // location_id: "string|empty:false",
       duration_feed: "string|empty:false",
       polls: "array|empty:false",
       pollsduration: {
@@ -68,7 +77,7 @@ module.exports = async (req, res) => {
       topics,
       anonimity,
       location,
-      location_level,
+      location_id,
       duration_feed,
       images_url,
       polls,
@@ -220,6 +229,13 @@ module.exports = async (req, res) => {
 
       let pollOptionUUID = pollOption[0][0].polling_option_id;
       pollsOptionUUIDs.push(pollOptionUUID);
+    }
+    
+    console.log('location id: ', location_id);
+    let location_level = "";
+    if (location_id) {
+      const locationDetail = await getLocationDetail(location_id);
+      location_level = locationDetail.location_level;
     }
 
     let object = {
