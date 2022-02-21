@@ -5,5 +5,6 @@ module.exports = {
   EVENT_CANCEL_UPVOTE_POST: "cancel-upvote-post",
   EVENT_DOWNVOTE_POST: "downvote-post",
   EVENT_CANCEL_DOWNVOTE_POST: "cancel-downvote-post",
+  EVENT_BLOCK_USER_POST: "block-user-post",
   EVENT_CREATE_COMMENT: "create-comment",
 };

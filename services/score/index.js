@@ -5,7 +5,8 @@ const {
   EVENT_UPVOTE_POST,
   EVENT_CANCEL_UPVOTE_POST,
   EVENT_DOWNVOTE_POST,
-  EVENT_CANCEL_DOWNVOTE_POST
+  EVENT_CANCEL_DOWNVOTE_POST,
+  EVENT_BLOCK_USER_POST,
 } = require("./constant");
 
 const scoringProcessQueue = require("./queueSenderForRedis"); // uncomment this line if using redis as message queue server
@@ -103,6 +104,34 @@ const addForCancelDownvoteFeed = async(data) => {
 }
 
 /*
+ * Called when someone block someone else, either by it's post or not
+ * Needed data:
+ *   - user_id: text, id of the user who doing the action
+ *   - feed_id: text, optional, id of the feed which being blocked
+ *   - blocked_user_id: text, optional, id of the user which being blocked
+ *   - activity_time: text, date and time when activity is done in format "YYYY-MM-DD HH:mm:ss"
+ */
+const addForBlockUser = async(data) => {
+  console.debug("addForBlockUser called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_BLOCK_USER_POST, data);
+  return 1;
+}
+
+/*
+ * Called when someone block anonymous post
+ * Needed data:
+ *   - user_id: text, id of the user who doing the action
+ *   - feed_id: text, id of the feed which being blocked
+ *   - activity_time: text, date and time when activity is done in format "YYYY-MM-DD HH:mm:ss"
+ */
+const addForBlockAnonymousPost = async(data) => {
+  console.debug("addForBlockAnonymousPost called with data [" + JSON.stringify(data) + "]");
+  data.blocked_user_id = "";
+  scoringProcessQueue.sendQueue(EVENT_BLOCK_USER_POST, data);
+  return 1;
+}
+
+/*
  * Called when create comment event.
  * Needed data:
  *   - comment_id : text, id of the created comment
@@ -125,5 +154,7 @@ module.exports = {
   addForCancelUpvoteFeed,
   addForDownvoteFeed,
   addForCancelDownvoteFeed,
+  addForBlockUser,
+  addForBlockAnonymousPost,
   addForCreateComment,
 };
