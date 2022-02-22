@@ -6,6 +6,10 @@ module.exports = async (reactionId,userId, useridFeed, message, token) => {
     token,
     process.env.APP_ID
   );
+  let targetFeed = [`notification:${useridFeed}`]
+  if(useridFeed !== userId) {
+    targetFeed = [...targetFeed, `notification:${userId}`]
+  }
   return await clientUser.reactions.addChild(
     "comment",
     { id: reactionId },
@@ -13,7 +17,7 @@ module.exports = async (reactionId,userId, useridFeed, message, token) => {
       text: message,
       count_upvote: 0,
       count_downvote: 0,
-    },{targetFeeds: [`notification:${useridFeed}`], userId}
+    },{targetFeeds: targetFeed, userId}
     
   );
 };
