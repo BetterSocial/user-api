@@ -26,7 +26,8 @@ const getFeedChatService = async (req, res) => {
                     downvote: b.object.count_downvote, 
                     upvote: b.object.count_upvote,
                     block: blockList,
-                    comments: []
+                    postMaker: b.object.actor,
+                    comments: [],
                 }
                 a.push(newGroup[activity_id])
             }
