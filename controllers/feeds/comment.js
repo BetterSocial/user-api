@@ -3,7 +3,7 @@ module.exports = async (req, res) => {
   try {
     let body = req.body;
     body = {...body, kind: 'comment', userid: req.userId}
-    let result = await comment(body.activity_id, req.userId,body.useridFeed, body.message, req.token);
+    let result = await comment(body.activity_id, req.userId,body.useridFeed, body.message, req.token, body.sendPostNotif);
     const { countProcess } = require("../../process");
     // save to db if character message > 80
     if (body.message.length > 80){
