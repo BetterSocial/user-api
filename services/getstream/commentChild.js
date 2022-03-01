@@ -1,11 +1,20 @@
 const stream = require("getstream");
 
-module.exports = async (reactionId, message, token) => {
+module.exports = async (reactionId,userId, useridFeed, message, token, sendPostNotif) => {
   const clientUser = stream.connect(
     process.env.API_KEY,
     token,
     process.env.APP_ID
   );
+  let targetFeed = [`notification:${useridFeed}`]
+  if(sendPostNotif) {
+    if(useridFeed !== userId) {
+      targetFeed = [...targetFeed, `notification:${userId}`]
+    }
+  } else {
+    targetFeed = []
+  }
+ 
   return await clientUser.reactions.addChild(
     "comment",
     { id: reactionId },
@@ -13,6 +22,7 @@ module.exports = async (reactionId, message, token) => {
       text: message,
       count_upvote: 0,
       count_downvote: 0,
-    }
+    },{targetFeeds: targetFeed, userId}
+    
   );
 };

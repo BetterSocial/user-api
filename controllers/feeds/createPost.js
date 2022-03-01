@@ -40,6 +40,7 @@ module.exports = async (req, res) => {
       privacy: "string|empty:false",
       anonimity: "boolean|empty:false",
       location: "string|empty:false",
+      // location_id: "string|empty:false",
       duration_feed: "string|empty:false",
       images_url: "array",
     };
@@ -61,10 +62,13 @@ module.exports = async (req, res) => {
       topics,
       anonimity,
       location,
+      location_id,
       duration_feed,
       images_url,
     } = req.body;
 
+
+    console.log('location id: ', location_id);
     let userDetail = await getUserDetail(req.userId);
 
     let expiredAt = null;

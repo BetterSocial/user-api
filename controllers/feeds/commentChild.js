@@ -1,9 +1,9 @@
 const { commentChild } = require("../../services/getstream");
 module.exports = async (req, res) => {
   try {
-    let { reaction_id, message } = req.body;
+    let { reaction_id, message, sendPostNotif } = req.body;
 
-    let result = await commentChild(reaction_id, message, req.token);
+    let result = await commentChild(reaction_id, req.userId, req.body.useridFeed, message, req.token, sendPostNotif);
     return res.status(200).json({
       code: 200,
       status: "Success comment child",
@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     console.log(err);
     return res.status(400).json({
       code: 400,
-      status: "failed create comment",
+      status: String(e),
       data: err.detail,
     });
   }

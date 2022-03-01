@@ -24,7 +24,7 @@ const {
   followUserQueue,
   addToChannelChatQueue,
   prepopulatedDmQueue,
-  prepopulatedQueue,
+  registerServiceQueue,
 } = require("../../services/redis");
 const { responseSuccess } = require("../../utils/Responses");
 
@@ -272,59 +272,60 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
-    await addUserToLocation(dataLocations, userId);
+    // await getstreamService.followLocations(token, dataLocations);
+    await registerServiceQueue(token, userId, follows, dataTopics, dataLocations);
 
-    addUserToTopic(dataTopics, userId);
+    // await addUserToLocation(dataLocations, userId);
+    // addUserToTopic(dataTopics, userId);
 
-    // await prepopulatedDmQueue(userId, follows);
-    const optionsPrepopulated = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    }
-    let dataPrepoluated = {
-      userId,
-      follows,
-    }
-    prepopulatedQueue.add(dataPrepoluated, optionsPrepopulated);
-    console.log("===============end queue prepopulated dm ========================");
-
-    await getstreamService.followLocations(token, dataLocations);
-
-    const optionsUser = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
-    const userQueue = {
-      token,
-      users: follows,
-    };
-    followUserQueue.add(userQueue, optionsUser);
-    console.log("===============end queue follow user queue ========================");
-
-    const topicQueue = {
-      token,
-      topics: dataTopics,
-    };
-    const optionsTopic = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
-    followTopicQueue.add(topicQueue, optionsTopic);
-    console.log("===============end queue follow topic queue ========================");
+    // // await prepopulatedDmQueue(userId, follows);
+    // const optionsPrepopulated = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // }
+    // let dataPrepoluated = {
+    //   userId,
+    //   follows,
+    // }
+    // prepopulatedDmQueue.add(dataPrepoluated, optionsPrepopulated);
+    // console.log("===============end queue prepopulated dm ========================");
 
 
-    const locationQueue = {
-      token,
-      locations: dataLocations,
-    };
+    // const optionsUser = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
+    // const userQueue = {
+    //   token,
+    //   users: follows,
+    // };
+    // followUserQueue.add(userQueue, optionsUser);
+    // console.log("===============end queue follow user queue ========================");
 
-    const optionLocation = {
-      jobId: uuidv4(),
-      removeOnComplete: true,
-    };
+    // const topicQueue = {
+    //   token,
+    //   topics: dataTopics,
+    // };
+    // const optionsTopic = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
+    // followTopicQueue.add(topicQueue, optionsTopic);
+    // console.log("===============end queue follow topic queue ========================");
 
-    followLocationQueue.add(locationQueue, optionLocation);
-    console.log("===============end queue follow location queue ========================");
+
+    // const locationQueue = {
+    //   token,
+    //   locations: dataLocations,
+    // };
+
+    // const optionLocation = {
+    //   jobId: uuidv4(),
+    //   removeOnComplete: true,
+    // };
+
+    // followLocationQueue.add(locationQueue, optionLocation);
+    // console.log("===============end queue follow location queue ========================");
 
 
 
