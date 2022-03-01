@@ -11,6 +11,7 @@ const {
   getBlockedDomain,
   unblockDomain,
   getSingleBlockedDomain,
+  localUploadDomain,
   getDetailDomain
 
 
@@ -28,6 +29,7 @@ router.post("/unfollow", isAuth, unfollowDomain);
 router.get("/ifollow", isAuth, iFollow);
 router.post("/unblock", isAuth, unblockDomain);
 router.get("/check-blocked/:domainId", isAuth, getSingleBlockedDomain);
+router.get("/local/upload-domain", localUploadDomain)
 router.get("/detail/:domainId", isAuth, getDetailDomainHandle);
 
 module.exports = router;
