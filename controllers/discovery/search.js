@@ -39,8 +39,8 @@ const Search = async(req, res) => {
                 (SELECT 
                     "f"."user_id_follower" AS "user_id_follower"
                 FROM "user_follow_user" AS f 
-                WHERE "f"."user_id_followed" ='${userId}' 
-                    AND "f"."user_id_follower" = "User"."user_id")
+                WHERE "f"."user_id_follower" ='${userId}' 
+                    AND "f"."user_id_followed" = "User"."user_id")
             FROM "users" 
                 AS "User" 
             LEFT OUTER JOIN "user_follow_user" 
