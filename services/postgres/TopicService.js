@@ -34,7 +34,7 @@ class TopicService {
       let result = await this._topic.findAll({
         where: {
           name: {
-            [Op.iLike]: `${name}%`
+            [Op.iLike]: `%${name}%`
           },
 
         },
