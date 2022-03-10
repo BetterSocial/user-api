@@ -11,6 +11,7 @@ const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
 const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
+const { handlePostTO } = require("../../utils/post");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -225,8 +226,7 @@ module.exports = async (req, res) => {
       topics: topics,
     };
 
-    let TO = [];
-    TO.push("user:" + req.userId);
+    let TO = handlePostTO(req.userId, req.body)
 
     let data = {
       verb: verb,

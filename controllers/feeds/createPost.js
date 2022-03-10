@@ -7,6 +7,7 @@ const v = new Validator();
 const cloudinary = require("cloudinary");
 const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 const { POST_TYPE_STANDARD } = require("../../helpers/constants");
+const { handlePostTO } = require("../../utils/post");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -106,18 +107,7 @@ module.exports = async (req, res) => {
       expiredAt = utc.toISOString();
     }
 
-    TO.push("location:everywhare");
-    TO.push("user:" + req.userId);
-    if (topics !== null) {
-      topics.map((value) => {
-        TO.push("topic:" + value);
-      });
-    }
-
-    if (location !== null) {
-      let loc = formatLocationGetStream(location);
-      TO.push("location:" + loc);
-    }
+    TO = handlePostTO(req.userId, req.body)
 
     let object = {
       verb: verb,
