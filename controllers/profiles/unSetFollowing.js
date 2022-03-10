@@ -6,6 +6,8 @@ const sequelize = require("../../databases/models").sequelize;
 const Validator = require("fastest-validator");
 const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
+const moment = require("moment");
+const { addForUnfollowUser } = require("../../services/score");
 
 module.exports = async (req, res) => {
   try {
@@ -74,6 +76,14 @@ module.exports = async (req, res) => {
             message: "error create data",
           });
         } else {
+          // sending queue for scoring process on unfollow user event
+          const scoringProcessData = {
+            user_id: user_id_follower,
+            unfollowed_user_id: user_id_followed,
+            activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+          };
+          await addForUnfollowUser(scoringProcessData);
+          
           return res.status(201).json({
             status: "success",
             code: 200,

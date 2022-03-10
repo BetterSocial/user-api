@@ -7,6 +7,10 @@ const {
   EVENT_DOWNVOTE_POST,
   EVENT_CANCEL_DOWNVOTE_POST,
   EVENT_BLOCK_USER_POST,
+  EVENT_VIEW_POST,
+  EVENT_FOLLOW_USER,
+  EVENT_UNFOLLOW_USER,
+  EVENT_UNBLOCK_USER,
 } = require("./constant");
 
 const scoringProcessQueue = require("./queueSenderForRedis"); // uncomment this line if using redis as message queue server
@@ -132,7 +136,7 @@ const addForBlockAnonymousPost = async(data) => {
 }
 
 /*
- * Called when create comment event.
+ * Called when comment post event.
  * Needed data:
  *   - comment_id : text, id of the created comment
  *   - feed_id : text, id of the post/feed which commented
@@ -146,6 +150,60 @@ const addForCommentPost = async(data) => {
   return 1;
 }
 
+/*
+ * Called when view post event, either from feed tab, topic feed, or PDP.
+ * Needed data:
+ *   - feed_id : text, id of the post/feed which viewed
+ *   - user_id : text, user id who viewing the post
+ *   - view_duration : number in milliseconds, duration of user viewing the post. If the user clicked to show the post in PDP, than the duration is total duration from previous page and view it in PDP
+ *   - is_pdp : boolean, whether it includes duration in PDP
+ *   - activity_time : time, when the user comment the post/feed
+ */
+const addForViewPost = async(data) => {
+  console.debug("addForViewPost called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_VIEW_POST, data);
+  return 1;
+}
+
+/*
+ * Called when someone follow someone else.
+ * Needed data:
+ *   - user_id: text, id of the user who doing the action
+ *   - followed_user_id: text, id of the user which being followed
+ *   - activity_time: text, date and time when activity is done in format "YYYY-MM-DD HH:mm:ss"
+ */
+const addForFollowUser = async(data) => {
+  console.debug("addForFollowUser called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_FOLLOW_USER, data);
+  return 1;
+}
+
+/*
+ * Called when someone unfollow someone else.
+ * Needed data:
+ *   - user_id: text, id of the user who doing the action
+ *   - unfollowed_user_id: text, id of the user which being unfollowed
+ *   - activity_time: text, date and time when activity is done in format "YYYY-MM-DD HH:mm:ss"
+ */
+const addForUnfollowUser = async(data) => {
+  console.debug("addForUnfollowUser called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_UNFOLLOW_USER, data);
+  return 1;
+}
+
+/*
+ * Called when someone unblock user
+ * Needed data:
+ *   - user_id: text, id of the user who doing the action
+ *   - unblocked_user_id: text, id of the user which being unblocked
+ *   - activity_time: text, date and time when activity is done in format "YYYY-MM-DD HH:mm:ss"
+ */
+const addForUnblockUser = async(data) => {
+  console.debug("addForUnblockUser called with data [" + JSON.stringify(data) + "]");
+  scoringProcessQueue.sendQueue(EVENT_UNBLOCK_USER, data);
+  return 1;
+}
+
 module.exports = {
   addForCreateAccount,
   addForCreatePost,
@@ -156,4 +214,8 @@ module.exports = {
   addForBlockUser,
   addForBlockAnonymousPost,
   addForCommentPost,
+  addForViewPost,
+  addForFollowUser,
+  addForUnfollowUser,
+  addForUnblockUser,
 };

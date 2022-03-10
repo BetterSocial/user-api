@@ -13,7 +13,8 @@ const createQueuePostTime = async (req, res) => {
                 const jwt = require("jsonwebtoken");
                 const { v4: uuidv4 } = require('uuid');
                 const user_id = jwt.decode(token).user_id;
-                const { postTimeQueue } = require('../../services/redis');
+                const { addForViewPost } = require("../../services/score");
+                const moment = require("moment");
                 /*
                   @description options bull queue ref https://www.npmjs.com/package/bull
                 */
@@ -22,12 +23,21 @@ const createQueuePostTime = async (req, res) => {
                     removeOnComplete: true,
                 };
                 const { post_id, view_time } = req.body;
-                const data = { post_id, user_id, view_time };
-                const resultJob = await postTimeQueue.add(data, options);
+                
+                // send queue for scoring processing on create post
+                const scoringProcessData = {
+                  feed_id: post_id,
+                  user_id: user_id,
+                  view_duration: view_time,
+                  is_pdp: false, // TODO
+                  activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+                };
+                const resultJob = await addForViewPost(scoringProcessData);
+                
                 return res.status(200).json({
                     code: 200,
                     status: `success created queue post time with job id : ${resultJob.id}`,
-                    data: data,
+                    data: scoringProcessData,
                 });
             } else {
                 return res.status(500).json({
