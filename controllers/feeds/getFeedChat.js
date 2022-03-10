@@ -12,7 +12,6 @@ const getFeedChatService = async (req, res) => {
         })
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
-        console.log(blockList,'sumba')
         for (let i = 0; i < data.results.length; i++) {
             newFeed.push(...data.results[i].activities)
         }
@@ -26,7 +25,11 @@ const getFeedChatService = async (req, res) => {
                     downvote: b.object.count_downvote, 
                     upvote: b.object.count_upvote,
                     block: blockList,
-                    comments: []
+                    postMaker: b.object.actor,
+                    comments: [],
+                    data: {
+                        updated_at: b.reaction.updated_at
+                    }
                 }
                 a.push(newGroup[activity_id])
             }

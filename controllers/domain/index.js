@@ -8,6 +8,7 @@ const getFollowedDomain = require('./getFollowedDomain')
 const {getBlockedDomain} = require("./getBlockedDomain")
 const {unblockDomain} = require("./unblockDomain")
 const {getSingleBlockedDomain} = require("./getSingleBlockedDomain")
+const localUploadDomain = require('./localUploadDomain')
 
 module.exports = {
   getDomain,
@@ -19,5 +20,6 @@ module.exports = {
   iFollow,
   getBlockedDomain,
   unblockDomain,
-  getSingleBlockedDomain
+  getSingleBlockedDomain,
+  localUploadDomain
 };

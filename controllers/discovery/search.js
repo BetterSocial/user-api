@@ -13,7 +13,7 @@ const { getBlockDomain } = require('../../services/domain')
 const Search = async(req, res) => {
     const { q } = req.query
     const userId = req.userId
-    if(q.length < 3) return res.status(200).json({
+    if(q.length < 2) return res.status(200).json({
         success: true,
         message: 'Your search characters is too few, please input 3 or more characters for search'
     })
@@ -39,8 +39,8 @@ const Search = async(req, res) => {
                 (SELECT 
                     "f"."user_id_follower" AS "user_id_follower"
                 FROM "user_follow_user" AS f 
-                WHERE "f"."user_id_followed" ='${userId}' 
-                    AND "f"."user_id_follower" = "User"."user_id")
+                WHERE "f"."user_id_follower" ='${userId}' 
+                    AND "f"."user_id_followed" = "User"."user_id")
             FROM "users" 
                 AS "User" 
             LEFT OUTER JOIN "user_follow_user" 
