@@ -76,7 +76,7 @@ module.exports = async (req, res) => {
     const key = getIdBlockFeed(req.userId);
     delCache(key);
 
-    await getstreamService.followUser(req.token, req.body.userId, "user", 0);
+    await getstreamService.followUserExclusive(req.userId, req.body.userId, 0);
     res.json({
       message: "The user has been successfully blocked",
       code: 200,

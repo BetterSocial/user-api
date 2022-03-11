@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     const token = req.token;
 
     getstreamService
-      .getFeeds(token, "user", {
+      .getFeeds(token, "user_excl", {
         reactions: { own: true, recent: true, counts: true },
       })
 
