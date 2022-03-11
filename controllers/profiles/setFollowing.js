@@ -4,6 +4,7 @@ const {
 } = require("../../databases/models");
 const sequelize = require("../../databases/models").sequelize;
 const Validator = require("fastest-validator");
+const getstreamService = require("../../services/getstream");
 const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
 
@@ -68,6 +69,8 @@ module.exports = async (req, res) => {
             message: "error create data",
           });
         } else {
+          await getstreamService.followUserExclusive(user_id_follower, user_id_followed, 1);
+          
           return res.status(201).json({
             status: "success",
             code: 200,
