@@ -1,4 +1,4 @@
-const { User, Topics, UserFollowUser, sequelize, Sequelize, NewsLink } = require('../../databases/models')
+const { User, Topics, UserFollowUser, sequelize, Sequelize, NewsLink, DomainPage } = require('../../databases/models')
 const { Op, fn, col, QueryTypes } = require('sequelize')
 const _ = require('lodash')
 const { getDomain } = require('../../services/getstream')
@@ -39,6 +39,13 @@ const Search = async(req, res) => {
                 limit: 10,
                 order: [
                     ['created_at', 'DESC']
+                ],
+                include : [
+                    {
+                        model: DomainPage,
+                        as: 'newsLinkDomain',
+                        attributes: ['domain_name', 'logo'],
+                    }
                 ]
             })    
         } else {
@@ -54,6 +61,13 @@ const Search = async(req, res) => {
                 limit: 10,
                 order: [
                     ['created_at', 'DESC']
+                ],
+                include : [
+                    {
+                        model: DomainPage,
+                        as: 'newsLinkDomain',
+                        attributes: ['domain_name', 'logo'],
+                    }
                 ]
             })    
         }
