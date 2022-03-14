@@ -28,7 +28,7 @@ const getFeedChatService = async (req, res) => {
                     postMaker: b.object.actor,
                     comments: [],
                     data: {
-                        updated_at: b.reaction.updated_at
+                        last_message_at: b.reaction.updated_at
                     }
                 }
                 a.push(newGroup[activity_id])
