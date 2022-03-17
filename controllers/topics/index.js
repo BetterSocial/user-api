@@ -3,7 +3,7 @@ const TopicService = require("../../services/postgres/TopicService");
 const TopicValidator = require("../../validators/topic");
 const topics = require("./topics");
 const getFollowedTopic = require("./getFollowedTopic");
-const { Topics, UserTopic, UserTopicHistory } = require("../../databases/models");
+const { Topics, UserTopic, UserTopicHistory, sequelize } = require("../../databases/models");
 const UserTopicService = require("../../services/postgres/UserTopicService");
 
 const getFollowTopic = async (req, res) => {
@@ -84,10 +84,32 @@ const putFollowTopic = async (req, res) => {
 const getTopics = async (req, res) => {
     let { name } = req.query;
     console.log(name);
+    let query = `select topic_id, name,icon_path, categories, flg_show,  count(*) as follower from (Select * from topics where name ILIKE'%${name}%')as topics join user_topics Using (topic_id) group by topics.name, topics.topic_id, topics.icon_path, topics.categories, topics.created_at, topics.flg_show order by follower desc`;
     try {
-        let topicService = new TopicService(Topics);
-        let topics = await topicService.search(name);
-        // todo mendapatkan topic paling popular berdasarkan banyak user yang follow
+        // let topicService = new TopicService(Topics);
+        // let topics = await topicService.search(name);
+        // // todo mendapatkan topic paling popular berdasarkan banyak user yang follow
+        // let ids = topics.map(item => {
+        //     return item.topic_id;
+        // });
+        const [results, metadata] = await sequelize.query(query,
+            {
+                raw: false
+            }
+        )
+
+        // console.log(ids);
+
+        // const { count, rows } = await UserTopic.findAndCountAll({
+        //     where: {
+        //         'topic_id': { in: ids }
+        //     }
+        // });
+        // console.log(count);
+        // console.log(rows);
+
+
+        // console.log(countRes);
 
 
         let message = 'Success get topic user';
@@ -95,9 +117,10 @@ const getTopics = async (req, res) => {
             status: "success",
             code: 200,
             message,
-            data: topics,
+            data: results,
         })
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             "code": 500,
             "message": 'Internal server error'
