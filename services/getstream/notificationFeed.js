@@ -6,13 +6,14 @@ const client = stream.connect(
     process.env.APP_ID
   );
 
-const notificationGetNewFeed = (userid) => {
+const notificationGetNewFeed = (userid, token) => {
     console.log(userid, 'nanak')
-    return client.feed('notification',userid).get({
+    return client.feed('notification',userid, token).get({
         withRecentReactions:true,
         withReactionCounts: true,
         withOwnReactions: true,
         mark_seen: false,
+        
     })
 }
 
