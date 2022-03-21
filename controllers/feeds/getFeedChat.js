@@ -29,6 +29,7 @@ const getFeedChatService = async (req, res) => {
                     upvote: totalVote > 0 ? totalVote : 0,
                     block: blockList,
                     postMaker: b.object.actor,
+                    isAnonym: b.object.anonimity ,
                     comments: [],
                     data: {
                         last_message_at: b.reaction.updated_at,
