@@ -23,8 +23,10 @@ const topicPage = require("./routes/topicPages");
 const linkRouter = require("./routes/link");
 const discovery = require('./routes/discovery')
 const auth = require("./middlewares/auth");
+const HomeRouter = require("./routes/home");
 
 const app = express();
+app.use('/', HomeRouter)
 
 app.use(logger("dev"));
 app.use(express.json({ limit: "50mb" }));
