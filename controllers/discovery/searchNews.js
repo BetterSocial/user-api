@@ -75,7 +75,7 @@ const Search = async(req, res) => {
         return res.status(200).json({
             success: true,
             message: `Search ${q}`,
-            news : newsLink
+            news : newsLink || []
         })
     }catch(e) {
         console.log('e')

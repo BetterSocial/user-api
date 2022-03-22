@@ -21,8 +21,8 @@ const createQueuePostTime = async (req, res) => {
                     jobId: uuidv4(),
                     removeOnComplete: true,
                 };
-                const { post_id, view_time } = req.body;
-                const data = { post_id, user_id, view_time };
+                const { post_id, view_time, source } = req.body;
+                const data = { post_id, user_id, view_time, source };
                 const resultJob = await postTimeQueue.add(data, options);
                 return res.status(200).json({
                     code: 200,
