@@ -44,6 +44,13 @@ const changeValue = (items) => {
   });
 };
 
+const getNames = (items) => {
+  return items.map((item, index) => {
+    let temp = Object.assign({}, item.dataValues);
+    return temp.name;
+  });
+};
+
 const createTokenChat = async (userId) => {
   const serverClient = new StreamChat(process.env.API_KEY, process.env.SECRET);
   return serverClient.createToken(userId);
@@ -260,6 +267,7 @@ module.exports = async (req, res) => {
         return res.status(400).json(error);
       });
 
+    let topicNames;
     let dataTopics = await Topics.findAll({
       where: {
         topic_id: topics,
@@ -267,6 +275,7 @@ module.exports = async (req, res) => {
       attributes: ["name"],
     })
       .then((result) => {
+        topicNames = getNames(result);
         let body = changeValue(result);
         return body;
       })
@@ -335,7 +344,7 @@ module.exports = async (req, res) => {
       register_time: myTs,
       emails: [],
       twitter_acc: "",
-      topics: topics,
+      topics: topicNames,
       follow_users: follows
     };
     await addForCreateAccount(scoringProcessData);
