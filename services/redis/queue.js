@@ -88,7 +88,11 @@ postTimeQueue.on('waiting', (e) => console.log('postime: ', e));
 
 const scoringProcessQueue = new Bull("scoringProcessQueue", connectRedis,
   {
-    redis: { tls: { rejectUnauthorized: false } }
+    redis: {
+      tls: { rejectUnauthorized: false },
+      maxRetriesPerRequest: 100,
+      connectTimeout: 30000
+    }
   });
   scoringProcessQueue.on('error', (err) => console.log('scoringProcessQueue', err));
 
