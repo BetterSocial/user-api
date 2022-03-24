@@ -22,7 +22,8 @@ const createQueuePostTime = async (req, res) => {
                     jobId: uuidv4(),
                     removeOnComplete: true,
                 };
-                const { post_id, view_time } = req.body;
+              
+                const { post_id, view_time, source } = req.body;
                 
                 // send queue for scoring processing on create post
                 const scoringProcessData = {
@@ -33,7 +34,7 @@ const createQueuePostTime = async (req, res) => {
                   activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
                 };
                 const resultJob = await addForViewPost(scoringProcessData);
-                
+
                 return res.status(200).json({
                     code: 200,
                     status: `success created queue post time with job id : ${resultJob.id}`,

@@ -20,13 +20,14 @@ module.exports = async (req, res) => {
       refresh_token: refresh_token,
     });
   } catch (error) {
+    console.log(error);
     // const { status, data } = error.response;
     // return res.json({
     //   code: status,
     //   data: 0,
     //   message: data,
     // });
-    return res.status(200).json({
+    return res.status(500).json({
       code: 500,
       data: false,
       message: error,

@@ -13,7 +13,7 @@ const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
 const { Locations } = require("../../databases/models");
-const { handlePostTO } = require("../../utils/post");
+const { handleCreatePostTO } = require("../../utils/post");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -245,7 +245,7 @@ module.exports = async (req, res) => {
       topics: topics,
     };
 
-    let TO = handlePostTO(req.userId, req.body)
+    let TO = handleCreatePostTO(req.userId, req.body)
 
     let data = {
       verb: verb,

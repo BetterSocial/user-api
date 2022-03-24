@@ -79,7 +79,7 @@ module.exports = async (req, res) => {
     const key = getIdBlockFeed(req.userId);
     delCache(key);
 
-    await getstreamService.followUser(req.token, req.body.userId, "user", 0);
+    await getstreamService.followUserExclusive(req.userId, req.body.userId, 0);
     
     const scoringProcessData = {
       user_id: req.userId,

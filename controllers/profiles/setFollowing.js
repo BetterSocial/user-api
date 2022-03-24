@@ -4,6 +4,7 @@ const {
 } = require("../../databases/models");
 const sequelize = require("../../databases/models").sequelize;
 const Validator = require("fastest-validator");
+const getstreamService = require("../../services/getstream");
 const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
 const moment = require("moment");
@@ -70,6 +71,8 @@ module.exports = async (req, res) => {
             message: "error create data",
           });
         } else {
+          await getstreamService.followUserExclusive(user_id_follower, user_id_followed, 1);
+          
           // sending queue for scoring process on follow user event
           const scoringProcessData = {
             user_id: user_id_follower,

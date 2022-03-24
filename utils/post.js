@@ -6,7 +6,7 @@
 
 const formatLocationGetStream = require("../helpers/formatLocationGetStream");
 
-const handlePostTO = (userId, postBody) => {
+const handleCreatePostTO = (userId, postBody) => {
     let {
         privacy,
         topics,
@@ -14,7 +14,7 @@ const handlePostTO = (userId, postBody) => {
     } = postBody;
 
     let TO = []
-    // TO.push(`user_exc:${userId}`)
+    TO.push(`main_feed:${userId}`)
 
     if(privacy === "public") {
         TO.push(`user:${userId}`)
@@ -32,10 +32,9 @@ const handlePostTO = (userId, postBody) => {
         }
     }
 
-    console.log(TO)
     return TO
 }
 
 module.exports = {
-    handlePostTO
+    handleCreatePostTO
 }
