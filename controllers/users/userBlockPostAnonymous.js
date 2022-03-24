@@ -12,10 +12,12 @@ const {
   ResponseSuccess,
 } = require("../../utils/Responses");
 const v = new Validator();
+const moment = require("moment");
 
 const Responses = require("../../utils/Responses");
 const { delCache } = require("../../services/redis");
 const { getIdBlockAnonymous } = require("../../utils/block");
+const { addForBlockAnonymousPost } = require("../../services/score");
 
 module.exports = async (req, res) => {
   const schema = {
@@ -63,6 +65,13 @@ module.exports = async (req, res) => {
 
     let key = getIdBlockAnonymous(req.userId);
     delCache(key);
+    
+    const scoringProcessData = {
+      user_id: req.userId,
+      feed_id: req.body.postId,
+      activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+    };
+    await addForBlockAnonymousPost(scoringProcessData);
 
     return res
       .status(201)
