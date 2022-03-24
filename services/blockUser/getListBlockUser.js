@@ -14,10 +14,18 @@ module.exports = async (userId) => {
     let blockUser = await UserBlockedUser.findAll({
       attributes: ["user_id_blocked"],
       where: {
-        [Op.or]: [{ user_id_blocker: userId }, { user_id_blocked: userId }],
+        user_id_blocker: userId,
       },
     });
-    const valueString = JSON.stringify(blockUser);
+
+    let blockedUser = await UserBlockedUser.findAll({
+      attributes: ["user_id_blocker"],
+      where: {
+        user_id_blocked: userId,
+      },
+    });
+    let newArr = [...blockUser, ...blockedUser];
+    const valueString = JSON.stringify(newArr);
     setValue(MY_KEY, valueString);
     return valueString;
   } catch (error) {
