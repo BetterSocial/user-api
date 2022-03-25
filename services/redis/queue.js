@@ -10,7 +10,7 @@ const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : pro
 const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
   {
     redis: {
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: false, requestCert: true, },
       maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }
@@ -153,7 +153,7 @@ const addToChannelChatQueue = async (locations, userId) => {
 const registerQueue = new Bull("registerQueue", connectRedis,
   {
     redis: {
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: false, requestCert: true, },
       maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }
