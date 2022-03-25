@@ -24,7 +24,6 @@ const createQueuePostTime = async (req, res) => {
                 };
               
                 const { post_id, view_time, source } = req.body;
-console.log("Source of view:" + source); // TODO
                 // send queue for scoring processing on create post
                 const scoringProcessData = {
                   feed_id: post_id,
@@ -32,7 +31,9 @@ console.log("Source of view:" + source); // TODO
                   view_duration: view_time,
                   is_pdp: false, // TODO
                   activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+                  source: source,
                 };
+console.log("view post data:" + scoringProcessData); // TODO
                 const resultJob = await addForViewPost(scoringProcessData);
 
                 return res.status(200).json({
