@@ -7,7 +7,7 @@ const scoringProcessQueue = new Bull(
   "scoringProcessQueue",
   connectRedis,
   {
-    redis: { tls: { rejectUnauthorized: false } }
+    redis: { tls: { rejectUnauthorized: false, requestCert: true, } }
   });
 scoringProcessQueue.on('error', (err) => console.log('scoringProcessQueue', err));
 

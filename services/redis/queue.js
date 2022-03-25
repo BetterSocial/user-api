@@ -10,7 +10,7 @@ const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : pro
 const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
   {
     redis: {
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: false, requestCert: true, },
       maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }
@@ -86,16 +86,6 @@ postTimeQueue.on('waiting', (e) => console.log('postime: ', e));
 // );
 // addUserToChannel.on('error', (err) => console.log('addUserToChannelQueue', err));
 
-const scoringProcessQueue = new Bull("scoringProcessQueue", connectRedis,
-  {
-    redis: {
-      tls: { rejectUnauthorized: false },
-      maxRetriesPerRequest: 100,
-      connectTimeout: 30000
-    }
-  });
-  scoringProcessQueue.on('error', (err) => console.log('scoringProcessQueue', err));
-
 const addUserToChannelQueue = async (data, options) => {
   // addUserToChannel.add(data, options);
   // return addUserToChannel;
@@ -163,7 +153,7 @@ const addToChannelChatQueue = async (locations, userId) => {
 const registerQueue = new Bull("registerQueue", connectRedis,
   {
     redis: {
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: false, requestCert: true, },
       maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }
