@@ -29,12 +29,23 @@ module.exports = async (req, res) => {
     const listBlockDomain = await getBlockDomain(req.userId);
     const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
 
-    getstreamService
-      .getFeeds(token, "main_feed", {
+    let paramGetFeeds = {};
+    if ("ids" in req) {
+      console.log("There is ids in the req");
+      paramGetFeeds = {
+        ids: req.ids
+      };
+    } else {
+      console.log("There is no ids in the req");
+      paramGetFeeds = {
         limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
         id_lt: req.query.id_lt || "",
         reactions: { own: true, recent: true, counts: true },
-      })
+      };
+    }
+
+    getstreamService
+      .getFeeds(token, "main_feed", paramGetFeeds)
 
       .then(async (result) => {
         let data = [];
