@@ -15,6 +15,7 @@ const client = new Redis(String(process.env.REDIS_URL), {
   tls: {
     rejectUnauthorized: false,
     requestCert: true,
+    agent: false,
   },
 });
 client.on("connect", function () {
