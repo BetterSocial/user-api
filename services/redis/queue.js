@@ -7,17 +7,18 @@ const { convertString } = require("../../utils/custom");
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
 
+/* commented by Citrahadi, 20220327, since it's not used anymore
 const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
   {
     redis: {
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
       maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }
   }
 );
 postTimeQueue.on('error', (err) => console.log('posttimeque', err));
-postTimeQueue.on('waiting', (e) => console.log('postime: ', e));
+postTimeQueue.on('waiting', (e) => console.log('postime: ', e));*/
 
 // const followLocationQueue = new Bull("followLocationQueue", connectRedis,
 //   {
@@ -153,7 +154,7 @@ const addToChannelChatQueue = async (locations, userId) => {
 const registerQueue = new Bull("registerQueue", connectRedis,
   {
     redis: {
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
       maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }
@@ -213,7 +214,7 @@ const registerServiceQueue = async (token, userId, follows, topics, locations) =
 
 
 module.exports = {
-  postTimeQueue,
+  //postTimeQueue,
   // followLocationQueue,
   // followUserQueue,
   // followTopicQueue,

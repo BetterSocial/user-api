@@ -10,6 +10,7 @@ const {
   PollingOption,
   LogPolling,
   sequelize,
+  UserFollowUser
 } = require("../../databases/models");
 const { Op } = require("sequelize");
 const {
@@ -26,9 +27,23 @@ module.exports = async (req, res) => {
   try {
     const token = req.token;
     console.log(`params : ${req.params.id}`)
+    console.log('other profile id: ', req.params.id);
+    console.log('your id: ', req.userId);
+
+    /**
+     * lakukan pemeriksaan apakah user tersebut sudah memfollow dengan id tersebut
+     */
+    let userFollow = await UserFollowUser.findOne({
+      where: {
+        user_id_follower: req.params.id,
+        user_id_followed: req.userId
+      }
+    });
+
+
 
     getstreamService
-      .getOtherFeeds(token, "user", req.params.id, {
+      .getOtherFeeds(token, userFollow ? 'user_excl' : 'user', req.params.id, {
         reactions: { own: true, recent: true, counts: true },
       })
 
@@ -42,7 +57,7 @@ module.exports = async (req, res) => {
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
           if (now < dateExpired || item.duration_feed == "never") {
-            if(item.anonimity) continue
+            if (item.anonimity) continue
             if (item.verb === POST_VERB_POLL) {
               let newItem = { ...item };
               let pollOptions = await PollingOption.findAll({

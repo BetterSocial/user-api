@@ -2,17 +2,20 @@ const Redis = require("ioredis");
 /**
  * this is for local
  */
-// const client = new Redis({
-//   port: process.env.REDIS_PORT,
-//   host: process.env.REDIS_HOST,
-//   connectTimeout: 100,
-// });
+/*
+const client = new Redis({
+   port: process.env.REDIS_PORT,
+   host: process.env.REDIS_HOST,
+   connectTimeout: 100,
+ });*/
 /**
  * this is for production
  */
 const client = new Redis(String(process.env.REDIS_URL), {
   tls: {
     rejectUnauthorized: false,
+    requestCert: true,
+    agent: false,
   },
 });
 client.on("connect", function () {

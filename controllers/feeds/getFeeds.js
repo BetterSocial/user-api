@@ -25,21 +25,32 @@ const { convertString } = require("../../utils/custom");
 module.exports = async (req, res) => {
   try {
     const token = req.token;
-    // const listBlockUser = await getListBlockUser(req.userId);
-    // const listBlockDomain = await getBlockDomain(req.userId);
-    // const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
+    const listBlockUser = await getListBlockUser(req.userId);
+    const listBlockDomain = await getBlockDomain(req.userId);
+    const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
 
-    getstreamService
-      .getFeeds(token, "main_feed", {
+    let paramGetFeeds = {};
+    if ("ids" in req) {
+      console.log("There is ids in the req");
+      paramGetFeeds = {
+        ids: req.ids
+      };
+    } else {
+      console.log("There is no ids in the req");
+      paramGetFeeds = {
         limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
         id_lt: req.query.id_lt || "",
         reactions: { own: true, recent: true, counts: true },
-      })
+      };
+    }
+
+    getstreamService
+      .getFeeds(token, "main_feed", paramGetFeeds)
 
       .then(async (result) => {
         let data = [];
         let feeds = result.results;
-        // let listBlock = String(listBlockUser + listBlockDomain);
+        let listBlock = String(listBlockUser + listBlockDomain);
         // let yFilter = listBlockUser.map((itemY) => {
         //   return itemY.user_id_blocked;
         // });
@@ -53,26 +64,24 @@ module.exports = async (req, res) => {
         //   return feed;
         // }, []);
 
-        // let newArr = await _.filter(feeds, function (o) {
-        //   return !listBlock.includes(o.actor.id);
-        // });
+        let newArr = await _.filter(feeds, function (o) {
+          return !listBlock.includes(o.actor.id);
+        });
 
-        // let listAnonymous = listPostAnonymous.map((value) => {
-        //   return value.post_anonymous_id_blocked;
-        // });
+        let listAnonymous = listPostAnonymous.map((value) => {
+          return value.post_anonymous_id_blocked;
+        });
 
-        // let feedWithAnonymous = newArr.reduce((feed, current) => {
-        //   if (!listAnonymous.includes(current.id)) {
-        //     feed.push(current);
-        //   }
-        //   return feed;
-        // }, []);
+        let feedWithAnonymous = newArr.reduce((feed, current) => {
+          if (!listAnonymous.includes(current.id)) {
+            feed.push(current);
+          }
+          return feed;
+        }, []);
 
         // Change to conventional loop because map cannot handle await
-        // for (let i = 0; i < feedWithAnonymous.length; i++) {
-        // let item = feedWithAnonymous[i];
-        for (let i = 0; i < feeds.length; i++) {
-          let item = feeds[i];
+        for (let i = 0; i < feedWithAnonymous.length; i++) {
+          let item = feedWithAnonymous[i];
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
           if (now < dateExpired || item.duration_feed == "never") {
@@ -120,10 +129,9 @@ module.exports = async (req, res) => {
 
               newItem.pollOptions = pollOptions;
               newItem.voteCount = voteCount;
-              
               data.push(newItem);
             } else {
-              data.push(newItem);
+              data.push(item);
             }
           }
         }

@@ -18,16 +18,25 @@ const getFeedChatService = async (req, res) => {
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
             const activity_id = b.reaction.activity_id
+            const downvote = b.object.reaction_counts.downvotes || 0
+            const upvote = b.object.reaction_counts.upvotes || 0
+            const totalVote = upvote - downvote
+            let actor = b.object.actor
+            if(b.object.anonimity) {
+                actor = {...actor, data: {...actor.data, username: 'anonymous'}}
+            }
             if(!newGroup[activity_id]) {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
                     titlePost: b.object.message,
-                    downvote: b.object.count_downvote, 
-                    upvote: b.object.count_upvote,
+                    downvote: totalVote < 0 ? totalVote * -1 : 0, 
+                    upvote: totalVote > 0 ? totalVote : 0,
                     block: blockList,
-                    postMaker: b.object.actor,
+                    postMaker: actor,
+                    isAnonym: b.object.anonimity ,
                     comments: [],
                     data: {
+                        last_message_at: b.reaction.updated_at,
                         updated_at: b.reaction.updated_at
                     }
                 }

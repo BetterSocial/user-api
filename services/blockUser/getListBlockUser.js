@@ -2,6 +2,8 @@ const { UserBlockedUser } = require("../../databases/models");
 const { BLOCK_FEED_KEY } = require("../../helpers/constants");
 const { getIdBlockFeed } = require("../../utils/block");
 const { getValue, setValue } = require("../redis");
+const { Op } = require("sequelize");
+
 module.exports = async (userId) => {
   try {
     const MY_KEY = getIdBlockFeed(userId);
@@ -15,7 +17,15 @@ module.exports = async (userId) => {
         user_id_blocker: userId,
       },
     });
-    const valueString = JSON.stringify(blockUser);
+
+    let blockedUser = await UserBlockedUser.findAll({
+      attributes: ["user_id_blocker"],
+      where: {
+        user_id_blocked: userId,
+      },
+    });
+    let newArr = [...blockUser, ...blockedUser];
+    const valueString = JSON.stringify(newArr);
     setValue(MY_KEY, valueString);
     return valueString;
   } catch (error) {

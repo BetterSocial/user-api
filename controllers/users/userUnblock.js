@@ -44,29 +44,6 @@ module.exports = async(req,res) => {
             {
                 transaction : t
             })
-
-            console.log('transaction 2')
-
-            const result = await UserFollowUser.findAll({
-                where : {
-                    user_id_follower : myUserId,
-                    user_id_followed : userId,
-                }
-            }, 
-            {
-                transaction : t
-            })
-
-            if(result.length === 0) {
-                await UserFollowUser.create({
-                    follow_action_id: uuidv4(),
-                    user_id_follower : myUserId,
-                    user_id_followed : userId,
-                },
-                {
-                    transaction: t
-                })    
-            }
         })
 
         if (result === null) {
@@ -79,14 +56,14 @@ module.exports = async(req,res) => {
         
         const key = getIdBlockFeed(req.userId);
         delCache(key);
-        
-        await getstreamService.followUser(req.token, userId, "user", 1);
-        res.json({
-            message: "The user has been successfully unblocked",
-            code: 200,
-            data: result,
-            status: "success",
-        });
+    
+        const scoringProcessData = {
+          user_id: req.userId,
+          feed_id: req.body.postId,
+          unblocked_user_id: req.body.userId,
+          activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+        };
+        await addForBlockUser(scoringProcessData);
     } catch (e) {
         return res.status(403).json({
             code: 403,
