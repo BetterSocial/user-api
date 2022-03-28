@@ -5,6 +5,7 @@ const {
   NO_POLL_OPTION_UUID,
   BLOCK_FEED_KEY,
   BLOCK_POST_ANONYMOUS,
+  GETSTREAM_RANKING_METHOD,
 } = require("../../helpers/constants");
 const {
   PollingOption,
@@ -45,6 +46,7 @@ module.exports = async (req, res) => {
     getstreamService
       .getOtherFeeds(token, userFollow ? 'user_excl' : 'user', req.params.id, {
         reactions: { own: true, recent: true, counts: true },
+        ranking: GETSTREAM_RANKING_METHOD,
       })
 
       .then(async (result) => {

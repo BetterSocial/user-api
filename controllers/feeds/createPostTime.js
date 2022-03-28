@@ -29,7 +29,7 @@ const createQueuePostTime = async (req, res) => {
                   feed_id: post_id,
                   user_id: user_id,
                   view_duration: view_time,
-                  is_pdp: false, // TODO
+                  is_pdp: (source === "PDP"),
                   activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
                   source: source,
                 };

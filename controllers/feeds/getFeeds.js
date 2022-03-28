@@ -5,6 +5,7 @@ const {
   NO_POLL_OPTION_UUID,
   BLOCK_FEED_KEY,
   BLOCK_POST_ANONYMOUS,
+  GETSTREAM_RANKING_METHOD,
 } = require("../../helpers/constants");
 const {
   PollingOption,
@@ -41,6 +42,7 @@ module.exports = async (req, res) => {
         limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
         id_lt: req.query.id_lt || "",
         reactions: { own: true, recent: true, counts: true },
+        ranking: GETSTREAM_RANKING_METHOD,
       };
     }
 
