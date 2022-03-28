@@ -9,7 +9,13 @@ module.exports = async (req, res) => {
   let feedItem = feed.results[0];
 
   let newItem = { ...feedItem };
-
+ 
+  if(newItem.anonimity) {
+    newItem.actor = {}
+    newItem.to = []
+    newItem.origin = null
+    newItem.object = ""
+  }
   if(feedItem.post_type === POST_TYPE_POLL) {
     let pollOptions = await PollingOption.findAll({
       where: {
@@ -42,7 +48,7 @@ module.exports = async (req, res) => {
     let voteCount = distinctPollingByUserId[0].length
   
     newItem.pollOptions = pollOptions;
-    newItem.voteCount = voteCount;  
+    newItem.voteCount = voteCount;
   }
 
   return res
