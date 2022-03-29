@@ -167,7 +167,7 @@ module.exports = async (req, res) => {
           anonimity: data.anonimity,
           location_level: location_level,
           duration_feed: data.duration_feed,
-          expired_at: moment.utc(data.expired_at).format("YYYY-MM-DD HH:mm:ss"),
+          expired_at: (data.expired_at) ? moment.utc(data.expired_at).format("YYYY-MM-DD HH:mm:ss") : "",
           images_url: data.images_url,
           created_at: moment.utc(data.time).format("YYYY-MM-DD HH:mm:ss"),
         };
