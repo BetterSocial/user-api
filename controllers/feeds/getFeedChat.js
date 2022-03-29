@@ -23,7 +23,7 @@ const getFeedChatService = async (req, res) => {
             const totalVote = upvote - downvote
             let actor = b.object.actor
             if(b.object.anonimity) {
-                actor = {...actor, data: {...actor.data, username: 'anonymous'}}
+                actor = {...actor, data: {}}
             }
             if(!newGroup[activity_id]) {
                 newGroup[activity_id] = {
