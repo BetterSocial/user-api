@@ -5,8 +5,12 @@ const NO_POLL_OPTION_UUID = "00000000-0000-0000-0000-000000000000";
 
 const POST_VERB_POLL = "poll";
 
-const MAX_FEED_FETCH_LIMIT = 10;
-const MAX_FEED_FETCH_LIMIT_DOMAIN = 20;
+// TODO
+// Changed temporarily, until logic improvement on getting the feeds is implemented.
+//const MAX_FEED_FETCH_LIMIT = 10;
+//const MAX_FEED_FETCH_LIMIT_DOMAIN = 20;
+const MAX_FEED_FETCH_LIMIT = 100;
+const MAX_FEED_FETCH_LIMIT_DOMAIN = 100;
 
 const REDIS_TTL = 86400;
 const BLOCK_DOMAIN_KEY = "BLOCK_DOMAIN_";
