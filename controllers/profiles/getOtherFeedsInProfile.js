@@ -6,6 +6,8 @@ const {
   BLOCK_FEED_KEY,
   BLOCK_POST_ANONYMOUS,
   GETSTREAM_RANKING_METHOD,
+  MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
+  MAX_DATA_RETURN_LENGTH
 } = require("../../helpers/constants");
 const {
   PollingOption,
@@ -23,8 +25,13 @@ const _ = require("lodash");
 const lodash = require("lodash");
 const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
+const { modifyPollPostObject } = require("../../utils/post");
 
 module.exports = async (req, res) => {
+  let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query
+
+  let getFeedFromGetstreamIteration = 0;
+  let data = []
   try {
     const token = req.token;
     console.log(`params : ${req.params.id}`)
@@ -41,82 +48,49 @@ module.exports = async (req, res) => {
       }
     });
 
+    while (data.length < MAX_DATA_RETURN_LENGTH) {
+      if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
+      console.log(`get feeds from ${offset}`)
+      let result = await getstreamService
+        .getOtherFeeds(token, userFollow ? 'user_excl' : 'user', req.params.id, {
+          reactions: { own: true, recent: true, counts: true },
+          limit,
+          offset,
+          ranking: GETSTREAM_RANKING_METHOD,
+        })
 
-    getstreamService
-      .getOtherFeeds(token, userFollow ? 'user_excl' : 'user', req.params.id, {
-        reactions: { own: true, recent: true, counts: true },
-        ranking: GETSTREAM_RANKING_METHOD,
-      })
+      let feeds = result.results;
+      // Change to conventional loop because map cannot handle await
+      for (let i = 0; i < feeds.length; i++) {
+        let item = feeds[i];
+        let now = new Date();
+        let dateExpired = new Date(item.expired_at);
+        offset++;
 
-      .then(async (result) => {
-        let data = [];
-        let feeds = result.results;
-
-        // Change to conventional loop because map cannot handle await
-        for (let i = 0; i < feeds.length; i++) {
-          let item = feeds[i];
-          let now = new Date();
-          let dateExpired = new Date(item.expired_at);
-          if (now < dateExpired || item.duration_feed == "never") {
-            if (item.anonimity) continue
-            if (item.verb === POST_VERB_POLL) {
-              let newItem = { ...item };
-              let pollOptions = await PollingOption.findAll({
-                where: {
-                  polling_option_id: item.polls,
-                },
-              });
-
-              let pollingOptionsId = pollOptions.reduce((acc, current) => {
-                acc.push(current.polling_id);
-                return acc;
-              }, []);
-
-              let logPolling = await LogPolling.findAll({
-                where: {
-                  polling_id: pollingOptionsId,
-                  user_id: req.userId,
-                },
-              });
-
-              if (logPolling.length > 0) {
-                if (item.multiplechoice) newItem.mypolling = logPolling;
-                else newItem.mypolling = logPolling[0];
-                newItem.isalreadypolling = true;
-              } else {
-                newItem.isalreadypolling = false;
-                newItem.mypolling = [];
-              }
-
-              let distinctPollingByUserId = await sequelize.query(
-                `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}' AND polling_option_id !='${NO_POLL_OPTION_UUID}'`
-              );
-              let voteCount = distinctPollingByUserId[0].length;
-
-              newItem.pollOptions = pollOptions;
-              newItem.voteCount = voteCount;
-              data.push(newItem);
-            } else {
-              data.push(item);
-            }
+        if (now < dateExpired || item.duration_feed == "never") {
+          if (item.anonimity) continue
+          if (item.verb === POST_VERB_POLL) {
+            let newItem = modifyPollPostObject(req.userId, item)
+            data.push(newItem);
+          } else {
+            data.push(item);
           }
         }
 
-        res.status(200).json({
-          code: 200,
-          status: "success",
-          data: data,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(403).json({
-          status: "failed",
-          data: null,
-          error: err,
-        });
-      });
+        if(data.length === MAX_DATA_RETURN_LENGTH) break;
+      }
+
+      getFeedFromGetstreamIteration++;
+    }
+
+    console.log(data.length)
+    res.status(200).json({
+      code: 200,
+      status: "success",
+      data: data,
+      offset
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -124,6 +98,7 @@ module.exports = async (req, res) => {
       data: null,
       message: "Internal server error",
       error: error,
+      offset
     });
   }
 };
