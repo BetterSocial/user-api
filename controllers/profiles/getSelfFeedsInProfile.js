@@ -24,12 +24,15 @@ const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 
 module.exports = async (req, res) => {
+  let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
   try {
     const token = req.token;
 
     getstreamService
       .getFeeds(token, "user_excl", {
         reactions: { own: true, recent: true, counts: true },
+        limit,
+        offset,
         ranking: GETSTREAM_RANKING_METHOD,
       })
 

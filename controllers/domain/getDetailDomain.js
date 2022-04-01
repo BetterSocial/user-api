@@ -7,18 +7,17 @@ const {
 const { convertString } = require("../../utils");
 
 module.exports = async (req, res) => {
+  let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
+
   try {
     const query = {
       name: "domain",
       idFeed: convertString(req.params.idfeed, ".", "-"),
-      limit: req.query.limit || MAX_FEED_FETCH_LIMIT,
-      id_lt: req.query.id_lt || "",
+      limit,
+      offset,
       reactions: { own: true, recent: true, counts: true },
       ranking: GETSTREAM_RANKING_METHOD,
     };
-    console.log(query);
-    const resp = await getDetailDomain(query);
-
     let domain = await DomainPage.findOne({
       where : {
         domain_name : req.params.idfeed
@@ -30,6 +29,9 @@ module.exports = async (req, res) => {
         domain_id_followed : domain.domain_page_id
       }
     })
+
+    console.log(query);
+    const resp = await getDetailDomain(query);
 
     res.status(200).json({
       code: 200,
