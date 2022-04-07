@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
-    "bull": "^3.22.9",
+    "bull": "^4.1.4",
     "cli": "^1.0.1",
     "cloudinary": "^1.25.0",
     "cookie-parser": "^1.4.5",
@@ -24,6 +24,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
+    "mongodb": "^4.3.1",
     "morgan": "^1.9.1",
     "notenv": "^2.0.3",
     "pg": "^8.5.1",
