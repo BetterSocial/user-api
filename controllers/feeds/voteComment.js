@@ -9,6 +9,10 @@ module.exports = async (req, res) => {
     let count_downvote = dataReaction.data.count_downvote;
     let count_upvote = dataReaction.data.count_upvote;
     let text = dataReaction.data.text;
+    let targetFeeds = [`notification:${req.userId}`]
+    if(req.userId !== dataReaction.user_id) {
+      targetFeeds = [...targetFeeds, `notification:${dataReaction.user_id}`]
+    }
 
     let dataVote = await VoteComments.findOne({
       where: { comment_id: activity_id, user_id: req.userId },
@@ -66,6 +70,7 @@ module.exports = async (req, res) => {
       count_downvote,
       count_upvote,
       text,
+      targetFeeds
     };
     const data = await voteComment(activity_id, req.token, newData);
     return res.status(200).json(responseSuccess("Success vote comment", data));

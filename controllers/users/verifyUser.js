@@ -8,17 +8,25 @@ module.exports = async (req, res) => {
     const userData = await User.findOne({
       where: { human_id: req.body.user_id },
     });
-    let user_id = userData.user_id;
-    let userId = user_id.toLowerCase();
-    const token = await getstreamService.createToken(userId);
-    const refresh_token = await createRefreshToken(userId);
-    return res.json({
-      code: 200,
-      data: Object.keys(userData).length === 0 ? false : true,
-      message: "",
-      token: token,
-      refresh_token: refresh_token,
-    });
+    if (userData) {
+      let user_id = userData.user_id;
+      let userId = user_id.toLowerCase();
+      const token = await getstreamService.createToken(userId);
+      const refresh_token = await createRefreshToken(userId);
+      return res.json({
+        code: 200,
+        data: Object.keys(userData).length === 0 ? false : true,
+        message: "",
+        token: token,
+        refresh_token: refresh_token,
+      });
+    } else {
+      return res.status(200).json({
+        code: 500,
+        data: false,
+        message: 'user not found',
+      });
+    }
   } catch (error) {
     console.log(error);
     // const { status, data } = error.response;
@@ -27,7 +35,7 @@ module.exports = async (req, res) => {
     //   data: 0,
     //   message: data,
     // });
-    return res.status(500).json({
+    return res.status(200).json({
       code: 500,
       data: false,
       message: error,

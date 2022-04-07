@@ -24,12 +24,15 @@ const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 
 module.exports = async (req, res) => {
+  let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
   try {
     const token = req.token;
 
     getstreamService
       .getFeeds(token, "user_excl", {
         reactions: { own: true, recent: true, counts: true },
+        limit,
+        offset,
         ranking: GETSTREAM_RANKING_METHOD,
       })
 
@@ -43,8 +46,16 @@ module.exports = async (req, res) => {
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
           if (now < dateExpired || item.duration_feed == "never") {
+            let newItem = { ...item };
+
+            if(newItem.anonimity) {
+              newItem.actor = {}
+              newItem.to = []
+              newItem.origin = null
+              newItem.object = ""
+            }
+
             if (item.verb === POST_VERB_POLL) {
-              let newItem = { ...item };
               let pollOptions = await PollingOption.findAll({
                 where: {
                   polling_option_id: item.polls,
@@ -81,7 +92,7 @@ module.exports = async (req, res) => {
               newItem.voteCount = voteCount;
               data.push(newItem);
             } else {
-              data.push(item);
+              data.push(newItem);
             }
           }
         }

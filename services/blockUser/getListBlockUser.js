@@ -24,7 +24,13 @@ module.exports = async (userId) => {
         user_id_blocked: userId,
       },
     });
-    let newArr = [...blockUser, ...blockedUser];
+
+    let newarrBlockuser = blockedUser.map(item => {
+      return {
+        "user_id_blocked": item.user_id_blocker
+      }
+    });
+    let newArr = [...blockUser, ...newarrBlockuser];
     const valueString = JSON.stringify(newArr);
     setValue(MY_KEY, valueString);
     return valueString;
