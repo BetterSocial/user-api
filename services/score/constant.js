@@ -11,4 +11,6 @@ module.exports = {
   EVENT_FOLLOW_USER: "follow-user",
   EVENT_UNFOLLOW_USER: "unfollow-user",
   EVENT_UNBLOCK_USER: "unblock-user",
+
+  DB_COLLECTION_USER_POST_SCORE: "user_post_score",
 };

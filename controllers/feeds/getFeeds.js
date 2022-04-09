@@ -15,6 +15,7 @@ const getBlockDomain = require("../../services/domain/getBlockDomain");
 const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 const { modifyPollPostObject, modifyAnonymousAndBlockPost, modifyAnonimityPost, isPostBlocked } = require("../../utils/post");
+const putUserPostScore = require("../../services/score/putUserPostScore");
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query
@@ -27,7 +28,7 @@ module.exports = async (req, res) => {
     const listBlockUser = await getListBlockUser(req.userId);
     const listBlockDomain = await getBlockDomain(req.userId);
     const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
-    
+
     let listAnonymous = listPostAnonymous.map((value) => {
       return value.post_anonymous_id_blocked;
     });
@@ -57,6 +58,10 @@ module.exports = async (req, res) => {
             offset++;
             continue
           }
+
+          // TODO Should be used for testing in dev only. Remove this when done testing (ask Bastian)
+          // Put user post score in score details
+          await putUserPostScore(item, req.userId);
 
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
