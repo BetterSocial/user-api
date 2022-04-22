@@ -23,6 +23,7 @@ const Search = async(req, res) => {
         const blockDomain = await getBlockDomain(req.userId);
         // const blockDomain = ["f0433444-8459-4b9a-969b-dc13f98580b3"]
         let filteredBlockDomainArray = blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain)
+        console.log(filteredBlockDomainArray)
 
         let newsLink
         if(filteredBlockDomainArray.length > 0) {
@@ -34,7 +35,7 @@ const Search = async(req, res) => {
                         { description : { [Op.iLike] : `%${q}%`}},
                         { url : { [Op.iLike] : `%${q}%`}},
                     ],
-                    domain_page_id: { [Op.notIn] : filteredBlockDomainArray}
+                    domain_page_id: { [Op.notIn] : filteredBlockDomainArray.map((item) => item.domain_page_id)}
                 },
                 limit: 10,
                 order: [
