@@ -1,25 +1,29 @@
 const { getDomain } = require("../../services/getstream");
-const { 
-  MAX_FEED_FETCH_LIMIT_DOMAIN, 
+const {
+  MAX_FEED_FETCH_LIMIT_DOMAIN,
   GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DOMAIN_DATA_RETURN_LENGTH
 } = require("../../helpers/constants");
 const _ = require("lodash");
+
 const { getBlockDomain } = require("../../services/domain");
+const { DomainPage } = require("../../databases/models/");
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_FEED_FETCH_LIMIT_DOMAIN } = req.query
   console.log(`offset ${offset} limit ${limit}`)
+
+  let domainPageCache = {}
 
   let data = []
   let getFeedFromGetstreamIteration = 0;
   try {
     const blockDomain = await getBlockDomain(req.userId);
 
-    while(data.length < MAX_DOMAIN_DATA_RETURN_LENGTH) {
-      if(getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
-  
+    while (data.length < MAX_DOMAIN_DATA_RETURN_LENGTH) {
+      if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
+
       try {
         let query = {
           limit,
@@ -27,27 +31,46 @@ module.exports = async (req, res) => {
           ranking: GETSTREAM_RANKING_METHOD,
           reactions: { own: true, recent: true, counts: true },
         };
-  
+
         console.log(`get feeds from ${query.offset}`)
         const resp = await getDomain(query);
         let feeds = resp.results
-  
-        for(let i in feeds) {
+
+        for (let i in feeds) {
           let item = feeds[i];
           console.log(`${blockDomain} vs ${item.content.domain_page_id}`)
-          if(blockDomain.includes(item.content.domain_page_id)) {
+          if (blockDomain.includes(item.content.domain_page_id)) {
             offset++;
             continue;
           }
-  
+
+          if (domainPageCache[item.content.domain_page_id]) {
+            let cache = domainPageCache[item.content.domain_page_id]
+            item.domain.credderScore = cache.credder_score
+            item.domain.credderLastChecked = cache.credder_last_checked
+          } else {
+            let dataDomain = await DomainPage.findOne({
+              where: { domain_page_id: item.content.domain_page_id },
+              raw: true
+            })
+
+            if (dataDomain) {
+              domainPageCache[item.content.domain_page_id] = dataDomain
+              item.domain.credderScore = dataDomain.credder_score
+              item.domain.credderLastChecked = dataDomain.credder_last_checked
+            }
+          }
+
+          console.log(domainPageCache)
+
           data.push(item)
           offset++;
-  
-          if(data.length === MAX_DOMAIN_DATA_RETURN_LENGTH) break
+
+          if (data.length === MAX_DOMAIN_DATA_RETURN_LENGTH) break
         }
-  
+
         getFeedFromGetstreamIteration++;
-    
+
       } catch (error) {
         console.log('error')
         console.log(error)
@@ -58,7 +81,7 @@ module.exports = async (req, res) => {
           error: error,
           offset,
         });
-      }  
+      }
     }
 
     console.log(data.length)
@@ -68,7 +91,7 @@ module.exports = async (req, res) => {
       data: data,
       offset,
     });
-  } catch(e) {
+  } catch (e) {
     return res.status(500).json({
       code: 500,
       data: [],

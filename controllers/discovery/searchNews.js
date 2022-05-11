@@ -45,7 +45,7 @@ const Search = async(req, res) => {
                     {
                         model: DomainPage,
                         as: 'newsLinkDomain',
-                        attributes: ['domain_name', 'logo'],
+                        attributes: ['domain_name', 'logo', "credder_score", "credder_last_checked"],
                     }
                 ]
             })    
@@ -67,7 +67,7 @@ const Search = async(req, res) => {
                     {
                         model: DomainPage,
                         as: 'newsLinkDomain',
-                        attributes: ['domain_name', 'logo'],
+                        attributes: ['domain_name', 'logo', "credder_score", "credder_last_checked"],
                     }
                 ]
             })    

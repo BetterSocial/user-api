@@ -29,6 +29,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         field: "updated_at",
       },
+      credder_score: DataTypes.INTEGER,
+      credder_last_checked: DataTypes.DATE,
     },
     {
       sequelize,
