@@ -84,7 +84,7 @@ const putFollowTopic = async (req, res) => {
 const getTopics = async (req, res) => {
     let { name } = req.query;
     console.log(name);
-    let query = `select topic_id, name,icon_path, categories, flg_show,  count(*) as follower from (Select * from topics where name ILIKE'%${name}%')as topics join user_topics Using (topic_id) group by topics.name, topics.topic_id, topics.icon_path, topics.categories, topics.created_at, topics.flg_show order by follower desc`;
+    let query = `select topic_id, name,icon_path, categories, flg_show,  count(*) as follower from (Select * from topics where name ILIKE'%${name}%') as topics join user_topics Using (topic_id) group by topics.name, topics.topic_id, topics.icon_path, topics.categories, topics.created_at, topics.flg_show order by follower desc limit 5`;
     try {
         // let topicService = new TopicService(Topics);
         // let topics = await topicService.search(name);
