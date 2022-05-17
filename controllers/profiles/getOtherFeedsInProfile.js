@@ -28,6 +28,7 @@ const lodash = require("lodash");
 const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 const { modifyPollPostObject } = require("../../utils/post");
+const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query
@@ -80,18 +81,21 @@ module.exports = async (req, res) => {
           } else {
             if (item.post_type === POST_TYPE_LINK) {
               console.log('masuk post type link')
-              if (domainPageCache[item?.og?.domain_page_id]) {
-                let cache = domainPageCache[item?.og?.domain_page_id]
-                newItem.credderScore = cache.credder_score
-                newItem.credderLastChecked = cache.credder_last_checked
-              } else {
-                let dataDomain = await DomainPage.findOne({
-                  where: { domain_page_id: item?.og?.domain_page_id },
-                  raw: true
-                })
+              if (item.post_type === POST_TYPE_LINK) {
+                let domainPageId = item?.og?.domain_page_id
+                let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
+                if (credderScoreCache) {
+                  newItem.credderScore = credderScoreCache
+                  newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
+                } else {
+                  let dataDomain = await DomainPage.findOne({
+                    where: { domain_page_id: domainPageId },
+                    raw: true
+                  })
 
-                if (dataDomain) {
-                  domainPageCache[item?.og?.domain_page_id] = dataDomain
+                  await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain.credder_score)
+                  await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain.credder_last_checked)
+
                   newItem.credderScore = dataDomain.credder_score
                   newItem.credderLastChecked = dataDomain.credder_last_checked
                 }

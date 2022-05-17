@@ -17,7 +17,8 @@ const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 const { modifyPollPostObject, modifyAnonymousAndBlockPost, modifyAnonimityPost, isPostBlocked } = require("../../utils/post");
 const putUserPostScore = require("../../services/score/putUserPostScore");
-const { DomainPage} = require('../../databases/models')
+const { DomainPage} = require('../../databases/models');
+const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query
@@ -63,7 +64,7 @@ module.exports = async (req, res) => {
 
           // TODO Should be used for testing in dev only. Remove this when done testing (ask Bastian)
           // Put user post score in score details
-          await putUserPostScore(item, req.userId);
+          // await putUserPostScore(item, req.userId);
 
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
@@ -74,25 +75,24 @@ module.exports = async (req, res) => {
               data.push(postPoll)
             } else {
               if (item.post_type === POST_TYPE_LINK) {
-                console.log('masuk post type link')
-                if (domainPageCache[item?.og?.domain_page_id]) {
-                  let cache = domainPageCache[item?.og?.domain_page_id]
-                  newItem.credderScore = cache.credder_score
-                  newItemcredderLastChecked = cache.credder_last_checked
+                let domainPageId = item?.og?.domain_page_id
+                let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
+                if (credderScoreCache) {
+                  newItem.credderScore = credderScoreCache
+                  newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
                 } else {
                   let dataDomain = await DomainPage.findOne({
-                    where: { domain_page_id: item?.og?.domain_page_id },
+                    where: { domain_page_id: domainPageId },
                     raw: true
                   })
 
-                  if (dataDomain) {
-                    domainPageCache[item?.og?.domain_page_id] = dataDomain
-                    newItem.credderScore = dataDomain.credder_score
-                    newItem.credderLastChecked = dataDomain.credder_last_checked
-                  }
+                  await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain.credder_score)
+                  await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain.credder_last_checked)
+
+                  newItem.credderScore = dataDomain.credder_score
+                  newItem.credderLastChecked = dataDomain.credder_last_checked
                 }
               }
-              data.push(newItem);
               data.push(newItem);
             }
           }
