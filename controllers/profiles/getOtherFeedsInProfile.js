@@ -7,13 +7,15 @@ const {
   BLOCK_POST_ANONYMOUS,
   GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
-  MAX_DATA_RETURN_LENGTH
+  MAX_DATA_RETURN_LENGTH,
+  POST_TYPE_LINK
 } = require("../../helpers/constants");
 const {
   PollingOption,
   LogPolling,
   sequelize,
-  UserFollowUser
+  UserFollowUser,
+  DomainPage,
 } = require("../../databases/models");
 const { Op } = require("sequelize");
 const {
@@ -29,6 +31,7 @@ const { modifyPollPostObject } = require("../../utils/post");
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query
+  let domainPageCache = {}
 
   let getFeedFromGetstreamIteration = 0;
   let data = []
@@ -69,16 +72,37 @@ module.exports = async (req, res) => {
         offset++;
 
         if (now < dateExpired || item.duration_feed == "never") {
+          let newItem = { ...item }
           if (item.anonimity) continue
           if (item.verb === POST_VERB_POLL) {
-            let newItem = modifyPollPostObject(req.userId, item)
+            newItem = modifyPollPostObject(req.userId, item)
             data.push(newItem);
           } else {
-            data.push(item);
+            if (item.post_type === POST_TYPE_LINK) {
+              console.log('masuk post type link')
+              if (domainPageCache[item?.og?.domain_page_id]) {
+                let cache = domainPageCache[item?.og?.domain_page_id]
+                newItem.credderScore = cache.credder_score
+                newItem.credderLastChecked = cache.credder_last_checked
+              } else {
+                let dataDomain = await DomainPage.findOne({
+                  where: { domain_page_id: item?.og?.domain_page_id },
+                  raw: true
+                })
+
+                if (dataDomain) {
+                  domainPageCache[item?.og?.domain_page_id] = dataDomain
+                  newItem.credderScore = dataDomain.credder_score
+                  newItem.credderLastChecked = dataDomain.credder_last_checked
+                }
+              }
+            }
+            
+            data.push(newItem);
           }
         }
 
-        if(data.length === MAX_DATA_RETURN_LENGTH) break;
+        if (data.length === MAX_DATA_RETURN_LENGTH) break;
       }
 
       getFeedFromGetstreamIteration++;

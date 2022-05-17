@@ -6,10 +6,12 @@ const {
   BLOCK_FEED_KEY,
   BLOCK_POST_ANONYMOUS,
   GETSTREAM_RANKING_METHOD,
+  POST_TYPE_LINK,
 } = require("../../helpers/constants");
 const {
   PollingOption,
   LogPolling,
+  DomainPage,
   sequelize,
 } = require("../../databases/models");
 const { Op } = require("sequelize");
@@ -25,6 +27,8 @@ const { convertString } = require("../../utils/custom");
 
 module.exports = async (req, res) => {
   let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
+  let domainPageCache = {}
+
   try {
     const token = req.token;
 
@@ -48,7 +52,7 @@ module.exports = async (req, res) => {
           if (now < dateExpired || item.duration_feed == "never") {
             let newItem = { ...item };
 
-            if(newItem.anonimity) {
+            if (newItem.anonimity) {
               newItem.actor = {}
               newItem.to = []
               newItem.origin = null
@@ -92,6 +96,25 @@ module.exports = async (req, res) => {
               newItem.voteCount = voteCount;
               data.push(newItem);
             } else {
+              if (item.post_type === POST_TYPE_LINK) {
+                console.log('masuk post type link')
+                if (domainPageCache[item?.og?.domain_page_id]) {
+                  let cache = domainPageCache[item?.og?.domain_page_id]
+                  newItem.credderScore = cache.credder_score
+                  newItemcredderLastChecked = cache.credder_last_checked
+                } else {
+                  let dataDomain = await DomainPage.findOne({
+                    where: { domain_page_id: item?.og?.domain_page_id },
+                    raw: true
+                  })
+
+                  if (dataDomain) {
+                    domainPageCache[item?.og?.domain_page_id] = dataDomain
+                    newItem.credderScore = dataDomain.credder_score
+                    newItem.credderLastChecked = dataDomain.credder_last_checked
+                  }
+                }
+              }
               data.push(newItem);
             }
           }

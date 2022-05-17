@@ -4,7 +4,8 @@ const {
   MAX_FEED_FETCH_LIMIT,
   GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
-  MAX_DATA_RETURN_LENGTH
+  MAX_DATA_RETURN_LENGTH,
+  POST_TYPE_LINK
 } = require("../../helpers/constants");
 const { Op } = require("sequelize");
 const {
@@ -16,10 +17,11 @@ const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 const { modifyPollPostObject, modifyAnonymousAndBlockPost, modifyAnonimityPost, isPostBlocked } = require("../../utils/post");
 const putUserPostScore = require("../../services/score/putUserPostScore");
+const { DomainPage} = require('../../databases/models')
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query
-
+  let domainPageCache = {}
   let getFeedFromGetstreamIteration = 0;
   let data = []
 
@@ -71,6 +73,26 @@ module.exports = async (req, res) => {
               let postPoll = await modifyPollPostObject(req.userId, item)
               data.push(postPoll)
             } else {
+              if (item.post_type === POST_TYPE_LINK) {
+                console.log('masuk post type link')
+                if (domainPageCache[item?.og?.domain_page_id]) {
+                  let cache = domainPageCache[item?.og?.domain_page_id]
+                  newItem.credderScore = cache.credder_score
+                  newItemcredderLastChecked = cache.credder_last_checked
+                } else {
+                  let dataDomain = await DomainPage.findOne({
+                    where: { domain_page_id: item?.og?.domain_page_id },
+                    raw: true
+                  })
+
+                  if (dataDomain) {
+                    domainPageCache[item?.og?.domain_page_id] = dataDomain
+                    newItem.credderScore = dataDomain.credder_score
+                    newItem.credderLastChecked = dataDomain.credder_last_checked
+                  }
+                }
+              }
+              data.push(newItem);
               data.push(newItem);
             }
           }
