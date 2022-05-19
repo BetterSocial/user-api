@@ -81,7 +81,7 @@ module.exports = async (req, res) => {
     },
     local_community: "string[]",
     topics: "string[]|empty:false",
-    follows: "string[]|empty:false",
+    follows: "string[]",
     follow_source: "string|empty:false",
   };
   let { users, local_community, topics, follows, follow_source } =
