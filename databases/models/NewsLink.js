@@ -34,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         field: "updated_at",
       },
+      post_id: DataTypes.STRING,
     },
     {
       sequelize,
