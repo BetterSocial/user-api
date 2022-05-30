@@ -8,8 +8,8 @@ const MAX_ITEM_PER_GROUP = 5;
 
 module.exports = async (req, res) => {
   const schema = {
-    // topics: "string[]|empty:false",
-    // locations: "string[]|empty:false"
+    topics: "string[]|empty:false",
+    locations: "string[]|empty:false"
   };
 
   let topics = JSON.parse(decodeURI(req.query.topics || []))
