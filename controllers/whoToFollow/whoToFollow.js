@@ -8,8 +8,8 @@ const MAX_ITEM_PER_GROUP = 5;
 
 module.exports = async (req, res) => {
   const schema = {
-    topics : "string[]|empty:false",
-    locations: "string[]|empty:false"
+    // topics: "string[]|empty:false",
+    // locations: "string[]|empty:false"
   };
 
   let topics = JSON.parse(decodeURI(req.query.topics || []))
@@ -49,113 +49,49 @@ module.exports = async (req, res) => {
     // let duplicateUserChecker = [];
 
     for (let indexTopic in TopicsData) {
+      let tempUsers = []
       let topic = TopicsData[indexTopic]
-      result.push({
-        viewtype: 'label',
-        name: topic.name,
-        id: topic.topic_id,
-      })
 
-      for(let indexUserTopic in userTopicFollower) {
+      for (let indexUserTopic in userTopicFollower) {
         let userTopic = userTopicFollower[indexUserTopic]
-        if (userTopic.topic_id === topic.topic_id) result.push({
+        if (userTopic.topic_id === topic.topic_id) tempUsers.push({
           ...userTopic,
           viewtype: 'user'
         })
       }
+
+      if (tempUsers.length > 0) {
+        result.push({
+          viewtype: 'label',
+          name: topic.name,
+          id: topic.topic_id,
+        })
+
+        result.push(...tempUsers)
+      }
     }
 
     for (let indexLocation in LocationsData) {
+      let tempUsers = []
       let location = LocationsData[indexLocation]
-      result.push({
-        ...location,
-        viewtype: 'label',
-      })
 
       for (let indexUserLocation in userLocationFollower) {
         let userLocation = userLocationFollower[indexUserLocation]
-        if (userLocation.location_id === location.location_id) result.push({
+        if (userLocation.location_id === location.location_id) tempUsers.push({
           ...userLocation,
           viewtype: 'user'
         })
       }
+
+      if (tempUsers.length > 0) {
+        result.push({
+          ...location,
+          viewtype: 'label',
+        })
+
+        result.push(...tempUsers)
+      }
     }
-
-    // for(let indexLocation in LocationsData) {
-    //   let location = LocationsData[indexLocation]
-    //   result = [...result, ...userLocationFollower.filter((item) => item.location_id === location.topic_id)]
-    // }
-
-    // _.forEach(TopicsData, (value, index) => {
-    //   let isTopicAdded = false;
-    //   if(value.users){
-    //     let userToBeReturned = 0
-    //     value.users.map((user, idx) => {
-    //       if(duplicateUserChecker.includes(user.user_id) || userToBeReturned >= MAX_ITEM_PER_GROUP) return
-    //       else {
-    //         if(!isTopicAdded) {
-    //           isTopicAdded = true; 
-    //           result.push({
-    //             viewtype: 'label',
-    //             name : value.name,
-    //             id: value.topic_id,
-    //           });
-    //         } 
-    //         duplicateUserChecker.push(user.user_id);
-    //         userToBeReturned++;
-    //         result.push({
-    //           viewtype: 'user',
-    //           user_id : user.user_id,
-    //           human_id : user.human_id,
-    //           username: user.username,
-    //           real_name: user.real_name,
-    //           profile_pic_path: user.profile_pic_path,
-    //           bio: user.bio,
-    //         })           
-    //       }
-    //     })
-    //   }
-    // })
-
-    // _.forEach(LocationsData, (value, index) => {
-    //   let isLocationsAdded = false;
-    //   if(value.users) {
-    //     let userToBeReturned = 0
-    //     value.users.map((user, idx) => {
-    //       if(duplicateUserChecker.includes(user.user_id) || userToBeReturned >= MAX_ITEM_PER_GROUP) return
-    //       else {
-    //         if(!isLocationsAdded) {
-    //           isLocationsAdded = true;
-    //           result.push({
-    //             viewtype: 'label',
-    //             name : value.city,
-    //             location_id: value.location_id,
-    //             zip: value.zip,
-    //             neighborhood: value.neighborhood,
-    //             city: value.city,
-    //             state: value.state,
-    //             country: value.country,
-    //             location_level: value.location_level,
-    //             status: value.status,
-    //             slug_name: value.slug_name,
-    //           });
-    //         }
-    //         duplicateUserChecker.push(user.user_id);
-    //         userToBeReturned++;
-
-    //         result.push({
-    //           viewtype: 'user',
-    //           user_id : user.user_id,
-    //           human_id : user.human_id,
-    //           username: user.username,
-    //           real_name: user.real_name,
-    //           profile_pic_path: user.profile_pic_path,
-    //           bio: user.bio,
-    //         })
-    //       }
-    //     })
-    //   }
-    // })
 
     console.log('Who to follow size')
     console.log(result.length)
