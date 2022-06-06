@@ -78,22 +78,24 @@ module.exports = async (req, res) => {
           } else {
             if (item.post_type === POST_TYPE_LINK) {
               let domainPageId = item?.og?.domain_page_id
-              let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
-              if (credderScoreCache) {
-                newItem.credderScore = credderScoreCache
-                newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
-              } else {
-                if (domainPageId) {
+              if (domainPageId) {
+                let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
+                if (credderScoreCache) {
+                  newItem.credderScore = credderScoreCache
+                  newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
+                } else {
                   let dataDomain = await DomainPage.findOne({
                     where: { domain_page_id: domainPageId },
                     raw: true
                   })
 
-                  await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain.credder_score)
-                  await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain.credder_last_checked)
-
-                  newItem.credderScore = dataDomain.credder_score
-                  newItem.credderLastChecked = dataDomain.credder_last_checked
+                  if(dataDomain) {
+                    await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain?.credder_score)
+                    await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain?.credder_last_checked)
+  
+                    newItem.credderScore = dataDomain?.credder_score
+                    newItem.credderLastChecked = dataDomain?.credder_last_checked
+                  }
                 }
               }
             }
