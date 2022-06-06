@@ -17,7 +17,7 @@ const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 const { modifyPollPostObject, modifyAnonymousAndBlockPost, modifyAnonimityPost, isPostBlocked } = require("../../utils/post");
 const putUserPostScore = require("../../services/score/putUserPostScore");
-const { DomainPage} = require('../../databases/models');
+const { DomainPage } = require('../../databases/models');
 const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
 
 module.exports = async (req, res) => {
@@ -68,19 +68,22 @@ module.exports = async (req, res) => {
 
           let now = new Date();
           let dateExpired = new Date(item.expired_at);
-          if (now < dateExpired || item.duration_feed == "never") {
-            let newItem = modifyAnonimityPost(item);
-            if (item.verb === POST_VERB_POLL) {
-              let postPoll = await modifyPollPostObject(req.userId, item)
-              data.push(postPoll)
-            } else {
-              if (item.post_type === POST_TYPE_LINK) {
-                let domainPageId = item?.og?.domain_page_id
-                let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
-                if (credderScoreCache) {
-                  newItem.credderScore = credderScoreCache
-                  newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
-                } else {
+
+          // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
+          // if (now < dateExpired || item.duration_feed == "never") {
+          let newItem = modifyAnonimityPost(item);
+          if (item.verb === POST_VERB_POLL) {
+            let postPoll = await modifyPollPostObject(req.userId, item)
+            data.push(postPoll)
+          } else {
+            if (item.post_type === POST_TYPE_LINK) {
+              let domainPageId = item?.og?.domain_page_id
+              let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
+              if (credderScoreCache) {
+                newItem.credderScore = credderScoreCache
+                newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
+              } else {
+                if (domainPageId) {
                   let dataDomain = await DomainPage.findOne({
                     where: { domain_page_id: domainPageId },
                     raw: true
@@ -93,9 +96,10 @@ module.exports = async (req, res) => {
                   newItem.credderLastChecked = dataDomain.credder_last_checked
                 }
               }
-              data.push(newItem);
             }
+            data.push(newItem);
           }
+          // }
 
           offset++;
           if (data.length === MAX_DATA_RETURN_LENGTH) break
