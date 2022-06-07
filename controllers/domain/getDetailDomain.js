@@ -1,8 +1,8 @@
-const {UserFollowDomain, DomainPage} = require('../../databases/models')
+const { UserFollowDomain, DomainPage } = require('../../databases/models')
 const { getDetailDomain } = require("../../services/getstream");
 const {
-    MAX_FEED_FETCH_LIMIT,
-    GETSTREAM_RANKING_METHOD,
+  MAX_FEED_FETCH_LIMIT,
+  GETSTREAM_RANKING_METHOD,
 } = require("../../helpers/constants");
 const { convertString } = require("../../utils");
 
@@ -19,16 +19,21 @@ module.exports = async (req, res) => {
       ranking: GETSTREAM_RANKING_METHOD,
     };
     let domain = await DomainPage.findOne({
-      where : {
-        domain_name : req.params.idfeed
+      where: {
+        domain_name: req.params.idfeed
       }
     })
 
-    let {count} = await UserFollowDomain.findAndCountAll({
-      where : {
-        domain_id_followed : domain.domain_page_id
-      }
-    })
+    let followers = 0;
+    if (domain?.domain_page_id) {
+      let { count } = await UserFollowDomain.findAndCountAll({
+        where: {
+          domain_id_followed: domain.domain_page_id
+        }
+      })
+
+      followers = count
+    }
 
     console.log(query);
     const resp = await getDetailDomain(query);
@@ -36,7 +41,7 @@ module.exports = async (req, res) => {
     res.status(200).json({
       code: 200,
       status: "success",
-      followers : count,
+      followers,
       data: resp?.results,
     });
   } catch (error) {
@@ -44,7 +49,7 @@ module.exports = async (req, res) => {
     return res.status(500).json({
       code: 500,
       data: null,
-      followers : 0,
+      followers: 0,
       message: "Internal server error",
       error: error,
     });
