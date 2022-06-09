@@ -3,6 +3,7 @@ const { getDetailDomain } = require("../../services/getstream");
 const {
   MAX_FEED_FETCH_LIMIT,
   GETSTREAM_RANKING_METHOD,
+  GETSTREAM_TIME_LINEAR_RANKING_METHOD
 } = require("../../helpers/constants");
 const { convertString } = require("../../utils");
 
@@ -16,7 +17,7 @@ module.exports = async (req, res) => {
       limit,
       offset,
       reactions: { own: true, recent: true, counts: true },
-      ranking: GETSTREAM_RANKING_METHOD,
+      ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD,
     };
     let domain = await DomainPage.findOne({
       where: {
