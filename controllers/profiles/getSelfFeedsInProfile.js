@@ -6,6 +6,7 @@ const {
   BLOCK_FEED_KEY,
   BLOCK_POST_ANONYMOUS,
   GETSTREAM_RANKING_METHOD,
+  GETSTREAM_TIME_LINEAR_RANKING_METHOD,
   POST_TYPE_LINK,
 } = require("../../helpers/constants");
 const {
@@ -38,7 +39,7 @@ module.exports = async (req, res) => {
         reactions: { own: true, recent: true, counts: true },
         limit,
         offset,
-        ranking: GETSTREAM_RANKING_METHOD,
+        ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD,
       })
 
       .then(async (result) => {

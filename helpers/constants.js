@@ -20,6 +20,7 @@ const BLOCK_FEED_KEY = "BLOCK_FEED_";
 const BLOCK_POST_ANONYMOUS = "BLOCK_POST_ANONYMOUS_";
 const API_PREFIX_V1 = "/api/v1";
 const GETSTREAM_RANKING_METHOD = "betterscore";
+const GETSTREAM_TIME_LINEAR_RANKING_METHOD = "time_linear";
 
 module.exports = {
   API_PREFIX_V1,
