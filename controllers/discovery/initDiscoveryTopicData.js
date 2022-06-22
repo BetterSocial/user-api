@@ -1,9 +1,4 @@
-const { User, Topics, UserFollowUser, sequelize, Sequelize, NewsLink, DomainPage } = require('../../databases/models')
-const { Op, fn, col, QueryTypes } = require('sequelize')
-const _ = require('lodash')
-const { getDomain } = require('../../services/getstream')
-const { getBlockDomain } = require('../../services/domain')
-const { filter } = require('lodash')
+const { sequelize } = require('../../databases/models')
 
 /**
  * 

@@ -29,7 +29,7 @@ let db;
 
 const getDb = async () => {
   if (db) {
-    //console.debug("mongodb already connected, just use it");
+    console.debug("mongodb already connected, just use it");
     return db;
   } else {
     console.debug("try to create mongodb connection");

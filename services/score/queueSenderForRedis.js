@@ -13,7 +13,7 @@ const scoringProcessQueue = new Bull(
       connectTimeout: 30000
     }
   });
-scoringProcessQueue.on('error', (err) => console.log('scoringProcessQueue', err));
+scoringProcessQueue.on('error', (err) => {/**console.log('scoringProcessQueue', err)**/});
 
 const sendQueue = async (event, data) => {
   console.log("queueSenderForRedis.sendQueue called with event[" + event + "] and data [" + JSON.stringify(data) + "]");
