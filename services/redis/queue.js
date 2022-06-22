@@ -160,8 +160,8 @@ const registerQueue = new Bull("registerQueue", connectRedis,
     }
   }
 );
-registerQueue.on('error', (err) => {/*console.log('posttimeque', err) */});
-registerQueue.on('waiting', (e) => {/*console.log('postime: ', e)*/});
+registerQueue.on('error', (err) => {console.log('posttimeque', err)});
+registerQueue.on('waiting', (e) => {console.log('postime: ', e)});
 
 const convertingUserFormatForLocation = (locations) => {
   let loc = locations.map((item) => {
