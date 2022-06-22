@@ -1,5 +1,5 @@
-const InitDiscoveryUserData = require('./InitDiscoveryUserData')
-const InitDiscoveryTopicData = require('./InitDiscoveryTopicData')
+const InitDiscoveryUserData = require('./initDiscoveryUserData')
+const InitDiscoveryTopicData = require('./initDiscoveryTopicData')
 const SearchUser = require('./searchUser')
 const SearchDomain = require('./searchDomain')
 const SearchTopic = require('./searchTopic')
