@@ -27,6 +27,8 @@ const InitDiscoveryUserData = async (req, res) => {
                 ON common.user_id = joint.target
                 WHERE joint.source = '${userId}') CommonUsers
         ON CommonUsers.user_id = A.user_id
+        LEFT JOIN user_follow_user B
+        ON A.user_id = B.user_id_followed AND B.user_id_follower = '${userId}'
         ORDER BY
         COALESCE(CommonUsers.common, -1) DESC, 
         COALESCE(CommonUsers.user_match, -1) DESC

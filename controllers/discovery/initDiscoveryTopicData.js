@@ -15,16 +15,16 @@ const InitDiscoveryTopicData = async (req, res) => {
         let suggestedTopicsQuery = `SELECT 
                 C.*, 
                 A.topic_id, 
-                COUNT(*) as common 
+                COUNT(*) as common,
+                A.user_id as user_id_follower
             FROM user_topics A 
             INNER JOIN user_topics B 
                 ON A.topic_id = B.topic_id 
-                AND A.user_id != B.user_id 
-                AND A.user_id = 'f19ce509-e8ae-405f-91cf-ed19ce1ed96e'
+                AND A.user_id = '${userId}'
             RIGHT JOIN topics C 
                 ON C.topic_id = A.topic_id
-            GROUP BY A.topic_id, C.topic_id
-            ORDER BY A.topic_id
+            GROUP BY A.topic_id, C.topic_id, A.user_id
+            ORDER BY common DESC, A.topic_id ASC
             LIMIT ${limit}
             OFFSET ${page * limit}`
 
