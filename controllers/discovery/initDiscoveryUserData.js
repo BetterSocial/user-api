@@ -15,7 +15,7 @@ const InitDiscoveryUserData = async (req, res) => {
 
     try {
         let usersWithCommonFollowerQuery = `
-        SELECT A.*, CommonUsers.common from users A
+        SELECT A.*, CommonUsers.common, B.user_id_follower from users A
             LEFT JOIN 
                 (SELECT 
                     common.*,
