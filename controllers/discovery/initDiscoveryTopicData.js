@@ -25,9 +25,9 @@ const InitDiscoveryTopicData = async (req, res) => {
                 ON C.topic_id = A.topic_id
             GROUP BY A.topic_id, C.topic_id, A.user_id
             ORDER BY 
-                common DESC,
-            	COALESCE(A.user_id, '') ASC,
-                A.topic_id ASC
+            	common DESC, 
+            	A.topic_id ASC,
+            	COALESCE(A.user_id, '') ASC
             LIMIT ${limit}
             OFFSET ${page * limit}`
 
