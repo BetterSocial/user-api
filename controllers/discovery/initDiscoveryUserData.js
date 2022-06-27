@@ -31,7 +31,8 @@ const InitDiscoveryUserData = async (req, res) => {
         ON A.user_id = B.user_id_followed AND B.user_id_follower = '${userId}'
         ORDER BY
         COALESCE(CommonUsers.common, -1) DESC, 
-        COALESCE(CommonUsers.user_match, -1) DESC
+        COALESCE(CommonUsers.user_match, -1) DESC,
+        COALESCE(B.user_id_follower, '') DESC
         LIMIT ${limit}
         OFFSET ${page * limit}`
 
