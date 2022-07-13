@@ -17,12 +17,13 @@ const getFeedChatService = async (req, res) => {
         }
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
-            const activity_id = b.reaction.activity_id
-            const downvote = b.object.reaction_counts.downvotes || 0
-            const upvote = b.object.reaction_counts.upvotes || 0
+            const activity_id = (b.reaction && b.reaction.activity_id) || b.id
+            const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
+            const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
             const totalVote = upvote - downvote
-            let actor = b.object.actor
-            if(b.object.anonimity) {
+            let actor = b.actor.data
+            const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
+            if(isAnonym) {
                 actor = {...actor, data: {
                     username: "Anonymous"
                 }}
@@ -38,13 +39,13 @@ const getFeedChatService = async (req, res) => {
                     isAnonym: b.object.anonimity ,
                     comments: [],
                     data: {
-                        last_message_at: b.reaction.updated_at,
-                        updated_at: b.reaction.updated_at
+                        last_message_at: typeof b.reaction === 'object' ? b.reaction.updated_at : b.time,
+                        updated_at: typeof b.reaction === 'object' ? b.reaction.updated_at : b.time
                     }
                 }
                 a.push(newGroup[activity_id])
             }
-            newGroup[activity_id].comments.push({reaction: b.reaction, actor: b.actor})
+            newGroup[activity_id].comments.push({reaction: b.reaction || {}, actor: b.actor})
             return a
         }, [])
         res.status(200).send({

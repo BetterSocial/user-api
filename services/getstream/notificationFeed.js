@@ -7,7 +7,6 @@ const client = stream.connect(
   );
 
 const notificationGetNewFeed = (userid, token) => {
-    console.log(userid, 'nanak')
     return client.feed('notification',userid, token).get({
         withRecentReactions:true,
         withReactionCounts: true,

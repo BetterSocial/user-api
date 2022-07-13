@@ -150,7 +150,6 @@ module.exports = async (req, res) => {
       post_type: POST_TYPE_STANDARD,
       to: TO,
     };
-
     getstreamService
       .createPost(token, feedGroup, data)
       .then((result) => {
