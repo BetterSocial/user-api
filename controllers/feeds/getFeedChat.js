@@ -45,7 +45,21 @@ const getFeedChatService = async (req, res) => {
                 }
                 a.push(newGroup[activity_id])
             }
-            newGroup[activity_id].comments.push({reaction: b.reaction || {}, actor: b.actor})
+            let myReaction = b.reaction
+            if(!myReaction) {
+                myReaction = {
+                    created_at: b.time,
+                    updated_at: b.time,
+                    data: {
+                        count_downvote: downvote,
+                        count_upvote: upvote,
+                        text: null
+                    },
+                    parent: "",
+                    actor:b.actor
+                }
+            }
+            newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
             return a
         }, [])
         res.status(200).send({
