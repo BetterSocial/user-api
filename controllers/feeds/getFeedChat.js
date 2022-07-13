@@ -20,6 +20,7 @@ const getFeedChatService = async (req, res) => {
             const activity_id = (b.reaction && b.reaction.activity_id) || b.id
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
+            const message = typeof b.object === 'object' ? b.object.message : b.message
             const totalVote = upvote - downvote
             let actor = b.actor
             const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
@@ -31,12 +32,12 @@ const getFeedChatService = async (req, res) => {
             if(!newGroup[activity_id]) {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
-                    titlePost: b.object.message,
+                    titlePost: message,
                     downvote: totalVote < 0 ? totalVote * -1 : 0, 
                     upvote: totalVote > 0 ? totalVote : 0,
                     block: blockList,
                     postMaker: actor,
-                    isAnonym: b.object.anonimity ,
+                    isAnonym:isAnonym ,
                     comments: [],
                     data: {
                         last_message_at: typeof b.reaction === 'object' ? b.reaction.updated_at : b.time,
