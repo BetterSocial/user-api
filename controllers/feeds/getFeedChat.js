@@ -22,7 +22,7 @@ const getFeedChatService = async (req, res) => {
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
             const message = typeof b.object === 'object' ? b.object.message : b.message
             const totalVote = upvote - downvote
-            let actor = b.actor
+            let actor = typeof b.object === 'object' ? b.object.actor : b.actor
             const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
             if(isAnonym) {
                 actor = {...actor, data: {
@@ -47,20 +47,10 @@ const getFeedChatService = async (req, res) => {
                 a.push(newGroup[activity_id])
             }
             let myReaction = b.reaction
-            if(!myReaction) {
-                myReaction = {
-                    created_at: b.time,
-                    updated_at: b.time,
-                    data: {
-                        count_downvote: downvote,
-                        count_upvote: upvote,
-                        text: null
-                    },
-                    parent: "",
-                    actor:b.actor
-                }
+            if(myReaction) {
+                newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
             }
-            newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
+            
             return a
         }, [])
         res.status(200).send({
