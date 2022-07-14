@@ -40,8 +40,8 @@ const getFeedChatService = async (req, res) => {
                     isAnonym:isAnonym ,
                     comments: [],
                     data: {
-                        last_message_at: typeof b.reaction === 'object' ? b.reaction.updated_at : b.time,
-                        updated_at: typeof b.reaction === 'object' ? b.reaction.updated_at : b.time
+                        last_message_at: b.time,
+                        updated_at: b.time
                     }
                 }
                 a.push(newGroup[activity_id])
