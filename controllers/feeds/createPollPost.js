@@ -233,6 +233,7 @@ module.exports = async (req, res) => {
     }
     
     console.log('location id: ', location_id);
+    let userDetail = await getUserDetail(req.userId);
     let location_level = "";
     if (location_id) {
       const locationDetail = await getLocationDetail(location_id);
@@ -243,6 +244,10 @@ module.exports = async (req, res) => {
       verb: verb,
       message: message,
       topics: topics,
+      feed_group: feedGroup,
+      username: userDetail.username,
+      profile_pic_path: userDetail.profile_pic_path,
+      real_name: userDetail.real_name,
     };
 
     let TO = handleCreatePostTO(req.userId, req.body)
