@@ -1,6 +1,6 @@
 const {UserBlockedUser} = require ('../../databases/models')
 const getstreamService = require("../../services/getstream");
-
+const moment = require('moment')
 
 
 const getFeedChatService = async (req, res) => {
@@ -17,12 +17,15 @@ const getFeedChatService = async (req, res) => {
         }
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
-            const activity_id = b.reaction.activity_id
-            const downvote = b.object.reaction_counts.downvotes || 0
-            const upvote = b.object.reaction_counts.upvotes || 0
+            const localDate = moment.utc(b.time).local().format()
+            const activity_id = (b.reaction && b.reaction.activity_id) || b.id
+            const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
+            const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
+            const message = typeof b.object === 'object' ? b.object.message : b.message
             const totalVote = upvote - downvote
-            let actor = b.object.actor
-            if(b.object.anonimity) {
+            let actor = typeof b.object === 'object' ? b.object.actor : b.actor
+            const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
+            if(isAnonym) {
                 actor = {...actor, data: {
                     username: "Anonymous"
                 }}
@@ -30,21 +33,25 @@ const getFeedChatService = async (req, res) => {
             if(!newGroup[activity_id]) {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
-                    titlePost: b.object.message,
+                    titlePost: message,
                     downvote: totalVote < 0 ? totalVote * -1 : 0, 
                     upvote: totalVote > 0 ? totalVote : 0,
                     block: blockList,
                     postMaker: actor,
-                    isAnonym: b.object.anonimity ,
+                    isAnonym:isAnonym ,
                     comments: [],
                     data: {
-                        last_message_at: b.reaction.updated_at,
-                        updated_at: b.reaction.updated_at
+                        last_message_at: localDate,
+                        updated_at: localDate
                     }
                 }
                 a.push(newGroup[activity_id])
             }
-            newGroup[activity_id].comments.push({reaction: b.reaction, actor: b.actor})
+            let myReaction = b.reaction
+            if(myReaction) {
+                newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
+            }
+            
             return a
         }, [])
         res.status(200).send({

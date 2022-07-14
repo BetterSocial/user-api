@@ -23,6 +23,7 @@ const handleCreatePostTO = (userId, postBody) => {
 
     let TO = []
     TO.push(`main_feed:${userId}`)
+    TO.push(`notification:${userId}`)
 
     if (privacy === "public") {
         TO.push(`user:${userId}`)
