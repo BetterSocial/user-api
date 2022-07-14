@@ -1,4 +1,5 @@
 const getstreamService = require("../../services/getstream");
+const { User, Locations } = require("../../databases/models");
 
 const Validator = require("fastest-validator");
 const {
@@ -12,7 +13,6 @@ const v = new Validator();
 const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
-const { Locations } = require("../../databases/models");
 const { handleCreatePostTO } = require("../../utils/post");
 
 function addDays(theDate, days) {
@@ -100,10 +100,10 @@ module.exports = async (req, res) => {
       date = addDays(date, duration_feed);
       expiredAt = date.toISOString();
       console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`);
-    
+
       if (pollsDurationMoment.valueOf() > date.getTime()) return res.status(403).json({
-          message: "Polling Duration cannot be more than post expiration date",
-          success: false,
+        message: "Polling Duration cannot be more than post expiration date",
+        success: false,
       });
     } else {
       date = addDays(date, 100 * 365)
@@ -231,8 +231,17 @@ module.exports = async (req, res) => {
       let pollOptionUUID = pollOption[0][0].polling_option_id;
       pollsOptionUUIDs.push(pollOptionUUID);
     }
-    
+
     console.log('location id: ', location_id);
+
+    const getUserDetail = async (userId) => {
+      try {
+        return await User.findByPk(userId);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     let userDetail = await getUserDetail(req.userId);
     let location_level = "";
     if (location_id) {
@@ -265,7 +274,7 @@ module.exports = async (req, res) => {
       expired_at: expiredAt,
       count_upvote: 0,
       count_downvote: 0,
-      polling_id : pollId,
+      polling_id: pollId,
       polls: pollsOptionUUIDs,
       post_type: POST_TYPE_POLL,
       polls_expired_at: pollsDurationInIso,
@@ -276,11 +285,11 @@ module.exports = async (req, res) => {
     getstreamService
       .createPost(token, feedGroup, data)
       .then((result) => {
-    
+
         // send queue for scoring processing on create post
         const scoringProcessData = {
           feed_id: result.id,
-          foreign_id : data.foreign_id,
+          foreign_id: data.foreign_id,
           time: result.time,
           user_id: req.userId,
           message: data.message,
@@ -295,7 +304,7 @@ module.exports = async (req, res) => {
           created_at: moment.utc(data.time).format("YYYY-MM-DD HH:mm:ss"),
         };
         addForCreatePost(scoringProcessData);
-        
+
         res.status(200).json({
           code: 200,
           status: "success create post",
