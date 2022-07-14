@@ -1,6 +1,6 @@
 const {UserBlockedUser} = require ('../../databases/models')
 const getstreamService = require("../../services/getstream");
-
+const moment = require('moment')
 
 
 const getFeedChatService = async (req, res) => {
@@ -17,6 +17,7 @@ const getFeedChatService = async (req, res) => {
         }
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
+            const localDate = moment.utc(b.time).local().format()
             const activity_id = (b.reaction && b.reaction.activity_id) || b.id
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
@@ -40,8 +41,8 @@ const getFeedChatService = async (req, res) => {
                     isAnonym:isAnonym ,
                     comments: [],
                     data: {
-                        last_message_at: b.time,
-                        updated_at: b.time
+                        last_message_at: localDate,
+                        updated_at: localDate
                     }
                 }
                 a.push(newGroup[activity_id])
