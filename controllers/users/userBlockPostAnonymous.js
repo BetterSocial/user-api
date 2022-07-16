@@ -20,6 +20,7 @@ const { getIdBlockAnonymous } = require("../../utils/block");
 const { addForBlockAnonymousPost } = require("../../services/score");
 
 module.exports = async (req, res) => {
+  const token = req.token;
   const schema = {
     postId: "string",
     reason: "array|optional:true",
@@ -38,10 +39,17 @@ module.exports = async (req, res) => {
         reason: reason ? reason : null,
         message: message ? message : null,
       };
+      // Get author of anonymous post
+      // To Improve, send author id from mobile
+      // Remove activity from main_feed
+      const data = await getstreamService.getFeeds(token, 'main_feed', { "ids": [postId] });
+      let author_id = data.results[0].actor.id
+
       const userBlock = {
         blocked_action_id: uuidv4(),
         user_id_blocker: req.userId,
         post_anonymous_id_blocked: postId,
+        post_anonymous_author_id: author_id,
         reason_blocked: reasonBlock,
       };
       const userBlockedPostAnonymous = await UserBlockedPostAnonymous.create(
@@ -65,7 +73,7 @@ module.exports = async (req, res) => {
 
     let key = getIdBlockAnonymous(req.userId);
     delCache(key);
-    
+
     const scoringProcessData = {
       user_id: req.userId,
       feed_id: req.body.postId,
