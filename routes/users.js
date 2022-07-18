@@ -9,14 +9,14 @@ router.post('/verify-user', usersHandler.verifyUser);
 router.get('/veryfy-token', usersHandler.veryfyToken);
 router.get('/refresh-token', auth.isRefreshToken, usersHandler.refreshToken);
 router.get(
-  '/veryfy-token-getstream',
-  auth.isAuth,
-  usersHandler.varifyTokenGetstream
+    '/veryfy-token-getstream',
+    auth.isAuth,
+    usersHandler.varifyTokenGetstream
 );
 router.get(
-  '/showing-audience-estimates',
-  auth.isAuth,
-  usersHandler.showingAudience
+    '/showing-audience-estimates',
+    auth.isAuth,
+    usersHandler.showingAudience
 );
 router.post('/blockuser', auth.isAuth, usersHandler.blockUser);
 router.post('/block-domain', auth.isAuth, usersHandler.blockDomain);
@@ -25,5 +25,6 @@ router.post('/unblock', auth.isAuth, usersHandler.userUnblock);
 router.get('/populate', auth.isAuth, usersHandler.populate);
 router.post('/block-post-anonymous', auth.isAuth, usersHandler.blockPostAnonymous);
 router.post('/delete', auth.isAuth, usersHandler.deleteUser);
+router.post('/rename/:userId', auth.isAuth, usersHandler.renameUser);
 
 module.exports = router;
