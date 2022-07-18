@@ -12,20 +12,22 @@ const blockPostAnonymous = require('./userBlockPostAnonymous');
 const userBlockStatus = require('./userBlockStatus');
 const userUnblock = require('./userUnblock');
 const deleteUser = require('./deleteUser');
+const renameUser = require('./renameUser');
 
 module.exports = {
-  checkUsername,
-  register,
-  verifyUser,
-  veryfyToken,
-  refreshToken,
-  varifyTokenGetstream,
-  showingAudience,
-  blockUser,
-  blockDomain,
-  populate,
-  blockPostAnonymous,
-  userBlockStatus,
-  userUnblock,
-  deleteUser,
+    checkUsername,
+    register,
+    verifyUser,
+    veryfyToken,
+    refreshToken,
+    varifyTokenGetstream,
+    showingAudience,
+    blockUser,
+    blockDomain,
+    populate,
+    blockPostAnonymous,
+    userBlockStatus,
+    userUnblock,
+    deleteUser,
+    renameUser,
 };
