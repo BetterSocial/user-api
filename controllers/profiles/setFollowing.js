@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     }
     let { user_id_follower, user_id_followed, follow_source } = req.body;
 
-    if(user_id_follower == user_id_followed) {
+    if (user_id_follower == user_id_followed) {
       return res.status(403).json({
         code: 403,
         status: "error",
@@ -71,8 +71,10 @@ module.exports = async (req, res) => {
             message: "error create data",
           });
         } else {
-          await getstreamService.followUserExclusive(user_id_follower, user_id_followed, 1);
-          
+          let response = await getstreamService.followUserExclusive(user_id_follower, user_id_followed, 1);
+          console.log('response')
+          console.log(response)
+
           // sending queue for scoring process on follow user event
           const scoringProcessData = {
             user_id: user_id_follower,
@@ -80,7 +82,7 @@ module.exports = async (req, res) => {
             activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
           };
           await addForFollowUser(scoringProcessData);
-      
+
           return res.status(201).json({
             status: "success",
             code: 200,

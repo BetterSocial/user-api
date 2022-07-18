@@ -17,7 +17,7 @@ const ConnectGetstream = require("../../services/getstream/ConnectGetstream");
 module.exports = async (req, res) => {
   try {
 
-    const { user_id } = req.body;
+    const user_id = req.userId;
     console.log(req.body);
 
     let result = await sequelize.transaction(async (t) => {
@@ -90,6 +90,8 @@ module.exports = async (req, res) => {
       // // Instantiate a new client (client side)
       // client = stream.connect('hqfuwk78kb3n', null, '114344');
 
+      // instantiate a new client (server side) 
+
       const StreamChat = require("stream-chat").StreamChat;
       const serverClient = new StreamChat(process.env.API_KEY, process.env.SECRET);
       const destroy = await serverClient.deleteUser(user_id, {
@@ -99,8 +101,6 @@ module.exports = async (req, res) => {
       // return destroy;
 
       const stream = require('getstream');
-
-      // instantiate a new client (server side) 
       const clientFeed = stream.connect(process.env.API_KEY, process.env.SECRET);
       let status = await clientFeed.user(user_id).delete();
       return status;
@@ -108,7 +108,7 @@ module.exports = async (req, res) => {
 
     res.json({
       status: 'success',
-      data: result
+      // data: result
     })
 
   } catch (error) {
