@@ -13,6 +13,7 @@ const _ = require('lodash')
  */
 
 const formatLocationGetStream = require("../helpers/formatLocationGetStream");
+const { convertTopicWithEmoji } = require("./custom");
 
 const handleCreatePostTO = (userId, postBody) => {
     let {
@@ -31,7 +32,7 @@ const handleCreatePostTO = (userId, postBody) => {
 
         if (topics !== null) {
             topics.map((value) => {
-                TO.push("topic:" + value);
+                TO.push("topic:" + convertTopicWithEmoji(value));
             });
         }
 

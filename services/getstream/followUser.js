@@ -12,18 +12,18 @@ const followUser = async (token, userId, feedGroup, status = 1) => {
 const followUserExclusive = async (userIdFollower, userIdFollowed, status = 1) => {
   // instantiate a new client (server side) 
   const client = stream.connect(process.env.API_KEY, process.env.SECRET);
-  // const user = client.feed("main_feed", userIdFollowed);
-  // if (status === 1) {
-  //   return user.follow("user_excl", userIdFollower);
-  // } else {
-  //   return user.unfollow("user_excl", userIdFollower);
-  // }
-  const user = client.feed("main_feed", userIdFollower);
+  const user = client.feed("main_feed", userIdFollowed);
   if (status === 1) {
-    return user.follow("user_excl", userIdFollowed);
+    return user.follow("user_excl", userIdFollower);
   } else {
-    return user.unfollow("user_excl", userIdFollowed);
+    return user.unfollow("user_excl", userIdFollower);
   }
+  // const user = client.feed("main_feed", userIdFollower);
+  // if (status === 1) {
+  //   return user.follow("user_excl", userIdFollowed);
+  // } else {
+  //   return user.unfollow("user_excl", userIdFollowed);
+  // }
 };
 
 const followUsers = async (token, userIds) => {

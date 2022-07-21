@@ -24,6 +24,7 @@ const linkRouter = require("./routes/link");
 const discovery = require('./routes/discovery')
 const auth = require("./middlewares/auth");
 const HomeRouter = require("./routes/home");
+const stream = require('getstream');
 
 const app = express();
 app.use('/', HomeRouter)
@@ -78,5 +79,5 @@ app.use(
 );
 app.use("/api/v1", indexRouter);
 
-// app.listen(3000, () => console.log('app started'))
+app.listen(3000, () => console.log('app started'))
 module.exports = app;

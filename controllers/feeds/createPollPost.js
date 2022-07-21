@@ -14,6 +14,7 @@ const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
 const { handleCreatePostTO } = require("../../utils/post");
+const { convertTopicWithEmoji } = require("../../utils");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -249,10 +250,17 @@ module.exports = async (req, res) => {
       location_level = locationDetail.location_level;
     }
 
+    let newTopic = topics.reduce((acc, next) => {
+      acc.push(convertTopicWithEmoji(next))
+      return acc
+    }, [])
+
+
     let object = {
       verb: verb,
       message: message,
-      topics: topics,
+      // topics: topics,
+      topics: newTopic,
       feed_group: feedGroup,
       username: userDetail.username,
       profile_pic_path: userDetail.profile_pic_path,
@@ -264,7 +272,8 @@ module.exports = async (req, res) => {
     let data = {
       verb: verb,
       message: message,
-      topics: topics,
+      // topics: topics,
+      topics: newTopic,
       privacy: privacy,
       object: object,
       anonimity: anonimity,

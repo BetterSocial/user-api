@@ -23,7 +23,7 @@ client.on("connect", function () {
   console.error("redis connect");
 });
 client.on("error", function (error) {
-  console.error("connection error ", error);
+  console.error("connection error ", /** error **/);
 });
 client.on("ready", function () {
   console.error("redis ready");
