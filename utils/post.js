@@ -20,6 +20,7 @@ const handleCreatePostTO = (userId, postBody) => {
         privacy,
         topics,
         location,
+        message
     } = postBody;
 
     let TO = []
@@ -31,8 +32,8 @@ const handleCreatePostTO = (userId, postBody) => {
         TO.push("location:everywhere");
 
         if (topics !== null) {
-            topics.map((value) => {
-                TO.push("topic:" + convertTopicWithEmoji(value));
+            filterAllTopics(message, topics).map((value) => {
+                TO.push("topic:" + value);
             });
         }
 
@@ -139,7 +140,26 @@ const isPostBlocked = (item, listAnonymous, listBlock) => {
     return false
 }
 
+/**
+ * 
+ * @param {String} text 
+ * @param {String[]} topics 
+ * @returns {String[]}
+ */
+const filterAllTopics = (text, topics = []) => {
+    let topicsFromText = text.match(/#(\w+)\b/gi)
+    let topicsFromTextWithoutHashtag = topicsFromText.reduce((acc, next) => {
+        acc.push(next.slice(1))
+        return acc
+    }, [])
+
+    console.log(JSON.stringify(topicsFromTextWithoutHashtag))
+
+    return [...new Set([...topicsFromTextWithoutHashtag, ...topics])]
+}
+
 module.exports = {
+    filterAllTopics,
     handleCreatePostTO,
     isPostBlocked,
     modifyAnonimityPost,

@@ -9,7 +9,7 @@ const cloudinary = require("cloudinary");
 const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 const { POST_TYPE_STANDARD } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
-const { handleCreatePostTO } = require("../../utils/post");
+const { handleCreatePostTO, filterAllTopics } = require("../../utils/post");
 const emojiUnicode = require("emoji-unicode");
 const { convertTopicWithEmoji } = require("../../utils");
 
@@ -81,10 +81,7 @@ module.exports = async (req, res) => {
       images_url,
     } = req.body;
 
-    let newTopic = topics.reduce((acc, next) => {
-      acc.push(convertTopicWithEmoji(next))
-      return acc
-    }, [])
+    let newTopic = filterAllTopics(message, topics)
 
     // console.log('location id: ', location_id);
     let userDetail = await getUserDetail(req.userId);
