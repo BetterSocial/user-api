@@ -129,13 +129,14 @@ const modifyAnonimityPost = (item) => {
         newItem.origin = null
         newItem.object = ""
     }
-    
+
     return newItem
 }
 
-const isPostBlocked = (item, listAnonymous, listBlock) => {
-    if(listAnonymous.includes(item.id)) return true
-    if(listBlock.includes(item.actor.id)) return true
+const isPostBlocked = (item, listAnonymous, listBlock, myLocations) => {
+    if (listAnonymous.includes(item.id)) return true
+    if (listBlock.includes(item.actor.id)) return true
+    if (!myLocations.includes(item.location) && item.location != "Everywhere") return true
 
     return false
 }
