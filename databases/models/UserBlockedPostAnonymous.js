@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
+      post_anonymous_author_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
       reason_blocked: DataTypes.JSON,
     },
     {

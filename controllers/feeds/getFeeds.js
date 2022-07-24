@@ -11,6 +11,7 @@ const { Op } = require("sequelize");
 const {
   getListBlockUser,
   getListBlockPostAnonymous,
+  getListBlockPostAnonymousAuthor
 } = require("../../services/blockUser");
 const getBlockDomain = require("../../services/domain/getBlockDomain");
 const { setData, getValue, delCache } = require("../../services/redis");
@@ -30,13 +31,14 @@ module.exports = async (req, res) => {
     const token = req.token;
     const listBlockUser = await getListBlockUser(req.userId);
     const listBlockDomain = await getBlockDomain(req.userId);
-    const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
+    const listPostAnonymousAuthor = await getListBlockPostAnonymousAuthor(req.userId);
 
-    let listAnonymous = listPostAnonymous.map((value) => {
-      return value.post_anonymous_id_blocked;
+    let listAnonymousAuthor = listPostAnonymousAuthor.map((value) => {
+      return value.post_anonymous_author_id;
     });
 
     let listBlock = String(listBlockUser + listBlockDomain);
+<<<<<<< HEAD
 
     let myLocations = []
     let userLocations = await User.findByPk(req.userId, {
@@ -54,6 +56,8 @@ module.exports = async (req, res) => {
     })
 
 
+=======
+>>>>>>> 243db7dec519f2429a8c471744d1109899a979e5
     while (data.length < MAX_DATA_RETURN_LENGTH) {
       if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
@@ -69,10 +73,15 @@ module.exports = async (req, res) => {
         let response = await getstreamService.getFeeds(token, "main_feed", paramGetFeeds)
         let feeds = response.results;
 
+
         // Change to conventional loop because map cannot handle await
         for (let i = 0; i < feeds.length; i++) {
           let item = feeds[i];
+<<<<<<< HEAD
           let isBlocked = isPostBlocked(item, listAnonymous, listBlock, myLocations)
+=======
+          let isBlocked = isPostBlocked(item, listAnonymousAuthor, listBlock)
+>>>>>>> 243db7dec519f2429a8c471744d1109899a979e5
           if (isBlocked) {
             offset++;
             continue
