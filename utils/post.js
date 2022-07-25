@@ -150,7 +150,7 @@ const isPostBlocked = (item, listAnonymous, listBlock, myLocations) => {
  * @returns {String[]}
  */
 const filterAllTopics = (text, topics = []) => {
-    let topicsFromText = text.match(/#(\w+)\b/gi)
+    let topicsFromText = text.match(/#(\w+)\b/gi) || []
     let topicsFromTextWithoutHashtag = topicsFromText.reduce((acc, next) => {
         acc.push(next.slice(1))
         return acc
