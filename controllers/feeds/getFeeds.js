@@ -74,7 +74,7 @@ module.exports = async (req, res) => {
         // Change to conventional loop because map cannot handle await
         for (let i = 0; i < feeds.length; i++) {
           let item = feeds[i];
-          let isBlocked = isPostBlocked(item, listAnonymous, listBlock, myLocations)
+          let isBlocked = isPostBlocked(item, listAnonymousAuthor, listBlock, myLocations)
           if (isBlocked) {
             offset++;
             continue
