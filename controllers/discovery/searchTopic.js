@@ -11,17 +11,17 @@ const { filter } = require('lodash')
  * @param {import("express").Response} res 
  * @returns 
  */
-const Search = async(req, res) => {
+const Search = async (req, res) => {
     const { q } = req.query
     const userId = req.userId
-    if(q.length < 2) return res.status(200).json({
+    if (q.length < 2) return res.status(200).json({
         success: true,
         message: 'Your search characters is too few, please input 3 or more characters for search'
     })
 
     try {
         let topics = await sequelize.query(
-        `SELECT 
+            `SELECT 
             "Topic".*,
             count("topicFollower"."user_id") 
                 AS "followersCount",
@@ -55,7 +55,7 @@ const Search = async(req, res) => {
             followedTopic,
             unfollowedTopic,
         })
-    }catch(e) {
+    } catch (e) {
         console.log('e')
         console.log(e)
         return res.status(200).json({
@@ -65,4 +65,4 @@ const Search = async(req, res) => {
     }
 }
 
-module.exports =  Search
+module.exports = Search

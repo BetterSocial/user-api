@@ -1,10 +1,12 @@
 const {
     PollingOption,
     LogPolling,
+    Topics,
     sequelize,
 } = require("../databases/models");
 const { NO_POLL_OPTION_UUID } = require("../helpers/constants");
 const _ = require('lodash')
+const uuid = require('uuid').v4
 
 /**
  * 
@@ -159,9 +161,45 @@ const filterAllTopics = (text, topics = []) => {
     return [...new Set([...topicsFromTextWithoutHashtag, ...topics])]
 }
 
+/**
+ * 
+ * @param {String[]} topics 
+ */
+const insertTopics = async (topics = []) => {
+    let lastTopic = await Topics.findOne({
+        order: [['topic_id', 'DESC']],
+        limit: 1,
+        raw: true
+    })
+
+    for (let index in topics) {
+        let topic = topics[index]
+        let topicIndex = parseInt(lastTopic.topic_id) + parseInt(index) + parseInt(1)
+
+        try {
+            let result = await Topics.findOrCreate({
+                where: { name: topic },
+                defaults: {
+                    topic_id: topicIndex,
+                    name: topic,
+                    icon_path: '',
+                    is_custom_topic: true,
+                    created_at: new Date(),
+                    categories: '',
+
+                }
+            })
+        } catch (e) {
+            console.log(e)
+            break;
+        }
+    }
+}
+
 module.exports = {
     filterAllTopics,
     handleCreatePostTO,
+    insertTopics,
     isPostBlocked,
     modifyAnonimityPost,
     modifyAnonymousAndBlockPost,

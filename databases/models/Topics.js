@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       topic_id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
+        autoIncrement: true,
       },
       name: DataTypes.STRING,
       icon_path: DataTypes.STRING,
