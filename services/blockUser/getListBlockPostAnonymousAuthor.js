@@ -9,8 +9,8 @@ module.exports = async (userId) => {
                 user_id_blocker: userId,
             },
         });
-        let userBlock = await JSON.stringify(blockPost);
-        return userBlock
+
+        return blockPost
         // let KEY = getIdBlockAnonymousAuthor(userId);
         // let cache = await getValue(KEY);
         // if (cache === null || cache === false) {
