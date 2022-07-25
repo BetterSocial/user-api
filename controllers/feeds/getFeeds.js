@@ -37,6 +37,13 @@ module.exports = async (req, res) => {
       return value.post_anonymous_author_id;
     });
 
+    let listAnonymousPostId = listPostAnonymousAuthor.map((value) => {
+      return value.post_anonymous_id_blocked;
+    });
+
+    console.log('listAnonymousAuthor')
+    console.log(listAnonymousAuthor)
+
     let listBlock = String(listBlockUser + listBlockDomain);
 
     let myLocations = []
@@ -74,7 +81,7 @@ module.exports = async (req, res) => {
         // Change to conventional loop because map cannot handle await
         for (let i = 0; i < feeds.length; i++) {
           let item = feeds[i];
-          let isBlocked = isPostBlocked(item, listAnonymousAuthor, listBlock, myLocations)
+          let isBlocked = isPostBlocked(item, listAnonymousAuthor, listBlock, myLocations, listAnonymousPostId)
           if (isBlocked) {
             offset++;
             continue

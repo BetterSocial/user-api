@@ -7,7 +7,7 @@ module.exports = async (userId) => {
         let cache = await getValue(KEY);
         if (cache === null || cache === false) {
             let blockPost = await UserBlockedPostAnonymous.findAll({
-                attributes: ["post_anonymous_author_id"],
+                attributes: ["post_anonymous_author_id", "post_anonymous_id_blocked"],
                 where: {
                     user_id_blocker: userId,
                 },
