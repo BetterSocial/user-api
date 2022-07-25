@@ -38,7 +38,6 @@ module.exports = async (req, res) => {
     });
 
     let listBlock = String(listBlockUser + listBlockDomain);
-<<<<<<< HEAD
 
     let myLocations = []
     let userLocations = await User.findByPk(req.userId, {
@@ -56,8 +55,6 @@ module.exports = async (req, res) => {
     })
 
 
-=======
->>>>>>> 243db7dec519f2429a8c471744d1109899a979e5
     while (data.length < MAX_DATA_RETURN_LENGTH) {
       if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
@@ -77,11 +74,7 @@ module.exports = async (req, res) => {
         // Change to conventional loop because map cannot handle await
         for (let i = 0; i < feeds.length; i++) {
           let item = feeds[i];
-<<<<<<< HEAD
           let isBlocked = isPostBlocked(item, listAnonymous, listBlock, myLocations)
-=======
-          let isBlocked = isPostBlocked(item, listAnonymousAuthor, listBlock)
->>>>>>> 243db7dec519f2429a8c471744d1109899a979e5
           if (isBlocked) {
             offset++;
             continue
