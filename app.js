@@ -25,6 +25,7 @@ const discovery = require('./routes/discovery')
 const auth = require("./middlewares/auth");
 const HomeRouter = require("./routes/home");
 const mentionRouter = require('./routes/mention');
+const stream = require('getstream');
 
 const app = express();
 app.use('/', HomeRouter)

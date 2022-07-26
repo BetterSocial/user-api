@@ -72,8 +72,7 @@ module.exports = async (req, res) => {
           });
         } else {
           let response = await getstreamService.followUserExclusive(user_id_follower, user_id_followed, 1);
-          console.log('response')
-          console.log(response)
+          await getstreamService.followUser(req.token, user_id_followed, "user", 1)
 
           // sending queue for scoring process on follow user event
           const scoringProcessData = {
@@ -90,6 +89,8 @@ module.exports = async (req, res) => {
           });
         }
       } catch (error) {
+        console.log('error')
+        console.log(error)
         const { data } = error.response;
         return res.status(500).json({
           code: 500,

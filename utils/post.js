@@ -1,10 +1,12 @@
 const {
     PollingOption,
     LogPolling,
+    Topics,
     sequelize,
 } = require("../databases/models");
 const { NO_POLL_OPTION_UUID } = require("../helpers/constants");
 const _ = require('lodash')
+const uuid = require('uuid').v4
 
 /**
  * 
@@ -13,12 +15,14 @@ const _ = require('lodash')
  */
 
 const formatLocationGetStream = require("../helpers/formatLocationGetStream");
+const { convertTopicWithEmoji } = require("./custom");
 
 const handleCreatePostTO = (userId, postBody) => {
     let {
         privacy,
         topics,
         location,
+        message
     } = postBody;
 
     let TO = []
@@ -30,7 +34,7 @@ const handleCreatePostTO = (userId, postBody) => {
         TO.push("location:everywhere");
 
         if (topics !== null) {
-            topics.map((value) => {
+            filterAllTopics(message, topics).map((value) => {
                 TO.push("topic:" + value);
             });
         }
@@ -127,19 +131,83 @@ const modifyAnonimityPost = (item) => {
         newItem.origin = null
         newItem.object = ""
     }
-    
+
     return newItem
 }
 
-const isPostBlocked = (item, listAnonymous, listBlock) => {
-    if(listAnonymous.includes(item.id)) return true
-    if(listBlock.includes(item.actor.id)) return true
+const isPostBlocked = (item, listAnonymous, listBlock, myLocations, listAnonymousPostIds) => {
+    // Check if this particular anonymous post is blocked
+    if (listAnonymousPostIds.includes(item.id)) return true
+
+    // Check if this anonymous post is from the user that has other blocked anonymous post
+    if (listAnonymous.includes(item?.actor?.id) && item?.anonimity) return true
+
+    // Check if this users have been blocked
+    if (listBlock.includes(item.actor.id)) return true
+
+    // Check locations
+    if (!myLocations.includes(item.location) && item.location != "Everywhere") return true
 
     return false
 }
 
+/**
+ * 
+ * @param {String} text 
+ * @param {String[]} topics 
+ * @returns {String[]}
+ */
+const filterAllTopics = (text, topics = []) => {
+    let topicsFromText = text.match(/#(\w+)\b/gi) || []
+    let topicsFromTextWithoutHashtag = topicsFromText.reduce((acc, next) => {
+        acc.push(next.slice(1))
+        return acc
+    }, [])
+
+    console.log(JSON.stringify(topicsFromTextWithoutHashtag))
+
+    return [...new Set([...topicsFromTextWithoutHashtag, ...topics])]
+}
+
+/**
+ * 
+ * @param {String[]} topics 
+ */
+const insertTopics = async (topics = []) => {
+    let lastTopic = await Topics.findOne({
+        order: [['topic_id', 'DESC']],
+        limit: 1,
+        raw: true
+    })
+
+    for (let index in topics) {
+        let topic = topics[index]
+        let topicIndex = parseInt(lastTopic.topic_id) + parseInt(index) + parseInt(1)
+
+        try {
+            let result = await Topics.findOrCreate({
+                where: { name: topic },
+                defaults: {
+                    topic_id: topicIndex,
+                    name: topic,
+                    icon_path: '',
+                    is_custom_topic: true,
+                    created_at: new Date(),
+                    categories: '',
+
+                }
+            })
+        } catch (e) {
+            console.log(e)
+            break;
+        }
+    }
+}
+
 module.exports = {
+    filterAllTopics,
     handleCreatePostTO,
+    insertTopics,
     isPostBlocked,
     modifyAnonimityPost,
     modifyAnonymousAndBlockPost,

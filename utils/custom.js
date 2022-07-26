@@ -1,3 +1,5 @@
+const emojiUnicode = require("emoji-unicode");
+
 const convertString = (str, from, to) => {
   return str.split(from).join(to);
 };
@@ -34,9 +36,18 @@ function capitalizing(str) {
   );
 }
 
+function convertTopicWithEmoji(topic) {
+  if(/\p{Emoji}/u.test(topic)) {
+    let newTopic = topic.replace(/\p{Emoji}/u, (char) => emojiUnicode(char))
+    return "emoji" + newTopic.slice(0,5) + newTopic.slice(7)
+  }
+  return topic
+}
+
 module.exports = {
+  capitalizing,
   convertString,
+  convertTopicWithEmoji,
   dateCreted,
   getToken,
-  capitalizing,
 };

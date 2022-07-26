@@ -2,7 +2,9 @@ const { Topics } = require("../../databases/models");
 const groupBy = require("lodash/groupBy");
 module.exports = async (req, res) => {
   try {
-    return Topics.findAll({})
+    return Topics.findAll({
+      where: { is_custom_topic: false }
+    })
       .then((todos) => {
         const response = groupBy(todos, function (n) {
           return n.categories;

@@ -78,6 +78,7 @@ module.exports = async (req, res) => {
           });
         } else {
           await getstreamService.followUserExclusive(user_id_follower, user_id_followed, 0);
+          await getstreamService.followUser(req.token, user_id_followed, "user", 0 )
 
           // sending queue for scoring process on unfollow user event
           const scoringProcessData = {

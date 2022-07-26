@@ -13,8 +13,8 @@ router.get("/get-profile/:username", profileController.getProfileByName);
 router.post("/update-bio/:id", profileController.updateBio);
 router.get("/following/:id", profileController.following);
 router.get("/block/", Auth.isAuth, profileController.handleBlock);
-router.post("/set-following", profileController.setFollowing);
-router.post("/unset-following", profileController.unSetFollowing);
+router.post("/set-following", Auth.isAuth, profileController.setFollowing);
+router.post("/unset-following", Auth.isAuth, profileController.unSetFollowing);
 router.get("/self-feeds", Auth.isAuth, profileController.getSelfFeedsInProfile);
 router.get("/feeds/:id", Auth.isAuth, profileController.getOtherFeedsInProfile);
 

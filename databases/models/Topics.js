@@ -17,11 +17,13 @@ module.exports = (sequelize, DataTypes) => {
       topic_id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
+        autoIncrement: true,
       },
       name: DataTypes.STRING,
       icon_path: DataTypes.STRING,
       categories: DataTypes.TEXT,
       created_at: DataTypes.DATE,
+      is_custom_topic: DataTypes.BOOLEAN,
     },
     {
       sequelize,

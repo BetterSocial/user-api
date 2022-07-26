@@ -11,13 +11,14 @@ const { Op } = require("sequelize");
 const {
   getListBlockUser,
   getListBlockPostAnonymous,
+  getListBlockPostAnonymousAuthor
 } = require("../../services/blockUser");
 const getBlockDomain = require("../../services/domain/getBlockDomain");
 const { setData, getValue, delCache } = require("../../services/redis");
 const { convertString } = require("../../utils/custom");
 const { modifyPollPostObject, modifyAnonymousAndBlockPost, modifyAnonimityPost, isPostBlocked } = require("../../utils/post");
 const putUserPostScore = require("../../services/score/putUserPostScore");
-const { DomainPage } = require('../../databases/models');
+const { DomainPage, Locations, User } = require('../../databases/models');
 const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
 
 module.exports = async (req, res) => {
@@ -30,13 +31,36 @@ module.exports = async (req, res) => {
     const token = req.token;
     const listBlockUser = await getListBlockUser(req.userId);
     const listBlockDomain = await getBlockDomain(req.userId);
-    const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
+    const listPostAnonymousAuthor = await getListBlockPostAnonymousAuthor(req.userId);
 
-    let listAnonymous = listPostAnonymous.map((value) => {
+    let listAnonymousAuthor = listPostAnonymousAuthor.map((value) => {
+      return value.post_anonymous_author_id;
+    });
+
+    let listAnonymousPostId = listPostAnonymousAuthor.map((value) => {
       return value.post_anonymous_id_blocked;
     });
 
+    console.log('listAnonymousAuthor')
+    console.log(listAnonymousAuthor)
+
     let listBlock = String(listBlockUser + listBlockDomain);
+
+    let myLocations = []
+    let userLocations = await User.findByPk(req.userId, {
+      include: [
+        {
+          model: Locations,
+          as: "locations",
+          through: { attributes: [] },
+          attributes: ["neighborhood"]
+        },
+      ],
+    });
+    userLocations.locations.forEach(loc => {
+      myLocations.push(loc.neighborhood)
+    })
+
 
     while (data.length < MAX_DATA_RETURN_LENGTH) {
       if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
@@ -53,10 +77,11 @@ module.exports = async (req, res) => {
         let response = await getstreamService.getFeeds(token, "main_feed", paramGetFeeds)
         let feeds = response.results;
 
+
         // Change to conventional loop because map cannot handle await
         for (let i = 0; i < feeds.length; i++) {
           let item = feeds[i];
-          let isBlocked = isPostBlocked(item, listAnonymous, listBlock)
+          let isBlocked = isPostBlocked(item, listAnonymousAuthor, listBlock, myLocations, listAnonymousPostId)
           if (isBlocked) {
             offset++;
             continue
@@ -89,10 +114,10 @@ module.exports = async (req, res) => {
                     raw: true
                   })
 
-                  if(dataDomain) {
+                  if (dataDomain) {
                     await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain?.credder_score)
                     await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain?.credder_last_checked)
-  
+
                     newItem.credderScore = dataDomain?.credder_score
                     newItem.credderLastChecked = dataDomain?.credder_last_checked
                   }
