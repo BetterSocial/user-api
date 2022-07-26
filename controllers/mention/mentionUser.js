@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { User, sequelize } = require("../../databases/models");
+const { User } = require("../../databases/models");
 module.exports = async (req, res) => {
     let { name } = req.params
 
