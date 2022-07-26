@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const { User, sequelize } = require("../../databases/models");
 module.exports = async (req, res) => {
-    let { name } = req.query
+    let { name } = req.params
 
     let users = await User.findAll({
         attributes: ['user_id', 'username'],
