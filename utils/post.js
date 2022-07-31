@@ -136,9 +136,6 @@ const modifyAnonimityPost = (item) => {
 }
 
 const isPostBlocked = (item, listAnonymous, listBlock, myLocations, listAnonymousPostIds) => {
-    // Check if this particular anonymous post is blocked
-    if (listAnonymousPostIds.includes(item.id)) return true
-
     // Check if this anonymous post is from the user that has other blocked anonymous post
     if (listAnonymous.includes(item?.actor?.id) && item?.anonimity) return true
 
