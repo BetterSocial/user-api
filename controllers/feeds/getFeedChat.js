@@ -19,7 +19,6 @@ const getFeedChatService = async (req, res) => {
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
             const localDate = moment.utc(b.time).local().format()
-            console.log(b, 'babon')
             const activity_id = (b.reaction && b.reaction.activity_id) || b.id
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
