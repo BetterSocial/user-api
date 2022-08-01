@@ -9,7 +9,7 @@ const cloudinary = require("cloudinary");
 const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 const { POST_TYPE_STANDARD } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
-const { handleCreatePostTO, filterAllTopics } = require("../../utils/post");
+const { handleCreatePostTO, filterAllTopics, insertTopics } = require("../../utils/post");
 const emojiUnicode = require("emoji-unicode");
 const { convertTopicWithEmoji } = require("../../utils");
 
