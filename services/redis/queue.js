@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const _ = require("lodash");
 const url = require('url');
 
-const { convertString } = require("../../utils/custom");
+const { convertString, convertingUserFormatForLocation } = require("../../utils/custom");
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
 
@@ -88,8 +88,8 @@ postTimeQueue.on('waiting', (e) => console.log('postime: ', e));*/
 // addUserToChannel.on('error', (err) => console.log('addUserToChannelQueue', err));
 
 const addUserToChannelQueue = async (data, options) => {
-  // addUserToChannel.add(data, options);
-  // return addUserToChannel;
+    // addUserToChannel.add(data, options);
+    // return addUserToChannel;
 };
 
 // const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connectRedis,
@@ -106,8 +106,8 @@ const addUserToChannelQueue = async (data, options) => {
 // addUserToTopicChannelQueue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
 
 const addUserToTopicChannel = async (data, options) => {
-  // addUserToTopicChannelQueue.add(data, options);
-  // return addUserToTopicChannelQueue;
+    // addUserToTopicChannelQueue.add(data, options);
+    // return addUserToTopicChannelQueue;
 };
 
 
@@ -125,102 +125,86 @@ const addUserToTopicChannel = async (data, options) => {
 // locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
 
 const addToChannelChatQueue = async (locations, userId) => {
-  let loc = locations.map((item) => {
-    if (item.country === "US") {
-      let loc = [];
-      loc.push(convertString(item.neighborhood.toLowerCase(), " ", "-"));
-      loc.push(convertString(item.city.toLowerCase(), " ", "-"));
-      return loc;
-    } else {
-      let loc = [];
-      loc.push(convertString(item.country.toLowerCase(), " ", "-"));
-      return loc;
-    }
-  });
-  let temp = _.union(...loc);
+    let loc = locations.map((item) => {
+        if (item.country === "US") {
+            let loc = [];
+            loc.push(convertString(item.neighborhood.toLowerCase(), " ", "-"));
+            loc.push(convertString(item.city.toLowerCase(), " ", "-"));
+            return loc;
+        } else {
+            let loc = [];
+            loc.push(convertString(item.country.toLowerCase(), " ", "-"));
+            return loc;
+        }
+    });
+    let temp = _.union(...loc);
 
-  let data = {
-    user_id: userId,
-    locations: temp,
-  };
-  const options = {
-    jobId: uuidv4(),
-    removeOnComplete: true,
-  };
-  // locationQueue.add(data, options);
-  return locations;
+    let data = {
+        user_id: userId,
+        locations: temp,
+    };
+    const options = {
+        jobId: uuidv4(),
+        removeOnComplete: true,
+    };
+    // locationQueue.add(data, options);
+    return locations;
 };
 
 const registerQueue = new Bull("registerQueue", connectRedis,
-  {
-    redis: {
-      tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
-      maxRetriesPerRequest: 100,
-      connectTimeout: 30000
+    {
+        redis: {
+            tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
+            maxRetriesPerRequest: 100,
+            connectTimeout: 30000
+        }
     }
-  }
 );
-registerQueue.on('error', (err) => {console.log('posttimeque', /** err **/)});
-registerQueue.on('waiting', (e) => {console.log('postime: ', /** e **/)});
+registerQueue.on('error', (err) => { console.log('posttimeque', /** err **/) });
+registerQueue.on('waiting', (e) => { console.log('postime: ', /** e **/) });
 
-const convertingUserFormatForLocation = (locations) => {
-  let loc = locations.map((item) => {
-    if (item.country === "US") {
-      let loc = [];
-      loc.push(convertString(item.neighborhood.toLowerCase(), " ", "-"));
-      loc.push(convertString(item.city.toLowerCase(), " ", "-"));
-      return loc;
-    } else {
-      let loc = [];
-      loc.push(convertString(item.country.toLowerCase(), " ", "-"));
-      return loc;
-    }
-  });
-  let temp = _.union(...loc);
-  return temp;
-}
 const registerServiceQueue = async (token, userId, follows, topics, locations) => {
-  // add user To locaitons
-  let locationsChannel = convertingUserFormatForLocation(locations);
+    // add user To locaitons
+    let locationsChannel = convertingUserFormatForLocation(locations);
 
-  // add user to topics
+    // add user to topics
 
-  // created prepopulated dm
+    // created prepopulated dm
 
 
-  // following user
+    // following user
 
-  // following topic
+    // following topic
 
-  // following locations
+    // following locations
 
-  let data = {
-    token,
-    userId,
-    locationsChannel,
-    follows,
-    topics,
-    locations
-  }
+    let data = {
+        token,
+        userId,
+        locationsChannel,
+        follows,
+        topics,
+        locations
+    }
 
-  const options = {
-    jobId: uuidv4(),
-    removeOnComplete: true,
-  };
+    const options = {
+        jobId: uuidv4(),
+        removeOnComplete: true,
+    };
 
-  let status = await registerQueue.add(data, options);
-  return status;
+    let status = await registerQueue.add(data, options);
+    return status;
 }
 
 
 module.exports = {
-  //postTimeQueue,
-  // followLocationQueue,
-  // followUserQueue,
-  // followTopicQueue,
-  addToChannelChatQueue,
-  addUserToChannelQueue,
-  addUserToTopicChannel,
-  // prepopulatedDmQueue,
-  registerServiceQueue,
+    //postTimeQueue,
+    // followLocationQueue,
+    // followUserQueue,
+    // followTopicQueue,
+    addToChannelChatQueue,
+    addUserToChannelQueue,
+    addUserToTopicChannel,
+    // prepopulatedDmQueue,
+    registerServiceQueue,
 };
