@@ -13,7 +13,7 @@ const getFeedChatService = async (req, res) => {
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
         for (let i = 0; i < data.results.length; i++) {
-            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen}))
+            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead:data.results[i].is_read}))
             newFeed.push(...mapping)
         }
         let newGroup = {}
@@ -36,6 +36,8 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
                     isSeen: b.isSeen,
+                    commentsNotRead: [],
+                    isRead:b.isRead,
                     type: "post-notif",
                     titlePost: message,
                     downvote: totalVote < 0 ? totalVote * -1 : 0, 
@@ -55,10 +57,13 @@ const getFeedChatService = async (req, res) => {
             let myReaction = b.reaction
             if(myReaction) {
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
+                if(myReaction.data.isNotSeen) {
+                    newGroup[activity_id].commentsNotRead.push(myReaction.id)
+                }
             }
-            
             return a
         }, [])
+
         res.status(200).send({
             success: true,
             data: groupingFeed,

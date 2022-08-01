@@ -5,6 +5,7 @@ module.exports = async (token, activityId, feedGroup = "main_feed") => {
     process.env.SECRET,
     process.env.APP_ID
   );
+ 
   return client.getActivities({
     ids: [activityId],
     withOwnReactions: true,

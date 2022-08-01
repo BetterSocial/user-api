@@ -22,6 +22,7 @@ module.exports = async (reactionId,userId, useridFeed, message, token, sendPostN
       text: message,
       count_upvote: 0,
       count_downvote: 0,
+      isNotSeen:true
     },{targetFeeds: targetFeed, userId}
     
   );
