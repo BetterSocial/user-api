@@ -15,6 +15,5 @@ module.exports = async (token, activityId, feedGroup = "main_feed") => {
     reactions: true,
     withReactionCounts: true,
     withRecentReactions: true,
-    mark_read: [activityId]
   });
 };
