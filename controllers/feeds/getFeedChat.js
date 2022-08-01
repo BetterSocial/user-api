@@ -36,6 +36,7 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
                     isSeen: b.isSeen,
+                    type: "post-notif",
                     titlePost: message,
                     downvote: totalVote < 0 ? totalVote * -1 : 0, 
                     upvote: totalVote > 0 ? totalVote : 0,
