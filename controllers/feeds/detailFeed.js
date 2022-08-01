@@ -7,7 +7,6 @@ module.exports = async (req, res) => {
   let id = req.query.id;
   let feed = await getDetailFeed(req.token, id);
   let feedItem = feed.results[0];
-
   let newItem = { ...feedItem };
  
   if(newItem.anonimity) {
