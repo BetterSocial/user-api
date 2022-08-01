@@ -56,9 +56,9 @@ const convertingUserFormatForLocation = (locations) => {
     locations.map((item) => {
         /**
          * 1. cek location level is same with neigborhood, city, state or country
-         * 2. - if location level same with neigborhood ambil semua value location dari neigborood -> city -> state -> country
-         *    - if location level same with city then ambil semua data value location mulai dari city dan seterusnya
-         *    - if location level same with state maka ambil semua data value location dari mulai state
+         * 2. - if location level same with neigborhood ambil semua value location dari neigborood -> city
+         *    - if location level same with city then ambil semua data value location mulai dari city
+         *    - if location level same with state maka ambil semua data value location state dan country
          *    - if location level same with country maka hanya ambil country saja
          * 3. convert semua location name menjadi lowercase
          * 4. bila ada space maka ganti space dengan -
@@ -73,12 +73,8 @@ const convertingUserFormatForLocation = (locations) => {
         if (item.location_level.toLowerCase() == 'neighborhood') {
             loc.push(neighborhood);
             loc.push(city);
-            loc.push(state);
-            loc.push(country);
         } else if (item.location_level.toLowerCase() == 'city') {
             loc.push(city);
-            loc.push(state);
-            loc.push(country);
         } else if (item.location_level.toLowerCase() == 'state') {
             loc.push(state);
             loc.push(country);
