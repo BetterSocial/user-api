@@ -19,5 +19,6 @@ module.exports = async (activityId, userId, useridFeed, message, token, sendPost
     text: message,
     count_upvote: 0,
     count_downvote: 0,
+    isNotSeen: true
   }, {targetFeeds: targetFeed, userId});
 };
