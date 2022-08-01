@@ -160,11 +160,12 @@ module.exports = async (req, res) => {
     getstreamService
       .createPost(token, feedGroup, data)
       .then((result) => {
-    
+
+        insertTopics(newTopic)
         // send queue for scoring processing on create post
         const scoringProcessData = {
           feed_id: result.id,
-          foreign_id : data.foreign_id,
+          foreign_id: data.foreign_id,
           time: result.time,
           user_id: userDetail.user_id,
           message: data.message,
@@ -178,7 +179,7 @@ module.exports = async (req, res) => {
           created_at: moment.utc(data.time).format("YYYY-MM-DD HH:mm:ss"),
         };
         addForCreatePost(scoringProcessData);
-        
+
         res.status(200).json({
           code: 200,
           status: "success create post",
