@@ -1,7 +1,8 @@
 const {UserBlockedUser} = require ('../../databases/models')
 const getstreamService = require("../../services/getstream");
 const moment = require('moment')
-
+const NodeCache = require( "node-cache" );
+const myCache = new NodeCache( { stdTTL: 100, checkperiod: 0 } );
 
 const getFeedChatService = async (req, res) => {
     try {
@@ -13,7 +14,8 @@ const getFeedChatService = async (req, res) => {
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
         for (let i = 0; i < data.results.length; i++) {
-            newFeed.push(...data.results[i].activities)
+            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead: data.results[i].is_read}))
+            newFeed.push(...mapping)
         }
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
@@ -56,6 +58,8 @@ const getFeedChatService = async (req, res) => {
             if(myReaction) {
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
                 newGroup[activity_id].totalComment = newGroup[activity_id].comments.length || 0
+                
+          
             }
             return a
         }, [])
@@ -63,6 +67,8 @@ const getFeedChatService = async (req, res) => {
         res.status(200).send({
             success: true,
             data: groupingFeed,
+            unSeen: data.unseen,
+            unRead: data.unread,
             message: "Success get data",
         })
     } catch (e) {
