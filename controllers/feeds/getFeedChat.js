@@ -13,8 +13,7 @@ const getFeedChatService = async (req, res) => {
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
         for (let i = 0; i < data.results.length; i++) {
-            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead:data.results[i].is_read}))
-            newFeed.push(...mapping)
+            newFeed.push(...data.results[i].activities)
         }
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
@@ -24,7 +23,6 @@ const getFeedChatService = async (req, res) => {
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
             const message = typeof b.object === 'object' ? b.object.message : b.message
             const totalVote = upvote - downvote
-
             let actor = typeof b.object === 'object' ? b.object.actor : b.actor
             const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
             if(isAnonym) {
@@ -36,7 +34,7 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
                     isSeen: b.isSeen,
-                    commentsNotRead: [],
+                    totalComment: 0,
                     isRead:b.isRead,
                     type: "post-notif",
                     titlePost: message,
@@ -57,9 +55,7 @@ const getFeedChatService = async (req, res) => {
             let myReaction = b.reaction
             if(myReaction) {
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
-                if(myReaction.data.isNotSeen) {
-                    newGroup[activity_id].commentsNotRead.push(myReaction.id)
-                }
+                newGroup[activity_id].totalComment = newGroup[activity_id].comments.length || 0
             }
             return a
         }, [])

@@ -11,8 +11,6 @@ const notificationGetNewFeed = (userid, token) => {
         withRecentReactions:true,
         withReactionCounts: true,
         withOwnReactions: true,
-        mark_seen: true,
-        mark_read: true
     })
 }
 
