@@ -62,6 +62,7 @@ module.exports = async (req, res) => {
         notifId.push(notification.results[i].id)
       }
       await client.feed('notification', req.userId).get({mark_read: notifId, mark_seen: notifId })
+ 
   return res
     .status(200)
     .json(responseSuccess("success get detail feed", newItem));
