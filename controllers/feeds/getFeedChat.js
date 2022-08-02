@@ -38,6 +38,7 @@ const getFeedChatService = async (req, res) => {
                     isSeen: b.isSeen,
                     totalComment: 0,
                     isRead:b.isRead,
+                    unreadComment: !b.isRead ? 1 : 0,
                     type: "post-notif",
                     titlePost: message,
                     downvote: totalVote < 0 ? totalVote * -1 : 0, 
