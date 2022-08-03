@@ -12,6 +12,7 @@ const topicPage = require("./topicPages");
 const topics = require("./topics");
 const users = require("./users");
 const whoToFollow = require("./whoToFollow");
+const configRouter = require("./config");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {

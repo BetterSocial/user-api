@@ -1,33 +1,35 @@
-const checkUsername = require('./checkUsername');
-const register = require('./register');
-const verifyUser = require('./verifyUser');
-const veryfyToken = require('./veryfyToken');
-const refreshToken = require('./refreshToken');
-const varifyTokenGetstream = require('./varifyTokenGetstream');
-const showingAudience = require('../users/showingAudienceEstimates');
-const blockUser = require('../users/userblocking');
 const blockDomain = require('../users/userBlockingDomain');
-const populate = require('./populateUser');
 const blockPostAnonymous = require('./userBlockPostAnonymous');
+const blockUser = require('../users/userblocking');
+const checkUsername = require('./checkUsername');
+const deleteUser = require('./deleteUser');
+const demoVerifyUser = require('./demoVerifyUser');
+const populate = require('./populateUser');
+const refreshToken = require('./refreshToken');
+const register = require('./register');
+const renameUser = require('./renameUser');
+const showingAudience = require('../users/showingAudienceEstimates');
 const userBlockStatus = require('./userBlockStatus');
 const userUnblock = require('./userUnblock');
-const deleteUser = require('./deleteUser');
-const renameUser = require('./renameUser');
+const varifyTokenGetstream = require('./varifyTokenGetstream');
+const verifyUser = require('./verifyUser');
+const veryfyToken = require('./veryfyToken');
 
 module.exports = {
-    checkUsername,
-    register,
-    verifyUser,
-    veryfyToken,
-    refreshToken,
-    varifyTokenGetstream,
-    showingAudience,
-    blockUser,
     blockDomain,
-    populate,
     blockPostAnonymous,
+    blockUser,
+    checkUsername,
+    deleteUser,
+    demoVerifyUser,
+    populate,
+    refreshToken,
+    register,
+    renameUser,
+    showingAudience,
     userBlockStatus,
     userUnblock,
-    deleteUser,
-    renameUser,
+    varifyTokenGetstream,
+    verifyUser,
+    veryfyToken,
 };

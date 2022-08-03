@@ -25,6 +25,7 @@ const discovery = require('./routes/discovery')
 const auth = require("./middlewares/auth");
 const HomeRouter = require("./routes/home");
 const mentionRouter = require('./routes/mention');
+const configRouter = require('./routes/config');
 const stream = require('getstream');
 
 const app = express();
@@ -56,6 +57,7 @@ app.use("/api/v1/domain", domainRouter);
 app.use("/api/v1/discovery", discovery);
 app.use("/api/v1/u", linkRouter);
 app.use("/api/v1/mention", mentionRouter)
+app.use("/api/v1/config", configRouter);
 app.use(auth.isAuth, topicPage);
 
 var options = {
@@ -81,5 +83,5 @@ app.use(
 );
 app.use("/api/v1", indexRouter);
 
-// app.listen(3000, () => console.log('app started'))
+app.listen(3000, () => console.log('app started'))
 module.exports = app;

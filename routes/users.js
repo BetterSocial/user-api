@@ -5,6 +5,7 @@ const auth = require('../middlewares/auth');
 
 router.post('/check-username', usersHandler.checkUsername);
 router.post('/register', usersHandler.register);
+router.post('/demo-verify-user', usersHandler.demoVerifyUser);
 router.post('/verify-user', usersHandler.verifyUser);
 router.get('/veryfy-token', usersHandler.veryfyToken);
 router.get('/refresh-token', auth.isRefreshToken, usersHandler.refreshToken);
