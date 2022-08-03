@@ -9,7 +9,7 @@ const POST_VERB_POLL = "poll";
 // Changed temporarily, until logic improvement on getting the feeds is implemented.
 const MAX_FEED_FETCH_LIMIT = 10;
 const MAX_FEED_FETCH_LIMIT_DOMAIN = 20;
-const MAX_GET_FEED_FROM_GETSTREAM_ITERATION = 3;
+const MAX_GET_FEED_FROM_GETSTREAM_ITERATION = 10;
 const MAX_DATA_RETURN_LENGTH = 10;
 const MAX_DOMAIN_DATA_RETURN_LENGTH = 20;
 
