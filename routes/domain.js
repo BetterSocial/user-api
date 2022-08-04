@@ -12,7 +12,8 @@ const {
   unblockDomain,
   getSingleBlockedDomain,
   localUploadDomain,
-  getDetailDomain
+  getDetailDomain,
+  getLinkContextScreenRelatedArticles
 
 
 } = require("../controllers/domain");
@@ -31,5 +32,6 @@ router.post("/unblock", isAuth, unblockDomain);
 router.get("/check-blocked/:domainId", isAuth, getSingleBlockedDomain);
 // router.get("/local/upload-domain", localUploadDomain)
 router.get("/detail/:domainId", isAuth, getDetailDomainHandle);
+router.get("/link-context-screen/:news_link_id", isAuth, getLinkContextScreenRelatedArticles);
 
 module.exports = router;

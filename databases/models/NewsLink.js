@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       image: DataTypes.STRING,
       description: DataTypes.TEXT,
       url: DataTypes.STRING,
+      keyword: DataTypes.STRING,
+      author: DataTypes.STRING,
+      created_article: DataTypes.INTEGER,
       createdAt: {
         type: DataTypes.DATE,
         field: "created_at",

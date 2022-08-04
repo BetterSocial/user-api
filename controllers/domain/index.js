@@ -9,6 +9,7 @@ const {getBlockedDomain} = require("./getBlockedDomain")
 const {unblockDomain} = require("./unblockDomain")
 const {getSingleBlockedDomain} = require("./getSingleBlockedDomain")
 const localUploadDomain = require('./localUploadDomain')
+const getLinkContextScreenRelatedArticles = require('./getLinkContextScreenRelatedArticles')
 
 module.exports = {
   getDomain,
@@ -21,5 +22,6 @@ module.exports = {
   getBlockedDomain,
   unblockDomain,
   getSingleBlockedDomain,
-  localUploadDomain
+  localUploadDomain,
+  getLinkContextScreenRelatedArticles
 };
