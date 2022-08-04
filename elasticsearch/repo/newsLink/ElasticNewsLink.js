@@ -8,7 +8,7 @@ class ElasticNewsLink extends BetterSocialBaseElasticSearchRepo {
         super(INDEX_NAME)
     }
 
-    async searchLinkContextScreenRelatedArticle(newsLinkReference) {
+    async searchLinkContextScreenRelatedArticle(newsLinkReference, offset = 0, limit = 10) {
         let { description, title, createdAt, news_link_id } = newsLinkReference
         const query = `${description} ${title}`
 
