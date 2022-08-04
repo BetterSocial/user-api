@@ -1,7 +1,7 @@
 const esb = require('elastic-builder')
 const BetterSocialBaseElasticSearchRepo = require('../BetterSocialBaseElasticSearchRepo')
 
-const INDEX_NAME = 'news_link'
+const INDEX_NAME = 'getstream_news_link'
 
 class ElasticNewsLink extends BetterSocialBaseElasticSearchRepo {
     constructor() {
@@ -25,7 +25,7 @@ class ElasticNewsLink extends BetterSocialBaseElasticSearchRepo {
                             ])
                     )
                     .function(
-                        esb.decayScoreFunction('gauss', 'createdAt')
+                        esb.decayScoreFunction('gauss', 'content_created_at')
                             .origin(createdAt)
                             .decay(0.8)
                             .scale('3d')
@@ -36,6 +36,10 @@ class ElasticNewsLink extends BetterSocialBaseElasticSearchRepo {
             .minScore(0)
 
         return await this.search(requestBody)
+    }
+
+    async putToIndex(item) {
+        return await this.index(item.id, item)
     }
 }
 

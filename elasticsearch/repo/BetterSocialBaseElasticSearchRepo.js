@@ -1,9 +1,9 @@
 const BetterSocialElasticSearch = require("../client")
 const esb = require('elastic-builder')
 
-class BetterSocialElasticSearchBaseRepo{
+class BetterSocialElasticSearchBaseRepo {
     #indexName = ''
-    
+
     constructor(indexName) {
         this.indexName = indexName
     }
@@ -19,7 +19,11 @@ class BetterSocialElasticSearchBaseRepo{
      */
     async search(body) {
         return await BetterSocialElasticSearch.search(this, body)
-    } 
+    }
+
+    async index(id, item) {
+        return await BetterSocialElasticSearch.index(this, id, item)
+    }
 }
 
 module.exports = BetterSocialElasticSearchBaseRepo

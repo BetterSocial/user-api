@@ -45,6 +45,29 @@ class BetterSocialElasticSearch {
             })
         })
     }
+
+    /**
+     * 
+     * @param {BetterSocialElasticSearchBaseRepo} betterSocialRepo 
+     * @param {String} id
+     * @param {Any} item
+     */
+    static index(betterSocialRepo, id, item) {
+        const client = this.getClient()
+        return new Promise((resolve, reject) => {
+            client.index({
+                index: betterSocialRepo.getIndexName(),
+                type: 'document',
+                id: id,
+                body: {
+                    ...item
+                }
+            }, function (error, response) {
+                console.log(response);
+                resolve(response)
+            });
+        })
+    }
 }
 
 module.exports = BetterSocialElasticSearch

@@ -9,11 +9,13 @@ const _ = require("lodash");
 
 const { getBlockDomain } = require("../../services/domain");
 const { DomainPage } = require("../../databases/models/");
+const ElasticNewsLink = require("../../elasticsearch/repo/newsLink/ElasticNewsLink");
 
 module.exports = async (req, res) => {
-  let { offset = 0, limit = MAX_FEED_FETCH_LIMIT_DOMAIN } = req.query
+  let { offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH, fetch = MAX_FEED_FETCH_LIMIT_DOMAIN } = req.query
   console.log(`offset ${offset} limit ${limit}`)
 
+  const elasticNewsLink = new ElasticNewsLink()
   let domainPageCache = {}
 
   let data = []
@@ -21,7 +23,7 @@ module.exports = async (req, res) => {
   try {
     const blockDomain = await getBlockDomain(req.userId);
 
-    while (data.length < MAX_DOMAIN_DATA_RETURN_LENGTH) {
+    while (data.length < limit) {
       if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
       try {
@@ -32,13 +34,13 @@ module.exports = async (req, res) => {
           reactions: { own: true, recent: true, counts: true },
         };
 
-        console.log(`get feeds from ${query.offset}`)
+        // console.log(`get feeds from ${query.offset}`)
         const resp = await getDomain(query);
         let feeds = resp.results
 
         for (let i in feeds) {
           let item = feeds[i];
-          console.log(`${blockDomain} vs ${item.content.domain_page_id}`)
+          // console.log(`${blockDomain} vs ${item.content.domain_page_id}`)
           if (blockDomain.includes(item.content.domain_page_id)) {
             offset++;
             continue;
@@ -61,12 +63,21 @@ module.exports = async (req, res) => {
             }
           }
 
-          console.log(domainPageCache)
+          // console.log(item)
 
           data.push(item)
+          // const { id, content, content_created_at, domain } = item
+          // const { description, domain_page_id, news_link_id, news_url, site_name, title } = content
+          // const { image, name } = domain
+
+          // elasticNewsLink.putToIndex({
+          //   id, content_created_at, description, domain_page_id, news_link_id, news_url, site_name, title, image, name
+          // })
+
           offset++;
 
-          if (data.length === MAX_DOMAIN_DATA_RETURN_LENGTH) break
+          console.log(`${data.length} === ${limit} ${data.length === limit}`)
+          if (data.length === limit) break
         }
 
         getFeedFromGetstreamIteration++;
