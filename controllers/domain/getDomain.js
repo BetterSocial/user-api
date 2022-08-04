@@ -66,13 +66,13 @@ module.exports = async (req, res) => {
           // console.log(item)
 
           data.push(item)
-          const { id, content, content_created_at, domain } = item
-          const { description, domain_page_id, news_link_id, news_url, site_name, title } = content
-          const { image, name } = domain
+          // const { id, content, content_created_at, domain } = item
+          // const { description, domain_page_id, news_link_id, news_url, site_name, title } = content
+          // const { image, name } = domain
 
-          elasticNewsLink.putToIndex({
-            id, content_created_at, description, domain_page_id, news_link_id, news_url, site_name, title, image, name
-          })
+          // elasticNewsLink.putToIndex({
+          //   id, content_created_at, description, domain_page_id, news_link_id, news_url, site_name, title, image, name
+          // })
 
           offset++;
 
