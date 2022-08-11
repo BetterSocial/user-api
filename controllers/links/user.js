@@ -5,34 +5,30 @@ module.exports = async (req, res) => {
     const firebaseDynamicLinkURL = process.env.FIREBASE_DYNAMIC_LINK_URL
     const firebaseDynamicLinkAndroidAppPackage = process.env.FIREBASE_DYNAMIC_LINK_ANDROID_APP_PACKAGE
     const firebaseDynamicLinkIOSAppPackage = process.env.FIREBASE_DYNAMIC_LINK_IOS_APP_PACKAGE
-    console.log(req.params)
     // console.log(req.params.username)
     // console.log(firebaseDynamicLinkURL)
     // console.log(firebaseDynamicLinkAndroidAppPackage)
     // console.log(firebaseDynamicLinkIOSAppPackage)
-    if(!req.params.platform) {
-          try {
-            const {shortLink, previewLink} = await firebaseDynamicLinks.createLink({
-                dynamicLinkInfo : {
-                    domainUriPrefix: `${firebaseDynamicLinkURL}`,
-                    link: `${firebaseDynamicLinkURL}/users?username=${req.params.username}`,
-                    androidInfo: {
-                        androidPackageName: firebaseDynamicLinkAndroidAppPackage,
-                    },
-                    iosInfo : {
-                        iosBundleId: firebaseDynamicLinkIOSAppPackage
-                    }
+    try {
+        const {shortLink, previewLink} = await firebaseDynamicLinks.createLink({
+            dynamicLinkInfo : {
+                domainUriPrefix: `${firebaseDynamicLinkURL}`,
+                link: `${firebaseDynamicLinkURL}/users?username=${req.params.username}`,
+                androidInfo: {
+                    androidPackageName: firebaseDynamicLinkAndroidAppPackage,
+                },
+                iosInfo : {
+                    iosBundleId: firebaseDynamicLinkIOSAppPackage
                 }
-            })
-        
-            // console.log(shortLink)
-            // console.log(previewLink)
-            return res.redirect(shortLink)
-            // return res.redirect('https://link.bettersocial.org/users')
-        } catch(e) {
-            console.log(e)
-            return res.status(500)
-        }
+            }
+        })
+    
+        // console.log(shortLink)
+        // console.log(previewLink)
+        return res.redirect(shortLink)
+        // return res.redirect('https://link.bettersocial.org/users')
+    } catch(e) {
+        console.log(e)
+        return res.status(500)
     }
-  
 }
