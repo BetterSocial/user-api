@@ -22,7 +22,7 @@ const { DomainPage, Locations, User } = require('../../databases/models');
 const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
 
 module.exports = async (req, res) => {
-  let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query
+  let { offset = 0, limit = MAX_DATA_RETURN_LENGTH, getstreamLimit = MAX_FEED_FETCH_LIMIT } = req.query
   let domainPageCache = {}
   let getFeedFromGetstreamIteration = 0;
   let data = []
@@ -60,12 +60,12 @@ module.exports = async (req, res) => {
     })
 
 
-    while (data.length < MAX_DATA_RETURN_LENGTH) {
+    while (data.length < limit) {
       if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
       try {
         let paramGetFeeds = {
-          limit,
+          limit: getstreamLimit,
           reactions: { own: true, recent: true, counts: true },
           ranking: GETSTREAM_RANKING_METHOD,
           offset
@@ -127,7 +127,8 @@ module.exports = async (req, res) => {
           // }
 
           offset++;
-          if (data.length === MAX_DATA_RETURN_LENGTH) break
+
+          if (parseInt(data.length) === parseInt(limit)) break
         }
 
         getFeedFromGetstreamIteration++;
@@ -142,6 +143,8 @@ module.exports = async (req, res) => {
       }
     }
 
+    console.log('data.length')
+    console.log(data.length)
     res.status(200).json({
       code: 200,
       status: "success",

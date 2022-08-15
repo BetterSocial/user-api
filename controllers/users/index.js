@@ -1,6 +1,7 @@
 const blockDomain = require('../users/userBlockingDomain');
 const blockPostAnonymous = require('./userBlockPostAnonymous');
 const blockUser = require('../users/userblocking');
+const chatSearch = require('./chatSearch')
 const checkUsername = require('./checkUsername');
 const deleteUser = require('./deleteUser');
 const demoVerifyUser = require('./demoVerifyUser');
@@ -19,6 +20,7 @@ module.exports = {
     blockDomain,
     blockPostAnonymous,
     blockUser,
+    chatSearch,
     checkUsername,
     deleteUser,
     demoVerifyUser,

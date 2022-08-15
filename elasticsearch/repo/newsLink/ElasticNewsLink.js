@@ -31,8 +31,8 @@ class ElasticNewsLink extends BetterSocialBaseElasticSearchRepo {
                             .scale('3d')
                     )
             )
-            .size(10)
-            .from(0)
+            .size(limit)
+            .from(offset)
             .minScore(0)
 
         return await this.search(requestBody)

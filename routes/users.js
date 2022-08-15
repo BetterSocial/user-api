@@ -27,5 +27,6 @@ router.get('/populate', auth.isAuth, usersHandler.populate);
 router.post('/block-post-anonymous', auth.isAuth, usersHandler.blockPostAnonymous);
 router.post('/delete', auth.isAuth, usersHandler.deleteUser);
 router.post('/rename/:userId', auth.isAuth, usersHandler.renameUser);
+router.get('/chat/search', auth.isAuth, usersHandler.chatSearch)
 
 module.exports = router;
