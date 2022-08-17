@@ -158,7 +158,7 @@ module.exports = async (req, res) => {
     };
 
     getstreamService
-      .createPost(token, feedGroup, data)
+      .createPost(token, feedGroup, data, req.userId)
       .then((result) => {
 
         insertTopics(newTopic)
