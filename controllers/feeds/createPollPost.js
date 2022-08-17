@@ -292,7 +292,7 @@ module.exports = async (req, res) => {
     };
 
     getstreamService
-      .createPost(token, feedGroup, data)
+      .createPost(token, feedGroup, data, req.userId)
       .then((result) => {
 
         // send queue for scoring processing on create post
