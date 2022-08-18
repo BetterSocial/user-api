@@ -19,7 +19,7 @@ class TopicPage {
 
   async getTopicPages(req, res) {
     let { id } = req.params;
-    const client = connectStreamChat(req.userId, req.token)
+    const client = await connectStreamChat(req.userId, req.token)
     const channel = client.channel('messaging', id)
     channel.updatePartial({set: {unread: 0}})
     
