@@ -3,6 +3,7 @@ const BlockServices = require("../../services/block/BlockServices");
 const { getListBlockPostAnonymous, getListBlockUser } = require("../../services/blockUser");
 const getBlockDomain = require("../../services/domain/getBlockDomain");
 const ConnectGetstream = require("../../services/getstream/ConnectGetstream");
+const { connectStreamChat } = require("../../services/getstream/connectStreamChat");
 const GetstreamService = require("../../services/getstream/GetstreamService");
 const TopicPageValidator = require("../../validators/topicPage");
 
@@ -18,7 +19,10 @@ class TopicPage {
 
   async getTopicPages(req, res) {
     let { id } = req.params;
-
+    const client = connectStreamChat(req.userId, req.token)
+    const channel = client.channel('messaging', id)
+    channel.updatePartial({set: {unread: 0}})
+    
     try {
       this._validator.validateGetTopicPages({ id });
       const topicPages = await this._getStreamService.getTopicPages(id);

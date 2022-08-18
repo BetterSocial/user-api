@@ -1,13 +1,10 @@
 const stream = require("getstream");
+const { connectStreamChat } = require("./connectStreamChat");
 const StreamChat = require('stream-chat').StreamChat;
 
 module.exports = async (token, feedGroup, data, userId) => {
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
-  const clientChat = StreamChat.getInstance(process.env.API_KEY,process.env.APP_ID);  
-
-  await clientChat.connectUser({
-    id: userId
-  }, token)
+  const clientChat = connectStreamChat(userId, token);  
   const user = client.feed(feedGroup, client.userId, token);
   const userExc = client.feed('user_excl', client.userId, token)
   const defaultImage ='https://res.cloudinary.com/hpjivutj2/image/upload/v1636632905/vdg8solozeepgvzxyfbv.png'
