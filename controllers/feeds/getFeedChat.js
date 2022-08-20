@@ -37,6 +37,7 @@ const getFeedChatService = async (req, res) => {
                     activity_id: activity_id,
                     isSeen: b.isSeen,
                     totalComment: 0,
+                    totalCommentBadge: 0,
                     isRead:b.isRead,
                     unreadComment: !b.isRead ? 1 : 0,
                     type: "post-notif",
@@ -59,8 +60,8 @@ const getFeedChatService = async (req, res) => {
             if(myReaction) {
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
                 newGroup[activity_id].totalComment = newGroup[activity_id].comments.length || 0
+                newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => data.actor.id !== req.userId).length || 0
                 
-          
             }
             return a
         }, [])
