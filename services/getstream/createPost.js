@@ -4,15 +4,18 @@ const StreamChat = require('stream-chat').StreamChat;
 
 module.exports = async (token, feedGroup, data, userId) => {
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
-  // const clientChat = await connectStreamChat(userId, token);  
+  const clientChat = await connectStreamChat(userId, token);  
   const user = client.feed(feedGroup, client.userId, token);
   const userExc = client.feed('user_excl', client.userId, token)
   const defaultImage ='https://res.cloudinary.com/hpjivutj2/image/upload/v1636632905/vdg8solozeepgvzxyfbv.png'
-  // for(let i = 0; i < data.topics.length; i++) {
-  //   const channel = await clientChat.channel('livestream', `${data.topics[i]}`, {name: `#${data.topics[i]}`, members: [userId], channel_type: 3, channel_image: defaultImage, channelImage: defaultImage, image: defaultImage, unread: 1})
-  //   await channel.create()
-  //   await channel.sendMessage({text: 'New topic added'})
-  // }
+
+  for(let i = 0; i < data.topics.length; i++) {
+
+    const channel = await clientChat.channel('topics', `topic_${data.topics[i]}`, {name: `#${data.topics[i]}`, members: [userId], channel_type: 3, channel_image: defaultImage, channelImage: defaultImage, image: defaultImage, unread: 1})
+    await channel.create()
+    await channel.addMembers([userId])
+    await channel.sendMessage({text: 'New topic post added'})
+  }
   
   // let userExcData = {...data}
   // userExcData.to = []
