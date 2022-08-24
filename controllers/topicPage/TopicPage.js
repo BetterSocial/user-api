@@ -38,7 +38,7 @@ class TopicPage {
         status: 'success',
         message: "Success get topic pages",
         data: newTopicPagesWithBlock || [],
-        offset: parseInt(offset) + parseInt(newTopicPagesWithBlock.length)
+        offset: parseInt(offset) + parseInt(topicPages.length)
       })
     } catch (error) {
       console.log(error);
