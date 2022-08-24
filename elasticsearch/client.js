@@ -38,6 +38,8 @@ class BetterSocialElasticSearch {
             }, (err, response) => {
                 const data = response?.hits?.hits?.reduce((acc, next) => {
                     acc.push(next._source)
+                    console.log(`score ${next._score}`)
+                    console.table(next?._source)
                     return acc
                 }, [])
 

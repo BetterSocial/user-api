@@ -12,11 +12,12 @@ class GetstreamService {
     this.getTopicPages = this.getTopicPages.bind(this);
   }
 
-  async getTopicPages(id) {
+  async getTopicPages(id, limit = MAX_FEED_FETCH_LIMIT, offset = 0) {
     const query = {
-      limit: MAX_FEED_FETCH_LIMIT,
+      limit,
       reactions: { own: true, recent: true, counts: true },
       ranking: GETSTREAM_RANKING_METHOD,
+      offset,
     };
     const res = await this._client.feed("topic", id).get(query);
     let data = res.results
