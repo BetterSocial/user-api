@@ -1,4 +1,5 @@
 const ClientError = require("../../exceptions/ClientError");
+const { MAX_FEED_FETCH_LIMIT } = require("../../helpers/constants");
 const BlockServices = require("../../services/block/BlockServices");
 const { getListBlockPostAnonymous, getListBlockUser } = require("../../services/blockUser");
 const getBlockDomain = require("../../services/domain/getBlockDomain");
@@ -19,13 +20,14 @@ class TopicPage {
 
   async getTopicPages(req, res) {
     let { id } = req.params;
+    let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
     const client = await connectStreamChat(req.userId, req.token)
     const channel = client.channel('messaging', id)
     channel.updatePartial({set: {unread: 0}})
     
     try {
       this._validator.validateGetTopicPages({ id });
-      const topicPages = await this._getStreamService.getTopicPages(id);
+      const topicPages = await this._getStreamService.getTopicPages(id, limit, offset);
 
       const listBlockUser = await getListBlockUser(req.userId);
       const listBlockDomain = await getBlockDomain(req.userId);
@@ -35,7 +37,8 @@ class TopicPage {
         code: 200,
         status: 'success',
         message: "Success get topic pages",
-        data: newTopicPagesWithBlock,
+        data: newTopicPagesWithBlock || [],
+        offset: parseInt(offset) + parseInt(newTopicPagesWithBlock.length)
       })
     } catch (error) {
       console.log(error);
@@ -44,7 +47,8 @@ class TopicPage {
           "code": error.statusCode,
           "status": 'fail',
           "message": error.message,
-          "data": "null"
+          "data": "null",
+          offset: parseInt(offset),
         });
       }
 
@@ -52,7 +56,8 @@ class TopicPage {
         "code": error.statusCode,
         "status": 'error',
         "message": 'Internal server error',
-        "data": "null"
+        "data": "null",
+        offset: parseInt(offset),
       });
     }
   }
