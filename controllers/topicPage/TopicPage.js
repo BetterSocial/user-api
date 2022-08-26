@@ -18,11 +18,11 @@ class TopicPage {
     }
 
     async getTopicPages(req, res) {
-        let { id } = req.params;
+        let { id, rawid } = req.params;
         let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
         const client = await connectStreamChat(req.userId, req.token)
 
-        const channels = await client.queryChannels({ id })
+        const channels = await client.queryChannels({ id: rawid })
         const countUnread = await channels[0]?.markRead()
 
         try {
