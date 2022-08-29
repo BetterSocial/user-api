@@ -13,7 +13,7 @@ module.exports = async (token, feedGroup, data, userId) => {
     const channel = await clientChat.channel('topics', `topic_${data.topics[i]}`, {name: `#${data.topics[i]}`, members: [userId], channel_type: 3, channel_image: defaultImage, channelImage: defaultImage, image: defaultImage})
     await channel.create()
     await channel.addMembers([userId])
-    await channel.sendMessage({text: `#${data.topics[i]} new post`})
+    await channel.sendMessage({text: `#${data.topics[i]} new post`}, {skip_push: true})
   }
   
   // let userExcData = {...data}
