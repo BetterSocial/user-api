@@ -8,7 +8,7 @@ const auth = require("../middlewares/auth")
 const { API_PREFIX_V1 } = require('../helpers/constants');
 
 /* GET locations listing. */
-router.get(`${API_PREFIX_V1}/topic-pages/:id`, new TopicPage().getTopicPages);
+router.get(`${API_PREFIX_V1}/topic-pages/:id/:rawid`, new TopicPage().getTopicPages);
 router.get(`${API_PREFIX_V1}/topic-pages/:id/:id_gte`, new TopicPage().getTopicPageById);
 
 module.exports = router;
