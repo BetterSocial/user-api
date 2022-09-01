@@ -29,7 +29,7 @@ const handleCreatePostTO = (userId, postBody) => {
     TO.push(`main_feed:${userId}`)
     TO.push(`notification:${userId}`)
 
-    if (privacy === "public") {
+    if (privacy.toLowerCase() === "public") {
         TO.push(`user:${userId}`)
         TO.push("location:everywhere");
 
