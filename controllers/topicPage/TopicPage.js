@@ -24,6 +24,8 @@ class TopicPage {
 
         // const channels = await client.queryChannels({ id })
         // const countUnread = await channels[0]?.markRead()
+        // const channels = await client.queryChannels({ id: `topic_${id}` })
+        // const countUnread = await channels[0]?.markRead()
 
         try {
             this._validator.validateGetTopicPages({ id });
