@@ -22,9 +22,9 @@ class TopicPage {
         let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
         const client = await connectStreamChat(req.userId, req.token)
 
-        const channels = await client.queryChannels({ id })
+        const channels = await client.queryChannels({ id: `topic_${id}` })
         const countUnread = await channels[0]?.markRead()
-
+        console.log(`topic_${id}`)
         try {
             this._validator.validateGetTopicPages({ id });
             const topicPages = await this._getStreamService.getTopicPages(id, limit, offset);
