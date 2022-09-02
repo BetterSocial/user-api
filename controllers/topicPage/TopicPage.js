@@ -24,7 +24,6 @@ class TopicPage {
 
         const channels = await client.queryChannels({ id: `topic_${id}` })
         const countUnread = await channels[0]?.markRead()
-        console.log(`topic_${id}`)
         try {
             this._validator.validateGetTopicPages({ id });
             const topicPages = await this._getStreamService.getTopicPages(id, limit, offset);
