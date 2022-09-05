@@ -26,10 +26,8 @@ module.exports = async (req, res) => {
 
   try {
     let topicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id IN (${topics.join(',')})`
-    console.log(topicsQuery)
 
     let locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (${locations.join(',')})`
-    console.log(locationQuery)
 
     let userTopicFollowerQueryResult = await sequelize.query(topicsQuery)
     let userTopicFollower = userTopicFollowerQueryResult[0]
@@ -62,7 +60,7 @@ module.exports = async (req, res) => {
 
       if (tempUsers.length > 0) {
         result.push({
-          viewtype: 'label',
+          viewtype: 'labeltopic',
           name: topic.name,
           id: topic.topic_id,
         })
@@ -86,7 +84,7 @@ module.exports = async (req, res) => {
       if (tempUsers.length > 0) {
         result.push({
           ...location,
-          viewtype: 'label',
+          viewtype: 'labellocation',
         })
 
         result.push(...tempUsers)
