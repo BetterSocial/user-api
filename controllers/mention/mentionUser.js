@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
             }
         }
     })
-    data.push(users);
+    data.push(...users);
     return res.status(200).json({
         'status': 'success',
         'data': data,
