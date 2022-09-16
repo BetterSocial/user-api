@@ -2,7 +2,7 @@ const { Locations, sequelize } = require("../../databases/models");
 const { Op } = require("sequelize");
 module.exports = async (req, res) => {
   try {
-    let { name } = req.body;
+    let { name, limit = 20, offset = 0 } = req.body;
 
     let stringToCapitalize = "";
     let stringToLowerCase = "";
@@ -48,7 +48,9 @@ module.exports = async (req, res) => {
     OR A.city ILIKE '%${name}%' 
     OR A.state ILIKE '%${name}%' 
     OR A.country ILIKE '%${name}%'
-    ORDER BY location_rank DESC`
+    ORDER BY location_rank DESC
+    OFFSET ${offset}
+    LIMIT ${limit}`
 
     try {
       const result = await sequelize.query(locationQuery)
