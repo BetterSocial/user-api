@@ -20,9 +20,9 @@ const SearchDomain = async(req, res) => {
     })
 
     try {
-        const blockDomain = await getBlockDomain(req.userId);
+        // const blockDomain = await getBlockDomain(req.userId);
         // const blockDomain = ["f0433444-8459-4b9a-969b-dc13f98580b3"]
-        let filteredBlockDomainArray = blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain)
+        // let filteredBlockDomainArray = blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain)
 
         let domains = await sequelize.query(
             `SELECT 
@@ -30,6 +30,7 @@ const SearchDomain = async(req, res) => {
                 "Domain"."domain_name",
 				"Domain"."logo",
 				"Domain"."short_description",
+                "Domain"."credder_score",
                 count("domainFollower"."user_id_follower") 
                     AS "followersCount",
                 (SELECT "f"."user_id_follower" AS "user_id_follower" FROM "user_follow_domain" AS "f" WHERE "f"."user_id_follower" ='${userId}' AND "f"."domain_id_followed" = "Domain"."domain_page_id")
@@ -45,7 +46,8 @@ const SearchDomain = async(req, res) => {
                 "Domain"."domain_page_id",
                 "Domain"."domain_name",
 				"Domain"."logo",
-				"Domain"."short_description"
+				"Domain"."short_description",
+                "Domain"."credder_score"
             ORDER BY
                 "user_id_follower" ASC,
                 "followersCount" DESC
