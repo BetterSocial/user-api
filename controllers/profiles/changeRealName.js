@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
       return res.status(404).json({
         code: 404,
         status: "error",
-        message: "user not found",
+        message: "User not found",
       });
     } else {
       const [numberOfAffectedRows, affectedRows] = await User.update(

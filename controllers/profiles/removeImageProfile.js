@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
       return res.status(404).json({
         code: 404,
         status: "error",
-        message: "user not found",
+        message: "User not found",
       });
     } else {
       let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");

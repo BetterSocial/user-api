@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
       return res.status(404).json({
         code: 404,
         status: "error",
-        message: "user not found",
+        message: "User not found",
       });
     }
     if (user && profile_pic_path) {

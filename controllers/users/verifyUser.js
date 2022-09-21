@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({
         code: 500,
         data: false,
-        message: 'user not found',
+        message: "User not found",
       });
     }
   } catch (error) {

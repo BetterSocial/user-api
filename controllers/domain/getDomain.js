@@ -9,13 +9,11 @@ const _ = require("lodash");
 
 const { getBlockDomain } = require("../../services/domain");
 const { DomainPage } = require("../../databases/models/");
-const ElasticNewsLink = require("../../elasticsearch/repo/newsLink/ElasticNewsLink");
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH, fetch = MAX_FEED_FETCH_LIMIT_DOMAIN } = req.query
   console.log(`offset ${offset} limit ${limit}`)
 
-  const elasticNewsLink = new ElasticNewsLink()
   let domainPageCache = {}
 
   let data = []
@@ -34,13 +32,11 @@ module.exports = async (req, res) => {
           reactions: { own: true, recent: true, counts: true },
         };
 
-        // console.log(`get feeds from ${query.offset}`)
         const resp = await getDomain(query);
         let feeds = resp.results
 
         for (let i in feeds) {
           let item = feeds[i];
-          // console.log(`${blockDomain} vs ${item.content.domain_page_id}`)
           if (blockDomain.includes(item.content.domain_page_id)) {
             offset++;
             continue;
@@ -75,8 +71,6 @@ module.exports = async (req, res) => {
           // })
 
           offset++;
-
-          console.log(`${data.length} === ${limit} ${data.length === limit}`)
           if (data.length === limit) break
         }
 
