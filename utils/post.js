@@ -22,13 +22,14 @@ const handleCreatePostTO = (userId, postBody) => {
         privacy,
         topics,
         location,
-        message
+        message,
+        tagUsers
     } = postBody;
-
+    const mapTagUser = tagUsers.map((user) => `notification:${user}`)
     let TO = []
     TO.push(`main_feed:${userId}`)
     TO.push(`notification:${userId}`)
-
+    TO.push(...mapTagUser)
     if (privacy.toLowerCase() === "public") {
         TO.push(`user:${userId}`)
         TO.push("location:everywhere");
