@@ -48,8 +48,8 @@ const handleCreatePostTO = (userId, postBody) => {
             TO.push("location:" + loc);
         }
     }
-
-    return TO
+    const removeDupilcate = _.union(TO)
+    return removeDupilcate
 }
 
 const modifyPollPostObject = async (userId, item) => {
