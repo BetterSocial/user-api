@@ -26,6 +26,7 @@ const getFeedChatService = async (req, res) => {
             const message = typeof b.object === 'object' ? b.object.message : b.message
             const totalVote = upvote - downvote
             let actor = typeof b.object === 'object' ? b.object.actor : b.actor
+            console.log('test')
             const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
             if(isAnonym) {
                 actor = {...actor, data: {
