@@ -27,6 +27,7 @@ const getFeedChatService = async (req, res) => {
             const totalVote = upvote - downvote
             let actor = typeof b.object === 'object' ? b.object.actor : b.actor
             const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
+            console.log(upvote, 'nakal')
             if(isAnonym) {
                 actor = {...actor, data: {
                     username: "Anonymous"
@@ -42,8 +43,8 @@ const getFeedChatService = async (req, res) => {
                     unreadComment: !b.isRead ? 1 : 0,
                     type: "post-notif",
                     titlePost: message,
-                    downvote: totalVote < 0 ? totalVote * -1 : 0, 
-                    upvote: totalVote > 0 ? totalVote : 0,
+                    downvote: downvote, 
+                    upvote: upvote,
                     block: blockList,
                     postMaker: actor,
                     isAnonym:isAnonym ,
@@ -68,9 +69,7 @@ const getFeedChatService = async (req, res) => {
 
         res.status(200).send({
             success: true,
-            data: groupingFeed,
-            unSeen: data.unseen,
-            unRead: data.unread,
+            data:groupingFeed,
             message: "Success get data",
         })
     } catch (e) {

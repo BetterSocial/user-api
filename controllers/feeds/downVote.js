@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
           }
         }
       }
-      const data = await downVote(activity_id, req.token);
+      const data = await downVote(activity_id, req.token, feed.actor.id);
       countProcess(activity_id, { downvote_count: +1 }, { downvote_count: 1 });
       
       // Send message queue for downvote event

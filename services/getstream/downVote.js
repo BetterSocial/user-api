@@ -1,6 +1,6 @@
 const stream = require("getstream");
 
-module.exports = async (activityId, token) => {
+module.exports = async (activityId, token, actorId) => {
   const clientUser = stream.connect(
     process.env.API_KEY,
     token,
@@ -11,6 +11,8 @@ module.exports = async (activityId, token) => {
     { id: activityId },
     {
       count_downvote: 1,
-    }
+      text: 'You have new downvote'
+    },
+    {targetFeeds: [`notification:${actorId}`]}
   );
 };
