@@ -24,7 +24,6 @@ const getFeedChatService = async (req, res) => {
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
             const message = typeof b.object === 'object' ? b.object.message : b.message
-            const totalVote = upvote - downvote
             let actor = typeof b.object === 'object' ? b.object.actor : b.actor
             const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
             if(isAnonym) {
@@ -42,8 +41,8 @@ const getFeedChatService = async (req, res) => {
                     unreadComment: !b.isRead ? 1 : 0,
                     type: "post-notif",
                     titlePost: message,
-                    downvote: downvote, 
-                    upvote: upvote,
+                    downvote: downvote || 0, 
+                    upvote: upvote || 0,
                     block: blockList,
                     postMaker: actor,
                     isAnonym:isAnonym ,
