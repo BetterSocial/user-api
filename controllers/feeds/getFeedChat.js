@@ -58,8 +58,8 @@ const getFeedChatService = async (req, res) => {
             let myReaction = b.reaction
             if(myReaction) {
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
-                newGroup[activity_id].totalComment = newGroup[activity_id].comments.length || 0
-                newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => data.actor.id !== req.userId).length || 0
+                newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
+                newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => data.actor.id !== req.userId && data.reaction.kind === 'comment').length || 0
                 
             }
             return a
