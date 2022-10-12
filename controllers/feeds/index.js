@@ -23,8 +23,10 @@ const upVoteDomain = require("./upVoteDomain");
 const downVoteDomain = require("./downVoteDomain");
 const voteComment = require("./voteComment");
 const iVoteComment = require("./iVoteComment");
-const {getFeedChatService} = require("./getFeedChat")
-const   notificationCommentFeed = require("./notificationCommentFeed")
+const { getFeedChatService } = require("./getFeedChat")
+const notificationCommentFeed = require("./notificationCommentFeed")
+const getOpenGraph = require('./getOpenGraph')
+
 module.exports = {
   createQueuePostTime,
   createPost,
@@ -52,5 +54,6 @@ module.exports = {
   voteComment,
   iVoteComment,
   getFeedChatService,
-  notificationCommentFeed
+  notificationCommentFeed,
+  getOpenGraph
 };

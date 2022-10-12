@@ -34,6 +34,8 @@ router.post("/viewpost", feed.createQueuePostTime);
 router.post("/vote_comment", isAuth, feed.voteComment);
 router.get("/i_vote_comment", isAuth, feed.iVoteComment);
 router.get("/feed-chat/", isAuth, feed.getFeedChatService)
+router.post("/open-graph", isAuth, feed.getOpenGraph)
 
 router.post("/feed-action-notification/:kind", isAuth, feed.notificationCommentFeed)
+
 module.exports = router;
