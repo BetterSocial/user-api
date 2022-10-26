@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
     A.neighborhood ILIKE '%${name}%' 
     OR A.state ILIKE '%${name}%' 
     OR A.country ILIKE '%${name}%'
-    UNION (SELECT *, 2 FROM "location" A WHERE A.city ILIKE '%${name}%' AND location_level = 'city' ORDER BY location_id ASC LIMIT 1)
+    OR A.city ILIKE '%${name}%'
     ORDER BY location_rank DESC
     OFFSET ${offset}
     LIMIT ${limit}`
