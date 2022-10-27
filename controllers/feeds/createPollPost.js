@@ -13,7 +13,7 @@ const v = new Validator();
 const moment = require("moment");
 const { POST_TYPE_POLL } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
-const { handleCreatePostTO } = require("../../utils/post");
+const { handleCreatePostTO, filterAllTopics } = require("../../utils/post");
 const { convertTopicWithEmoji } = require("../../utils");
 
 function addDays(theDate, days) {
@@ -250,10 +250,7 @@ module.exports = async (req, res) => {
       location_level = locationDetail.location_level;
     }
 
-    let newTopic = topics.reduce((acc, next) => {
-      acc.push(convertTopicWithEmoji(next))
-      return acc
-    }, [])
+    let newTopic = filterAllTopics(message, topics)
 
 
     let object = {

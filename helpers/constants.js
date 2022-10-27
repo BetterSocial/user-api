@@ -4,6 +4,7 @@ const POST_TYPE_LINK = 2;
 const NO_POLL_OPTION_UUID = "00000000-0000-0000-0000-000000000000";
 
 const POST_VERB_POLL = "poll";
+const POST_VERB_TWEET = "tweet";
 
 // TODO
 // Changed temporarily, until logic improvement on getting the feeds is implemented.
