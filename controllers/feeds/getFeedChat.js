@@ -8,7 +8,7 @@ const getFeedChatService = async (req, res) => {
     try {
         const blockList = await UserBlockedUser.count({
             where: {
-                user_id_blocker: req.userId
+                user_id_blocked: req.userId
             }
         })
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
