@@ -32,7 +32,6 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-
     const result = await sequelize.transaction(async (t) => {
       await UserFollowUser.destroy(
         {
@@ -52,6 +51,7 @@ module.exports = async (req, res) => {
         user_id_blocker: req.userId,
         user_id_blocked: req.body.userId,
         reason_blocked: reason,
+        post_id:req.body.postId
       };
       let resultUserBlock = await UserBlockedUser.create(userBlock, {
         transaction: t,

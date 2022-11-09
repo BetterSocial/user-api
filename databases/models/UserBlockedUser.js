@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         allowNull: true,
       },
+      post_id: {
+        type: DataTypes.UUID,
+        allowNull:true
+      }
     },
     {
       sequelize,
