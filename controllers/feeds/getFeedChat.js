@@ -6,17 +6,20 @@ const myCache = new NodeCache( { stdTTL: 100, checkperiod: 0 } );
 
 const getFeedChatService = async (req, res) => {
     try {
-        const blockList = await UserBlockedUser.count({
-            where: {
-                user_id_blocked: req.userId
-            }
-        })
+        const findAll = await UserBlockedUser.findAll()
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
         for (let i = 0; i < data.results.length; i++) {
-            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead: data.results[i].is_read}))
+            const blockCount = await UserBlockedUser.count({
+            where: {
+                // user_id_blocked: req.userId,
+                post_id: data.results[i].activities[0].id
+            }
+        })
+            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead: data.results[i].is_read, blockCount}))
             newFeed.push(...mapping)
         }
+
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
             const localDate = moment.utc(b.time).local().format()
@@ -43,7 +46,7 @@ const getFeedChatService = async (req, res) => {
                     titlePost: message,
                     downvote: downvote || 0, 
                     upvote: upvote || 0,
-                    block: blockList,
+                    block: b.blockCount,
                     postMaker: actor,
                     isAnonym:isAnonym ,
                     comments: [],
