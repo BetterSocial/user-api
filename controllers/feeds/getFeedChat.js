@@ -9,6 +9,7 @@ const getFeedChatService = async (req, res) => {
         const findAll = await UserBlockedUser.findAll()
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
+        const block = []
         for (let i = 0; i < data.results.length; i++) {
             const blockCount = await UserBlockedUser.count({
             where: {
@@ -16,10 +17,17 @@ const getFeedChatService = async (req, res) => {
                 post_id: data.results[i].activities[0].id
             }
         })
-            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead: data.results[i].is_read, blockCount}))
+        block.push({id: data.results[i].activities[0].id, count: blockCount}) 
+            const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead: data.results[i].is_read }))
             newFeed.push(...mapping)
         }
-
+        newFeed = newFeed.map((feed) => {
+            const findBlock = block.find((blck) => blck.id === feed.id)
+            if(findBlock) {
+                return {...feed, blockCount: findBlock.count}
+            }
+            return {...feed, blockCount: 0}
+        })
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
             const localDate = moment.utc(b.time).local().format()
