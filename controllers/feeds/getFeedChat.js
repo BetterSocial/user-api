@@ -9,25 +9,13 @@ const getFeedChatService = async (req, res) => {
         const findAll = await UserBlockedUser.findAll()
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
-        const block = []
+
         for (let i = 0; i < data.results.length; i++) {
-            const blockCount = await UserBlockedUser.count({
-            where: {
-                // user_id_blocked: req.userId,
-                post_id: data.results[i].activities[0].id
-            }
-        })
-        block.push({id: data.results[i].activities[0].id, count: blockCount}) 
+
             const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead: data.results[i].is_read }))
             newFeed.push(...mapping)
         }
-        newFeed = newFeed.map((feed) => {
-            const findBlock = block.find((blck) => blck.id === feed.id)
-            if(findBlock) {
-                return {...feed, blockCount: findBlock.count}
-            }
-            return {...feed, blockCount: 0}
-        })
+
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
             const localDate = moment.utc(b.time).local().format()
@@ -54,7 +42,7 @@ const getFeedChatService = async (req, res) => {
                     titlePost: message,
                     downvote: downvote || 0, 
                     upvote: upvote || 0,
-                    block: b.blockCount,
+                    // block: b.blockCount,
                     postMaker: actor,
                     isAnonym:isAnonym ,
                     comments: [],
@@ -75,10 +63,18 @@ const getFeedChatService = async (req, res) => {
             }
             return a
         }, [])
-
+        let feedGroup = []
+        for(let i = 0; i < groupingFeed.length; i++) {
+            const blockCount = await UserBlockedUser.count({
+                where: {
+                    post_id: groupingFeed[i].activity_id
+                }
+            })
+            feedGroup.push({...groupingFeed[i], block: blockCount})
+        }
         res.status(200).send({
             success: true,
-            data:groupingFeed,
+            data:feedGroup,
             message: "Success get data",
         })
     } catch (e) {
