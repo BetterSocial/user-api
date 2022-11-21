@@ -1,59 +1,62 @@
-const createPost = require("./createPost");
-const getFeeds = require("./getFeeds");
-const followUser = require("./followUser");
-const createReaction = require("./createReaction");
-const getReaction = require("./getReaction");
-const upvote = require("./upVote");
-const downvote = require("./downVote");
-const comment = require("./comment");
-const like = require("./like");
-const createPollPost = require("./createPollPost");
-const deleteFeed = require("./deleteFeed");
-const getFeedUser = require("./getFeedUser");
-const commentChild = require("./commentChild");
-const inputPoll = require("./inputPoll");
 const childDownvote = require("./childDownvote");
 const childUpvote = require("./childUpvote");
-const updateReaction = require("./updateReaction");
+const comment = require("./comment");
+const commentChild = require("./commentChild");
+const commentDomain = require('./commentDomain')
+const createPollPost = require("./createPollPost");
+const createPost = require("./createPost");
+const createReaction = require("./createReaction");
+const deleteFeed = require("./deleteFeed");
 const deleteReaction = require("./deleteReaction");
-const { putMainFeed } = require("./updateActivity");
-const { createQueuePostTime } = require("./createPostTime");
 const detailFeed = require("./detailFeed");
-const upVoteDomain = require("./upVoteDomain");
+const downvote = require("./downVote");
 const downVoteDomain = require("./downVoteDomain");
-const voteComment = require("./voteComment");
-const iVoteComment = require("./iVoteComment");
-const { getFeedChatService } = require("./getFeedChat")
-const notificationCommentFeed = require("./notificationCommentFeed")
+const followUser = require("./followUser");
+const getFeeds = require("./getFeeds");
+const getFeedUser = require("./getFeedUser");
 const getOpenGraph = require('./getOpenGraph')
+const getReaction = require("./getReaction");
+const inputPoll = require("./inputPoll");
+const iVoteComment = require("./iVoteComment");
+const like = require("./like");
+const notificationCommentFeed = require("./notificationCommentFeed")
+const updateReaction = require("./updateReaction");
+const upvote = require("./upVote");
+const upVoteDomain = require("./upVoteDomain");
+const voteComment = require("./voteComment");
+
+const { createQueuePostTime } = require("./createPostTime");
+const { getFeedChatService } = require("./getFeedChat")
+const { putMainFeed } = require("./updateActivity");
 
 module.exports = {
-  createQueuePostTime,
-  createPost,
-  getFeeds,
-  followUser,
-  createReaction,
-  getReaction,
-  upvote,
-  comment,
-  like,
-  createPollPost,
-  deleteFeed,
-  getFeedUser,
-  downvote,
-  commentChild,
-  inputPoll,
   childDownvote,
   childUpvote,
-  updateReaction,
+  comment,
+  commentChild,
+  commentDomain,
+  createPollPost,
+  createPost,
+  createQueuePostTime,
+  createReaction,
+  deleteFeed,
   deleteReaction,
-  putMainFeed,
   detailFeed,
-  upVoteDomain,
+  downvote,
   downVoteDomain,
-  voteComment,
-  iVoteComment,
+  followUser,
   getFeedChatService,
+  getFeeds,
+  getFeedUser,
+  getOpenGraph,
+  getReaction,
+  inputPoll,
+  iVoteComment,
+  like,
   notificationCommentFeed,
-  getOpenGraph
+  putMainFeed,
+  updateReaction,
+  upvote,
+  upVoteDomain,
+  voteComment,
 };
