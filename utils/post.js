@@ -26,13 +26,13 @@ const handleCreatePostTO = (userId, postBody) => {
         tagUsers
     } = postBody;
     let TO = []
-    if(tagUsers && Array.isArray(tagUsers)) {
+    if (tagUsers && Array.isArray(tagUsers)) {
         const mapTagUser = tagUsers.map((user) => `notification:${user}`)
         TO.push(...mapTagUser)
     }
     TO.push(`main_feed:${userId}`)
     TO.push(`notification:${userId}`)
-    
+
     if (privacy.toLowerCase() === "public") {
         TO.push(`user:${userId}`)
         TO.push("location:everywhere");
@@ -159,13 +159,11 @@ const isPostBlocked = (item, listAnonymous, listBlock, myLocations, listAnonymou
  * @returns {String[]}
  */
 const filterAllTopics = (text, topics = []) => {
-    let topicsFromText = text.match(/#(\w+)\b/gi) || []
+    const topicsFromText = text.match(/#([a-zA-Z0-9-_]+)\b/gi) || []
     let topicsFromTextWithoutHashtag = topicsFromText.reduce((acc, next) => {
         acc.push(next.slice(1))
         return acc
     }, [])
-
-    console.log(JSON.stringify(topicsFromTextWithoutHashtag))
 
     return [...new Set([...topicsFromTextWithoutHashtag, ...topics])]
 }
