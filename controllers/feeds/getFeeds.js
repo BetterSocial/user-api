@@ -96,10 +96,12 @@ module.exports = async (req, res) => {
         for (let i = 0; i < feeds.length; i++) {
           let item = feeds[i];
 
-          if (item.is_deleted) {
+          // validation admin hide post
+          if (item.is_hide) {
             offset++;
             continue;
           }
+
           let isBlocked = isPostBlocked(
             item,
             listAnonymousAuthor,
