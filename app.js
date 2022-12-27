@@ -21,6 +21,7 @@ const domainRouter = require("./routes/domain");
 const chatRouter = require("./routes/chat");
 const topicPage = require("./routes/topicPages");
 const linkRouter = require("./routes/link");
+const linkPostRouter = require("./routes/link-post");
 const discovery = require('./routes/discovery')
 const auth = require("./middlewares/auth");
 const HomeRouter = require("./routes/home");
@@ -45,6 +46,7 @@ app.use("/location", locationsRouter);
 app.use("/who-to-follow", whoToFollowRouter);
 app.use("/profiles", profilesRouter);
 app.use("/u", linkRouter);
+app.use("/p", linkPostRouter);
 
 // app.use("/", indexRouter);
 app.use("/api/v1/users", usersRouter);
