@@ -52,7 +52,9 @@ const getFeedChatService = async (req, res) => {
                     },
                
                 }
-                a.push(newGroup[activity_id])
+                if(actor && typeof actor === 'object') {
+                    a.push(newGroup[activity_id])
+                }
             }
             let myReaction = b.reaction
             if(myReaction) {
