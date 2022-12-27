@@ -7,6 +7,7 @@ const createPollPost = require("./createPollPost");
 const createPost = require("./createPost");
 const createReaction = require("./createReaction");
 const deleteFeed = require("./deleteFeed");
+const deletePost = require("./deletePost")
 const deleteReaction = require("./deleteReaction");
 const detailFeed = require("./detailFeed");
 const downvote = require("./downVote");
@@ -40,6 +41,7 @@ module.exports = {
   createQueuePostTime,
   createReaction,
   deleteFeed,
+  deletePost,
   deleteReaction,
   detailFeed,
   downvote,
