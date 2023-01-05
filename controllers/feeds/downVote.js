@@ -46,6 +46,7 @@ module.exports = async (req, res) => {
     } else {
       // let reactionId = feed.
       let latestReactions = feed.latest_reactions;
+       let dataResponse = {}
       if (JSON.stringify(latestReactions) !== "{}") {
         let downvotes = latestReactions.downvotes;
         if (downvotes !== undefined && downvotes.length > 0) {
@@ -55,6 +56,7 @@ module.exports = async (req, res) => {
 
           if (data.length > 0) {
             let reaction = data[0];
+            dataResponse = reaction
             await deleteReaction(reaction.id);
           }
         }
@@ -64,7 +66,7 @@ module.exports = async (req, res) => {
       // Send message queue for downvote event
       await addForCancelDownvoteFeed(scoringProcessData);
       
-      res.status(200).json(responseSuccess("Success cancel downvote"));
+      res.status(200).json(responseSuccess("Success cancel downvote", dataResponse));
     }
   } catch (errors) {
     console.log(errors);

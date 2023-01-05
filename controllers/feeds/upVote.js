@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
     let token = req.token;
     let { activity_id, status, feed_group } = req.body;
     let feeds = await getDetailFeed(token, activity_id, feed_group);
+    console.log(feeds, 'susu')
     let feed = feeds.results[0];
     const scoringProcessData = {
       user_id: req.userId,
@@ -46,6 +47,7 @@ module.exports = async (req, res) => {
     } else {
       // let reactionId = feed.
       let latestReactions = feed.latest_reactions;
+      let dataResponse = {}
       if (JSON.stringify(latestReactions) !== "{}") {
         let upvotes = latestReactions.upvotes;
         if (upvotes !== undefined && upvotes.length > 0) {
@@ -55,6 +57,7 @@ module.exports = async (req, res) => {
 
           if (data.length > 0) {
             let reaction = data[0];
+            dataResponse = reaction
             await deleteReaction(reaction.id);
           }
         }
@@ -64,7 +67,7 @@ module.exports = async (req, res) => {
       // Send message queue for cancel upvote event
       await addForCancelUpvoteFeed(scoringProcessData);
       
-      res.status(200).json(responseSuccess("Success cancel upvote"));
+      res.status(200).json(responseSuccess("Success cancel upvote", dataResponse));
     }
   } catch (errors) {
     console.log(errors);
