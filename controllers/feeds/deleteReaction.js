@@ -6,6 +6,7 @@ module.exports = async (req, res) => {
     let result = await deleteReaction(reaction_id, req.token);
     return res.status(200).json({
       code: 200,
+      success: true,
       status: "Success delete reaction",
       data: result,
     });
@@ -13,6 +14,7 @@ module.exports = async (req, res) => {
     console.log(err);
     return res.status(400).json({
       code: 400,
+      success: false,
       status: "failed delete reaction",
       data: err.detail,
     });
