@@ -13,9 +13,11 @@ class BetterSocialQueue {
      * @returns {Bull.Queue}
      */
     static generate(queueName, additionalQueueOptions = {}) {
-        let redisUrl = process.env.NODE_ENV === 'production' ?
-            // process.env.HEROKU_REDIS_BETTERSOCIAL_GENERAL_QUEUE_URL : process.env.HEROKU_REDIS_BETTERSOCIAL_GENERAL_QUEUE_URL
-            process.env.REDIS_TLS_URL : process.env.REDIS_TLS_URL
+        // Uncomment below for local development redis
+        // let redisUrl = process.env.REDIS_TLS_URL
+
+        // Comment below for local development redis
+        let redisUrl = process.env.REDIS_TLS_URL
 
         let createClientOptions = {
             redis: {
@@ -42,9 +44,11 @@ class BetterSocialQueue {
             }
         }
 
-        let queueOptions = process.env.NODE_ENV === 'production' ?
-            { redis: { tls: { rejectUnauthorized: false, requestCert: true, } }, ...createClientOptions, ...additionalQueueOptions }
-            : { ...createClientOptions, ...additionalQueueOptions }
+        // Uncomment below for local development redis
+        // let queueOptions = { ...createClientOptions, ...additionalQueueOptions }
+
+        // Comment below for local development redis
+        let queueOptions = { redis: { tls: { rejectUnauthorized: false, requestCert: true, } }, ...createClientOptions, ...additionalQueueOptions }
 
         return new Bull(queueName, redisUrl, queueOptions)
     }
