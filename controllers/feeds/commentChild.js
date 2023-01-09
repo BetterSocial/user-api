@@ -2,12 +2,12 @@ const { commentChild } = require("../../services/getstream");
 const QueueTrigger = require("../../services/queue/trigger");
 module.exports = async (req, res) => {
   try {
-    let { reaction_id, message, sendPostNotif, useridFeed } = req?.body;
+    let { reaction_id, message, sendPostNotif, useridFeed, postMaker } = req?.body;
 
     let result = await commentChild(reaction_id, req.userId, req.body.useridFeed, message, req.token, sendPostNotif, req.body.postMaker);
 
     QueueTrigger.addCommentToDb({
-      authorUserId: useridFeed,
+      authorUserId: postMaker,
       comment: message,
       commenterUserId: req?.userId,
       commentId: result?.id,

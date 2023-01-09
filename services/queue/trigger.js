@@ -22,7 +22,7 @@ const addCommentToDb= (data) => {
 
 /**
  * 
- * @param {DeleteCommentByBlockTriggerQueue} data 
+ * @param {DeleteCommentByBlockPayload} data 
  * @returns 
  */
 const deleteCommentByBlock= (data) => {
@@ -34,7 +34,7 @@ const deleteCommentByBlock= (data) => {
         removeOnComplete: true
     }
 
-    QueueInstance.addCommentToDbQueue.add(data, options)
+    const queue = QueueInstance.deleteCommentByBlockTriggerQueue.add(data, options)
     return
 }
 

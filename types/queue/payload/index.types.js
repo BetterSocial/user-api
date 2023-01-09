@@ -8,7 +8,7 @@
  */
 
 /** 
- * @typedef {object} DeleteCommentByBlockTriggerQueue
+ * @typedef {object} DeleteCommentByBlockPayload
  * @property {string} authorUserId
  * @property {string} commenterUserId
  */

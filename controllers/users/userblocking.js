@@ -14,6 +14,7 @@ const { getIdBlockFeed } = require("../../utils/block");
 const { addForBlockUser } = require("../../services/score");
 const v = new Validator();
 const moment = require("moment");
+const QueueTrigger = require("../../services/queue/trigger");
 
 module.exports = async (req, res) => {
   try {
@@ -88,6 +89,11 @@ module.exports = async (req, res) => {
       activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
     };
     await addForBlockUser(scoringProcessData);
+
+    QueueTrigger.deleteCommentByBlock({
+      authorUserId: req?.body?.userId,
+      commenterUserId: req?.userId
+    })
 
     res.json({
       message: "The user has been successfully blocked",
