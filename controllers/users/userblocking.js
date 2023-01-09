@@ -91,8 +91,8 @@ module.exports = async (req, res) => {
     await addForBlockUser(scoringProcessData);
 
     QueueTrigger.deleteCommentByBlock({
-      authorUserId: req?.body?.userId,
-      commenterUserId: req?.userId
+      authorUserId: req?.userId,
+      commenterUserId: req?.body?.userId
     })
 
     res.json({
