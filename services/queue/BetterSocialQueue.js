@@ -16,13 +16,18 @@ class BetterSocialQueue {
         // Uncomment below for local development redis
         // let redisUrl = process.env.REDIS_TLS_URL
 
-        // Comment below for local development redis
-        let redisUrl = process.env.REDIS_TLS_URL
+        // Comment below for heroku redis
+        let redisUrl = process.env.REDIS_URL
 
         let createClientOptions = {
             redis: {
                 enableReadyCheck: false,
                 maxRetriesPerRequest: null,
+                tls: {
+                    rejectUnauthorized: false,
+                    requestCert: true
+                }
+
             },
             createClient: (type, redisOpts) => {
                 switch (type) {
@@ -47,8 +52,11 @@ class BetterSocialQueue {
         // Uncomment below for local development redis
         // let queueOptions = { ...createClientOptions, ...additionalQueueOptions }
 
-        // Comment below for local development redis
-        let queueOptions = { redis: { tls: { rejectUnauthorized: false, requestCert: true, } }, ...createClientOptions, ...additionalQueueOptions }
+        // Comment below for local heroku redis
+        let queueOptions = {
+            ...createClientOptions,
+            ...additionalQueueOptions
+        }
 
         return new Bull(queueName, redisUrl, queueOptions)
     }
