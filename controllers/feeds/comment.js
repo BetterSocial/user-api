@@ -1,15 +1,16 @@
 const { comment } = require("../../services/getstream");
 const { addForCommentPost } = require("../../services/score");
 const moment = require("moment");
+const QueueTrigger = require("../../services/queue/trigger");
 
 module.exports = async (req, res) => {
   try {
     let body = req.body;
-    body = {...body, kind: 'comment', userid: req.userId}
-    let result = await comment(body.activity_id, req.userId,body.useridFeed, body.message, req.token, body.sendPostNotif);
+    body = { ...body, kind: 'comment', userid: req.userId }
+    let result = await comment(body.activity_id, req.userId, body.useridFeed, body.message, req.token, body.sendPostNotif);
     const { countProcess } = require("../../process");
     // save to db if character message > 80
-    if (body.message.length > 80){
+    if (body.message.length > 80) {
       await countProcess(body.activity_id, { comment_count: +1 }, { comment_count: 1 });
     }
 
@@ -22,7 +23,15 @@ module.exports = async (req, res) => {
       activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
     };
     await addForCommentPost(scoringProcessData);
-    
+
+    QueueTrigger.addCommentToDb({
+      authorUserId: body?.useridFeed,
+      comment: body?.message,
+      commenterUserId: req?.userId,
+      commentId: result?.id,
+      postId: body?.activity_id
+    })
+
     return res.status(200).json({
       code: 200,
       status: "Success comment",
