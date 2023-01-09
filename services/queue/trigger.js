@@ -17,7 +17,6 @@ const addCommentToDb= (data) => {
     }
 
     QueueInstance.addCommentToDbQueue.add(data, options)
-    return
 }
 
 /**
@@ -34,8 +33,7 @@ const deleteCommentByBlock= (data) => {
         removeOnComplete: true
     }
 
-    const queue = QueueInstance.deleteCommentByBlockTriggerQueue.add(data, options)
-    return
+    QueueInstance.deleteCommentByBlockTriggerQueue.add(data, options)
 }
 
 const QueueTrigger = {
