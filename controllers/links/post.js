@@ -14,9 +14,9 @@ module.exports = async (req, res) => {
             dynamicLinkInfo : {
                 domainUriPrefix: `${firebaseDynamicLinkURL}`,
                 link: `${firebaseDynamicLinkURL}/post?postId=${req.params.postId}`,
-                androidInfo: {
-                    androidPackageName: firebaseDynamicLinkAndroidAppPackage,
-                },
+                // androidInfo: {
+                //     androidPackageName: firebaseDynamicLinkAndroidAppPackage,
+                // },
                 iosInfo : {
                     iosBundleId: firebaseDynamicLinkIOSAppPackage
                 }
@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
         })
     
         console.log(shortLink)
-        // console.log(previewLink)
+        console.log(previewLink)
         return res.redirect(shortLink)
         // return res.redirect('https://link.bettersocial.org/users')
     } catch(e) {
