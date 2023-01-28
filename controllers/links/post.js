@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
 
     try {
         const betterWebAppUrl = `${BETTER_WEB_APP_URL}?postId=${post?.id}`
-        const { shortLink, previewLink } = await firebaseDynamicLinks.createLink({
+        const { shortLink } = await firebaseDynamicLinks.createLink({
             longDynamicLink: `${FIREBASE_DYNAMIC_LINK_URL}?link=${betterWebAppUrl}&apn=${firebaseDynamicLinkAndroidAppPackage}&afl=${betterWebAppUrl}&isi=${BETTER_APP_STORE_ID}&ibi=${firebaseDynamicLinkIOSAppPackage}&ifl=${betterWebAppUrl}`
         })
 
