@@ -19,7 +19,6 @@ module.exports = async (req, res) => {
     try {
         let response = await getDetailFeed(req?.token, req?.params?.postId, 'main_feed')
         post = response?.results?.length > 0 ? response?.results[0] : null
-        console.log(post)
     } catch (e) {
         console.log(e)
         return res.status(500)
