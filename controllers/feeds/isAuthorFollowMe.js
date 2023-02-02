@@ -1,5 +1,6 @@
 const { UserFollowUser } = require("../../databases/models");
 const { getDetailFeed } = require("../../services/getstream");
+const { isDateExpired } = require("../../utils/date");
 
 /**
  * 
@@ -15,6 +16,12 @@ module.exports = async (req, res) => {
         success: false,
         code: 1,
         message: 'Feed not found'
+    })
+
+    if (isDateExpired(feed?.expired_at)) return res?.status(200)?.json({
+        success: false,
+        code: 3,
+        message: 'This post has been expired'
     })
 
     if (feed?.actor?.id === req?.userId) return res?.status(200)?.json({
