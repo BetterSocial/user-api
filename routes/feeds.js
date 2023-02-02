@@ -10,6 +10,7 @@ const { isAuth } = require("../middlewares/auth");
 router.post("/post", feed.createPost);
 router.post("/post/poll", feed.createPollPost);
 router.post("/post/poll/input", feed.inputPoll);
+router.get("/post/is-author-follow-me/:postId", feed.isAuthorFollowMe);
 router.post("/create-token", feedController.createToken);
 router.get("/feeds", feed.getFeeds);
 router.post("/reaction", feed.createReaction);
