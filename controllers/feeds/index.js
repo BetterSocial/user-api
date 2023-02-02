@@ -25,6 +25,7 @@ const updateReaction = require("./updateReaction");
 const upvote = require("./upVote");
 const upVoteDomain = require("./upVoteDomain");
 const voteComment = require("./voteComment");
+const isAuthorFollowMe = require('./isAuthorFollowMe')
 
 const { createQueuePostTime } = require("./createPostTime");
 const { getFeedChatService } = require("./getFeedChat")
@@ -53,6 +54,7 @@ module.exports = {
   getOpenGraph,
   getReaction,
   inputPoll,
+  isAuthorFollowMe,
   iVoteComment,
   like,
   notificationCommentFeed,
