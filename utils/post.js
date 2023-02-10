@@ -171,8 +171,8 @@ const filterAllTopics = (text, topics = []) => {
     return acc;
   }, []);
 
-  // return [...new Set([...topicsFromTextWithoutHashtag, ...topics])]
-  return topics;
+  return [...new Set([...topicsFromTextWithoutHashtag, ...topics])]
+  // return topics;
 };
 
 /**
