@@ -20,6 +20,7 @@ module.exports = async (req, res) => {
         user_id: req.body.useridFeed
       }
     })
+
     const detailSendUser = await User.findOne({
       where: {
         user_id: req.userId
@@ -34,9 +35,13 @@ module.exports = async (req, res) => {
     notification: {
       title: `${detailSendUser.username} commented on your post`,
       body: body.message,
-      click_action: ".Activities.OpenGflixApp",
+      click_action: "OPEN_ACTIVITY_1",
       image: detailUser.profile_pic_path
     },
+    data: {
+      feed_id: body.activity_id,
+      type: 'feed'
+    }
   };
     if(userToken) {
       messaging().sendToDevice(userToken.token, payload).then((res) => {
