@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
     notification: {
       title: `${detailSendUser.username} commented on your post`,
       body: body.message,
-      // click_action: "OPEN_ACTIVITY_1",
+      click_action: "OPEN_ACTIVITY_1",
       image: detailUser.profile_pic_path
     },
     data: {
