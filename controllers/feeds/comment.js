@@ -2,6 +2,8 @@ const { comment } = require("../../services/getstream");
 const { addForCommentPost } = require("../../services/score");
 const moment = require("moment");
 const QueueTrigger = require("../../services/queue/trigger");
+const {messaging} = require('firebase-admin')
+const { FcmToken, User } = require("../../databases/models");
 
 module.exports = async (req, res) => {
   try {
@@ -13,7 +15,34 @@ module.exports = async (req, res) => {
     if (body.message.length > 80) {
       await countProcess(body.activity_id, { comment_count: +1 }, { comment_count: 1 });
     }
-
+    const detailUser = await User.findOne({
+      where: {
+        user_id: req.body.useridFeed
+      }
+    })
+    const detailSendUser = await User.findOne({
+      where: {
+        user_id: req.userId
+      }
+    })
+    const userToken = await FcmToken.findOne({
+            where: {
+                user_id: req.body.useridFeed
+            }
+        })
+    const payload = {
+    notification: {
+      title: `${detailSendUser.username} commented on your post`,
+      body: body.message,
+      click_action: ".Activities.OpenGflixApp",
+      image: detailUser.profile_pic_path
+    },
+  };
+    if(userToken) {
+      messaging().sendToDevice(userToken.token, payload).then((res) => {
+        console.log(res,'hehe')
+      })
+    }   
     // send queue for scoring processing on comment a post
     const scoringProcessData = {
       comment_id: result.id,
