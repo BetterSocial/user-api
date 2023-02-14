@@ -44,9 +44,11 @@ module.exports = async (req, res) => {
     }
   };
       if(userToken) {
+        if(detailUser.user_id !== detailSendUser.user_id) {
           messaging().sendToDevice(userToken.token, payload).then((res) => {
             console.log(res,'hehe')
           })
+        }
      
     } 
     return res.status(200).json({
