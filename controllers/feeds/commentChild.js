@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         })
     const payload = {
     notification: {
-      title: `${detailSendUser.username}  replied to your comment on ${req.body.postTitle ? req.body.postTitle.substring(0, 20) : ''}`,
+      title: `${detailSendUser.username}  replied to your comment on ${req.body.postTitle ? req.body.postTitle.substring(0, 50) : ''}`,
       body: message,
       click_action: "OPEN_ACTIVITY_1",
       image: detailUser.profile_pic_path
