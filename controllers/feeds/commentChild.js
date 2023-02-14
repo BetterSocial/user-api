@@ -1,7 +1,7 @@
 const { commentChild } = require("../../services/getstream");
 const QueueTrigger = require("../../services/queue/trigger");
 const {messaging} = require('firebase-admin')
-const { FcmToken, User } = require("../../databases/models");
+const { FcmToken, User, Post } = require("../../databases/models");
 
 module.exports = async (req, res) => {
   try {
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         })
     const payload = {
     notification: {
-      title: `${detailSendUser.username} commented on your comment`,
+      title: `${detailSendUser.username}  replied to your comment on ${req.body.postTitle}`,
       body: message,
       click_action: "OPEN_ACTIVITY_1",
       image: detailUser.profile_pic_path
