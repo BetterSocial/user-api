@@ -97,7 +97,9 @@ module.exports = async (req, res) => {
               data: {
                 username: req.body.username_followed,
                 type: 'follow_user',
-                user_id: req.body.user_id_followed
+                user_id: req.body.user_id_followed,
+                user_id_follower: req.body.user_id_follower,
+                username_follower: req.body.username_follower
               }
             };
         if(userToken) {
