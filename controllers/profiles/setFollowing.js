@@ -90,8 +90,8 @@ module.exports = async (req, res) => {
         })
             const payload = {
               notification: {
-                title: req.body.username_followed,
-                body: `${req.body.username_followed} just started following you. Say 'Hi'!`,
+                title: req.body.username_follower,
+                body: `${req.body.username_follower} just started following you. Say 'Hi'!`,
                 click_action: "OPEN_ACTIVITY_1",
               },
               data: {
