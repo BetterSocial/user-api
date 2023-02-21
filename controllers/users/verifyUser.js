@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
         code: 200,
         data: Object.keys(userData).length === 0 ? false : true,
         message: "",
+        is_banned: false,
         token: token,
         refresh_token: refresh_token,
       });
@@ -32,6 +33,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({
         code: 500,
         data: false,
+        is_banned: false,
         message: "User not found",
       });
     }
