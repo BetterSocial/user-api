@@ -6,9 +6,17 @@ const { createRefreshToken } = require("../../services/jwt");
 module.exports = async (req, res) => {
   try {
     const userData = await User.findOne({
-      where: { human_id: req.body.user_id },
+      where: { human_id: req.body.user_id},
     });
     if (userData) {
+      if (userData.is_banned) {
+        return res.status(401).json({
+          code: 401,
+          data: false,
+          is_banned: true,
+          message: "User has banned by admin",
+        });
+      }
       let user_id = userData.user_id;
       let userId = user_id.toLowerCase();
       const token = await getstreamService.createToken(userId);
