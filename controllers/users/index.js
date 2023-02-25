@@ -15,6 +15,7 @@ const userUnblock = require('./userUnblock');
 const varifyTokenGetstream = require('./varifyTokenGetstream');
 const verifyUser = require('./verifyUser');
 const veryfyToken = require('./veryfyToken');
+const fcmToken = require('./fcmToken')
 
 module.exports = {
     blockDomain,
@@ -34,4 +35,5 @@ module.exports = {
     varifyTokenGetstream,
     verifyUser,
     veryfyToken,
+    fcmToken
 };

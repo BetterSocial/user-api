@@ -1,6 +1,7 @@
 const {
   UserFollowUser,
   UserFollowUserHistory,
+  FcmToken
 } = require("../../databases/models");
 const sequelize = require("../../databases/models").sequelize;
 const Validator = require("fastest-validator");
@@ -9,6 +10,7 @@ const { v4: uuidv4 } = require("uuid");
 const v = new Validator();
 const moment = require("moment");
 const { addForFollowUser } = require("../../services/score");
+const {messaging} = require('firebase-admin')
 
 module.exports = async (req, res) => {
   try {
@@ -81,6 +83,30 @@ module.exports = async (req, res) => {
             activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
           };
           await addForFollowUser(scoringProcessData);
+          const userToken = await FcmToken.findOne({
+            where: {
+                user_id: req.body.user_id_followed
+            }
+        })
+            const payload = {
+              notification: {
+                title: req.body.username_follower,
+                body: `${req.body.username_follower} just started following you. Say 'Hi'!`,
+                click_action: "OPEN_ACTIVITY_1",
+              },
+              data: {
+                username: req.body.username_followed,
+                type: 'follow_user',
+                user_id: req.body.user_id_followed,
+                user_id_follower: req.body.user_id_follower,
+                username_follower: req.body.username_follower
+              }
+            };
+        if(userToken) {
+          messaging().sendToDevice(userToken.token, payload).then((res) => {
+            console.log(res,'hehe')
+          })
+        }
 
           return res.status(201).json({
             status: "success",
