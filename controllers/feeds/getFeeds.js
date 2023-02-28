@@ -122,49 +122,49 @@ module.exports = async (req, res) => {
           let dateExpired = new Date(item.expired_at);
 
           // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
-          // if (now < dateExpired || item.duration_feed == "never") {
-          let newItem = modifyAnonimityPost(item);
-          if (item.verb === POST_VERB_POLL) {
-            let postPoll = await modifyPollPostObject(req.userId, item);
-            data.push(postPoll);
-          } else {
-            if (item.post_type === POST_TYPE_LINK) {
-              let domainPageId = item?.og?.domain_page_id;
-              if (domainPageId) {
-                let credderScoreCache =
-                  await RedisDomainHelper.getDomainCredderScore(domainPageId);
-                if (credderScoreCache) {
-                  newItem.credderScore = credderScoreCache;
-                  newItem.credderLastChecked =
-                    await RedisDomainHelper.getDomainCredderLastChecked(
-                      domainPageId
-                    );
-                } else {
-                  let dataDomain = await DomainPage.findOne({
-                    where: { domain_page_id: domainPageId },
-                    raw: true,
-                  });
-
-                  if (dataDomain) {
-                    await RedisDomainHelper.setDomainCredderScore(
-                      domainPageId,
-                      dataDomain?.credder_score
-                    );
-                    await RedisDomainHelper.setDomainCredderLastChecked(
-                      domainPageId,
-                      dataDomain?.credder_last_checked
-                    );
-
-                    newItem.credderScore = dataDomain?.credder_score;
+          if (now < dateExpired || item.duration_feed == "never") {
+            let newItem = modifyAnonimityPost(item);
+            if (item.verb === POST_VERB_POLL) {
+              let postPoll = await modifyPollPostObject(req.userId, item);
+              data.push(postPoll);
+            } else {
+              if (item.post_type === POST_TYPE_LINK) {
+                let domainPageId = item?.og?.domain_page_id;
+                if (domainPageId) {
+                  let credderScoreCache =
+                    await RedisDomainHelper.getDomainCredderScore(domainPageId);
+                  if (credderScoreCache) {
+                    newItem.credderScore = credderScoreCache;
                     newItem.credderLastChecked =
-                      dataDomain?.credder_last_checked;
+                      await RedisDomainHelper.getDomainCredderLastChecked(
+                        domainPageId
+                      );
+                  } else {
+                    let dataDomain = await DomainPage.findOne({
+                      where: { domain_page_id: domainPageId },
+                      raw: true,
+                    });
+
+                    if (dataDomain) {
+                      await RedisDomainHelper.setDomainCredderScore(
+                        domainPageId,
+                        dataDomain?.credder_score
+                      );
+                      await RedisDomainHelper.setDomainCredderLastChecked(
+                        domainPageId,
+                        dataDomain?.credder_last_checked
+                      );
+
+                      newItem.credderScore = dataDomain?.credder_score;
+                      newItem.credderLastChecked =
+                        dataDomain?.credder_last_checked;
+                    }
                   }
                 }
               }
+              data.push(newItem);
             }
-            data.push(newItem);
           }
-          // }
 
           offset++;
 
