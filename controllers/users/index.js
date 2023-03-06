@@ -8,6 +8,7 @@ const demoVerifyUser = require('./demoVerifyUser');
 const populate = require('./populateUser');
 const refreshToken = require('./refreshToken');
 const register = require('./register');
+const registerV2 = require('./register_v2');
 const renameUser = require('./renameUser');
 const showingAudience = require('../users/showingAudienceEstimates');
 const userBlockStatus = require('./userBlockStatus');
@@ -28,6 +29,7 @@ module.exports = {
     populate,
     refreshToken,
     register,
+    registerV2,
     renameUser,
     showingAudience,
     userBlockStatus,

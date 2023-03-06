@@ -30,6 +30,8 @@ const POST_CHECK_AUTHOR_NOT_FOLLOWING = 2;
 const POST_CHECK_FEED_EXPIRED = 3;
 const POST_CHECK_AUTHOR_BLOCKED = 4;
 
+const USERS_DEFAULT_IMAGE = 'https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png';
+
 module.exports = {
   API_PREFIX_V1,
   BLOCK_DOMAIN_KEY,
@@ -54,4 +56,5 @@ module.exports = {
   POST_CHECK_AUTHOR_NOT_FOLLOWING,
   POST_CHECK_FEED_EXPIRED,
   POST_CHECK_AUTHOR_BLOCKED,
+  USERS_DEFAULT_IMAGE
 };

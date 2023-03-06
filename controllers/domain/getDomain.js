@@ -63,11 +63,11 @@ module.exports = async (req, res) => {
             }
           }
 
-          // console.log(item)
+          console.log(item)
 
-          if (item?.domain?.credderScore >= MIN_CREDDER_SCORE) {
+          // if (item?.domain?.credderScore >= MIN_CREDDER_SCORE) {
             data.push(item)
-          }
+          // }
           // const { id, content, content_created_at, domain } = item
           // const { description, domain_page_id, news_link_id, news_url, site_name, title } = content
           // const { image, name } = domain
