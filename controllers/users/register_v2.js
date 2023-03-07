@@ -15,6 +15,8 @@ const { User,
     UserFollowUser,
     UserFollowUserHistory
 } = require("../../databases/models");
+const BetterSocialCore = require("../../services/bettersocial");
+const BetterSocialCreateUser = require("../../services/bettersocial/user/BetterSocialCreateUser");
 const { createRefreshToken } = require("../../services/jwt");
 const { registerServiceQueue } = require("../../services/redis");
 const { addForCreateAccount } = require("../../services/score");
@@ -45,6 +47,11 @@ const registerV2 = async (req, res) => {
     try {
         insertedObject = await sequelize.transaction(async (t) => {
             const user = await UsersFunction.register(User, users, t);
+            const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
+
+            console.log('anonymousUser')
+            console.log(anonymousUser)
+
             const locations = await UserLocationFunction.registerUserLocation(
                 UserLocation,
                 UserLocationHistory,
@@ -72,6 +79,7 @@ const registerV2 = async (req, res) => {
 
             return {
                 user,
+                anonymousUser,
                 locations,
                 topics: topicRegistered,
                 userFollowed
@@ -93,7 +101,10 @@ const registerV2 = async (req, res) => {
      * Creating User to Getstream
      */
     try {        
-        token = await Getstream.createUser(insertedObject?.user);
+        token = await BetterSocialCore.user.createUser(insertedObject?.user);
+        console.log('insertedObject?.anonymousUser')
+        console.log(insertedObject?.anonymousUser)
+        await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
     } catch (e) {
         console.log('error on inserting user to getstream creating', e);
         return res.status(500).json({
