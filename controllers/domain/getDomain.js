@@ -13,6 +13,7 @@ const { getBlockDomain } = require("../../services/domain");
 const { DomainPage } = require("../../databases/models/");
 
 const MIN_CREDDER_SCORE = 50
+const CREDDER_CHECK_ENABLED = false
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH, fetch = MAX_FEED_FETCH_LIMIT_DOMAIN } = req.query
@@ -65,16 +66,17 @@ module.exports = async (req, res) => {
 
           console.log(item)
 
-          // if (item?.domain?.credderScore >= MIN_CREDDER_SCORE) {
+          if (item?.domain?.credderScore >= MIN_CREDDER_SCORE || !CREDDER_CHECK_ENABLED) {
             data.push(item)
-          // }
-          // const { id, content, content_created_at, domain } = item
-          // const { description, domain_page_id, news_link_id, news_url, site_name, title } = content
-          // const { image, name } = domain
+          }
 
-          // elasticNewsLink.putToIndex({
-          //   id, content_created_at, description, domain_page_id, news_link_id, news_url, site_name, title, image, name
-          // })
+          const { id, content, content_created_at, domain } = item
+          const { description, domain_page_id, news_link_id, news_url, site_name, title } = content
+          const { image, name } = domain
+
+          elasticNewsLink.putToIndex({
+            id, content_created_at, description, domain_page_id, news_link_id, news_url, site_name, title, image, name
+          })
 
           offset++;
           if (data.length === limit) break

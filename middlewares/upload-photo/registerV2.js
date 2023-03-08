@@ -2,8 +2,6 @@ const { USERS_DEFAULT_IMAGE } = require("../../helpers/constants");
 const CloudinaryService = require("../../vendor/cloudinary");
 
 const RegisterV2UploadPhotoMiddleware = async (req, res, next) => {
-    const newBody = req.body;
-
     /**
      * @type {RegisterBody}
      */
