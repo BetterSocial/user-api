@@ -65,11 +65,6 @@ const convertingUserFormatForLocation = (locations) => {
          * 5. 
          */
 
-        console.log('item?.neighborhood')
-        console.log(item?.neighborhood)
-        console.log('item?.city')
-        console.log(item?.city)
-
         let neighborhood = convertString(item?.neighborhood?.toLowerCase(), " ", "-");
         let city = convertString(getFirstStringFromSplit(item?.city?.toLowerCase(), ','), " ", "-");
         let state = convertString(item?.state?.toLowerCase(), " ", "-");

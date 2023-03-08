@@ -1,5 +1,6 @@
 const Validator = require("fastest-validator");
 const moment = require("moment");
+const TopicFunction = require("../../databases/functions/topics");
 
 const UserFollowUserFunction = require("../../databases/functions/userFollowUser");
 const UserLocationFunction = require("../../databases/functions/userLocation");
@@ -7,7 +8,9 @@ const UsersFunction = require("../../databases/functions/users");
 const UserTopicFunction = require("../../databases/functions/userTopic");
 const { sequelize } = require("../../databases/models");
 
-const { User,
+const { 
+    Topics,
+    User,
     UserLocation,
     UserLocationHistory,
     UserTopic,
@@ -49,40 +52,12 @@ const registerV2 = async (req, res) => {
             const user = await UsersFunction.register(User, users, t);
             const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
 
-            console.log('anonymousUser')
-            console.log(anonymousUser)
-
-            const locations = await UserLocationFunction.registerUserLocation(
-                UserLocation,
-                UserLocationHistory,
-                user?.user_id,
-                local_community,
-                t
-            );
-
-            const topicRegistered = await UserTopicFunction.registerUserTopic(
-                UserTopic,
-                UserTopicHistory,
-                user?.user_id,
-                topics,
-                t
-            )
-
-            const userFollowed = await UserFollowUserFunction.registerAddFollowUser(
-                UserFollowUser,
-                UserFollowUserHistory,
-                user?.user_id,
-                follows,
-                follow_source,
-                t
-            )
+            const topicRegistered = await TopicFunction.findAllByTopicIds(Topics, topics, t, true);
 
             return {
                 user,
                 anonymousUser,
-                locations,
                 topics: topicRegistered,
-                userFollowed
             };
         });
     } catch (e) {
@@ -102,8 +77,6 @@ const registerV2 = async (req, res) => {
      */
     try {        
         token = await BetterSocialCore.user.createUser(insertedObject?.user);
-        console.log('insertedObject?.anonymousUser')
-        console.log(insertedObject?.anonymousUser)
         await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
     } catch (e) {
         console.log('error on inserting user to getstream creating', e);
@@ -130,22 +103,14 @@ const registerV2 = async (req, res) => {
     /**
      * Creating register user queue
      */
-    try {
-        const queueTopics = insertedObject?.topics?.map((topic) => {
-            let temp = Object.assign({}, topic.dataValues);
-            if (/\s/.test(temp.name)) {
-                return temp.name.split(" ").join("-");
-            }
-    
-            return temp.name;
-        })
-    
+    try {    
         registerServiceQueue(
             token,
             insertedObject?.user?.user_id,
             follows,
-            queueTopics,
-            insertedObject?.locations
+            insertedObject?.topics,
+            local_community,
+            insertedObject?.anonymousUser?.user_id
         );    
     } catch(e) {
         console.log('error on inserting user to queue', e);

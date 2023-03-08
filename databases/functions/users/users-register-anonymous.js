@@ -16,7 +16,6 @@ module.exports = async (model, userId, transaction = null) => {
     const saltedUserId = salt + userId + salt;
     
     const anonymousUsername = crypto.createHash('sha256').update(saltedUserId).digest('hex');
-    console.log('anonymousUsername', anonymousUsername)
     const userIdAnonymous = uuidv4()
     const user = await model.create(
         {

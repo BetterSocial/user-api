@@ -7,8 +7,6 @@ const BetterSocialCreateUser = require("./BetterSocialCreateUser");
  * @returns 
  */
 const BetterSocialCreateAnonymousUser = async (user) => {
-    console.log('user?.user_id')
-    console.log(user?.user_id)
     if(user?.user_id === null || user?.user_id === undefined) throw new Error("user_id is required to create anonymous user");
 
     /**
