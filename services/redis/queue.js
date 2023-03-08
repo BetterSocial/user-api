@@ -163,7 +163,7 @@ const registerQueue = new Bull("registerQueue", connectRedis,
 registerQueue.on('error', (err) => { console.log('posttimeque', /** err **/) });
 registerQueue.on('waiting', (e) => { console.log('postime: ', /** e **/) });
 
-const registerServiceQueue = async (token, userId, follows, topics, locations) => {
+const registerServiceQueue = async (token, userId, follows, topics, locations, myAnonUserId) => {
     // add user To locaitons
     let locationsChannel = convertingUserFormatForLocation(locations);
 
@@ -184,6 +184,7 @@ const registerServiceQueue = async (token, userId, follows, topics, locations) =
         locationsChannel,
         follows,
         topics,
+        anonUserId: myAnonUserId,
         locations
     }
 

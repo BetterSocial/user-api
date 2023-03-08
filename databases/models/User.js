@@ -73,6 +73,10 @@ module.exports = (sequelize, DataTypes) => {
       is_banned: {
         type: DataTypes.BOOLEAN, 
         defaultValue: false,
+      },
+      is_anonymous: {
+        type: DataTypes.BOOLEAN, 
+        defaultValue: false,
       }
     },
     {

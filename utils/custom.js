@@ -2,7 +2,7 @@ const emojiUnicode = require("emoji-unicode");
 const _ = require("lodash");
 
 const convertString = (str, from, to) => {
-    return str.split(from).join(to);
+    return str?.split(from)?.join(to);
 };
 
 const dateCreted = {
@@ -46,8 +46,8 @@ function convertTopicWithEmoji(topic) {
 }
 
 function getFirstStringFromSplit(str, splitChar = ',') {
-
-    const [first, second] = str.split(splitChar);
+    if(!str) return ""; 
+    const [first] = str?.split(splitChar);
     return first;
 }
 
@@ -65,17 +65,17 @@ const convertingUserFormatForLocation = (locations) => {
          * 5. 
          */
 
-        let neighborhood = convertString(item.neighborhood.toLowerCase(), " ", "-");
-        let city = convertString(getFirstStringFromSplit(item.city.toLowerCase(), ','), " ", "-");
-        let state = convertString(item.state.toLowerCase(), " ", "-");
-        let country = convertString(item.country.toLowerCase(), " ", "-");
+        let neighborhood = convertString(item?.neighborhood?.toLowerCase(), " ", "-");
+        let city = convertString(getFirstStringFromSplit(item?.city?.toLowerCase(), ','), " ", "-");
+        let state = convertString(item?.state?.toLowerCase(), " ", "-");
+        let country = convertString(item?.country?.toLowerCase(), " ", "-");
 
-        if (item.location_level.toLowerCase() == 'neighborhood') {
+        if (item?.location_level?.toLowerCase() == 'neighborhood') {
             loc.push(neighborhood);
             loc.push(city);
-        } else if (item.location_level.toLowerCase() == 'city') {
+        } else if (item?.location_level?.toLowerCase() == 'city') {
             loc.push(city);
-        } else if (item.location_level.toLowerCase() == 'state') {
+        } else if (item?.location_level?.toLowerCase() == 'state') {
             loc.push(state);
             loc.push(country);
 
