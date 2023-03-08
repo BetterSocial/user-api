@@ -104,7 +104,7 @@ const registerV2 = async (req, res) => {
      * Creating register user queue
      */
     try {    
-        registerServiceQueue(
+        await registerServiceQueue(
             token,
             insertedObject?.user?.user_id,
             follows,
