@@ -4,7 +4,6 @@ const {
   UserLocation,
   Locations,
 } = require("../../databases/models");
-const crypto = require("crypto");
 
 const checkMoreOrLess = require("../../helpers/checkMoreOrLess")
   .checkMoreOrLess;

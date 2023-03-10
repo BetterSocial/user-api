@@ -37,6 +37,7 @@ router.post("/update-bio/:id", profileController.updateBio);
  * Start of User Anonimity Changes
  */
 router.post("/follow-user", Auth.isAuth, BodyValidationMiddleware.followUserV2, profileController.followUserV2);
+router.post("/unfollow-user", Auth.isAuth, BodyValidationMiddleware.unfollowUserV2, profileController.unfollowUserV2);
 /**
  * End of User Anonimity Changes
  */

@@ -1,6 +1,5 @@
 const changeImageProfile = require("./changeImageProfile");
 const changeRealName = require("./changeRealName");
-const followUserV2 = require('./followUsersV2');
 const following = require("./following");
 const getMyProfile = require("./getMyProfile");
 const getOtherFeedsInProfile = require("./getOtherFeedsInProfile")
@@ -14,10 +13,12 @@ const unSetFollowing = require("./unSetFollowing");
 const updateBio = require("./updateBio");
 const {handleBlock} = require("./blocking")
 
+const followUserV2 = require('./followUsersV2');
+const unfollowUserV2 = require('./unfollowUsersV2');
+
 module.exports = {
   changeImageProfile,
   changeRealName,
-  followUserV2,
   following,
   getMyProfile,
   getOtherFeedsInProfile,
@@ -29,5 +30,8 @@ module.exports = {
   setFollowing,
   unSetFollowing,
   updateBio,
-  handleBlock
+  handleBlock,
+
+  followUserV2,
+  unfollowUserV2
 };

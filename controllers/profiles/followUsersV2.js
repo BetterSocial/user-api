@@ -5,11 +5,12 @@ const ErrorResponse = require("../../utils/Response/ErrorResponse")
 const SuccessResponse = require("../../utils/response/SuccessResponse")
 
 const {
-    UserFollowUser, UserFollowUserHistory, sequelize,
+    UserFollowUser, UserFollowUserHistory, User, sequelize,
 } = require("../../databases/models")
 const Getstream = require("../../vendor/getstream")
 const { addForFollowUser } = require('../../services/score')
 const BetterSocialCore = require('../../services/bettersocial')
+const UsersFunction = require('../../databases/functions/users')
 
 module.exports = async (req, res) => {
     const { user_id_followed, follow_source, username_follower, username_followed } = req?.body
@@ -31,8 +32,12 @@ module.exports = async (req, res) => {
     try {
         await Getstream.feed.followUserExclusive(req?.userId, user_id_followed)
         await Getstream.feed.followUser(req?.token, req?.userId, user_id_followed)
+        
+        const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed)
+        await Getstream.feed.followAnonUser(req?.token, req?.userId, anonymousUser?.user_id)
     } catch (e) {
         console.log('Error in follow user v2 getstream')
+        console.log(e)
         return ErrorResponse.e409(res, e.message)
     }
 
@@ -52,6 +57,7 @@ module.exports = async (req, res) => {
         await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, 'f19ce509-e8ae-405f-91cf-ed19ce1ed96e', username_followed)
     } catch(e) {
         console.log('Error in follow user v2 fcm')
+        console.log(e)
         return ErrorResponse.e409(res, e.message)
     }
     

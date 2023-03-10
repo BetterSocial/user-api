@@ -8,7 +8,7 @@ const { Model } = require("sequelize")
 module.exports = async (fcmTokenModel, userId) => {
     const userTargetToken = await fcmTokenModel.findOne({
         where: {
-            user_id: userIdFollowed
+            user_id: userId
         },
         raw: true
     })

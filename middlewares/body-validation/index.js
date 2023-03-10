@@ -22,6 +22,7 @@ const GenerateBodyValidationMiddleware = (schema) => {
 
 const BodyValidationMiddleware = {
     followUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.followUserV2),
+    unfollowUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
     registerV2: GenerateBodyValidationMiddleware(BodyValidationSchema.registerV2),
 }
 
