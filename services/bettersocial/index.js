@@ -5,6 +5,9 @@ const BetterSocialCore = {
     user: {
         createUser: BetterSocialCreateUser,
         createAnonymousUser: BetterSocialCreateAnonymousUser,
+    },
+    fcmToken: {
+        sendNotification: require('./fcmToken/sendNotification'),
     }
 }
 

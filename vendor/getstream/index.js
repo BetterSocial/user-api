@@ -8,7 +8,10 @@ const Getstream = {
         syncUser: require('./chat/syncUser')
     },
     feed: {
-        
+        followUser: require('./feed/followUser'),
+        followUserExclusive: require('./feed/followUserExclusive'),
+        unfollowUser: require('./feed/unfollowUser'),
+        unfollowUserExclusive: require('./feed/unfollowUserExclusive'),
     }
 }
 

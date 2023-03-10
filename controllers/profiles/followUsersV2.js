@@ -1,11 +1,59 @@
+const moment = require('moment')
+
+const UserFollowUserFunction = require("../../databases/functions/userFollowUser")
 const ErrorResponse = require("../../utils/Response/ErrorResponse")
 const SuccessResponse = require("../../utils/response/SuccessResponse")
 
-module.exports = async(req, res) => {
-    const {user_id_followed, follow_source} = req?.body    
+const {
+    UserFollowUser, UserFollowUserHistory, sequelize,
+} = require("../../databases/models")
+const Getstream = require("../../vendor/getstream")
+const { addForFollowUser } = require('../../services/score')
+const BetterSocialCore = require('../../services/bettersocial')
 
-    console.log(req?.userId)
-    if(req?.userId === user_id_followed) return ErrorResponse.e403(res, "You can't follow yourself")
+module.exports = async (req, res) => {
+    const { user_id_followed, follow_source, username_follower, username_followed } = req?.body
+
+    if (req?.userId === user_id_followed) return ErrorResponse.e403(res, "Only allow following other profiles")
+
+    if (await UserFollowUserFunction.checkIsUserFollowing(UserFollowUser, req?.userId, user_id_followed)) return ErrorResponse.e409(res, "You have followed this user")
+
+    try {
+        await sequelize.transaction(async (t) => {
+            const userFollowUser = await UserFollowUserFunction.registerAddFollowUser(UserFollowUser, UserFollowUserHistory,req?.userId, [user_id_followed], follow_source, t)
+            return userFollowUser
+        })
+    } catch (e) {
+        console.log('Error in follow user v2 sql transaction')
+        return ErrorResponse.e409(res, e.message)
+    }
+
+    try {
+        await Getstream.feed.followUserExclusive(req?.userId, user_id_followed)
+        await Getstream.feed.followUser(req?.token, req?.userId, user_id_followed)
+    } catch (e) {
+        console.log('Error in follow user v2 getstream')
+        return ErrorResponse.e409(res, e.message)
+    }
+
+    try {
+        await addForFollowUser({
+            user_id: req?.user_id,
+            followed_user_id: user_id_followed,
+            activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+        });
+    } catch (e) {
+        console.log('Error in follow user v2 scoring')
+        return ErrorResponse.e409(res, e.message)
+    }
+
+    try {
+        // await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, user_id_followed, username_followed)
+        await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, 'f19ce509-e8ae-405f-91cf-ed19ce1ed96e', username_followed)
+    } catch(e) {
+        console.log('Error in follow user v2 fcm')
+        return ErrorResponse.e409(res, e.message)
+    }
     
     return SuccessResponse(res, {
         message: "User has been followed successfully"
