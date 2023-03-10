@@ -15,22 +15,28 @@ module.exports = async (req, res) => {
     if (body.message.length > 80) {
       await countProcess(body.activity_id, { comment_count: +1 }, { comment_count: 1 });
     }
-    const detailUser = await User.findOne({
+    let detailUser = {}
+    if(req.body.useridFeed) {
+      detailUser = await User.findOne({
       where: {
         user_id: req.body.useridFeed
       }
     })
-
+    }
     const detailSendUser = await User.findOne({
       where: {
         user_id: req.userId
       }
     })
-    const userToken = await FcmToken.findOne({
+    let userToken = null
+    if(req.body.useridFeed) {
+          userToken = await FcmToken.findOne({
             where: {
                 user_id: req.body.useridFeed
             }
         })
+    }
+
     const payload = {
     notification: {
       title: `${detailSendUser.username} commented on your post`,
@@ -44,9 +50,12 @@ module.exports = async (req, res) => {
     }
   };
     if(userToken) {
-      messaging().sendToDevice(userToken.token, payload).then((res) => {
+      if(detailUser.user_id !== detailSendUser.user_id) {
+        messaging().sendToDevice(userToken.token, payload).then((res) => {
         console.log(res,'hehe')
       })
+      }
+  
     }   
     // send queue for scoring processing on comment a post
     const scoringProcessData = {
