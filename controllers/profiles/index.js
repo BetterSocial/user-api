@@ -13,6 +13,9 @@ const unSetFollowing = require("./unSetFollowing");
 const updateBio = require("./updateBio");
 const {handleBlock} = require("./blocking")
 
+const followUserV2 = require('./followUsersV2');
+const unfollowUserV2 = require('./unfollowUsersV2');
+
 module.exports = {
   changeImageProfile,
   changeRealName,
@@ -27,5 +30,8 @@ module.exports = {
   setFollowing,
   unSetFollowing,
   updateBio,
-  handleBlock
+  handleBlock,
+
+  followUserV2,
+  unfollowUserV2
 };

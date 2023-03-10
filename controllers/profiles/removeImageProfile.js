@@ -6,7 +6,7 @@ const v = new Validator();
 module.exports = async (req, res) => {
   try {
 
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findByPk(req?.userId);
     if (user === null) {
       return res.status(404).json({
         code: 404,
@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
           updated_at: myTs,
         },
         {
-          where: { user_id: req.params.id },
+          where: { user_id: req?.userId },
           returning: true, // needed for affectedRows to be populated
           plain: true, // makes sure that the returned instances are just plain objects
         }

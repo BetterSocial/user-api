@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
     }
     let { profile_pic_path } = req.body;
 
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findByPk(req?.userId);
     if (user === null) {
       return res.status(404).json({
         code: 404,
@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
           let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
           console.log(req.params)
           console.log(user.toJSON())
-          updateUser(req.params.id, {
+          updateUser(req?.userId, {
             username : user.username,
             human_id : user.human_id,
             profile_pic_url: returnCloudinary.secure_url
@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
               updated_at: myTs,
             },
             {
-              where: { user_id: req.params.id },
+              where: { user_id: req?.userId },
               returning: true, // needed for affectedRows to be populated
               plain: true, // makes sure that the returned instances are just plain objects
             }

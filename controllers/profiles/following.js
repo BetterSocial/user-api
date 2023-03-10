@@ -8,7 +8,7 @@ const { QueryTypes } = require("sequelize");
 const config = require("../../databases/config/database.js")[env];
 
 module.exports = async (req, res) => {
-  let id = req.params.id;
+  let id = req.userId;
   console.log(id);
   let sequelize;
   if (config.use_env_variable) {
