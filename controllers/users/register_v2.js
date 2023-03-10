@@ -21,7 +21,7 @@ const {
 const BetterSocialCore = require("../../services/bettersocial");
 const BetterSocialCreateUser = require("../../services/bettersocial/user/BetterSocialCreateUser");
 const { createRefreshToken } = require("../../services/jwt");
-const { registerServiceQueue } = require("../../services/redis");
+const { registerV2ServiceQueue } = require("../../services/redis");
 const { addForCreateAccount } = require("../../services/score");
 const Getstream = require("../../vendor/getstream");
 
@@ -104,7 +104,7 @@ const registerV2 = async (req, res) => {
      * Creating register user queue
      */
     try {    
-        await registerServiceQueue(
+        await registerV2ServiceQueue(
             token,
             insertedObject?.user?.user_id,
             follows,

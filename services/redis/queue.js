@@ -160,6 +160,16 @@ const registerQueue = new Bull("registerQueue", connectRedis,
         }
     }
 );
+
+const registerV2Queue = new Bull("registerV2", connectRedis,
+    {
+        redis: {
+            tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
+            maxRetriesPerRequest: 100,
+            connectTimeout: 30000
+        }
+    }
+);
 registerQueue.on('error', (err) => { console.log('posttimeque', /** err **/) });
 registerQueue.on('waiting', (e) => { console.log('postime: ', /** e **/) });
 
@@ -197,6 +207,31 @@ const registerServiceQueue = async (token, userId, follows, topics, locations, m
     return status;
 }
 
+const registerV2ServiceQueue = async (token, userId, follows, topics, locations, myAnonUserId) => {
+    let locationsChannel = convertingUserFormatForLocation(locations);
+
+    let data = {
+        token,
+        userId,
+        locationsChannel,
+        follows,
+        topics,
+        anonUserId: myAnonUserId,
+        locations
+    }
+
+    const options = {
+        jobId: uuidv4(),
+        removeOnComplete: true,
+    };
+
+    try {
+        let status = registerV2Queue.add(data, options);
+    } catch(e) {
+        console.log('error', e)
+    }
+}
+
 
 module.exports = {
     //postTimeQueue,
@@ -208,4 +243,5 @@ module.exports = {
     addUserToTopicChannel,
     // prepopulatedDmQueue,
     registerServiceQueue,
+    registerV2ServiceQueue,
 };
