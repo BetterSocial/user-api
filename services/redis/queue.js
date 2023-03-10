@@ -226,7 +226,7 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
     };
 
     try {
-        let status = registerV2Queue.add(data, options);
+        registerV2Queue.add(data, options);
     } catch(e) {
         console.log('error', e)
     }
