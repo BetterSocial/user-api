@@ -13,7 +13,6 @@ const BetterSocialCreateAnonymousUser = async (user) => {
      * @type {GetstreamCreateUserParam}
      */
     const anonymousUser = {
-        human_id: '',
         profile_pic_url: '',
         username: '',
         user_id: user?.user_id,
