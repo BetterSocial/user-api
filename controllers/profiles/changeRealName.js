@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findByPk(req.userId);
     let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     if (user === null) {
       return res.status(404).json({
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
           updated_at: myTs,
         },
         {
-          where: { user_id: req.params.id },
+          where: { user_id: req.userId },
           returning: true, // needed for affectedRows to be populated
           plain: true, // makes sure that the returned instances are just plain objects
         }

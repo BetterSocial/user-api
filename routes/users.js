@@ -2,12 +2,12 @@ var express = require('express');
 var router = express.Router();
 const usersHandler = require('../controllers/users');
 const auth = require('../middlewares/auth');
-const RegisterV2BodyValidationMiddleware = require('../middlewares/body-validation/registerV2');
+const BodyValidationMiddleware = require('../middlewares/body-validation');
 const RegisterV2UploadPhotoMiddleware = require('../middlewares/upload-photo/registerV2');
 
 router.post('/check-username', usersHandler.checkUsername);
 router.post('/register', usersHandler.register);
-router.post('/register-v2', RegisterV2BodyValidationMiddleware, RegisterV2UploadPhotoMiddleware, usersHandler.registerV2);
+router.post('/register-v2', BodyValidationMiddleware.registerV2, RegisterV2UploadPhotoMiddleware, usersHandler.registerV2);
 router.post('/demo-verify-user', usersHandler.demoVerifyUser);
 router.post('/verify-user', usersHandler.verifyUser);
 router.get('/veryfy-token', usersHandler.veryfyToken);

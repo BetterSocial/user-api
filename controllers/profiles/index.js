@@ -1,5 +1,6 @@
 const changeImageProfile = require("./changeImageProfile");
 const changeRealName = require("./changeRealName");
+const followUserV2 = require('./followUsersV2');
 const following = require("./following");
 const getMyProfile = require("./getMyProfile");
 const getOtherFeedsInProfile = require("./getOtherFeedsInProfile")
@@ -16,6 +17,7 @@ const {handleBlock} = require("./blocking")
 module.exports = {
   changeImageProfile,
   changeRealName,
+  followUserV2,
   following,
   getMyProfile,
   getOtherFeedsInProfile,

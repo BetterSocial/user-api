@@ -4,11 +4,13 @@ const {
   UserLocation,
   Locations,
 } = require("../../databases/models");
+const crypto = require("crypto");
+
 const checkMoreOrLess = require("../../helpers/checkMoreOrLess")
   .checkMoreOrLess;
 module.exports = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id, {
+    const user = await User.findByPk(req.userId, {
       include: [
         {
           model: UserFollowUser,
