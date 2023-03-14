@@ -1,6 +1,6 @@
 const { commentChild } = require("../../services/getstream");
 const QueueTrigger = require("../../services/queue/trigger");
-const {messaging} = require('firebase-admin')
+const {messaging, firestore} = require('firebase-admin')
 const { FcmToken, User, Post } = require("../../databases/models");
 
 module.exports = async (req, res) => {
@@ -31,12 +31,16 @@ module.exports = async (req, res) => {
                 user_id: req.body.useridFeed
             }
         })
+        const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.userId).get()
+    const {badgeCount} = await getBadge.data()
+    console.log(badgeCount, 'susu')
     const payload = {
     notification: {
       title: `${detailSendUser.username}  replied to your comment on ${req.body.postTitle ? req.body.postTitle.substring(0, 50) : ''}`,
       body: message,
       click_action: "OPEN_ACTIVITY_1",
-      image: detailUser.profile_pic_path
+      image: detailUser.profile_pic_path,
+      badge: String(badgeCount + 1)
     },
     data: {
       feed_id: req.body.activityId,
