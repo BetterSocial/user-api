@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
                 user_id: req.body.useridFeed
             }
         })
-        const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.userId).get()
+        const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.body.useridFeed).get()
     const {badgeCount} = await getBadge.data()
     console.log(badgeCount, 'susu')
     const payload = {

@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
             }
         })
     }
-    const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.userId).get()
+    const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.body.useridFeed).get()
     const {badgeCount} = await getBadge.data()
     const payload = {
     notification: {
