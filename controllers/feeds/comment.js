@@ -36,15 +36,15 @@ module.exports = async (req, res) => {
             }
         })
     }
-    const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.body.useridFeed).get()
-    const {badgeCount} = await getBadge.data()
+    // const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.body.useridFeed).get()
+    // const {badgeCount} = await getBadge.data()
     const payload = {
     notification: {
       title: `${detailSendUser.username} commented on your post`,
       body: body.message,
       click_action: "OPEN_ACTIVITY_1",
       image: detailUser.profile_pic_path,
-      badge: String(badgeCount + 1)
+      // badge: String(badgeCount + 1)
     },
     data: {
       feed_id: body.activity_id,
