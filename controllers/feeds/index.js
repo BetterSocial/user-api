@@ -5,6 +5,7 @@ const commentChild = require("./commentChild");
 const commentDomain = require('./commentDomain')
 const createPollPost = require("./createPollPost");
 const createPost = require("./createPost");
+const createPostV2 = require("./createPostV2");
 const createReaction = require("./createReaction");
 const deleteFeed = require("./deleteFeed");
 const deletePost = require("./deletePost")
@@ -39,6 +40,7 @@ module.exports = {
   commentDomain,
   createPollPost,
   createPost,
+  createPostV2,
   createQueuePostTime,
   createReaction,
   deleteFeed,

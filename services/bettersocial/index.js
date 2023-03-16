@@ -8,6 +8,10 @@ const BetterSocialCore = {
     },
     fcmToken: {
         sendNotification: require('./fcmToken/sendNotification'),
+    },
+    post: {
+        createPost: require('./post/createPost'),
+        createPollPost: require('./post/createPollPost'),
     }
 }
 

@@ -24,6 +24,8 @@ const BodyValidationMiddleware = {
     followUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.followUserV2),
     unfollowUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
     registerV2: GenerateBodyValidationMiddleware(BodyValidationSchema.registerV2),
+    createPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createPostV2),
+    createPollPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createPollPostV2),
 }
 
 module.exports =  BodyValidationMiddleware;
