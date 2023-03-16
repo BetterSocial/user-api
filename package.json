@@ -6,7 +6,8 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
     "test": "jest __tests__",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "update-env-dev": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config dev > .env.development"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
