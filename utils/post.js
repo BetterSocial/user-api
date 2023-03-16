@@ -6,7 +6,7 @@ const {
 } = require("../databases/models");
 const { NO_POLL_OPTION_UUID } = require("../helpers/constants");
 const _ = require("lodash");
-const uuid = require("uuid").v4;
+const moment = require('moment')
 
 /**
  *
@@ -15,36 +15,37 @@ const uuid = require("uuid").v4;
  */
 
 const formatLocationGetStream = require("../helpers/formatLocationGetStream");
-const { convertTopicWithEmoji } = require("./custom");
 
-const handleCreatePostTO = (userId, postBody) => {
+const handleCreatePostTO = (userId, postBody, isAnonimous = true) => {
   let { privacy, topics, location, message, tagUsers } = postBody;
   let TO = [];
   if (tagUsers && Array.isArray(tagUsers)) {
     const mapTagUser = tagUsers.map((user) => `notification:${user}`);
     TO.push(...mapTagUser);
   }
+  
   TO.push(`main_feed:${userId}`);
   TO.push(`notification:${userId}`);
   TO.push("user:bettersocial");
 
-  if (privacy.toLowerCase() === "public") {
-    TO.push(`user:${userId}`);
-    TO.push("location:everywhere");
-
-    if (topics !== null) {
-      filterAllTopics(message, topics).map((value) => {
-        TO.push("topic:" + value);
-      });
-    }
-
-    if (location !== null) {
-      let loc = formatLocationGetStream(location);
-      TO.push("location:" + loc);
-    }
+  if (topics !== null) {
+    filterAllTopics(message, topics).forEach((value) => {
+      TO.push("topic:" + value);
+    });
   }
-  const removeDupilcate = _.union(TO);
-  return removeDupilcate;
+
+  if (privacy.toLowerCase() === "public") {
+    if (!isAnonimous) TO.push(`user:${userId}`);
+    TO.push("location:everywhere");
+  }
+
+  if (location !== null) {
+    let loc = formatLocationGetStream(location);
+    TO.push("location:" + loc);
+  }
+
+  const removeDuplicate = _.union(TO);
+  return removeDuplicate;
 };
 
 const modifyPollPostObject = async (userId, item) => {
@@ -94,18 +95,6 @@ const modifyAnonymousAndBlockPost = async (
   listPostAnonymous
 ) => {
   let listBlock = String(listBlockUser + listBlockDomain);
-  // let yFilter = listBlockUser.map((itemY) => {
-  //   return itemY.user_id_blocked;
-  // });
-  // let filteredX = feeds.filter(
-  //   (itemX) => !yFilter.includes(itemX.actor.id)
-  // );
-  // let newArr = feeds.reduce((feed, current) => {
-  //   if (!yFilter.includes(current.actor.id)) {
-  //     feed.push(current);
-  //   }
-  //   return feed;
-  // }, []);
 
   let newArr = await _.filter(feeds, function (o) {
     return !listBlock.includes(o?.actor?.id);
@@ -192,7 +181,7 @@ const insertTopics = async (topics = []) => {
       parseInt(lastTopic.topic_id) + parseInt(index) + parseInt(1);
 
     try {
-      let result = await Topics.findOrCreate({
+      await Topics.findOrCreate({
         where: { name: topic },
         defaults: {
           topic_id: topicIndex,
@@ -210,6 +199,17 @@ const insertTopics = async (topics = []) => {
   }
 };
 
+function getFeedDuration(durationFeed) {
+  let expiredAt = null;
+
+  if (durationFeed !== "never") {
+    let dateMoment = moment().add(durationFeed, 'days');
+    expiredAt = dateMoment.toISOString();
+  }
+
+  return expiredAt
+}
+
 module.exports = {
   filterAllTopics,
   handleCreatePostTO,
@@ -218,4 +218,5 @@ module.exports = {
   modifyAnonimityPost,
   modifyAnonymousAndBlockPost,
   modifyPollPostObject,
+  getFeedDuration
 };

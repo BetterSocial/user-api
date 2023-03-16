@@ -1,11 +1,20 @@
 const Stream = require('getstream');
 
-const GetstreamSingleton = (() =>{
+const GetstreamSingleton = (() => {
     let instance;
+    let clientInstance;
+    const apiKey = process.env.API_KEY
+    const secret = process.env.SECRET
+    const appId = process.env.APP_ID
 
-    function createInstance(){
-        const client = Stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);
+    function createInstance() {
+        const client = Stream.connect(apiKey, secret, appId);
         return client;
+    }
+
+    function createClientInstance(clientToken) {
+        const client = Stream.connect(apiKey, clientToken, appId);
+        return client
     }
 
     return {
@@ -14,10 +23,19 @@ const GetstreamSingleton = (() =>{
          * @returns {Stream.StreamClient}
          */
         getInstance: () => {
-            if(!instance){
+            if (!instance) {
                 instance = createInstance();
             }
             return instance;
+        },
+
+        /**
+         * 
+         * @returns {Stream.StreamClient}
+         */
+        getClientInstance: (clientToken) => {
+            clientInstance = createClientInstance(clientToken);
+            return clientInstance;
         }
     }
 })()

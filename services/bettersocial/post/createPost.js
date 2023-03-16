@@ -1,12 +1,13 @@
 const moment = require('moment')
 
 const UsersFunction = require("../../../databases/functions/users");
-const { filterAllTopics, handleCreatePostTO, insertTopics } = require("../../../utils/post");
+const { filterAllTopics, handleCreatePostTO, insertTopics, getFeedDuration } = require("../../../utils/post");
 const CloudinaryService = require("../../../vendor/cloudinary");
 const { User, Locations } = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
 const { POST_TYPE_STANDARD } = require('../../../helpers/constants');
+const { addForCreatePost } = require('../../score');
 
 /**
  * 
@@ -18,35 +19,48 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     const { userId, body } = req
     const filteredTopics = filterAllTopics(body?.message, body?.topics)
 
+
     let userDetail = {};
-    if (isAnonimous) userDetail = await UsersFunction.findAnonymousUserId(User, userId);
-    else userDetail = await UsersFunction.findUserById(User, userId);
+    let data = {}
+    let locationDetail = {}
+    let post = {}
 
-    const getstreamObjectParam = generateDefaultGetstreamObject(body, isAnonimous, userDetail)
-    const uploadedImages = await uploadImages(body?.images_url);
-
-    const feedExpiredAt = getFeedDuration(body?.duration_feed)
-    const locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id)
-
-    let data = {
-        verb: body?.verb,
-        message: body?.message,
-        topics: filteredTopics,
-        privacy: body?.privacy,
-        object: getstreamObjectParam,
-        anonimity: isAnonimous,
-        location: body?.location,
-        duration_feed: feedExpiredAt,
-        images_url: uploadedImages,
-        expired_at: feedExpiredAt,
-        count_upvote: 0,
-        count_downvote: 0,
-        post_type: POST_TYPE_STANDARD,
-        to: handleCreatePostTO(req?.userId, req?.body),
+    try {
+        if (isAnonimous) userDetail = await UsersFunction.findAnonymousUserId(User, userId);
+        else userDetail = await UsersFunction.findUserById(User, userId);
+    
+        const getstreamObjectParam = generateDefaultGetstreamObject(body, isAnonimous, userDetail)
+        const uploadedImages = await CloudinaryService.uploadBase64Array(body?.images_url);
+    
+        const feedExpiredAt = getFeedDuration(body?.duration_feed)
+        locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id)
+    
+        data = {
+            verb: body?.verb,
+            message: body?.message,
+            topics: filteredTopics,
+            privacy: body?.privacy,
+            object: getstreamObjectParam,
+            anonimity: isAnonimous,
+            location: body?.location,
+            duration_feed: feedExpiredAt,
+            images_url: uploadedImages,
+            expired_at: feedExpiredAt,
+            count_upvote: 0,
+            count_downvote: 0,
+            post_type: POST_TYPE_STANDARD,
+            to: handleCreatePostTO(req?.userId, req?.body),
+        }
+    
+    } catch(e) {
+        console.log(e)
+        return null
     }
 
     try {
-        let post = await Getstream.feed.createPost(req?.token, data)
+        if(isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
+        else post = await Getstream.feed.createPost(req?.token, data);
+
         insertTopics(filteredTopics)
         const scoringProcessData = {
             feed_id: post?.id,
@@ -58,7 +72,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             topics: data?.topics,
             privacy: data?.privacy,
             anonimity: data?.anonimity,
-            location_level: location,
+            location_level: body?.location,
             duration_feed: data?.duration_feed,
             expired_at: (data?.expired_at) ? moment.utc(data?.expired_at).format("YYYY-MM-DD HH:mm:ss") : "",
             images_url: data?.images_url,
@@ -67,6 +81,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
         addForCreatePost(scoringProcessData);
         return post
     } catch (e) {
+        console.log(e)
         return null
     }
 
@@ -92,27 +107,4 @@ function generateDefaultGetstreamObject(body, isAnonimous = true, userDetail = n
     }
 
     return defaultGetstreamObject
-}
-
-async function uploadImages(imagesUrl) {
-    let cloudinaryLinkArray = []
-
-    for (const url of imagesUrl) {
-        const uploadStr = "data:image/jpeg;base64," + url;
-        let returnCloudinary = await CloudinaryService.uploadBase64(uploadStr)
-        cloudinaryLinkArray.push(returnCloudinary.secure_url)
-    }
-
-    return cloudinaryLinkArray
-}
-
-function getFeedDuration(durationFeed) {
-    let expiredAt = null;
-
-    if (durationFeed !== "never") {
-        let dateMoment = moment().add(durationFeed, 'days');
-        expiredAt = dateMoment.toISOString();
-    }
-
-    return expiredAt
 }
