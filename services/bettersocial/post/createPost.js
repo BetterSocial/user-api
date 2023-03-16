@@ -6,7 +6,7 @@ const CloudinaryService = require("../../../vendor/cloudinary");
 const { User, Locations } = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
-const { POST_TYPE_STANDARD } = require('../../../helpers/constants');
+const { POST_TYPE_STANDARD, POST_TYPE_POLL } = require('../../../helpers/constants');
 const { addForCreatePost } = require('../../score');
 
 /**
@@ -25,16 +25,25 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     let locationDetail = {}
     let post = {}
 
+    const isPollPost = body?.verb === POST_TYPE_POLL
+
     try {
+        if(isPollPost) {
+            return {
+                success: false,
+                message: "Poll post is not supported yet"
+            }
+        }
+
         if (isAnonimous) userDetail = await UsersFunction.findAnonymousUserId(User, userId);
         else userDetail = await UsersFunction.findUserById(User, userId);
-    
+
         const getstreamObjectParam = generateDefaultGetstreamObject(body, isAnonimous, userDetail)
         const uploadedImages = await CloudinaryService.uploadBase64Array(body?.images_url);
-    
+
         const feedExpiredAt = getFeedDuration(body?.duration_feed)
         locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id)
-    
+
         data = {
             verb: body?.verb,
             message: body?.message,
@@ -51,14 +60,28 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             post_type: POST_TYPE_STANDARD,
             to: handleCreatePostTO(req?.userId, req?.body),
         }
-    
-    } catch(e) {
+
+        if (body?.verb === POST_TYPE_POLL) {
+            data = {
+                ...data,
+                polling_id: pollId,
+                polls: pollsOptionUUIDs,
+                post_type: POST_TYPE_POLL,
+                polls_expired_at: getPollsDurationInIso(body?.polls_duration),
+                multiplechoice: body?.multiplechoice,
+            }
+        }
+
+    } catch (e) {
         console.log(e)
-        return null
+        return {
+            isSuccess: false,
+            message: e.message
+        }
     }
 
     try {
-        if(isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
+        if (isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
         else post = await Getstream.feed.createPost(req?.token, data);
 
         insertTopics(filteredTopics)
@@ -67,7 +90,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             foreign_id: data?.foreign_id,
             time: post?.time,
             user_id: userDetail.user_id,
-            location: locationDetail?.location_level || "", 
+            location: locationDetail?.location_level || "",
             message: data?.message,
             topics: data?.topics,
             privacy: data?.privacy,
@@ -79,10 +102,16 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             created_at: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
         }
         addForCreatePost(scoringProcessData);
-        return post
+        return {
+            isSuccess: true,
+            message: "Post created successfully",
+        }
     } catch (e) {
         console.log(e)
-        return null
+        return {
+            isSuccess: false,
+            message: e.message
+        }
     }
 
 }
@@ -107,4 +136,15 @@ function generateDefaultGetstreamObject(body, isAnonimous = true, userDetail = n
     }
 
     return defaultGetstreamObject
+}
+
+function getPollsDurationInIso(pollsDuration) {
+    const { day, hour, minute } = pollsDuration
+    const pollsDurationInIso = moment.utc()
+        .add(day, 'days')
+        .add(hour, 'hours')
+        .add(minute, 'minutes')
+        .toISOString()
+
+    return pollsDurationInIso
 }

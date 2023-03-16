@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     const { anonimity } = req?.body
     let response = await BetterSocialCore.post.createPost(req, anonimity)
     
-    if(!response) return ErrorResponse.e500(res, "Failed to create post") 
+    if(!response?.isSuccess) return ErrorResponse.e500(res, "Failed to create post \n" + response?.message) 
     return SuccessResponse(res, "Post created successfully")
   } catch (e) {
     return ErrorResponse.e500(res, e.message)

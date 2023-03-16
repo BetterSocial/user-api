@@ -50,6 +50,8 @@ const handleCreatePostTO = (userId, postBody, isAnonimous = true) => {
 
 const modifyPollPostObject = async (userId, item) => {
   let post = { ...item };
+  if(!item?.polls) return post;
+  
   let pollOptions = await PollingOption.findAll({
     where: {
       polling_option_id: item.polls,
