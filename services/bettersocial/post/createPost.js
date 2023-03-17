@@ -109,6 +109,20 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
                 expired_at: pollExpiredAt,
             }
         }
+
+        /**
+         * Process if Anonymous Post
+         */
+        if(isAnonimous) {
+            data = {
+                ...data,
+                anon_user_info_color_name: body?.anon_user_info?.color_name,
+                anon_user_info_color_code: body?.anon_user_info?.color_code,
+                anon_user_info_emoji_name: body?.anon_user_info?.emoji_name,
+                anon_user_info_emoji_code: body?.anon_user_info?.emoji_code,
+            }
+        }
+
     } catch (e) {
         console.log(e)
         return {
