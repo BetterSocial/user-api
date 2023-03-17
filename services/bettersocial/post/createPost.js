@@ -3,11 +3,13 @@ const moment = require('moment')
 const UsersFunction = require("../../../databases/functions/users");
 const { filterAllTopics, handleCreatePostTO, insertTopics, getFeedDuration } = require("../../../utils/post");
 const CloudinaryService = require("../../../vendor/cloudinary");
-const { User, Locations } = require('../../../databases/models');
+const { User, Locations, sequelize } = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
-const { POST_TYPE_STANDARD, POST_TYPE_POLL } = require('../../../helpers/constants');
+const { POST_TYPE_STANDARD, POST_TYPE_POLL, POST_VERB_POLL } = require('../../../helpers/constants');
 const { addForCreatePost } = require('../../score');
+const PostFunction = require('../../../databases/functions/post');
+const PollingFunction = require('../../../databases/functions/polling');
 
 /**
  * 
@@ -19,22 +21,17 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     const { userId, body } = req
     const filteredTopics = filterAllTopics(body?.message, body?.topics)
 
-
     let userDetail = {};
     let data = {}
     let locationDetail = {}
     let post = {}
 
-    const isPollPost = body?.verb === POST_TYPE_POLL
+    const isPollPost = body?.verb === POST_VERB_POLL
 
     try {
-        if(isPollPost) {
-            return {
-                success: false,
-                message: "Poll post is not supported yet"
-            }
-        }
-
+        /**
+         * Base Post Process
+         */
         if (isAnonimous) userDetail = await UsersFunction.findAnonymousUserId(User, userId);
         else userDetail = await UsersFunction.findUserById(User, userId);
 
@@ -58,20 +55,60 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             count_upvote: 0,
             count_downvote: 0,
             post_type: POST_TYPE_STANDARD,
-            to: handleCreatePostTO(req?.userId, req?.body),
+            to: handleCreatePostTO(req?.userId, req?.body, isAnonimous),
         }
 
-        if (body?.verb === POST_TYPE_POLL) {
+        /**
+         * Process if Poll Post
+         */
+        if (isPollPost) {
+            const pollExpiredAt = getPollPostExpiredAt(body?.pollsduration, body?.duration_feed)
+            if (!pollExpiredAt) return {
+                isSuccess: false,
+                message: "Polling duration cannot be more than post expiration date"
+            }
+
+            const postDate = moment().toISOString()
+
+            const [pollingId, pollsOptionUUIDs] = await sequelize.transaction(async (transaction) => {
+                const postId = await PostFunction.createPollPost(sequelize, {
+                    userId: req?.userId,
+                    anonimity: isAnonimous,
+                    createdAt: postDate,
+                    updatedAt: postDate,
+                    expiredAt: pollExpiredAt,
+                    resUrl: '',
+                }, transaction)
+
+                const pollingId = await PollingFunction.createPollingByPostId(sequelize, {
+                    createdAt: postDate,
+                    updatedAt: postDate,
+                    message: body?.message,
+                    multiplechoice: body?.multiplechoice,
+                    postId: postId,
+                    userId: req?.userId,
+                }, transaction)
+
+                const optionsUUIDs = await PollingFunction.createPollingOptionsByPollId(sequelize, {
+                    polls: body?.polls,
+                    createdAt: postDate,
+                    updatedAt: postDate,
+                    pollId: pollingId,
+                }, transaction)
+
+                return [pollingId, optionsUUIDs]
+            })
+
             data = {
                 ...data,
-                polling_id: pollId,
+                polling_id: pollingId,
                 polls: pollsOptionUUIDs,
                 post_type: POST_TYPE_POLL,
-                polls_expired_at: getPollsDurationInIso(body?.polls_duration),
+                polls_expired_at: getPollsDurationInIso(body?.pollsduration),
                 multiplechoice: body?.multiplechoice,
+                expired_at: pollExpiredAt,
             }
         }
-
     } catch (e) {
         console.log(e)
         return {
@@ -147,4 +184,18 @@ function getPollsDurationInIso(pollsDuration) {
         .toISOString()
 
     return pollsDurationInIso
+}
+
+function getPollPostExpiredAt(pollsDuration, durationFeed) {
+    console.log('pollsDuration, durationFeed')
+    console.log(pollsDuration, durationFeed)
+    if (durationFeed !== 'never') {
+        const pollDurationMoment = getPollsDurationInIso(pollsDuration)
+        const pollExpiredAt = moment().add(durationFeed, 'days')
+        if (moment(pollDurationMoment).isAfter(pollExpiredAt)) return null;
+
+        return pollExpiredAt.toISOString()
+    } else {
+        return moment().add(100, 'years').toISOString()
+    }
 }

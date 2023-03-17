@@ -12,11 +12,11 @@ const Redis = require("ioredis");
  * this is for production
  */
 const client = new Redis(String(process.env.REDIS_URL), {
-  // tls: {
-  //   rejectUnauthorized: false,
-  //   requestCert: true,
-  //   agent: false,
-  // },
+  tls: {
+    rejectUnauthorized: false,
+    requestCert: true,
+    agent: false,
+  },
 });
 client.on("connect", function () {
   console.log(process.env.REDIS_URL);
