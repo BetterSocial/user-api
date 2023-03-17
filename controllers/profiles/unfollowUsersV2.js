@@ -1,7 +1,7 @@
 const moment = require('moment')
 
 const UserFollowUserFunction = require("../../databases/functions/userFollowUser")
-const ErrorResponse = require("../../utils/Response/ErrorResponse")
+const ErrorResponse = require("../../utils/response/ErrorResponse")
 const SuccessResponse = require("../../utils/response/SuccessResponse")
 
 const {

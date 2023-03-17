@@ -1,11 +1,12 @@
 require("dotenv").config();
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
-var swaggerUi = require("swagger-ui-express");
-const { initializeApp, cert } = require('firebase-admin/app');
-const serviceAccount = require('./service-account.json')
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const swaggerUi = require("swagger-ui-express");
+const { initializeApp, cert, ServiceAccount } = require('firebase-admin/app');
+
+const serviceAccount = Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString();
 const bodyParser = require("body-parser");
 
 const swaggerApiDocumentation = require("./swagger/apiDocs.json");
@@ -29,7 +30,7 @@ const HomeRouter = require("./routes/home");
 const mentionRouter = require('./routes/mention');
 const configRouter = require('./routes/config');
 const stream = require('getstream');
-initializeApp({credential: cert(serviceAccount)})
+initializeApp({credential: cert(JSON.parse(serviceAccount))})
 const app = express();
 app.use('/', HomeRouter)
 
