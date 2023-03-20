@@ -91,9 +91,13 @@ module.exports = async (req, res) => {
       }
     }
 
-    console.log('Who to follow size')
-    console.log(result.length)
-
+    const betterAccount = await User.findOne({
+      where: {
+       user_id: process.env.BETTER_ADMIN_ID
+      }
+    })
+    result.push(betterAccount)
+    result = _.uniqBy(result, 'user_id')
     return res.status(200).json({
       status: "success",
       code: 200,
@@ -101,7 +105,6 @@ module.exports = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error)
     // const { status, data } = error.response;
     return res.json({
       status: failed,
