@@ -25,14 +25,28 @@ module.exports = async (req, res) => {
   }
 
   try {
-    let topicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id IN (${topics.join(',')})`
+    let topicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id IN (:topics)`
 
-    let locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (${locations.join(',')})`
+    let locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (:locations)`
 
-    let userTopicFollowerQueryResult = await sequelize.query(topicsQuery)
-    let userTopicFollower = userTopicFollowerQueryResult[0]
-    let userLocationFollowerQueryResult = await sequelize.query(locationQuery)
-    let userLocationFollower = userLocationFollowerQueryResult[0]
+    let userTopicFollowerQueryResult = await sequelize.query(topicsQuery, { 
+      type: sequelize.QueryTypes.SELECT,
+      replacements: {
+        // topics: topics.join(','),
+        topics: topics
+      }
+    })
+    let userTopicFollower = userTopicFollowerQueryResult
+
+    let userLocationFollowerQueryResult = await sequelize.query(locationQuery, {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: {
+        // locations: locations.join(','),
+        locations: locations
+      }
+    })
+    let userLocationFollower = userLocationFollowerQueryResult
+    
     let TopicsData = await Topics.findAll({
       where: { 'topic_id': topics },
       raw: true,
@@ -93,7 +107,7 @@ module.exports = async (req, res) => {
 
     const betterAccount = await User.findOne({
       where: {
-       user_id: process.env.BETTER_ADMIN_ID
+        user_id: process.env.BETTER_ADMIN_ID
       }
     })
     result.push(betterAccount)
