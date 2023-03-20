@@ -32,6 +32,7 @@ const configRouter = require('./routes/config');
 const stream = require('getstream');
 initializeApp({credential: cert(JSON.parse(serviceAccount))})
 const app = express();
+app.disable('x-powered-by');
 app.use('/', HomeRouter)
 
 app.use(logger("dev"));
