@@ -53,11 +53,18 @@ module.exports = async (req, res) => {
     LIMIT ${limit}`
 
     try {
-      const result = await sequelize.query(locationQuery)
+      const result = await sequelize.query(locationQuery, {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: {
+          name: name,
+          offset: offset,
+          limit: limit
+        }
+      })
       return res.status(200).json({
         status: "success",
         code: 200,
-        body: result[0],
+        body: result,
       });
     } catch (e) {
       return res.status(400).json({ error: e })

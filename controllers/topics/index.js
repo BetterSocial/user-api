@@ -85,35 +85,8 @@ const putFollowTopic = async (req, res) => {
 const getTopics = async (req, res) => {
     let { name } = req.query;
     const userId = req.userId
-    console.log(name);
-    // let query = `select topic_id, name,icon_path, categories, flg_show,  count(*) as follower from (Select * from topics where name ILIKE'%${name}%') as topics join user_topics Using (topic_id) group by topics.name, topics.topic_id, topics.icon_path, topics.categories, topics.created_at, topics.flg_show order by follower desc limit 5`;
 
     try {
-        // let topicService = new TopicService(Topics);
-        // let topics = await topicService.search(name);
-        // // todo mendapatkan topic paling popular berdasarkan banyak user yang follow
-        // let ids = topics.map(item => {
-        //     return item.topic_id;
-        // });
-        // const [results, metadata] = await sequelize.query(query,
-        //     {
-        //         raw: false
-        //     }
-        // )
-
-        // console.log(ids);
-
-        // const { count, rows } = await UserTopic.findAndCountAll({
-        //     where: {
-        //         'topic_id': { in: ids }
-        //     }
-        // });
-        // console.log(count);
-        // console.log(rows);
-
-
-        // console.log(countRes);
-
         let results = await sequelize.query(
             `SELECT 
             "Topic".*,
@@ -126,12 +99,17 @@ const getTopics = async (req, res) => {
             ON "Topic"."topic_id" = 
                 "topicFollower"."topic_id" 
             WHERE 
-                "Topic"."name" ILIKE '%${name}%' 
+                "Topic"."name" ILIKE :likeQuery
             GROUP BY 
                 "Topic"."topic_id"
             ORDER BY
                 "followersCount" DESC
-            LIMIT 5`, { type: QueryTypes.SELECT })
+            LIMIT 5`, {
+            type: QueryTypes.SELECT,
+            replacements: {
+                likeQuery: `%${name}%`,
+            }
+        })
 
         let message = 'Success get topic user';
         return res.json({
