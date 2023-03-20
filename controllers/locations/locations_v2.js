@@ -44,19 +44,20 @@ module.exports = async (req, res) => {
       END
     ) AS location_rank
     FROM "location" A WHERE 
-    A.neighborhood ILIKE '%${name}%' 
-    OR A.state ILIKE '%${name}%' 
-    OR A.country ILIKE '%${name}%'
-    OR A.city ILIKE '%${name}%'
+    A.neighborhood ILIKE :nameQuery 
+    OR A.state ILIKE :nameQuery 
+    OR A.country ILIKE :nameQuery
+    OR A.city ILIKE :nameQuery
     ORDER BY location_rank DESC
-    OFFSET ${offset}
-    LIMIT ${limit}`
+    OFFSET :offset
+    LIMIT :limit`
 
     try {
       const result = await sequelize.query(locationQuery, {
         type: sequelize.QueryTypes.SELECT,
         replacements: {
           name: name,
+          nameQuery: `%${name}%`,
           offset: offset,
           limit: limit
         }
