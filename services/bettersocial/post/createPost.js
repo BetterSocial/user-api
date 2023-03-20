@@ -3,13 +3,14 @@ const moment = require('moment')
 const UsersFunction = require("../../../databases/functions/users");
 const { filterAllTopics, handleCreatePostTO, insertTopics, getFeedDuration } = require("../../../utils/post");
 const CloudinaryService = require("../../../vendor/cloudinary");
-const { User, Locations, sequelize } = require('../../../databases/models');
+const { User, Locations, PostAnonUserInfo, sequelize } = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
 const { POST_TYPE_STANDARD, POST_TYPE_POLL, POST_VERB_POLL } = require('../../../helpers/constants');
 const { addForCreatePost } = require('../../score');
 const PostFunction = require('../../../databases/functions/post');
 const PollingFunction = require('../../../databases/functions/polling');
+const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 
 /**
  * 
@@ -134,6 +135,17 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     try {
         if (isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
         else post = await Getstream.feed.createPost(req?.token, data);
+
+        if(isAnonimous) {
+            await PostAnonUserInfoFunction.createAnonUserInfoInPost(PostAnonUserInfo, {
+                postId: post?.id,
+                anonUserId: userDetail?.user_id,
+                anonUserInfoColorCode: body?.anon_user_info?.color_code,
+                anonUserInfoColorName: body?.anon_user_info?.color_name,
+                anonUserInfoEmojiCode: body?.anon_user_info?.emoji_code,
+                anonUserInfoEmojiName: body?.anon_user_info?.emoji_name,
+            })
+        }
 
         insertTopics(filteredTopics)
         const scoringProcessData = {

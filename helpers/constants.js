@@ -6,6 +6,9 @@ const NO_POLL_OPTION_UUID = "00000000-0000-0000-0000-000000000000";
 const POST_VERB_POLL = "poll";
 const POST_VERB_TWEET = "tweet";
 
+const CONTENT_TYPE_POST = "post"
+const CONTENT_TYPE_COMMENT = "comment"
+
 // TODO
 // Changed temporarily, until logic improvement on getting the feeds is implemented.
 const MAX_FEED_FETCH_LIMIT = 10;
@@ -38,6 +41,8 @@ module.exports = {
   BLOCK_FEED_KEY,
   BLOCK_POST_ANONYMOUS,
   BLOCK_POST_ANONYMOUS_AUTHOR,
+  CONTENT_TYPE_COMMENT,
+  CONTENT_TYPE_POST,
   GETSTREAM_RANKING_METHOD,
   GETSTREAM_TIME_LINEAR_RANKING_METHOD,
   GETSTREAM_TIME_RANDOM_RANKING_METHOD,

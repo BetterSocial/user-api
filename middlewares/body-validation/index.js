@@ -28,6 +28,8 @@ const BodyValidationMiddleware = {
     createAnonymousPollPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createAnonymousPollPostV2),
     createPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createPostV2),
     createPollPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createPollPostV2),
+    generatePostAnonymousUsername: GenerateBodyValidationMiddleware(BodyValidationSchema.generatePostAnonymousUsername),
+    generateCommentAnonymousUsername: GenerateBodyValidationMiddleware(BodyValidationSchema.generateCommentAnonymousUsername),
 }
 
 module.exports =  BodyValidationMiddleware;

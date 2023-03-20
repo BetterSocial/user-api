@@ -12,6 +12,11 @@ const BetterSocialCore = {
     post: {
         createPost: require('./post/createPost'),
         createPollPost: require('./post/createPollPost'),
+    },
+    constantList: {
+        color: require('./constantList/color'),
+        emoji: require('./constantList/emoji'),
+        utils: require('./constantList/utils'),
     }
 }
 
