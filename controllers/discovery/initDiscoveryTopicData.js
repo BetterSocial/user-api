@@ -1,3 +1,4 @@
+const { QueryTypes } = require('sequelize')
 const { sequelize } = require('../../databases/models')
 
 /**
@@ -20,19 +21,26 @@ const InitDiscoveryTopicData = async (req, res) => {
             FROM user_topics A 
             INNER JOIN user_topics B 
                 ON A.topic_id = B.topic_id 
-                AND A.user_id = '${userId}'
+                AND A.user_id = :userId
             RIGHT JOIN topics C 
                 ON C.topic_id = A.topic_id
             GROUP BY A.topic_id, C.topic_id, A.user_id
             ORDER BY 
-            	common DESC, 
-            	A.topic_id ASC,
-            	COALESCE(A.user_id, '') ASC
-            LIMIT ${limit}
-            OFFSET ${page * limit}`
+                common DESC, 
+                A.topic_id ASC,
+                COALESCE(A.user_id, '') ASC
+            LIMIT :limit
+            OFFSET :offset`
 
-        let topicWithCommonFollowerResult = await sequelize.query(suggestedTopicsQuery)
-        let suggestedTopics = topicWithCommonFollowerResult[0]
+        let topicWithCommonFollowerResult = await sequelize.query(suggestedTopicsQuery, {
+            type: QueryTypes.SELECT,
+            replacements: {
+                userId,
+                limit: limit,
+                offset: page * limit
+            }
+        })
+        let suggestedTopics = topicWithCommonFollowerResult
 
         return res.status(200).json({
             success: true,

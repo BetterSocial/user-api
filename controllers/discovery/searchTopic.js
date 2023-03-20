@@ -25,7 +25,7 @@ const Search = async (req, res) => {
             "Topic".*,
             count("topicFollower"."user_id") 
                 AS "followersCount",
-            (SELECT "f"."user_id" AS "user_id_follower" FROM "user_topics" AS f WHERE "f"."user_id" ='${userId}' AND "f"."topic_id" = "Topic"."topic_id")
+            (SELECT "f"."user_id" AS "user_id_follower" FROM "user_topics" AS f WHERE "f"."user_id" = :userId AND "f"."topic_id" = "Topic"."topic_id")
         FROM "topics" 
             AS "Topic" 
         LEFT OUTER JOIN "user_topics" 
@@ -33,13 +33,19 @@ const Search = async (req, res) => {
         ON "Topic"."topic_id" = 
             "topicFollower"."topic_id" 
         WHERE 
-            "Topic"."name" ILIKE '%${q}%' 
+            "Topic"."name" ILIKE :likeQuery
         GROUP BY 
             "Topic"."topic_id"
         ORDER BY
             "user_id_follower" ASC,
             "followersCount" DESC
-            LIMIT 10`, { type: QueryTypes.SELECT })
+            LIMIT 10`, {
+            type: QueryTypes.SELECT,
+            replacements: {
+                userId,
+                likeQuery: `%${q}%`
+            }
+        })
 
         let followedTopic = topics.filter((item, index) => {
             return item.user_id_follower !== null
