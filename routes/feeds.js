@@ -6,6 +6,8 @@ const feedController = require("../controllers/feeds/FeedController");
 
 const feed = require("../controllers/feeds");
 const { isAuth } = require("../middlewares/auth");
+const CreatePostMiddleware = require("../middlewares/create-post");
+const GenerateAnonymousUsernameMiddleware = require("../middlewares/generate-anonymous-username");
 
 router.post("/post", feed.createPost);
 router.post("/post/poll", feed.createPollPost);
@@ -40,5 +42,7 @@ router.post("/open-graph", isAuth, feed.getOpenGraph)
 router.delete('/:postId', isAuth, feed.deletePost)
 
 router.post("/feed-action-notification/:kind", isAuth, feed.notificationCommentFeed)
+router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2);
+router.post('/generate-anonymous-username', isAuth, GenerateAnonymousUsernameMiddleware, feed.generateAnonymousUsername)
 
 module.exports = router;

@@ -14,9 +14,22 @@ const uploadBase64 = async (base64 = null) => {
     });
 }
 
+const uploadBase64Array = async (base64Array = []) => {
+    if (!base64Array) throw new Error('base64Array is required');
+    let cloudinaryLinkArray = []
+
+    for (const url of base64Array) {
+        let returnCloudinary = await CloudinaryService.uploadBase64(url)
+        cloudinaryLinkArray.push(returnCloudinary?.secure_url)
+    }
+
+    return cloudinaryLinkArray
+}
+
 
 const CloudinaryService = {
-    uploadBase64
+    uploadBase64,
+    uploadBase64Array
 }
 
 module.exports = CloudinaryService

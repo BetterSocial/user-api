@@ -5,6 +5,7 @@ const commentChild = require("./commentChild");
 const commentDomain = require('./commentDomain')
 const createPollPost = require("./createPollPost");
 const createPost = require("./createPost");
+const createPostV2 = require("./createPostV2");
 const createReaction = require("./createReaction");
 const deleteFeed = require("./deleteFeed");
 const deletePost = require("./deletePost")
@@ -26,6 +27,7 @@ const upvote = require("./upVote");
 const upVoteDomain = require("./upVoteDomain");
 const voteComment = require("./voteComment");
 const isAuthorFollowMe = require('./isAuthorFollowMe')
+const generateAnonymousUsername = require('./generateAnonymousUsername')
 
 const { createQueuePostTime } = require("./createPostTime");
 const { getFeedChatService } = require("./getFeedChat")
@@ -39,6 +41,7 @@ module.exports = {
   commentDomain,
   createPollPost,
   createPost,
+  createPostV2,
   createQueuePostTime,
   createReaction,
   deleteFeed,
@@ -48,6 +51,7 @@ module.exports = {
   downvote,
   downVoteDomain,
   followUser,
+  generateAnonymousUsername,
   getFeedChatService,
   getFeeds,
   getFeedUser,
