@@ -1,4 +1,5 @@
 const getstreamService = require("../../services/getstream");
+const moment = require('moment')
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
@@ -38,86 +39,87 @@ module.exports = async (req, res) => {
       let feeds = result.results;
 
       // Change to conventional loop because map cannot handle await
-      for (let i = 0; i < feeds.length; i++) {
-        let item = feeds[i];
-        let now = new Date();
-        let dateExpired = new Date(item.expired_at);
-        if (now < dateExpired || item.duration_feed == "never") {
-          let newItem = { ...item };
+      for (let item of feeds) {
+        let item = feeds[i]
+        let now = moment().valueOf()
+        let dateExpired = moment(item?.expired_at).valueOf()
 
-          if (newItem.anonimity) {
-            newItem.actor = {}
-            newItem.to = []
-            newItem.origin = null
-            newItem.object = ""
+        if (dateExpired > now) continue
+        let newItem = { ...item };
+
+        if (newItem.anonimity) {
+          newItem.actor = {}
+          newItem.to = []
+          newItem.origin = null
+          newItem.object = ""
+        }
+
+        if (item.verb === POST_VERB_POLL && item?.polls?.length > 0) {
+          let pollOptions = await PollingOption.findAll({
+            where: {
+              polling_option_id: item.polls,
+            },
+          });
+
+          let pollingOptionsId = pollOptions.reduce((acc, current) => {
+            acc.push(current.polling_id);
+            return acc;
+          }, []);
+
+          let logPolling = await LogPolling.findAll({
+            where: {
+              polling_id: pollingOptionsId,
+              user_id: req.userId,
+            },
+          });
+
+          if (logPolling.length === 0) {
+            newItem.isalreadypolling = false
+            newItem.mypolling = []
           }
 
-          if (item.verb === POST_VERB_POLL && item?.polls?.length > 0) {
-            let pollOptions = await PollingOption.findAll({
-              where: {
-                polling_option_id: item.polls,
-              },
-            });
+          if (logPolling.length > 0) {
+            newItem.isalreadypolling = true
+            newItem.mypolling = item?.multiplechoice ? logPolling : logPolling[0]
+          }
 
-            let pollingOptionsId = pollOptions.reduce((acc, current) => {
-              acc.push(current.polling_id);
-              return acc;
-            }, []);
+          let distinctPollingByUserId = await sequelize.query(
+            `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id= :polling_id AND polling_option_id != :polling_option_id`,
+            {
+              type: sequelize.QueryTypes.SELECT,
+              replacements: {
+                polling_id: item.polling_id,
+                polling_option_id: NO_POLL_OPTION_UUID,
+              }
+            }
+          );
+          let voteCount = distinctPollingByUserId[0].length;
 
-            let logPolling = await LogPolling.findAll({
-              where: {
-                polling_id: pollingOptionsId,
-                user_id: req.userId,
-              },
-            });
-
-            if (logPolling.length > 0) {
-              if (item.multiplechoice) newItem.mypolling = logPolling;
-              else newItem.mypolling = logPolling[0];
-              newItem.isalreadypolling = true;
+          newItem.pollOptions = pollOptions;
+          newItem.voteCount = voteCount;
+          data.push(newItem);
+        } else {
+          if (item.post_type === POST_TYPE_LINK) {
+            let domainPageId = item?.og?.domain_page_id
+            let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
+            if (credderScoreCache) {
+              newItem.credderScore = credderScoreCache
+              newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
             } else {
-              newItem.isalreadypolling = false;
-              newItem.mypolling = [];
+              let dataDomain = await DomainPage.findOne({
+                where: { domain_page_id: domainPageId },
+                raw: true
+              })
+
+              await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain.credder_score)
+              await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain.credder_last_checked)
+
+              newItem.credderScore = dataDomain.credder_score
+              newItem.credderLastChecked = dataDomain.credder_last_checked
             }
-
-            let distinctPollingByUserId = await sequelize.query(
-              `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id= :polling_id AND polling_option_id != :polling_option_id`,
-              {
-                type: sequelize.QueryTypes.SELECT,
-                replacements: {
-                  polling_id: item.polling_id,
-                  polling_option_id: NO_POLL_OPTION_UUID,
-                }
-              }
-            );
-            let voteCount = distinctPollingByUserId[0].length;
-
-            newItem.pollOptions = pollOptions;
-            newItem.voteCount = voteCount;
-            data.push(newItem);
-          } else {
-            if (item.post_type === POST_TYPE_LINK) {
-              let domainPageId = item?.og?.domain_page_id
-              let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
-              if (credderScoreCache) {
-                newItem.credderScore = credderScoreCache
-                newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
-              } else {
-                let dataDomain = await DomainPage.findOne({
-                  where: { domain_page_id: domainPageId },
-                  raw: true
-                })
-
-                await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain.credder_score)
-                await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain.credder_last_checked)
-
-                newItem.credderScore = dataDomain.credder_score
-                newItem.credderLastChecked = dataDomain.credder_last_checked
-              }
-            }
-
-            data.push(newItem);
           }
+
+          data.push(newItem);
         }
       }
 
