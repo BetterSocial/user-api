@@ -19,13 +19,6 @@ module.exports = async (userId) => {
     } else {
       return await JSON.parse(cache);
     }
-    // let blockUser = await UserBlockedPostAnonymous.findAll({
-    //   attributes: ["post_anonymous_id_blocked"],
-    //   where: {
-    //     user_id_blocker: userId,
-    //   },
-    // });
-    return blockUser;
   } catch (error) {
     throw error;
   }
