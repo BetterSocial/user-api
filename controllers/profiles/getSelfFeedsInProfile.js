@@ -15,16 +15,9 @@ const {
   DomainPage,
   sequelize,
 } = require("../../databases/models");
-const { Op } = require("sequelize");
-const {
-  getListBlockUser,
-  getListBlockPostAnonymous,
-} = require("../../services/blockUser");
+
 const getBlockDomain = require("../../services/domain/getBlockDomain");
 const _ = require("lodash");
-const lodash = require("lodash");
-const { setData, getValue, delCache } = require("../../services/redis");
-const { convertString } = require("../../utils/custom");
 const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
 
 module.exports = async (req, res) => {
@@ -61,7 +54,7 @@ module.exports = async (req, res) => {
               newItem.object = ""
             }
 
-            if (item.verb === POST_VERB_POLL) {
+            if (item.verb === POST_VERB_POLL && item?.polls?.length > 0) {
               let pollOptions = await PollingOption.findAll({
                 where: {
                   polling_option_id: item.polls,
@@ -90,7 +83,14 @@ module.exports = async (req, res) => {
               }
 
               let distinctPollingByUserId = await sequelize.query(
-                `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}' AND polling_option_id !='${NO_POLL_OPTION_UUID}'`
+                `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id= :polling_id AND polling_option_id != :polling_option_id`,
+                {
+                  type: sequelize.QueryTypes.SELECT,
+                  replacements: {
+                    polling_id: item.polling_id,
+                    polling_option_id: NO_POLL_OPTION_UUID,
+                  }
+                }
               );
               let voteCount = distinctPollingByUserId[0].length;
 
