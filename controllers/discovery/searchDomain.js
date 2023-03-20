@@ -11,10 +11,10 @@ const { filter } = require('lodash')
  * @param {import("express").Response} res 
  * @returns 
  */
-const SearchDomain = async(req, res) => {
+const SearchDomain = async (req, res) => {
     const { q } = req.query
     const userId = req.userId
-    if(q.length < 2) return res.status(200).json({
+    if (q.length < 2) return res.status(200).json({
         success: true,
         message: 'Your search characters is too few, please input 3 or more characters for search'
     })
@@ -33,7 +33,7 @@ const SearchDomain = async(req, res) => {
                 "Domain"."credder_score",
                 count("domainFollower"."user_id_follower") 
                     AS "followersCount",
-                (SELECT "f"."user_id_follower" AS "user_id_follower" FROM "user_follow_domain" AS "f" WHERE "f"."user_id_follower" ='${userId}' AND "f"."domain_id_followed" = "Domain"."domain_page_id")
+                (SELECT "f"."user_id_follower" AS "user_id_follower" FROM "user_follow_domain" AS "f" WHERE "f"."user_id_follower" = :userId AND "f"."domain_id_followed" = "Domain"."domain_page_id")
             FROM "domain_page" 
                 AS "Domain" 
             LEFT JOIN "user_follow_domain" 
@@ -41,7 +41,7 @@ const SearchDomain = async(req, res) => {
             ON "Domain"."domain_page_id" = 
                 "domainFollower"."domain_id_followed" 
             WHERE 
-                "Domain"."domain_name" ILIKE '%${q}%' 
+                "Domain"."domain_name" ILIKE :likeQuery 
             GROUP BY 
                 "Domain"."domain_page_id",
                 "Domain"."domain_name",
@@ -51,7 +51,13 @@ const SearchDomain = async(req, res) => {
             ORDER BY
                 "user_id_follower" ASC,
                 "followersCount" DESC
-            LIMIT 10`, { type: QueryTypes.SELECT })
+            LIMIT 10`, {
+            type: QueryTypes.SELECT,
+            replacements: {
+                userId,
+                likeQuery: `%${q}%`
+            }
+        })
 
         let followedDomains = domains.filter((item, index) => {
             return item.user_id_follower !== null
@@ -67,7 +73,7 @@ const SearchDomain = async(req, res) => {
             followedDomains,
             unfollowedDomains,
         })
-    }catch(e) {
+    } catch (e) {
         console.log('e')
         console.log(e)
         return res.status(200).json({
@@ -77,4 +83,4 @@ const SearchDomain = async(req, res) => {
     }
 }
 
-module.exports =  SearchDomain
+module.exports = SearchDomain
