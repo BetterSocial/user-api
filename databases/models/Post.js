@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
         parent_post_id : { type : DataTypes.UUID},
         audience_id : { type : DataTypes.STRING},
         duration : { type : DataTypes.DATE},
-        audience_id : { type : DataTypes.UUID},
         visibility_location_id : { type : DataTypes.STRING},
         topic_id : { type : DataTypes.BIGINT, allowNull : false},
         post_content : { type : DataTypes.STRING},

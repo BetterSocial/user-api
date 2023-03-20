@@ -4,11 +4,7 @@ module.exports = {
     await queryInterface.createTable('VoteComments', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.UUID
       },
       comment_id: {
