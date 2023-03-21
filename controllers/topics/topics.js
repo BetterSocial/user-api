@@ -3,10 +3,11 @@ const groupBy = require("lodash/groupBy");
 module.exports = async (req, res) => {
   try {
     return Topics.findAll({
-      where: { is_custom_topic: false }
+      where: { is_custom_topic: false },
+      order: [["sort", "ASC"]],
     })
-      .then((todos) => {
-        const response = groupBy(todos, function (n) {
+      .then((topics) => {
+        const response = groupBy(topics, function (n) {
           return n.categories;
         });
         res.status(200).json({
