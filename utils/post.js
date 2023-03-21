@@ -152,7 +152,7 @@ const isPostBlocked = (
  * @returns {String[]}
  */
 const filterAllTopics = (text, topics = []) => {
-  const topicsFromText = text.match(/#(?i)([a-z0-9-_]+)\b/gi) || [];
+  const topicsFromText = text.match(/#([a-zA-Z0-9-_]+)\b/gi) || [];
   let topicsFromTextWithoutHashtag = topicsFromText.reduce((acc, next) => {
     acc.push(next.slice(1));
     return acc;
