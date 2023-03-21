@@ -62,18 +62,16 @@ module.exports = async (req, res) => {
        user_id: process.env.BETTER_ADMIN_ID
       }
     })
-    console.log(betterAccount.user_id, 'lukas')
     let result = []
     // let duplicateUserChecker = [];
-    console.log(userTopicFollower)
     for (let indexTopic in TopicsData) {
       let tempUsers = []
       let topic = TopicsData[indexTopic]
-      tempUsers.push(betterAccount)
+       tempUsers.push(betterAccount)
+
       for (let indexUserTopic in userTopicFollower) {
         let userTopic = userTopicFollower[indexUserTopic]
-        if (userTopic.topic_id === topic.topic_id) {
-          // console.log(userTopic, 'user topic')
+        if (userTopic.topic_id === topic.topic_id && userTopic.user_id !== betterAccount.user_id) {
           tempUsers.push({
           ...userTopic,
           viewtype: 'user'
