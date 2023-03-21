@@ -6,7 +6,6 @@ const myCache = new NodeCache( { stdTTL: 100, checkperiod: 0 } );
 
 const getFeedChatService = async (req, res) => {
     try {
-        const findAll = await UserBlockedUser.findAll()
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
 
