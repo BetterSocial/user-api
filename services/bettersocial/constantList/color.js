@@ -1,92 +1,34 @@
-const BetterSocialColorList = [
-    {
-        "color": "Blue",
-        "code": "#2F58CD"
-    },
-    {
-        "color": "Red",
-        "code": "#B32A2A"
-    },
-    {
-        "color": "Green",
-        "code": "#027000"
-    },
-    {
-        "color": "Navy",
-        "code": "#11468F"
-    },
-    {
-        "color": "Golden",
-        "code": "#FFD700"
-    },
-    {
-        "color": "Teal",
-        "code": "#008080"
-    },
-    {
-        "color": "Silver",
-        "code": "#C0C0C0"
-    },
-    {
-        "color": "Bronze",
-        "code": "#CD7F32"
-    },
-    {
-        "color": "Purple",
-        "code": "#BE55FF"
-    },
-    {
-        "color": "Maroon",
-        "code": "#800000"
-    },
-    {
-        "color": "Yellow",
-        "code": "#DEDE00"
-    },
-    {
-        "color": "Pink",
-        "code": "#FF9DAE"
-    },
-    {
-        "color": "Olive",
-        "code": "#808000"
-    },
-    {
-        "color": "Cyan",
-        "code": "#A8FFFF"
-    },
-    {
-        "color": "Orange",
-        "code": "#FFA500"
-    },
-    {
-        "color": "Gray",
-        "code": "#808080"
-    },
-    {
-        "color": "Beige",
-        "code": "#F0F0AF"
-    },
-    {
-        "color": "Amber",
-        "code": "#FFBF00"
-    },
-    {
-        "color": "Crimson",
-        "code": "#DC143C"
-    },
-    {
-        "color": "Magenta",
-        "code": "#BA43BA"
-    },
-    {
-        "color": "Violet",
-        "code": "#640BBD"
-    },
-    {
-        "color": "Mint",
-        "code": "#3EB489"
-    },
-]
+let BetterSocialColorList = []
+
+function pushToColorList(color, code) {
+    BetterSocialColorList.push({
+        color,
+        code
+    })
+}
+
+pushToColorList('Blue', '#2F58CD')
+pushToColorList('Red', '#B32A2A')
+pushToColorList('Green', '#027000')
+pushToColorList('Navy', '#11468F')
+pushToColorList('Golden', '#FFD700')
+pushToColorList('Teal', '#008080')
+pushToColorList('Silver', '#C0C0C0')
+pushToColorList('Bronze', '#CD7F32')
+pushToColorList('Purple', '#BE55FF')
+pushToColorList('Maroon', '#800000')
+pushToColorList('Yellow', '#DEDE00')
+pushToColorList('Pink', '#FF9DAE')
+pushToColorList('Olive', '#808000')
+pushToColorList('Cyan', '#A8FFFF')
+pushToColorList('Orange', '#FFA500')
+pushToColorList('Gray', '#808080')
+pushToColorList('Beige', '#F0F0AF')
+pushToColorList('Amber', '#FFBF00')
+pushToColorList('Crimson', '#DC143C')
+pushToColorList('Magenta', '#BA43BA')
+pushToColorList('Violet', '#640BBD')
+pushToColorList('Mint', '#3EB489')
+
 
 module.exports = BetterSocialColorList;
