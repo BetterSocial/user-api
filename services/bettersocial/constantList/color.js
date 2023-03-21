@@ -1,90 +1,90 @@
 const BetterSocialColorList = [
     {
-        "name": "Blue",
+        "color": "Blue",
         "code": "#2F58CD"
     },
     {
-        "name": "Red",
+        "color": "Red",
         "code": "#B32A2A"
     },
     {
-        "name": "Green",
+        "color": "Green",
         "code": "#027000"
     },
     {
-        "name": "Navy",
+        "color": "Navy",
         "code": "#11468F"
     },
     {
-        "name": "Golden",
+        "color": "Golden",
         "code": "#FFD700"
     },
     {
-        "name": "Teal",
+        "color": "Teal",
         "code": "#008080"
     },
     {
-        "name": "Silver",
+        "color": "Silver",
         "code": "#C0C0C0"
     },
     {
-        "name": "Bronze",
+        "color": "Bronze",
         "code": "#CD7F32"
     },
     {
-        "name": "Purple",
+        "color": "Purple",
         "code": "#BE55FF"
     },
     {
-        "name": "Maroon",
+        "color": "Maroon",
         "code": "#800000"
     },
     {
-        "name": "Yellow",
+        "color": "Yellow",
         "code": "#DEDE00"
     },
     {
-        "name": "Pink",
+        "color": "Pink",
         "code": "#FF9DAE"
     },
     {
-        "name": "Olive",
+        "color": "Olive",
         "code": "#808000"
     },
     {
-        "name": "Cyan",
+        "color": "Cyan",
         "code": "#A8FFFF"
     },
     {
-        "name": "Orange",
+        "color": "Orange",
         "code": "#FFA500"
     },
     {
-        "name": "Gray",
+        "color": "Gray",
         "code": "#808080"
     },
     {
-        "name": "Beige",
+        "color": "Beige",
         "code": "#F0F0AF"
     },
     {
-        "name": "Amber",
+        "color": "Amber",
         "code": "#FFBF00"
     },
     {
-        "name": "Crimson",
+        "color": "Crimson",
         "code": "#DC143C"
     },
     {
-        "name": "Magenta",
+        "color": "Magenta",
         "code": "#BA43BA"
     },
     {
-        "name": "Violet",
+        "color": "Violet",
         "code": "#640BBD"
     },
     {
-        "name": "Mint",
+        "color": "Mint",
         "code": "#3EB489"
     },
 ]

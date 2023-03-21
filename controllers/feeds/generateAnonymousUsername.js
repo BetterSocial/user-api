@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
         let anonUserInfo = {
             emojiName: emoji.name,
             emojiIcon: emoji.emoji,
-            colorName: color.name,
+            colorName: color.color,
             colorCode: color.code,
         }
 
@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
                 userId: req?.userId,
                 anonUserInfoEmojiName: emoji.name,
                 anonUserInfoEmojiCode: emoji.emoji,
-                anonUserInfoColorName: color.name,
+                anonUserInfoColorName: color.color,
                 anonUserInfoColorCode: color.code,
             })
 
@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
             anonUserInfo = {
                 emojiName: emoji.name,
                 emojiIcon: emoji.emoji,
-                colorName: color.name,
+                colorName: color.color,
                 colorCode: color.code,
             }
 
