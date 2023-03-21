@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      models.Topics.belongsToMany(models.User, { through: 'user_topics', foreignKey: 'topic_id' ,  as: 'users'});
+      models.Topics.belongsToMany(models.User, {
+        through: "user_topics",
+        foreignKey: "topic_id",
+        as: "users",
+      });
     }
   }
   Topics.init(
@@ -24,13 +28,14 @@ module.exports = (sequelize, DataTypes) => {
       categories: DataTypes.TEXT,
       created_at: DataTypes.DATE,
       is_custom_topic: DataTypes.BOOLEAN,
+      sort: DataTypes.BIGINT,
     },
     {
       sequelize,
       modelName: "Topics",
       tableName: "topics",
       timestamps: false,
-      underscored: true
+      underscored: true,
     }
   );
   return Topics;
