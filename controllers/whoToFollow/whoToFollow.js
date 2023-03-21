@@ -57,19 +57,28 @@ module.exports = async (req, res) => {
       raw: true
     })
 
+        const betterAccount = await User.findOne({
+      where: {
+       user_id: process.env.BETTER_ADMIN_ID
+      }
+    })
+    console.log(betterAccount.user_id, 'lukas')
     let result = []
     // let duplicateUserChecker = [];
-
+    console.log(userTopicFollower)
     for (let indexTopic in TopicsData) {
       let tempUsers = []
       let topic = TopicsData[indexTopic]
-
+      tempUsers.push(betterAccount)
       for (let indexUserTopic in userTopicFollower) {
         let userTopic = userTopicFollower[indexUserTopic]
-        if (userTopic.topic_id === topic.topic_id) tempUsers.push({
+        if (userTopic.topic_id === topic.topic_id) {
+          // console.log(userTopic, 'user topic')
+          tempUsers.push({
           ...userTopic,
           viewtype: 'user'
         })
+        }
       }
 
       if (tempUsers.length > 0) {
@@ -82,7 +91,6 @@ module.exports = async (req, res) => {
         result.push(...tempUsers)
       }
     }
-
     for (let indexLocation in LocationsData) {
       let tempUsers = []
       let location = LocationsData[indexLocation]
@@ -105,13 +113,8 @@ module.exports = async (req, res) => {
       }
     }
 
-    const betterAccount = await User.findOne({
-      where: {
-        user_id: process.env.BETTER_ADMIN_ID
-      }
-    })
-    result.push(betterAccount)
-    result = _.uniqBy(result, 'user_id')
+
+
     return res.status(200).json({
       status: "success",
       code: 200,
