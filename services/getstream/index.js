@@ -11,7 +11,7 @@ const downVote = require("./downVote");
 const comment = require("./comment");
 const like = require("./like");
 const { followTopic, followTopics } = require("./followTopic");
-const { followLocation, followLocations } = require("./followLocation");
+const { followLocation } = require("./followLocation");
 const deleteFeed = require("./deleteFeed");
 const commentChild = require("./commentChild");
 const childUpvote = require("./childUpvote");
@@ -44,7 +44,6 @@ module.exports = {
   deleteReaction,
   downVote,
   followLocation,
-  followLocations,
   followTopic,
   followTopics,
   followUser,
