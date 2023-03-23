@@ -18,7 +18,7 @@ router.post("/changes-image", profileController.changeImageProfile);
 router.delete("/remove-image", profileController.removeImageProfile);
 router.get("/get-my-profile", Auth.isAuth, profileController.getMyProfile);
 router.get("/following", Auth.isAuth, profileController.following);
-router.post("/update-bio", profileController.updateBio);
+router.post("/update-bio", Auth.isAuth, profileController.updateBio);
 
 /**
  * TODO: remove this route if app api path has been reconfigured
@@ -28,7 +28,7 @@ router.post("/changes-image/:id", profileController.changeImageProfile);
 router.delete("/remove-image/:id", profileController.removeImageProfile);
 router.get("/get-my-profile/:id", Auth.isAuth, profileController.getMyProfile);
 router.get("/following/:id", Auth.isAuth, profileController.following);
-router.post("/update-bio/:id", profileController.updateBio);
+router.post("/update-bio/:id", Auth.isAuth, profileController.updateBio);
 /**
  * TODO END
  */

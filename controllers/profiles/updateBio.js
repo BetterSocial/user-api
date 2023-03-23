@@ -16,7 +16,12 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-    const user = await User.findByPk(req?.userId);
+    console.log(req, 'nini')
+    const user = await User.findOne({
+      where: {
+        user_id: req.userId
+      }
+    });
     let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     if (user === null) {
       return res.status(404).json({
