@@ -24,6 +24,8 @@ const BodyValidationMiddleware = {
     followUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.followUserV2),
     unfollowUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
     registerV2: GenerateBodyValidationMiddleware(BodyValidationSchema.registerV2),
+    createCommentV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createCommentV2),
+    createAnonymousCommentV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createAnonymousCommentV2),
     createAnonymousPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createAnonymousPostV2),
     createAnonymousPollPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createAnonymousPollPostV2),
     createPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createPostV2),

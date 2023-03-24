@@ -8,6 +8,8 @@ const Getstream = {
         syncUser: require('./chat/syncUser')
     },
     feed: {
+        comment: require('./feed/comment'),
+        commentAnonymous: require('./feed/commentAnonymous'),
         createPost: require('./feed/createPost'),
         createAnonymousPost: require('./feed/createAnonymousPost'),
         followAnonUser: require('./feed/followAnonUser'),
