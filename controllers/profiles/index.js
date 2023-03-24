@@ -7,6 +7,7 @@ const getOtherProfile = require("./getOtherProfile");
 const getOtherProfilebyUsername = require("./getOtherProfileByUsername");
 const getProfileByName = require("./getProfileByName")
 const getSelfFeedsInProfile = require("./getSelfFeedsInProfile")
+const getSelfAnonymousFeedsInProfile = require("./getSelfAnonymousFeedsInProfile")
 const removeImageProfile = require("./removeImageProfile");
 const setFollowing = require("./setFollowing");
 const unSetFollowing = require("./unSetFollowing");
@@ -26,6 +27,7 @@ module.exports = {
   getOtherProfilebyUsername,
   getProfileByName,
   getSelfFeedsInProfile,
+  getSelfAnonymousFeedsInProfile,
   removeImageProfile,
   setFollowing,
   unSetFollowing,
