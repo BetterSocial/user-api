@@ -1,7 +1,9 @@
 const childDownvote = require("./childDownvote");
 const childUpvote = require("./childUpvote");
 const comment = require("./comment");
+const commentV2 = require("./commentV2");
 const commentChild = require("./commentChild");
+const commentChildV2 = require("./commentChildV2");
 const commentDomain = require('./commentDomain')
 const createPollPost = require("./createPollPost");
 const createPost = require("./createPost");
@@ -37,7 +39,9 @@ module.exports = {
   childDownvote,
   childUpvote,
   comment,
+  commentV2,
   commentChild,
+  commentChildV2,
   commentDomain,
   createPollPost,
   createPost,

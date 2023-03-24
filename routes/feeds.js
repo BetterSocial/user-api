@@ -8,6 +8,9 @@ const feed = require("../controllers/feeds");
 const { isAuth } = require("../middlewares/auth");
 const CreatePostMiddleware = require("../middlewares/create-post");
 const GenerateAnonymousUsernameMiddleware = require("../middlewares/generate-anonymous-username");
+const CreateCommentMiddleware = require("../middlewares/create-comment");
+const CreateCommentChildMiddleware = require("../middlewares/create-comment-child");
+
 
 router.post("/post", feed.createPost);
 router.post("/post/poll", feed.createPollPost);
@@ -44,5 +47,7 @@ router.delete('/:postId', isAuth, feed.deletePost)
 router.post("/feed-action-notification/:kind", isAuth, feed.notificationCommentFeed)
 router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2);
 router.post('/generate-anonymous-username', isAuth, GenerateAnonymousUsernameMiddleware, feed.generateAnonymousUsername)
+router.post("/comment-v2", isAuth ,CreateCommentMiddleware , feed.commentV2);
+router.post("/comment-child-v2", isAuth ,CreateCommentChildMiddleware, feed.commentChildV2);
 
 module.exports = router;
