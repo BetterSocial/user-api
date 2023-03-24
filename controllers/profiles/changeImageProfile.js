@@ -19,10 +19,11 @@ module.exports = async (req, res) => {
       });
     }
     let { profile_pic_path } = req.body;
+
     const user = await User.findOne({
       where: {
-        user_id: req.userId
-      }
+        user_id: req.userId,
+      },
     });
     if (user === null) {
       return res.status(404).json({
@@ -40,13 +41,13 @@ module.exports = async (req, res) => {
         });
         if (returnCloudinary) {
           let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-          console.log(req.params)
-          console.log(user.toJSON())
+          console.log(req.params);
+          console.log(user.toJSON());
           updateUser(req?.userId, {
-            username : user.username,
-            human_id : user.human_id,
-            profile_pic_url: returnCloudinary.secure_url
-          })
+            username: user.username,
+            human_id: user.human_id,
+            profile_pic_url: returnCloudinary.secure_url,
+          });
           const [numberOfAffectedRows, affectedRows] = await User.update(
             {
               profile_pic_path: returnCloudinary.secure_url
