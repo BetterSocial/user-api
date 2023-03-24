@@ -2,10 +2,11 @@ const {
   PollingOption,
   LogPolling,
   Topics,
+  DomainPage,
   sequelize,
   Sequelize,
 } = require("../databases/models");
-const { NO_POLL_OPTION_UUID, POST_TYPE_LINK } = require("../helpers/constants");
+const { NO_POLL_OPTION_UUID, POST_TYPE_LINK, POST_VERB_POLL } = require("../helpers/constants");
 const _ = require("lodash");
 const moment = require('moment')
 
@@ -242,8 +243,37 @@ async function modifyPostLinkPost(domainPageModel, post) {
   return post
 }
 
+async function filterFeeds(userId, feeds = []) {
+  let newResult = []
+
+  for (let item of feeds || []) {
+    let now = moment().valueOf()
+    let dateExpired = moment(item?.expired_at).valueOf()
+
+    if (dateExpired > now) continue
+    let newItem = { ...item };
+
+    if (newItem.anonimity) {
+      newItem.actor = {}
+      newItem.to = []
+      newItem.origin = null
+      newItem.object = ""
+    }
+
+    let isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0
+
+    if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem)
+    else newItem = await modifyPostLinkPost(DomainPage, newItem)
+
+    newResult.push(newItem);
+  }
+
+  return newResult
+}
+
 module.exports = {
   filterAllTopics,
+  filterFeeds,
   handleCreatePostTO,
   insertTopics,
   isPostBlocked,

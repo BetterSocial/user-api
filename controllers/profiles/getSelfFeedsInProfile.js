@@ -10,7 +10,7 @@ const {
 } = require("../../databases/models");
 
 const _ = require("lodash");
-const { modifyPostLinkPost, modifyPollPostObject } = require("../../utils/post");
+const { modifyPostLinkPost, modifyPollPostObject, filterFeeds } = require("../../utils/post");
 
 module.exports = async (req, res) => {
   let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
@@ -27,30 +27,7 @@ module.exports = async (req, res) => {
     })
 
     .then(async (result) => {
-      let data = [];
-      let feeds = result.results;
-
-      // Change to conventional loop because map cannot handle await
-      for (let item of feeds) {
-        let now = moment().valueOf()
-        let dateExpired = moment(item?.expired_at).valueOf()
-
-        if (dateExpired > now) continue
-        let newItem = { ...item };
-
-        if (newItem.anonimity) {
-          newItem.actor = {}
-          newItem.to = []
-          newItem.origin = null
-          newItem.object = ""
-        }
-
-        let isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0
-        if (isValidPollPost) newItem = await modifyPollPostObject(req?.userId, newItem)
-        else newItem = await modifyPostLinkPost(DomainPage, newItem)
-        
-        data.push(newItem);
-      }
+      let data = await filterFeeds(req?.userId, result?.results || [])
 
       res.status(200).json({
         code: 200,
