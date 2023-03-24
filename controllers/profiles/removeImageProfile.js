@@ -2,6 +2,7 @@ const { User } = require("../../databases/models");
 const Validator = require("fastest-validator");
 const moment = require("moment");
 const v = new Validator();
+const updateUser = require("../../services/getstream/updateUser");
 
 module.exports = async (req, res) => {
   try {
@@ -19,6 +20,11 @@ module.exports = async (req, res) => {
       });
     } else {
       let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+      updateUser(req?.userId, {
+            username: user.username,
+            human_id: user.human_id,
+            profile_pic_url: null,
+      });
       const [numberOfAffectedRows, affectedRows] = await User.update(
         {
           profile_pic_path: null,
