@@ -32,5 +32,6 @@ router.post('/delete', auth.isAuth, usersHandler.deleteUser);
 router.post('/rename/:userId', auth.isAuth, usersHandler.renameUser);
 router.get('/chat/search', auth.isAuth, usersHandler.chatSearch)
 router.post('/fcmtoken', auth.isAuth, usersHandler.fcmToken)
+router.delete('/fcmtoken', auth.isAuth, usersHandler.removeFcmTokem)
 
 module.exports = router;
