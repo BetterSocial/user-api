@@ -1,4 +1,3 @@
-const stream = require("getstream");
 const GetstreamSingleton = require("../singleton");
 
 module.exports = async (token, message, activityId, commentAuthorUserId, feedOwnerUserId, sendPostNotif = true) => {

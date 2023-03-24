@@ -10,8 +10,10 @@ const Getstream = {
     feed: {
         comment: require('./feed/comment'),
         commentAnonymous: require('./feed/commentAnonymous'),
-        createPost: require('./feed/createPost'),
+        commentChild: require('./feed/commentChild'),
+        commentChildAnonymous: require('./feed/commentChildAnonymous'),
         createAnonymousPost: require('./feed/createAnonymousPost'),
+        createPost: require('./feed/createPost'),
         followAnonUser: require('./feed/followAnonUser'),
         followUser: require('./feed/followUser'),
         followUserExclusive: require('./feed/followUserExclusive'),

@@ -1,20 +1,16 @@
-const moment = require('moment')
-
 const UsersFunction = require("../../../databases/functions/users")
 const { countProcess } = require("../../../process")
-const { User, FcmToken } = require("../../../databases/models")
-const FcmTokenFunction = require("../../../databases/functions/fcmToken")
-const sendCommentNotification = require("../fcmToken/sendCommentNotification")
-const { addForCommentPost } = require("../../score")
+const { User} = require("../../../databases/models")
 const QueueTrigger = require('../../queue/trigger')
 const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
+const sendReplyCommentNotification = require('../fcmToken/sendReplyCommentNotification')
 
-const BetterSocialCreateComment = async (req, isAnonimous = true) => {
+const BetterSocialCreateCommentChild = async (req, isAnonimous = true) => {
     try {
         const { body, userId, token } = req
 
-        const { activity_id, useridFeed, message, anon_user_info, sendPostNotif } = body
+        const { reaction_id, useridFeed, message, anon_user_info, sendPostNotif, postMaker, postTitle } = body
         let detailUser = {}
         let result = {}
 
@@ -29,11 +25,11 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
 
         let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
 
-        if(isAnonimous) result = await Getstream.feed.commentAnonymous(selfUser?.user_id, message, activity_id, useridFeed, anon_user_info)
-        else result = await Getstream.feed.comment(token, message, activity_id, userId, useridFeed, sendPostNotif)
+        if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info)
+        else result = await Getstream.feed.commentChild(token, message, reaction_id, userId, postMaker, useridFeed, sendPostNotif)
 
         if (body?.message?.length > 80) {
-            await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
+            await countProcess(reaction_id, { comment_count: +1 }, { comment_count: 1 });
         }
 
         if (useridFeed) {
@@ -42,29 +38,21 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
 
 
         if (detailUser?.user_id !== req?.user_id) {
-            await sendCommentNotification(
+            await sendReplyCommentNotification(
                 useridFeed,
                 commentAuthor,
                 message,
-                activity_id
+                reaction_id,
+                postTitle
             )
         }
 
-        const scoringProcessData = {
-            comment_id: result?.id,
-            user_id: userId,
-            feed_id: activity_id,
-            message: message,
-            activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
-        };
-        await addForCommentPost(scoringProcessData);
-
         QueueTrigger.addCommentToDb({
-            authorUserId: useridFeed,
+            authorUserId: postMaker,
             comment: message,
             commenterUserId: userId,
             commentId: result?.id,
-            postId: activity_id
+            postId: result?.activity_id
         })
 
         return {
@@ -80,4 +68,4 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     }
 }
 
-module.exports = BetterSocialCreateComment
+module.exports = BetterSocialCreateCommentChild
