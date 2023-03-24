@@ -3,8 +3,9 @@ const {
   LogPolling,
   Topics,
   sequelize,
+  Sequelize,
 } = require("../databases/models");
-const { NO_POLL_OPTION_UUID } = require("../helpers/constants");
+const { NO_POLL_OPTION_UUID, POST_TYPE_LINK } = require("../helpers/constants");
 const _ = require("lodash");
 const moment = require('moment')
 
@@ -15,6 +16,7 @@ const moment = require('moment')
  */
 
 const formatLocationGetStream = require("../helpers/formatLocationGetStream");
+const RedisDomainHelper = require("../services/redis/helper/RedisDomainHelper");
 
 const handleCreatePostTO = (userId, postBody, isAnonimous = true) => {
   let { privacy, topics, location, message, tagUsers } = postBody;
@@ -23,7 +25,7 @@ const handleCreatePostTO = (userId, postBody, isAnonimous = true) => {
     const mapTagUser = tagUsers.map((user) => `notification:${user}`);
     TO.push(...mapTagUser);
   }
-  
+
   TO.push(`main_feed:${userId}`);
   TO.push(`notification:${userId}`);
   TO.push("user:bettersocial");
@@ -50,7 +52,7 @@ const handleCreatePostTO = (userId, postBody, isAnonimous = true) => {
 
 const modifyPollPostObject = async (userId, item) => {
   let post = { ...item };
-  if(!item?.polls) return post;
+  if (!item?.polls) return post;
   let pollOptions = await PollingOption.findAll({
     where: {
       polling_option_id: item.polls,
@@ -78,10 +80,17 @@ const modifyPollPostObject = async (userId, item) => {
     post.mypolling = [];
   }
 
-  let distinctPollingByUserId = await sequelize.query(
-    `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id='${item.polling_id}' AND polling_option_id !='${NO_POLL_OPTION_UUID}'`
+  let distinctPollingByUserId = await Sequelize.query(
+    `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id= :polling_id AND polling_option_id != :polling_option_id`,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: {
+        polling_id: post.polling_id,
+        polling_option_id: NO_POLL_OPTION_UUID,
+      }
+    }
   );
-  let voteCount = distinctPollingByUserId[0].length;
+  let voteCount = distinctPollingByUserId[0]?.length || 0;
 
   post.pollOptions = pollOptions;
   post.voteCount = voteCount;
@@ -208,6 +217,31 @@ function getFeedDuration(durationFeed) {
   return expiredAt
 }
 
+
+async function modifyPostLinkPost(domainPageModel, post) {
+  if (post?.post_type !== POST_TYPE_LINK) return post
+
+  let domainPageId = post?.og?.domain_page_id
+  let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
+  if (credderScoreCache) {
+    post.credderScore = credderScoreCache
+    post.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
+  } else {
+    let dataDomain = await domainPageModel.findOne({
+      where: { domain_page_id: domainPageId },
+      raw: true
+    })
+
+    await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain.credder_score)
+    await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain.credder_last_checked)
+
+    post.credderScore = dataDomain.credder_score
+    post.credderLastChecked = dataDomain.credder_last_checked
+  }
+
+  return post
+}
+
 module.exports = {
   filterAllTopics,
   handleCreatePostTO,
@@ -216,5 +250,6 @@ module.exports = {
   modifyAnonimityPost,
   modifyAnonymousAndBlockPost,
   modifyPollPostObject,
-  getFeedDuration
+  getFeedDuration,
+  modifyPostLinkPost,
 };
