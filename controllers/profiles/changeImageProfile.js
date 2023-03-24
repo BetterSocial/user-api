@@ -20,7 +20,11 @@ module.exports = async (req, res) => {
     }
     let { profile_pic_path } = req.body;
 
-    const user = await User.findByPk(req?.userId);
+    const user = await User.findOne({
+      where: {
+        user_id: req.userId
+      }
+    });
     if (user === null) {
       return res.status(404).json({
         code: 404,
