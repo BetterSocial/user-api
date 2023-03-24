@@ -16,7 +16,6 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-    console.log(req, 'nini')
     const user = await User.findOne({
       where: {
         user_id: req.userId

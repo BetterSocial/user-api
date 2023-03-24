@@ -14,7 +14,7 @@ router.get("/self-feeds", Auth.isAuth, profileController.getSelfFeedsInProfile);
 router.get("/feeds/:id", Auth.isAuth, profileController.getOtherFeedsInProfile);
 
 router.post("/changes-real-name", profileController.changeRealName);
-router.post("/changes-image", profileController.changeImageProfile);
+router.post("/changes-image", Auth.isAuth, profileController.changeImageProfile);
 router.delete("/remove-image", profileController.removeImageProfile);
 router.get("/get-my-profile", Auth.isAuth, profileController.getMyProfile);
 router.get("/following", Auth.isAuth, profileController.following);
@@ -24,7 +24,7 @@ router.post("/update-bio", Auth.isAuth, profileController.updateBio);
  * TODO: remove this route if app api path has been reconfigured
  */
 router.post("/changes-real-name/:id", profileController.changeRealName);
-router.post("/changes-image/:id", profileController.changeImageProfile);
+router.post("/changes-image/:id", Auth.isAuth, profileController.changeImageProfile);
 router.delete("/remove-image/:id", profileController.removeImageProfile);
 router.get("/get-my-profile/:id", Auth.isAuth, profileController.getMyProfile);
 router.get("/following/:id", Auth.isAuth, profileController.following);
