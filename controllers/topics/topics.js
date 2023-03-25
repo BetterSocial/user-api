@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     });
     let limit = limits[0].limit;
     Topics.findAll({
-      where: { is_custom_topic: false },
+      where: { is_custom_topic: false, deleted_at: null },
       order: [["sort", "ASC"]],
     })
       .then((topics) => {

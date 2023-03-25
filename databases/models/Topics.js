@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       icon_path: DataTypes.STRING,
       categories: DataTypes.TEXT,
       created_at: DataTypes.DATE,
+      deleted_at: DataTypes.DATE,
       is_custom_topic: DataTypes.BOOLEAN,
       sort: DataTypes.BIGINT,
     },
