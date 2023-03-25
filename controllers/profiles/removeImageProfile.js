@@ -6,11 +6,10 @@ const updateUser = require("../../services/getstream/updateUser");
 
 module.exports = async (req, res) => {
   try {
-
     const user = await User.findOne({
       where: {
-        user_id: req.userId
-      }
+        user_id: req.userId,
+      },
     });
     if (user === null) {
       return res.status(404).json({
@@ -20,10 +19,11 @@ module.exports = async (req, res) => {
       });
     } else {
       let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-            updateUser(req?.userId, {
-            username: user.username,
-            human_id: user.human_id,
-            profile_pic_url: null,
+
+      updateUser(req?.userId, {
+        username: user.username,
+        human_id: user.human_id,
+        profile_pic_url: null,
       });
       const [numberOfAffectedRows, affectedRows] = await User.update(
         {
