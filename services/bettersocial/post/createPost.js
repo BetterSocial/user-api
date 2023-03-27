@@ -6,7 +6,7 @@ const CloudinaryService = require("../../../vendor/cloudinary");
 const { User, Locations, PostAnonUserInfo, sequelize } = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
-const { POST_TYPE_STANDARD, POST_TYPE_POLL, POST_VERB_POLL } = require('../../../helpers/constants');
+const { POST_TYPE_STANDARD, POST_TYPE_POLL, POST_VERB_POLL, POST_VERSION } = require('../../../helpers/constants');
 const { addForCreatePost } = require('../../score');
 const PostFunction = require('../../../databases/functions/post');
 const PollingFunction = require('../../../databases/functions/polling');
@@ -50,12 +50,13 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             object: getstreamObjectParam,
             anonimity: isAnonimous,
             location: body?.location,
-            duration_feed: feedExpiredAt,
+            duration_feed: body?.duration_feed,
             images_url: uploadedImages,
             expired_at: feedExpiredAt,
             count_upvote: 0,
             count_downvote: 0,
             post_type: POST_TYPE_STANDARD,
+            version: POST_VERSION,
             to: handleCreatePostTO(req?.userId, req?.body, isAnonimous),
         }
 
