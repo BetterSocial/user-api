@@ -1,6 +1,6 @@
-var express = require('express');
+const express = require('express');
 const DiscoveryController = require('../controllers/discovery');
-var Router = express.Router();
+const Router = express.Router();
 
 const { isAuth } = require('../middlewares/auth');
 

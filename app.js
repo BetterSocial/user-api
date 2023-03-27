@@ -4,7 +4,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const swaggerUi = require("swagger-ui-express");
-const { initializeApp, cert, ServiceAccount } = require('firebase-admin/app');
+const { initializeApp, cert } = require('firebase-admin/app');
 
 const serviceAccount = Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString();
 const bodyParser = require("body-parser");
@@ -17,10 +17,8 @@ const whoToFollowRouter = require("./routes/whoToFollow");
 const usersRouter = require("./routes/users");
 const profilesRouter = require("./routes/profiles");
 const indexRouter = require("./routes/index");
-const verifyToken = require("./middlewares/verifyToken");
 const feedRouter = require("./routes/feeds");
 const domainRouter = require("./routes/domain");
-const chatRouter = require("./routes/chat");
 const topicPage = require("./routes/topicPages");
 const linkRouter = require("./routes/link");
 const linkPostRouter = require("./routes/link-post");
@@ -29,7 +27,6 @@ const auth = require("./middlewares/auth");
 const HomeRouter = require("./routes/home");
 const mentionRouter = require('./routes/mention');
 const configRouter = require('./routes/config');
-const stream = require('getstream');
 initializeApp({credential: cert(JSON.parse(serviceAccount))})
 const app = express();
 app.disable('x-powered-by');
@@ -51,7 +48,6 @@ app.use("/profiles", profilesRouter);
 app.use("/u", linkRouter);
 app.use("/p", linkPostRouter);
 
-// app.use("/", indexRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/topics", topicsRouter);
 app.use("/api/v1/location", locationsRouter);
@@ -65,7 +61,7 @@ app.use("/api/v1/mention", mentionRouter)
 app.use("/api/v1/config", configRouter);
 app.use(auth.isAuth, topicPage);
 
-var options = {
+const options = {
     swaggerOptions: {
         authAction: {
             JWT: {
@@ -88,5 +84,4 @@ app.use(
 );
 app.use("/api/v1", indexRouter);
 
-// app.listen(3000, () => console.log('app started'))
 module.exports = app;

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { User } = require("../databases/models");
 
 module.exports.isAuth = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -6,7 +7,7 @@ module.exports.isAuth = async (req, res, next) => {
   if (token === null || token === undefined) {
     return res.status(401).json({
       code: 401,
-      message: "Token not provide",
+      message: "Token not provided",
       data: null,
     });
   }
@@ -31,11 +32,10 @@ module.exports.isAuth = async (req, res, next) => {
 module.exports.isRefreshToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  console.log();
   if (token === null || token === undefined) {
     return res.status(401).json({
       code: 401,
-      message: "Token not provide",
+      message: "Token not provided",
       data: null,
     });
   }
@@ -56,3 +56,22 @@ module.exports.isRefreshToken = async (req, res, next) => {
     next();
   });
 };
+
+module.exports.isAuthUserAvailable = async (req, res, next) => {
+  const user = await User.findOne({
+    where: {
+      user_id: req.userId,
+    },
+  });
+
+  if (user === null) {
+    return res.status(404).json({
+      code: 404,
+      status: "error",
+      message: "User not found",
+    });
+  }
+
+  req.userModel = user;
+  next();
+}
