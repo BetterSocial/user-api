@@ -40,11 +40,11 @@ const InitDiscoveryUserData = async (req, res) => {
                 JOIN 
                     vwm_user_common_follower_count joint
                 ON common.user_id = joint.target
-                WHERE joint.source = :userId) CommonUsers
+                WHERE joint.source = :userId AND common.is_anonymous = false) CommonUsers
         ON CommonUsers.user_id = A.user_id
         LEFT JOIN user_follow_user B
         ON A.user_id = B.user_id_followed AND B.user_id_follower = :userId
-        WHERE A.user_id != :userId
+        WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false
         ORDER BY
         COALESCE(CommonUsers.common, -1) DESC, 
         COALESCE(CommonUsers.user_match, -1) DESC,
