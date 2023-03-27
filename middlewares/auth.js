@@ -57,7 +57,7 @@ module.exports.isRefreshToken = async (req, res, next) => {
   });
 };
 
-const isAuthUserAvailable = async (req, res, next) => {
+module.exports.isAuthUserAvailable = async (req, res, next) => {
   const user = await User.findOne({
     where: {
       user_id: req.userId,
@@ -74,32 +74,4 @@ const isAuthUserAvailable = async (req, res, next) => {
 
   req.userModel = user;
   next();
-}
-
-module.exports.isAuthWithUserModel = async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (token === null || token === undefined) {
-    return res.status(401).json({
-      code: 401,
-      message: "Token not provided",
-      data: null,
-    });
-  }
-
-  jwt.verify(token, process.env.SECRET, (err, user) => {
-    if (err) {
-      return res.status(401).json({
-        code: 401,
-        message: "Token invalid",
-        data: null,
-      });
-    }
-
-    req.user = user;
-    req.userId = user.user_id;
-    req.token = token;
-
-    isAuthUserAvailable(req, res, next);
-  });
 }
