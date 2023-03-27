@@ -38,8 +38,9 @@ const SearchUser = async (req, res) => {
                 "follower"."user_id_followed" 
             WHERE 
                 ("User"."username" ILIKE :likeQuery
-                AND 
-                "User"."user_id" != :userId) 
+                AND "User"."user_id" != :userId
+                AND "User"."is_anonymous" = false
+                AND "User"."is_banned" = false) 
             GROUP BY 
                 "User"."user_id"
             ORDER BY 
