@@ -81,10 +81,10 @@ const modifyPollPostObject = async (userId, item) => {
     post.mypolling = [];
   }
 
-  let distinctPollingByUserId = await Sequelize.query(
+  let distinctPollingByUserId = await sequelize.query(
     `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id= :polling_id AND polling_option_id != :polling_option_id`,
     {
-      type: sequelize.QueryTypes.SELECT,
+      type: Sequelize.QueryTypes.SELECT,
       replacements: {
         polling_id: post.polling_id,
         polling_option_id: NO_POLL_OPTION_UUID,
