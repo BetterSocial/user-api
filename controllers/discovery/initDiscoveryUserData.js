@@ -12,11 +12,25 @@ const InitDiscoveryUserData = async (req, res) => {
     let { limit = 10, page = 0 } = req.body
 
     const userId = req.userId
-    let allUsers = []
 
     try {
         let usersWithCommonFollowerQuery = `
-        SELECT A.*, CommonUsers.common, B.user_id_follower from users A
+        SELECT 
+            A.user_id,
+            A.country_code,
+            A.username,
+            A.real_name,
+            A.created_at,
+            A.updated_at,
+            A.last_active_at,
+            A.status,
+            A.profile_pic_path,
+            A.profile_pic_asset_id,
+            A.profile_pic_public_id,
+            A.bio,
+            A.is_banned,
+            A.is_anonymous,
+            CommonUsers.common, B.user_id_follower from users A
             LEFT JOIN 
                 (SELECT 
                     common.*,
@@ -30,6 +44,7 @@ const InitDiscoveryUserData = async (req, res) => {
         ON CommonUsers.user_id = A.user_id
         LEFT JOIN user_follow_user B
         ON A.user_id = B.user_id_followed AND B.user_id_follower = :userId
+        WHERE A.user_id != :userId
         ORDER BY
         COALESCE(CommonUsers.common, -1) DESC, 
         COALESCE(CommonUsers.user_match, -1) DESC,
