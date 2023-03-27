@@ -7,8 +7,12 @@ const cloudinary = require('cloudinary').v2
  */
 const uploadBase64 = async (base64 = null) => {
     if (!base64) throw new Error('base64 is required');
-    const uploadStr = "data:image/jpeg;base64," + base64;
-    return await cloudinary.uploader.upload(uploadStr, {
+
+    if(!base64.startsWith('data:image/jpeg;base64,')) {
+        base64 = `data:image/jpeg;base64,${base64}`
+    }
+    
+    return await cloudinary.uploader.upload(base64, {
         overwrite: false,
         invalidate: true,
     });
