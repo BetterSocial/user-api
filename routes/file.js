@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 const { isAuth } = require('../middlewares/auth');
-var fileController = require('../controllers/file')
+const fileController = require('../controllers/file')
 
 router.post('/upload', isAuth, fileController.upload)
 

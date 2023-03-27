@@ -5,49 +5,25 @@ const v = new Validator();
 
 module.exports = async (req, res) => {
   try {
-    const schema = {
-      bio: "string|empty:false|max:350",
-    };
-    const validate = v.validate(req.body, schema);
-    if (validate.length) {
-      return res.status(403).json({
-        code: 403,
-        status: "error",
-        message: validate,
-      });
-    }
-    const user = await User.findOne({
-      where: {
-        user_id: req.userId
-      }
-    });
     let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-    if (user === null) {
-      return res.status(404).json({
-        code: 404,
-        status: "error",
-        message: "User not found",
-      });
-    } else {
-      const [numberOfAffectedRows, affectedRows] = await User.update(
-        {
-          bio: req.body.bio,
-          updated_at: myTs,
-        },
-        {
-          where: { user_id: req?.userId },
-          returning: true, // needed for affectedRows to be populated
-          plain: true, // makes sure that the returned instances are just plain objects
-        }
-      );
-      if (affectedRows !== null || affectedRows !== undefined) {
-        return res.json({
-          status: "success",
-          code: 200,
-          data: affectedRows,
-        });
+    const [, affectedRows] = await User.update(
+      {
+        bio: req.body.bio,
+        updated_at: myTs,
+      },
+      {
+        where: { user_id: req?.userId },
+        returning: true, // needed for affectedRows to be populated
+        plain: true, // makes sure that the returned instances are just plain objects
       }
-    }
+    );
+    if (affectedRows !== null || affectedRows !== undefined) {
+      return res.json({
+        status: "success",
+        code: 200,
+        data: affectedRows,
+      });
+    } 
   } catch (error) {
     const { status, data } = error.response;
     return res.status(500).json({

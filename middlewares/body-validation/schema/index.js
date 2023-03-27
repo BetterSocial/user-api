@@ -1,4 +1,6 @@
 const BodyValidationSchema = {
+    changeBio: require('./changeBioSchema'),
+    changeProfileImage: require('./changeProfileImageSchema'),
     createAnonymousCommentChildV2: require('./createAnonymousCommentChildV2Schema'),
     createAnonymousCommentV2: require('./createAnonymousCommentV2Schema'),
     createAnonymousPollPostV2: require('./createAnonymousPollPostV2Schema'),

@@ -1,5 +1,5 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 const profileController = require("../controllers/profiles");
 const Auth = require("../middlewares/auth");
 const BodyValidationMiddleware = require("../middlewares/body-validation");
@@ -14,21 +14,21 @@ router.get("/self-feeds", Auth.isAuth, profileController.getSelfFeedsInProfile);
 router.get("/feeds/:id", Auth.isAuth, profileController.getOtherFeedsInProfile);
 
 router.post("/changes-real-name", profileController.changeRealName);
-router.post("/changes-image", Auth.isAuth, profileController.changeImageProfile);
+router.post("/changes-image", Auth.isAuthWithUserModel, BodyValidationMiddleware.changeProfileImage, profileController.changeImageProfile);
 router.delete("/remove-image", Auth.isAuth, profileController.removeImageProfile);
 router.get("/get-my-profile", Auth.isAuth, profileController.getMyProfile);
 router.get("/following", Auth.isAuth, profileController.following);
-router.post("/update-bio", Auth.isAuth, profileController.updateBio);
+router.post("/update-bio", Auth.isAuthWithUserModel, BodyValidationMiddleware.changeBio,profileController.updateBio);
 
 /**
  * TODO: remove this route if app api path has been reconfigured
  */
 router.post("/changes-real-name/:id", profileController.changeRealName);
-router.post("/changes-image/:id", Auth.isAuth, profileController.changeImageProfile);
+router.post("/changes-image/:id", Auth.isAuthWithUserModel, BodyValidationMiddleware.changeProfileImage, profileController.changeImageProfile);
 router.delete("/remove-image/:id", Auth.isAuth, profileController.removeImageProfile);
 router.get("/get-my-profile/:id", Auth.isAuth, profileController.getMyProfile);
 router.get("/following/:id", Auth.isAuth, profileController.following);
-router.post("/update-bio/:id", Auth.isAuth, profileController.updateBio);
+router.post("/update-bio/:id", Auth.isAuthWithUserModel, BodyValidationMiddleware.changeBio, profileController.updateBio);
 /**
  * TODO END
  */

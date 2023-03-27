@@ -1,5 +1,5 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
 const {
   getDomain,
@@ -11,7 +11,6 @@ const {
   getBlockedDomain,
   unblockDomain,
   getSingleBlockedDomain,
-  localUploadDomain,
   getDetailDomain,
   getLinkContextScreenRelatedArticles
 
@@ -30,7 +29,6 @@ router.post("/unfollow", isAuth, unfollowDomain);
 router.get("/ifollow", isAuth, iFollow);
 router.post("/unblock", isAuth, unblockDomain);
 router.get("/check-blocked/:domainId", isAuth, getSingleBlockedDomain);
-// router.get("/local/upload-domain", localUploadDomain)
 router.get("/detail/:domainId", isAuth, getDetailDomainHandle);
 router.get("/link-context-screen/:news_link_id", isAuth, getLinkContextScreenRelatedArticles);
 
