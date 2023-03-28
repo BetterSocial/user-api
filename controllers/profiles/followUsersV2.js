@@ -53,8 +53,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, user_id_followed, username_followed)
-        await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, 'f19ce509-e8ae-405f-91cf-ed19ce1ed96e', username_followed)
+        await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, user_id_followed, username_followed)
     } catch(e) {
         console.log('Error in follow user v2 fcm')
         console.log(e)
