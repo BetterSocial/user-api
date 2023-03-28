@@ -76,9 +76,6 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
 
 
 module.exports = {
-    addToChannelChatQueue,
-    addUserToChannelQueue,
-    addUserToTopicChannel,
     registerServiceQueue,
     registerV2ServiceQueue,
 };
