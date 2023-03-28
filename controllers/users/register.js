@@ -15,20 +15,11 @@ const Validator = require("fastest-validator");
 const moment = require("moment");
 const v = new Validator();
 const getstreamService = require("../../services/getstream");
-const jwt = require("jsonwebtoken");
 const { createRefreshToken } = require("../../services/jwt");
 const { v4: uuidv4 } = require("uuid");
 const {
-    followLocationQueue,
-    followTopicQueue,
-    followUserQueue,
-    addToChannelChatQueue,
-    prepopulatedDmQueue,
     registerServiceQueue,
 } = require("../../services/redis");
-const { responseSuccess } = require("../../utils/Responses");
-
-const { addUserToLocation, addUserToTopic } = require("../../services/chat");
 
 const StreamChat = require("stream-chat").StreamChat;
 const { addForCreateAccount } = require("../../services/score");
@@ -58,7 +49,7 @@ const createTokenChat = async (userId) => {
 
 const syncUser = async (userId) => {
     const serverClient = new StreamChat(process.env.API_KEY, process.env.SECRET);
-    const res = await serverClient.upsertUsers([
+    await serverClient.upsertUsers([
         {
             id: userId,
             role: "user",
@@ -67,7 +58,7 @@ const syncUser = async (userId) => {
 };
 
 module.exports = async (req, res) => {
-    var returnCloudinary = null;
+    let returnCloudinary = null;
     let defaultImage =
         "https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png";
     const schema = {
@@ -251,7 +242,7 @@ module.exports = async (req, res) => {
 
         await getstreamService.createUser(data, userId);
         let token = await getstreamService.createToken(userId);
-        let tokenChat = await createTokenChat(userId);
+        await createTokenChat(userId);
         await syncUser(userId);
         let dataLocations = await Locations.findAll({
             where: {
