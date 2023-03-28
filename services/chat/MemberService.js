@@ -21,7 +21,6 @@ const addUserToTopic = async (topics, userId) => {
     channelIds: newDataTopic,
   };
   const resultJob = await addUserToTopicChannel(data, options);
-  console.log(resultJob);
   return resultJob;
 };
 
@@ -50,7 +49,6 @@ const addUserToLocation = async (locations, userId) => {
   };
 
   const resultJob = await addUserToChannelQueue(data, options);
-  console.log(resultJob);
   return resultJob;
 };
 

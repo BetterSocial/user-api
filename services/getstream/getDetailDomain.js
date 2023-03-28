@@ -6,7 +6,6 @@ module.exports = async (query) => {
     process.env.SECRET,
     process.env.APP_ID
   );
-  console.log(query);
   const nameFeed = client.feed(query.name, query.idFeed);
   // Add an activity to the feed
   return await nameFeed.get(query);

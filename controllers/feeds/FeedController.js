@@ -142,7 +142,6 @@ exports.getReaction = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   const clientServerSide = getstreamService.streamClientServerSide();
-  console.log(clientServerSide);
   let data = {
     human_id: "1234567",
     username: "testing ",

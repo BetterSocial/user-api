@@ -23,7 +23,6 @@ const sendNotification = async (userIdFollower, userNameFollower, userIdFollowed
     };
     if (userTargetToken) {
         messaging().sendToDevice(userTargetToken?.token, payload).then((res) => {
-            console.log(res, 'hehe')
         })
     }
 }

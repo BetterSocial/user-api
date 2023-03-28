@@ -104,7 +104,6 @@ module.exports = async (req, res) => {
             };
         if(userToken) {
           messaging().sendToDevice(userToken.token, payload).then((res) => {
-            console.log(res,'hehe')
           })
         }
 

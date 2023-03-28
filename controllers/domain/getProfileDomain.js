@@ -2,7 +2,6 @@ const { profileDomain } = require("../../services/domain");
 
 module.exports = async (req, res) => {
   const result = await profileDomain(req.params.name);
-  console.log("resu ", result);
   if (!result) {
     return res.status(404).json({
       code: 404,

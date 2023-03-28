@@ -63,8 +63,6 @@ module.exports = async (req, res) => {
 
     const validated = v.validate(req.body, schema);
     if (validated.length) {
-      console.log("Error validation");
-      console.log(validated);
       return res.status(403).json({
         message: "Error validation",
         error: validated,
@@ -141,7 +139,6 @@ module.exports = async (req, res) => {
       );
     }
 
-    console.log(resUrl);
     // let post = await Post.create({
     //   post_id : uuidv4(),
     //   author_user_id : req.userId,

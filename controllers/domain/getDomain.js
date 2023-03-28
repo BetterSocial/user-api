@@ -11,9 +11,12 @@ const _ = require("lodash");
 
 const { getBlockDomain } = require("../../services/domain");
 const { DomainPage } = require("../../databases/models/");
+const ElasticNewsLink = require("../../elasticsearch/repo/newsLink/ElasticNewsLink");
 
 const MIN_CREDDER_SCORE = 50
 const CREDDER_CHECK_ENABLED = false
+
+const elasticNewsLink = new ElasticNewsLink()
 
 module.exports = async (req, res) => {
   let { offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH, fetch = MAX_FEED_FETCH_LIMIT_DOMAIN } = req.query
@@ -64,8 +67,6 @@ module.exports = async (req, res) => {
             }
           }
 
-          console.log(item)
-
           if (item?.domain?.credderScore >= MIN_CREDDER_SCORE || !CREDDER_CHECK_ENABLED) {
             data.push(item)
           }
@@ -97,7 +98,6 @@ module.exports = async (req, res) => {
       }
     }
 
-    console.log(data.length)
     res.status(200).json({
       code: 200,
       status: "success",

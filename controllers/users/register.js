@@ -114,8 +114,6 @@ module.exports = async (req, res) => {
     try {
         let myTs = moment.utc().format("YYYY-MM-DD HH:mm:ss");
         const result = await sequelize.transaction(async (t) => {
-            console.log("timestamp: " + myTs);
-            console.log(returnCloudinary)
             const user = await User.create(
                 {
                     //   generate UUID

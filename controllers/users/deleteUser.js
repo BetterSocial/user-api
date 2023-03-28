@@ -18,7 +18,6 @@ module.exports = async (req, res) => {
   try {
 
     const user_id = req.userId;
-    console.log(req.body);
 
     let result = await sequelize.transaction(async (t) => {
       let user = await User.destroy({

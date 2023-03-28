@@ -21,9 +21,7 @@ const Search = async(req, res) => {
 
     try {
         const blockDomain = await getBlockDomain(req.userId);
-        // const blockDomain = ["f0433444-8459-4b9a-969b-dc13f98580b3"]
         let filteredBlockDomainArray = blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain)
-        console.log(filteredBlockDomainArray)
 
         let newsLink
         if(filteredBlockDomainArray.length > 0) {

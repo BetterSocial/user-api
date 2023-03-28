@@ -214,8 +214,6 @@ function getPollsDurationInIso(pollsDuration) {
 }
 
 function getPollPostExpiredAt(pollsDuration, durationFeed) {
-    console.log('pollsDuration, durationFeed')
-    console.log(pollsDuration, durationFeed)
     if (durationFeed !== 'never') {
         const pollDurationMoment = getPollsDurationInIso(pollsDuration)
         const pollExpiredAt = moment().add(durationFeed, 'days')
