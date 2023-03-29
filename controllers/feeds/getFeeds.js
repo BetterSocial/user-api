@@ -1,3 +1,4 @@
+const moment = require('moment')
 const getstreamService = require("../../services/getstream");
 const {
   POST_VERB_POLL,
@@ -7,22 +8,16 @@ const {
   MAX_DATA_RETURN_LENGTH,
   POST_TYPE_LINK,
 } = require("../../helpers/constants");
-const { Op } = require("sequelize");
 const {
   getListBlockUser,
-  getListBlockPostAnonymous,
   getListBlockPostAnonymousAuthor,
 } = require("../../services/blockUser");
 const getBlockDomain = require("../../services/domain/getBlockDomain");
-const { setData, getValue, delCache } = require("../../services/redis");
-const { convertString } = require("../../utils/custom");
 const {
   modifyPollPostObject,
-  modifyAnonymousAndBlockPost,
   modifyAnonimityPost,
   isPostBlocked,
 } = require("../../utils/post");
-const putUserPostScore = require("../../services/score/putUserPostScore");
 const { DomainPage, Locations, User } = require("../../databases/models");
 const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
 
@@ -117,8 +112,8 @@ module.exports = async (req, res) => {
           // Put user post score in score details
           // await putUserPostScore(item, req.userId);
 
-          let now = new Date();
-          let dateExpired = new Date(item.expired_at);
+          let now = moment().valueOf();
+          let dateExpired = moment(item?.expired_at).valueOf();
 
           // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
           if (now < dateExpired || item.duration_feed == "never") {
