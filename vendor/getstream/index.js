@@ -2,6 +2,7 @@ const Getstream = {
     core: {
         createUser: require('./core/createUser'),
         createToken: require('./core/createToken'),
+        updateUserRemoveHumanId: require('./core/updateUserRemoveHumanId'),
     },
     chat: {
         createTokenChat: require('./chat/createTokenChat'),

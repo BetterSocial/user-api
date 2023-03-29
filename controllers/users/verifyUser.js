@@ -2,6 +2,7 @@ const { User } = require("../../databases/models");
 const getstreamService = require("../../services/getstream");
 const jwt = require("jsonwebtoken");
 const { createRefreshToken } = require("../../services/jwt");
+const Getstream = require("../../vendor/getstream");
 
 module.exports = async (req, res) => {
   try {
@@ -17,6 +18,7 @@ module.exports = async (req, res) => {
           message: "User has banned by admin",
         });
       }
+      await Getstream.core.updateUserRemoveHumanId(userData)
       let user_id = userData.user_id;
       let userId = user_id.toLowerCase();
       const token = await getstreamService.createToken(userId);
@@ -39,12 +41,6 @@ module.exports = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    // const { status, data } = error.response;
-    // return res.json({
-    //   code: status,
-    //   data: 0,
-    //   message: data,
-    // });
     return res.status(200).json({
       code: 500,
       data: false,

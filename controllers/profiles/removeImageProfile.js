@@ -22,7 +22,6 @@ module.exports = async (req, res) => {
 
       updateUser(req?.userId, {
         username: user.username,
-        human_id: user.human_id,
         profile_pic_url: null,
       });
       const [numberOfAffectedRows, affectedRows] = await User.update(

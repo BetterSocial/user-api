@@ -18,7 +18,10 @@ module.exports = async (req, res) => {
         let { username } = req.params 
 
         let user = await User.findOne({
-            where : { username }
+            where : { username },
+            attributes: {
+                exclude: ["human_id"],
+            }
         })
 
         if(!user) return res.json({
