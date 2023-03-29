@@ -39,7 +39,7 @@ const registerV2 = async (req, res) => {
     /**
      * @type {RegisterBody}
      */
-    const { data } = req?.body;
+    const { data } = req.body;
     const { users, follows, local_community, topics } = data;
 
     let insertedObject = {};

@@ -7,9 +7,9 @@ const getstreamService = require('../../services/getstream')
  * @returns 
  */
 module.exports = async (req, res) => {
-    const { postId } = req?.params
-    const token = req?.token
-    const userId = req?.userId
+    const { postId } = req.params
+    const token = req.token
+    const userId = req.userId
 
     const getstreamQueryResult = await getstreamService.getFeeds(token, 'user_excl', {
         ids: [postId]
@@ -22,8 +22,6 @@ module.exports = async (req, res) => {
             message: 'You are not authorized to delete this post'
         })
     }
-
-    console.log(feed)
 
     try {
         const getstreamDeleteResult = await getstreamService.deleteFeedById(token, 'user_excl', postId)

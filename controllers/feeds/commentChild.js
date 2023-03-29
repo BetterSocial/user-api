@@ -5,7 +5,7 @@ const { FcmToken, User, Post } = require("../../databases/models");
 
 module.exports = async (req, res) => {
   try {
-    let { reaction_id, message, sendPostNotif, postMaker } = req?.body;
+    let { reaction_id, message, sendPostNotif, postMaker } = req.body;
 
     let result = await commentChild(reaction_id, req.userId, req.body.useridFeed, message, req.token, sendPostNotif, req.body.postMaker);
 

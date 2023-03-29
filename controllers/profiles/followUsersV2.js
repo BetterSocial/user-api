@@ -13,7 +13,7 @@ const BetterSocialCore = require('../../services/bettersocial')
 const UsersFunction = require('../../databases/functions/users')
 
 module.exports = async (req, res) => {
-    const { user_id_followed, follow_source, username_follower, username_followed } = req?.body
+    const { user_id_followed, follow_source, username_follower, username_followed } = req.body
 
     if (req?.userId === user_id_followed) return ErrorResponse.e403(res, "Only allow following other profiles")
 
