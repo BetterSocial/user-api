@@ -24,8 +24,8 @@ class BetterSocialQueue {
                 enableReadyCheck: false,
                 maxRetriesPerRequest: null,
                 tls: {
-                    rejectUnauthorized: false,
-                    requestCert: true
+                    // rejectUnauthorized: false,
+                    // requestCert: true
                 }
 
             },

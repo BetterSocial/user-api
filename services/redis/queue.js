@@ -8,9 +8,9 @@ const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : pro
 const registerQueue = new Bull("registerQueue", connectRedis,
     {
         redis: {
-            tls: { rejectUnauthorized: false, requestCert: true },
-            maxRetriesPerRequest: 100,
-            connectTimeout: 30000
+            // tls: { rejectUnauthorized: false, requestCert: true },
+            // maxRetriesPerRequest: 100,
+            // connectTimeout: 30000
         }
     }
 );
@@ -18,9 +18,9 @@ const registerQueue = new Bull("registerQueue", connectRedis,
 const registerV2Queue = new Bull("registerV2", connectRedis,
     {
         redis: {
-            tls: { rejectUnauthorized: false, requestCert: true },
-            maxRetriesPerRequest: 100,
-            connectTimeout: 30000
+            // tls: { rejectUnauthorized: false, requestCert: true },
+            // maxRetriesPerRequest: 100,
+            // connectTimeout: 30000
         }
     }
 );
