@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
         ids: [postId]
     })
 
-    const [feed] = getstreamQueryResult?.results
+    const [feed] = getstreamQueryResult?.results || {}
     if (feed?.actor?.id !== userId) {
         return res.status(200).json({
             success: false,
