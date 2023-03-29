@@ -211,7 +211,7 @@ function getFeedDuration(durationFeed) {
   let expiredAt = null;
 
   if (durationFeed !== "never") {
-    let dateMoment = moment().add(durationFeed, 'days');
+    let dateMoment = moment().add(parseInt(durationFeed), 'days');
     expiredAt = dateMoment.toISOString();
   }
 
@@ -250,7 +250,7 @@ async function filterFeeds(userId, feeds = []) {
     let now = moment().valueOf()
     let dateExpired = moment(item?.expired_at).valueOf()
 
-    if (dateExpired > now) continue
+    if (dateExpired < now) continue
     let newItem = { ...item };
 
     if (newItem.anonimity) {
