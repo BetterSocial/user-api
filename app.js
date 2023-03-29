@@ -84,5 +84,4 @@ app.use(
 );
 app.use("/api/v1", indexRouter);
 
-app.listen(3000, () => console.log('app started'))
 module.exports = app;
