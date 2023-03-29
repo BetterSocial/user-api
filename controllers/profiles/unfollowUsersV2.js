@@ -33,7 +33,8 @@ module.exports = async (req, res) => {
         await Getstream.feed.unfollowUser(req?.token, req?.userId, user_id_followed)
 
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed)
-        await Getstream.feed.unfollowAnonUser(req?.token, req?.userId, anonymousUser?.user_id)
+        const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId)
+        await Getstream.feed.unfollowAnonUser(req?.token, req?.userId, user_id_followed, selfAnonymousUser?.user_id, anonymousUser?.user_id)
     } catch (e) {
         console.log('Error in unfollow user v2 getstream')
         console.log(e)
