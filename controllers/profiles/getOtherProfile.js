@@ -33,6 +33,9 @@ module.exports = async (req, res) => {
           as: "follower",
         },
       ],
+      attributes: {
+        exclude: ["human_id"],
+      }
     });
     if (user === null) {
       return res.status(404).json({

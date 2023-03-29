@@ -17,7 +17,6 @@ module.exports = async (req, res) => {
       let myTs = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
       updateUser(req?.userId, {
         username: user.username,
-        human_id: user.human_id,
         profile_pic_url: returnCloudinary.secure_url,
       });
       const [, affectedRows] = await User.update(
