@@ -21,6 +21,7 @@ const GenerateBodyValidationMiddleware = (schema) => {
 }
 
 const BodyValidationMiddleware = {
+    blockUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.blockUserV2),
     changeBio: GenerateBodyValidationMiddleware(BodyValidationSchema.changeBio),
     changeProfileImage: GenerateBodyValidationMiddleware(BodyValidationSchema.changeProfileImage),
     createAnonymousCommentChildV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createAnonymousCommentChildV2),

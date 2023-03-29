@@ -7,7 +7,6 @@ const RegisterV2UploadPhotoMiddleware = require('../middlewares/upload-photo/reg
 
 router.post('/check-username', usersHandler.checkUsername);
 router.post('/register', usersHandler.register);
-router.post('/register-v2', BodyValidationMiddleware.registerV2, RegisterV2UploadPhotoMiddleware, usersHandler.registerV2);
 router.post('/demo-verify-user', usersHandler.demoVerifyUser);
 router.post('/verify-user', usersHandler.verifyUser);
 router.get('/veryfy-token', usersHandler.veryfyToken);
@@ -33,5 +32,8 @@ router.post('/rename/:userId', auth.isAuth, usersHandler.renameUser);
 router.get('/chat/search', auth.isAuth, usersHandler.chatSearch)
 router.post('/fcmtoken', auth.isAuth, usersHandler.fcmToken)
 router.delete('/fcmtoken', auth.isAuth, usersHandler.removeFcmTokem)
+
+router.post('/register-v2', BodyValidationMiddleware.registerV2, RegisterV2UploadPhotoMiddleware, usersHandler.registerV2);
+router.post('/blockuser-v2', auth.isAuth, BodyValidationMiddleware.blockUserV2, usersHandler.blockUserV2);
 
 module.exports = router;

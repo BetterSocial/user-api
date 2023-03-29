@@ -19,10 +19,13 @@ const veryfyToken = require('./veryfyToken');
 const fcmToken = require('./fcmToken')
 const removeFcmTokem = require('./removeFcmToken')
 
+const blockUserV2 = require('../users/blockUserV2');
+
 module.exports = {
     blockDomain,
     blockPostAnonymous,
     blockUser,
+    blockUserV2,
     chatSearch,
     checkUsername,
     deleteUser,

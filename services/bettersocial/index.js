@@ -1,3 +1,4 @@
+const BetterSocialBlockUserV2 = require('./user/BetterSocialBlockUserV2');
 const BetterSocialCreateAnonymousUser = require('./user/BetterSocialCreateAnonymousUser');
 const BetterSocialCreateUser = require('./user/BetterSocialCreateUser');
 
@@ -5,6 +6,7 @@ const BetterSocialCore = {
     user: {
         createUser: BetterSocialCreateUser,
         createAnonymousUser: BetterSocialCreateAnonymousUser,
+        blockUser: BetterSocialBlockUserV2
     },
     fcmToken: {
         sendNotification: require('./fcmToken/sendNotification'),
