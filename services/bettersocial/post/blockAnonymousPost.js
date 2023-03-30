@@ -32,10 +32,7 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
             message: e?.message || "Error in fetching getstream post by post id"
         }
     }
-
-    /**
-     * TODO: check is self anonymous user same with anonymous author user here
-     */
+    
     const authorAnonymousUserId = post?.actor?.id || null
 
     if (selfAnonymousUserId?.user_id === authorAnonymousUserId) return {
