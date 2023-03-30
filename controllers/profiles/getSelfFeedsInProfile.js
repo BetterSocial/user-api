@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
       reactions: { own: true, recent: true, counts: true },
       limit,
       offset,
-      ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD,
+      // ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD,
     })
 
     .then(async (result) => {

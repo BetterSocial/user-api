@@ -29,10 +29,9 @@ module.exports = async (req, res) => {
 
     let locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (:locations)`
 
-    let userTopicFollowerQueryResult = await sequelize.query(topicsQuery, { 
+    let userTopicFollowerQueryResult = await sequelize.query(topicsQuery, {
       type: sequelize.QueryTypes.SELECT,
       replacements: {
-        // topics: topics.join(','),
         topics: topics
       }
     })
@@ -41,12 +40,11 @@ module.exports = async (req, res) => {
     let userLocationFollowerQueryResult = await sequelize.query(locationQuery, {
       type: sequelize.QueryTypes.SELECT,
       replacements: {
-        // locations: locations.join(','),
         locations: locations
       }
     })
     let userLocationFollower = userLocationFollowerQueryResult
-    
+
     let TopicsData = await Topics.findAll({
       where: { 'topic_id': topics },
       raw: true,
@@ -57,25 +55,28 @@ module.exports = async (req, res) => {
       raw: true
     })
 
-        const betterAccount = await User.findOne({
+    const betterAccount = await User.findOne({
       where: {
-       user_id: process.env.BETTER_ADMIN_ID
+        user_id: process.env.BETTER_ADMIN_ID
+      },
+      attributes: {
+        exclude: ['human_id']
       }
     })
     let result = []
-    // let duplicateUserChecker = [];
     for (let indexTopic in TopicsData) {
       let tempUsers = []
       let topic = TopicsData[indexTopic]
-       tempUsers.push(betterAccount)
+      tempUsers.push(betterAccount)
 
       for (let indexUserTopic in userTopicFollower) {
         let userTopic = userTopicFollower[indexUserTopic]
+        delete userTopic.human_id
         if (userTopic.topic_id === topic.topic_id && userTopic.user_id !== betterAccount.user_id) {
           tempUsers.push({
-          ...userTopic,
-          viewtype: 'user'
-        })
+            ...userTopic,
+            viewtype: 'user'
+          })
         }
       }
 
@@ -95,6 +96,7 @@ module.exports = async (req, res) => {
 
       for (let indexUserLocation in userLocationFollower) {
         let userLocation = userLocationFollower[indexUserLocation]
+        delete userLocation.human_id
         if (userLocation.location_id === location.location_id) tempUsers.push({
           ...userLocation,
           viewtype: 'user'
@@ -120,12 +122,10 @@ module.exports = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    // const { status, data } = error.response;
     return res.json({
-      status: failed,
       success: false,
       data: 0,
-      message: data,
+      message: error?.message,
     });
   }
 };
