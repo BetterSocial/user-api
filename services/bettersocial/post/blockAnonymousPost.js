@@ -56,7 +56,7 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
                 selfUserId,
                 authorAnonymousUserId,
                 source,
-                { transaction: t, message, postId, reason }
+                { transaction: t, message, postId, reason, isAnonymous: true }
             )
         });
     } catch (e) {

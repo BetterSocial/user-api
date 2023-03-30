@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require("uuid");
  * @property {string} [postId]
  * @property {string} [reason]
  * @property {string} [message]
+ * @property {boolean} [isAnonymous = false]
  * @property {Object} [transaction]
  * 
  */
@@ -37,6 +38,7 @@ module.exports = async (
         message = "",
         postId = null,
         reason = null,
+        isAnonymous = false,
         transaction = null } = optionalParams
 
     const reasonBlocked = {
@@ -49,6 +51,7 @@ module.exports = async (
         user_id_blocker: selfUserId,
         user_id_blocked: targetUserId,
         reason_blocked: reasonBlocked,
+        is_anonymous_user: isAnonymous,
         post_id: postId
     };
 
