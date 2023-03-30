@@ -1,3 +1,4 @@
+const blockAnonymousPostV2 = require('./blockAnonymousPostV2')
 const childDownvote = require("./childDownvote");
 const childUpvote = require("./childUpvote");
 const comment = require("./comment");
@@ -36,6 +37,7 @@ const { getFeedChatService } = require("./getFeedChat")
 const { putMainFeed } = require("./updateActivity");
 
 module.exports = {
+  blockAnonymousPostV2,
   childDownvote,
   childUpvote,
   comment,

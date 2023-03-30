@@ -19,6 +19,7 @@ module.exports = async (req, res) => {
     let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
 
     const anonymousUserId = await UsersFunction.findAnonymousUserId(User, req.userId)
+    if (!anonymousUserId) return ErrorResponse.e404(res, "Anonymous user not found")
 
     const result = await Getstream.feed.getAnonymousFeeds(anonymousUserId?.user_id, limit, offset)
     const newResult = await filterFeeds(req?.userId, result?.results || [])
@@ -30,6 +31,6 @@ module.exports = async (req, res) => {
     return SuccessResponse(res, responseData)
   } catch (e) {
     console.log(e)
-    return ErrorResponse.e500(res, e)
+    return ErrorResponse.e500(res, e?.message)
   }
 };
