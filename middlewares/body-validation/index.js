@@ -21,6 +21,7 @@ const GenerateBodyValidationMiddleware = (schema) => {
 }
 
 const BodyValidationMiddleware = {
+    blockAnonymousPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.blockAnonymousPostV2),
     blockUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.blockUserV2),
     changeBio: GenerateBodyValidationMiddleware(BodyValidationSchema.changeBio),
     changeProfileImage: GenerateBodyValidationMiddleware(BodyValidationSchema.changeProfileImage),
@@ -36,6 +37,7 @@ const BodyValidationMiddleware = {
     generateCommentAnonymousUsername: GenerateBodyValidationMiddleware(BodyValidationSchema.generateCommentAnonymousUsername),
     generatePostAnonymousUsername: GenerateBodyValidationMiddleware(BodyValidationSchema.generatePostAnonymousUsername),
     registerV2: GenerateBodyValidationMiddleware(BodyValidationSchema.registerV2),
+    unblockUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.unblockUserV2),
     unfollowUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
 }
 

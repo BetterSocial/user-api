@@ -1,12 +1,14 @@
 const BetterSocialBlockUserV2 = require('./user/BetterSocialBlockUserV2');
 const BetterSocialCreateAnonymousUser = require('./user/BetterSocialCreateAnonymousUser');
 const BetterSocialCreateUser = require('./user/BetterSocialCreateUser');
+const BetterSocialUnblockUserV2 = require('./user/BetterSocialUnblockUserV2');
 
 const BetterSocialCore = {
     user: {
         createUser: BetterSocialCreateUser,
         createAnonymousUser: BetterSocialCreateAnonymousUser,
-        blockUser: BetterSocialBlockUserV2
+        blockUser: BetterSocialBlockUserV2,
+        unblockUser: BetterSocialUnblockUserV2,
     },
     fcmToken: {
         sendNotification: require('./fcmToken/sendNotification'),
@@ -14,6 +16,7 @@ const BetterSocialCore = {
         sendReplyCommentNotification: require('./fcmToken/sendReplyCommentNotification')
     },
     post: {
+        blockAnonymousPost: require('./post/blockAnonymousPost'),
         createPost: require('./post/createPost'),
         createPollPost: require('./post/createPollPost'),
         comment: require('./post/comment'),
@@ -23,6 +26,10 @@ const BetterSocialCore = {
         color: require('./constantList/color'),
         emoji: require('./constantList/emoji'),
         utils: require('./constantList/utils'),
+    },
+    score: {
+        blockUser: require('./score/block-user'),
+        unblockUser: require('./score/unblock-user'),
     }
 }
 

@@ -1,4 +1,5 @@
 const BodyValidationSchema = {
+    blockAnonymousPostV2: require('./blockAnonymousPostV2Schema'),
     blockUserV2: require('./blockUserV2Schema'),
     changeBio: require('./changeBioSchema'),
     changeProfileImage: require('./changeProfileImageSchema'),
@@ -14,6 +15,7 @@ const BodyValidationSchema = {
     generateCommentAnonymousUsername: require('./generateCommentAnonymousUsernameSchema'),
     generatePostAnonymousUsername: require('./generatePostAnonymousUsernameSchema'),
     registerV2: require('./registerV2Schema'),
+    unblockUserV2: require('./unblockUserV2Schema'),
     unfollowUserV2: require('./unfollowUserV2Schema'),
 }
 

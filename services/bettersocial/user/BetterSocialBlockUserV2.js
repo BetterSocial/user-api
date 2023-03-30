@@ -3,6 +3,9 @@ const UserFollowUserFunction = require("../../../databases/functions/userFollowU
 const UsersFunction = require("../../../databases/functions/users");
 const { sequelize, User, UserBlockedUser, UserBlockedUserHistory, UserFollowUser, UserFollowUserHistory } = require("../../../databases/models");
 const Getstream = require("../../../vendor/getstream");
+const RedisBlockHelper = require("../../redis/helper/RedisBlockHelper");
+const BetterSocialScoreBlockUser = require("../score/block-user");
+
 /**
  * @typedef {Object} BetterSocialBlockUserV2OptionalParams
  * @property {string} [postId]
@@ -18,6 +21,8 @@ const Getstream = require("../../../vendor/getstream");
  * @param {BetterSocialBlockUserV2OptionalParams} params
  */
 const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, params = {}) => {
+    const { postId = "", reason = [], message = "" } = params
+    
     if(selfUserId === targetUserId) return {
         isSuccess: false,
         message: "You can't block yourself"
@@ -25,7 +30,6 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
     
     try {
         await sequelize.transaction(async (t) => {
-            const { postId = "", reason = [], message = "" } = params
             await UserFollowUserFunction.userBlock(
                 UserFollowUser,
                 UserFollowUserHistory,
@@ -45,6 +49,7 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
         });
     } catch (e) {
         console.log('Error in block user v2 sql transaction')
+        console.log(e)
         return {
             isSuccess: false,
             message: e?.message || "Error in block user v2 sql transaction"
@@ -52,11 +57,25 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
     }
 
     try {
+        await RedisBlockHelper.resetBlockUserList(selfUserId)
+    } catch(e) {
+        console.log('Error in block user v2 redis')
+        console.log(e)
+        return {
+            isSuccess: false,
+            message: e?.message || "Error in block user v2 redis"
+        }
+    }
+
+    BetterSocialScoreBlockUser(selfUserId, targetUserId, postId)
+
+    try {
         await Getstream.feed.unfollowUser(token, selfUserId, targetUserId)
         await Getstream.feed.unfollowUserExclusive(selfUserId, targetUserId)
 
         const targetAnonymousUserId = await UsersFunction.findAnonymousUserId(User, targetUserId)
-        await Getstream.feed.unfollowAnonUser(token, selfUserId, targetAnonymousUserId)
+        const selfAnonymousUserId = await UsersFunction.findAnonymousUserId(User, selfUserId)
+        await Getstream.feed.unfollowAnonUser(token, selfUserId, targetUserId, selfAnonymousUserId?.user_id, targetAnonymousUserId?.user_id)
         return {
             isSuccess: true,
             message: "User has been blocked successfully"

@@ -19,6 +19,7 @@ const veryfyToken = require('./veryfyToken');
 const fcmToken = require('./fcmToken')
 const removeFcmTokem = require('./removeFcmToken')
 
+const unblockUserV2 = require('./unblockUserV2')
 const blockUserV2 = require('../users/blockUserV2');
 
 module.exports = {
@@ -42,5 +43,6 @@ module.exports = {
     verifyUser,
     veryfyToken,
     fcmToken,
-    removeFcmTokem
+    removeFcmTokem,
+    unblockUserV2
 };

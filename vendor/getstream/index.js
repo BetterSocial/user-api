@@ -16,10 +16,12 @@ const Getstream = {
         createAnonymousPost: require('./feed/createAnonymousPost'),
         createPost: require('./feed/createPost'),
         getAnonymousFeeds: require('./feed/getAnonymousFeeds'),
+        getPlainFeedById: require('./feed/getPlainFeedById'),
         followAnonUser: require('./feed/followAnonUser'),
         followUser: require('./feed/followUser'),
         followUserExclusive: require('./feed/followUserExclusive'),
         unfollowAnonUser: require('./feed/unfollowAnonUser'),
+        unfollowAnonUserByBlockAnonPost: require('./feed/unfollowAnonUserByBlockAnonPost'),
         unfollowUser: require('./feed/unfollowUser'),
         unfollowUserExclusive: require('./feed/unfollowUserExclusive'),
     }
