@@ -10,7 +10,7 @@ module.exports = async (token, message, reactionId, commentAuthorUserId, postMak
         targetFeed = []
     }
 
-    return await clientUser.reactions.addChild("comment",
+    const data = await clientUser.reactions.addChild("comment",
         { id: reactionId },
         {
             text: message,
@@ -18,4 +18,5 @@ module.exports = async (token, message, reactionId, commentAuthorUserId, postMak
             count_downvote: 0,
             isNotSeen: true
         }, { targetFeeds: targetFeed, userId: commentAuthorUserId });
+    return data
 };
