@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
     process.env.SECRET,
     process.env.APP_ID
   );
- console.log('babuman')
+
   if(newItem.anonimity) {
     newItem.actor = {}
     newItem.to = []
