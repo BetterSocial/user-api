@@ -17,6 +17,7 @@ const Getstream = {
         createPost: require('./feed/createPost'),
         getAnonymousFeeds: require('./feed/getAnonymousFeeds'),
         getPlainFeedById: require('./feed/getPlainFeedById'),
+        getReactionById: require('./feed/getReactionById'),
         followAnonUser: require('./feed/followAnonUser'),
         followUser: require('./feed/followUser'),
         followUserExclusive: require('./feed/followUserExclusive'),

@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid")
 const moment = require("moment");
 const crypto = require("crypto");
 const { Transaction } = require("sequelize");
+const CryptoUtils = require("../../../utils/crypto");
 
 /**
  * 
@@ -16,6 +17,7 @@ module.exports = async (model, userId, transaction = null) => {
     const saltedUserId = salt + userId + salt;
     
     const anonymousUsername = crypto.createHash('sha256').update(saltedUserId).digest('hex');
+    const encryptedUserId = CryptoUtils.encryptSignedUserId(userId)
     const userIdAnonymous = uuidv4()
     const user = await model.create(
         {
@@ -31,6 +33,7 @@ module.exports = async (model, userId, transaction = null) => {
             updated_at: myTs,
             last_active_at: myTs,
             status: "Y",
+            bio: encryptedUserId,
             is_anonymous: true
         },
         { transaction, returning: true}

@@ -14,7 +14,10 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     try {
         const { body, userId, token } = req
 
-        const { activity_id, useridFeed, message, anon_user_info, sendPostNotif } = body
+        const { activity_id, message, anon_user_info, sendPostNotif } = body
+        const post = await Getstream.feed.getPlainFeedById(activity_id)
+        const useridFeed = await UsersFunction.findSignedUserId(User, post?.actor?.id)
+
         let detailUser = {}
         let result = {}
 

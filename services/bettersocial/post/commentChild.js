@@ -10,7 +10,13 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     try {
         const { body, userId, token } = req
 
-        const { reaction_id, useridFeed, message, anon_user_info, sendPostNotif, postMaker, postTitle } = body
+        const { reaction_id, message, anon_user_info, sendPostNotif, postTitle } = body
+
+        const reaction = await Getstream.feed.getReactionById(reaction_id)
+        const post = await Getstream.feed.getPlainFeedById(reaction?.activity_id)
+        const postMaker = await UsersFunction.findSignedUserId(User, post?.actor?.id)
+        const useridFeed = await UsersFunction.findSignedUserId(User, reaction?.user?.id)
+        
         let detailUser = {}
         let result = {}
 
@@ -24,7 +30,8 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
         }
 
         let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
-        if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info)
+
+        if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
         else result = await Getstream.feed.commentChild(token, message, reaction_id, userId, postMaker, useridFeed, sendPostNotif)
 
         if (body?.message?.length > 80) {
