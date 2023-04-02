@@ -10,7 +10,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     try {
         const { body, userId, token } = req
 
-        const { reaction_id, message, anon_user_info, sendPostNotif, postTitle } = body
+        const { reaction_id, message, anon_user_info, sendPostNotif, postTitle, activityId } = body
 
         const reaction = await Getstream.feed.getReactionById(reaction_id)
         const post = await Getstream.feed.getPlainFeedById(reaction?.activity_id)
