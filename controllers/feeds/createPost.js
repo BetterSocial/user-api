@@ -6,12 +6,9 @@ const v = new Validator();
 
 const moment = require("moment");
 const cloudinary = require("cloudinary");
-const formatLocationGetStream = require("../../helpers/formatLocationGetStream");
 const { POST_TYPE_STANDARD } = require("../../helpers/constants");
 const { addForCreatePost } = require("../../services/score");
 const { handleCreatePostTO, filterAllTopics, insertTopics } = require("../../utils/post");
-const emojiUnicode = require("emoji-unicode");
-const { convertTopicWithEmoji } = require("../../utils");
 
 function addDays(theDate, days) {
   return new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -28,7 +25,6 @@ const getUserDetail = async (userId) => {
 const getLocationDetail = async (locationId) => {
   try {
     return await Locations.findByPk(locationId);
-    // return await Locations.findByPk(1);
   } catch (err) {
     console.log(err);
   }
@@ -83,7 +79,6 @@ module.exports = async (req, res) => {
 
     let newTopic = filterAllTopics(message, topics)
 
-    // console.log('location id: ', location_id);
     let userDetail = await getUserDetail(req.userId);
     let location_level = "";
     if (location_id) {

@@ -1,7 +1,12 @@
+const jwt = require("jsonwebtoken");
+const { addForViewPost } = require("../../services/score");
+const moment = require("moment");
+
 const createQueuePostTime = async (req, res) => {
     try {
         const { getToken } = require("../../utils");
         const token = getToken(req);
+        const user_id = jwt.decode(token).user_id;
         if (token == null) {
             return res.status(401).json({
                 code: 401,
@@ -10,30 +15,21 @@ const createQueuePostTime = async (req, res) => {
             });
         } else {
             if (req.body.post_id && req.body.view_time) {
-                const jwt = require("jsonwebtoken");
-                const { v4: uuidv4 } = require('uuid');
-                const user_id = jwt.decode(token).user_id;
-                const { addForViewPost } = require("../../services/score");
-                const moment = require("moment");
                 /*
                   @description options bull queue ref https://www.npmjs.com/package/bull
                 */
-                const options = {
-                    jobId: uuidv4(),
-                    removeOnComplete: true,
-                };
-              
+
                 const { post_id, view_time, source } = req.body;
                 // send queue for scoring processing on create post
                 const scoringProcessData = {
-                  feed_id: post_id,
-                  user_id: user_id,
-                  view_duration: view_time,
-                  is_pdp: (source === "PDP"),
-                  activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
-                  source: source,
+                    feed_id: post_id,
+                    user_id: user_id,
+                    view_duration: view_time,
+                    is_pdp: (source === "PDP"),
+                    activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+                    source: source,
                 };
-console.log("view post data:" + scoringProcessData); // TODO
+                console.log("view post data:" + scoringProcessData); // TODO
                 const resultJob = await addForViewPost(scoringProcessData);
 
                 return res.status(200).json({
