@@ -28,27 +28,20 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
         }
         if (!isAnonimous) {
             commentAuthor = await UsersFunction.findUserById(User, userId)
-                     console.log('masuk3')
-
         }
 
         let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
-                 console.log('masuk4')
 
         if(isAnonimous) result = await Getstream.feed.commentAnonymous(selfUser?.user_id, message, activity_id, useridFeed, anon_user_info)
         else result = await Getstream.feed.comment(token, message, activity_id, userId, useridFeed, sendPostNotif)
-                 console.log('masuk5')
 
         if (body?.message?.length > 80) {
             await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
-                     console.log('masuk5')
 
         }
 
         if (useridFeed) {
             detailUser = await UsersFunction.findUserById(User, useridFeed)
-                     console.log('masuk7')
-
         }
 
 
@@ -59,8 +52,6 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
                 message,
                 activity_id
             )
-                     console.log('masuk8')
-
         }
 
         const scoringProcessData = {
