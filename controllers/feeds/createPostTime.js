@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const user_id = jwt.decode(token).user_id;
 const { addForViewPost } = require("../../services/score");
 const moment = require("moment");
 
@@ -7,6 +6,7 @@ const createQueuePostTime = async (req, res) => {
     try {
         const { getToken } = require("../../utils");
         const token = getToken(req);
+        const user_id = jwt.decode(token).user_id;
         if (token == null) {
             return res.status(401).json({
                 code: 401,
