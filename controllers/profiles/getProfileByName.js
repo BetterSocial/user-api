@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         let { username } = req.params 
 
         let user = await User.findOne({
-            where : { username },
+            where : { username, is_anonymous : false },
             attributes: {
                 exclude: ["human_id"],
             }

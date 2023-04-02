@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
     let users = await User.findAll({
       where: {
         user_id: idUsers,
+        is_anonymous: false,
       },
     });
     res.status(200).json(responseSuccess('Success get populate', users));

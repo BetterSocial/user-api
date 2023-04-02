@@ -9,7 +9,8 @@ module.exports = async (req, res) => {
         where: {
             username: {
                 [Op.iLike]: `%${name}%`
-            }
+            },
+            is_anonymous: false
         }
     })
     data.push(...users);
