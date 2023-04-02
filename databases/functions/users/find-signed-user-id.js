@@ -1,13 +1,13 @@
 const CryptoUtils = require("../../../utils/crypto")
 
-module.exports = async (userModel, anonUserId) => {
-    const anonymousUser = await userModel.findOne({
+module.exports = async (userModel, userId) => {
+    const user = await userModel.findOne({
         where: {
-            user_id: anonUserId,
-            is_anonymous: true
+            user_id: userId,
         },
         raw: true
     })
 
-    return CryptoUtils.decryptAnonymousUserId(anonymousUser?.bio)
+    if(user?.is_anonymous) return CryptoUtils.decryptAnonymousUserId(user?.bio)
+    return user?.user_id
 }
