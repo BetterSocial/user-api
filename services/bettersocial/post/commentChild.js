@@ -6,7 +6,7 @@ const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
 const sendReplyCommentNotification = require('../fcmToken/sendReplyCommentNotification')
 
-const BetterSocialCreateCommentChild = async (req, isAnonimous = true) => {
+const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     try {
         const { body, userId, token } = req
 
