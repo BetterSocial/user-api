@@ -16,7 +16,7 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
 
         const { activity_id, message, anon_user_info, sendPostNotif } = body
         const post = await Getstream.feed.getPlainFeedById(activity_id)
-        const useridFeed = await UsersFunction.findSignedUserId(User, post?.actor?.id)
+        const useridFeed = await UsersFunction.findActorId(User, post?.actor?.id)
 
         let detailUser = {}
         let result = {}
@@ -28,19 +28,27 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
         }
         if (!isAnonimous) {
             commentAuthor = await UsersFunction.findUserById(User, userId)
+                     console.log('masuk3')
+
         }
 
         let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
+                 console.log('masuk4')
 
         if(isAnonimous) result = await Getstream.feed.commentAnonymous(selfUser?.user_id, message, activity_id, useridFeed, anon_user_info)
         else result = await Getstream.feed.comment(token, message, activity_id, userId, useridFeed, sendPostNotif)
+                 console.log('masuk5')
 
         if (body?.message?.length > 80) {
             await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
+                     console.log('masuk5')
+
         }
 
         if (useridFeed) {
             detailUser = await UsersFunction.findUserById(User, useridFeed)
+                     console.log('masuk7')
+
         }
 
 
@@ -51,6 +59,8 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
                 message,
                 activity_id
             )
+                     console.log('masuk8')
+
         }
 
         const scoringProcessData = {
@@ -61,6 +71,7 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
             activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
         };
         await addForCommentPost(scoringProcessData);
+                 console.log('masuk9')
 
         QueueTrigger.addCommentToDb({
             authorUserId: useridFeed,
