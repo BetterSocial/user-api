@@ -16,7 +16,7 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
 
         const { activity_id, message, anon_user_info, sendPostNotif } = body
         const post = await Getstream.feed.getPlainFeedById(activity_id)
-        const useridFeed = await UsersFunction.findSignedUserId(User, post?.actor?.id)
+        const useridFeed = await UsersFunction.findActorId(User, post?.actor?.id)
 
         let detailUser = {}
         let result = {}
@@ -37,6 +37,7 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
 
         if (body?.message?.length > 80) {
             await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
+
         }
 
         if (useridFeed) {
@@ -61,6 +62,7 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
             activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
         };
         await addForCommentPost(scoringProcessData);
+                 console.log('masuk9')
 
         QueueTrigger.addCommentToDb({
             authorUserId: useridFeed,
