@@ -14,8 +14,8 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
 
         const reaction = await Getstream.feed.getReactionById(reaction_id)
         const post = await Getstream.feed.getPlainFeedById(reaction?.activity_id)
-        const postMaker = await UsersFunction.findSignedUserId(User, post?.actor?.id)
-        const useridFeed = await UsersFunction.findSignedUserId(User, reaction?.user?.id)
+        const postMaker = await UsersFunction.findActorId(User, post?.actor?.id)
+        const useridFeed = await UsersFunction.findActorId(User, reaction?.user?.id)
         
         let detailUser = {}
         let result = {}
