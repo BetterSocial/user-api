@@ -3,12 +3,7 @@ const getstreamService = require("../../services/getstream");
 
 module.exports = async (req, res) => {
   try {
-    const { activity_id, kind, message, target_feeds } = req.body;
-    const client = stream.connect(
-      process.env.API_KEY,
-      req.token,
-      process.env.APP_ID
-    );
+    const { activity_id, message } = req.body;
 
     getstreamService
       .createReaction(token, activity_id, message)
