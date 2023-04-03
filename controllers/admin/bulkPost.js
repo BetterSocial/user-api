@@ -10,8 +10,8 @@ const bulkPostController = async (req, res) => {
     }
     for (let index = 0; index < post.length; index++) {
       const element = post[index];
-      const { anonimity: anonymity } = element;
-      await BetterSocialCore.post.createPost(req, anonymity);
+      const { anonimity } = element;
+      await BetterSocialCore.post.createPost(req, anonimity);
     }
     return SuccessResponse(res, "Post created successfully");
   } catch (e) {
