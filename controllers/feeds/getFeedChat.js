@@ -63,10 +63,11 @@ const getFeedChatService = async (req, res) => {
             }
             let myReaction = b.reaction
             if(myReaction) {
+                myReaction = {...myReaction,isOwningReaction: req.userId === myReaction.user_id || myReaction.user_id === myAnonymousId.user_id }
                 if(myReaction.data.is_anonymous || myReaction.data.anon_user_info_emoji_name) {
-                    myReaction = {...myReaction,  user_id: null, user: {}, isOwningReaction: req.userId === myReaction.user_id || myReaction.user_id === myAnonymousId.user_id}
+                    myReaction = {...myReaction,  user_id: null, user: {}, }
                 }
-                newGroup[activity_id].comments.push({reaction: myReaction, actor: {}})
+                newGroup[activity_id].comments.push({reaction: myReaction, actor: myReaction.data.is_anonymous ||  myReaction.data.anon_user_info_emoji_name ?  {} : constantActor})
                 newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
                 newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => constantActor.id !== req.userId && data.reaction.kind === 'comment').length || 0
                 
