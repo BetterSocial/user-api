@@ -4,7 +4,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const swaggerUi = require("swagger-ui-express");
-const { initializeApp, cert } = require("firebase-admin/app");
+const { initializeApp, cert, ServiceAccount } = require("firebase-admin/app");
 
 const serviceAccount = Buffer.from(
   process.env.SERVICE_ACCOUNT,
@@ -66,7 +66,7 @@ app.use("/api/v1/mention", mentionRouter);
 app.use("/api/v1/config", configRouter);
 app.use(auth.isAuth, topicPage);
 
-const options = {
+var options = {
   swaggerOptions: {
     authAction: {
       JWT: {
