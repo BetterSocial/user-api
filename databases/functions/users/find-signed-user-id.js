@@ -8,6 +8,6 @@ module.exports = async (userModel, userId) => {
         raw: true
     })
 
-    if(user?.is_anonymous) return CryptoUtils.decryptAnonymousUserId(user?.bio)
+    if(user?.is_anonymous) return CryptoUtils.decryptAnonymousUserId(user?.encrypted)
     return user?.user_id
 }
