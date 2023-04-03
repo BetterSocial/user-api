@@ -4,7 +4,7 @@ const SuccessResponse = require("../../utils/response/SuccessResponse");
 
 const bulkPostController = async (req, res) => {
   try {
-    let { post } = req?.body;
+    let { post } = req.body;
     if (post.length < 1) {
       return ErrorResponse.e400(res, "Data not null");
     }
