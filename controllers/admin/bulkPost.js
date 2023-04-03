@@ -1,6 +1,7 @@
 const BetterSocialCore = require("../../services/bettersocial");
 const ErrorResponse = require("../../utils/response/ErrorResponse");
 const SuccessResponse = require("../../utils/response/SuccessResponse");
+const { LogError } = require("../../databases/models");
 
 const bulkPostController = async (req, res) => {
   try {
@@ -11,15 +12,11 @@ const bulkPostController = async (req, res) => {
     for (let index = 0; index < post.length; index++) {
       const element = post[index];
       const { anonimity } = element;
-      let copyReq = {
-        body: element,
-        userId: element.userId,
-      };
+      req.body = element;
       let { isSuccess, message } = await BetterSocialCore.post.createPost(
-        copyReq,
+        req,
         anonimity
       );
-      console.log("message in loop", message);
       if (!isSuccess) {
         console.log(message);
         let messageForInsert = {
