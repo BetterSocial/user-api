@@ -12,10 +12,12 @@ const bulkPostController = async (req, res) => {
     for (let index = 0; index < post.length; index++) {
       const element = post[index];
       const { anonimity } = element;
+      console.log("item post: ", element);
       let { isSuccess, message } = await BetterSocialCore.post.createPost(
         element,
         anonimity
       );
+      console.log("message in loop", message);
       if (!isSuccess) {
         console.log(message);
         let messageForInsert = {
@@ -30,6 +32,7 @@ const bulkPostController = async (req, res) => {
     }
     return SuccessResponse(res, "Post created successfully");
   } catch (e) {
+    console.log("log error in catch", e);
     let messageForInsert = {
       process: "bulk insert error catch",
       message: e.message,
