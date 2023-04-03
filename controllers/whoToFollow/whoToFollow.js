@@ -67,7 +67,7 @@ module.exports = async (req, res) => {
     for (let indexTopic in TopicsData) {
       let tempUsers = []
       let topic = TopicsData[indexTopic]
-      tempUsers.push(betterAccount)
+      if (betterAccount) tempUsers.push(betterAccount)
 
       for (let indexUserTopic in userTopicFollower) {
         let userTopic = userTopicFollower[indexUserTopic]
@@ -80,13 +80,13 @@ module.exports = async (req, res) => {
         }
       }
 
-      if (tempUsers.length > 0) {
-        result.push({
-          viewtype: 'labeltopic',
-          name: topic.name,
-          id: topic.topic_id,
-        })
+      result.push({
+        viewtype: 'labeltopic',
+        name: topic.name,
+        id: topic.topic_id,
+      })
 
+      if (tempUsers.length > 0) {
         result.push(...tempUsers)
       }
     }
