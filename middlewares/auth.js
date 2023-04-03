@@ -3,104 +3,79 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../databases/models");
 const { ApiKey } = require("../databases/models");
 
+async function isAuthTokenValid(token, secret) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, user) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(user);
+      }
+    });
+  });
+}
+
+function createResponse(statusCode, message, data) {
+  return {
+    code: statusCode,
+    message: message,
+    data: data || null,
+  };
+}
+
 module.exports.isAuth = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token === null || token === undefined) {
-    return res.status(401).json({
-      code: 401,
-      message: "Token not provided",
-      data: null,
-    });
+    return res.status(401).json(createResponse(401, "Token not provided"));
   }
 
-  jwt.verify(token, process.env.SECRET, (err, user) => {
-    if (err) {
-      return res.status(401).json({
-        code: 401,
-        message: "Token invalid",
-        data: null,
-      });
-    }
-
+  try {
+    const user = await isAuthTokenValid(token, process.env.SECRET);
     req.user = user;
     req.userId = user.user_id;
     req.token = token;
-
     next();
-  });
+  } catch (err) {
+    return res.status(401).json(createResponse(401, "Token invalid"));
+  }
 };
 
 module.exports.isRefreshToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token === null || token === undefined) {
-    return res.status(401).json({
-      code: 401,
-      message: "Token not provided",
-      data: null,
-    });
+    return res.status(401).json(createResponse(401, "Token not provided"));
   }
 
-  jwt.verify(token, process.env.SECRET_REFRESH_TOKEN, (err, user) => {
-    if (err) {
-      return res.status(401).json({
-        code: 401,
-        message: "Token invalid",
-        data: null,
-      });
-    }
-
+  try {
+    const user = await isAuthTokenValid(
+      token,
+      process.env.SECRET_REFRESH_TOKEN
+    );
     req.user = user;
     req.userId = user.user_id;
     req.token = token;
-
     next();
-  });
+  } catch (err) {
+    return res.status(401).json(createResponse(401, "Token invalid"));
+  }
 };
+
+async function getLatestApiKey() {
+  return ApiKey.findOne({
+    order: [["createdAt", "DESC"]],
+  });
+}
 
 module.exports.isAdminAuth = async (req, res, next) => {
   const authHeader = req.headers["api-key"];
-  let apiKey = await ApiKey.findOne({
-    order: [["createdAt", "DESC"]],
-  });
-  console.log("key: ", apiKey.key);
+  const apiKey = await getLatestApiKey();
   if (authHeader === null || authHeader === undefined) {
-    return res.status(401).json({
-      code: 401,
-      message: "Api Key not provide",
-      data: null,
-    });
+    return res.status(401).json(createResponse(401, "Api Key not provided"));
   }
-  if (authHeader != apiKey.key) {
-    return res.status(401).json({
-      code: 401,
-      message: "Api Key invalid",
-      data: null,
-    });
-  }
-  next();
-};
-
-module.exports.isAdminAuth = async (req, res, next) => {
-  const authHeader = req.headers["api-key"];
-  let apiKey = await ApiKey.findOne({
-    order: [["createdAt", "DESC"]],
-  });
-  console.log("key: ", apiKey.key);
-  if (authHeader === null || authHeader === undefined) {
-    return res.status(401).json({
-      code: 401,
-      message: "Api Key not provide",
-      data: null,
-    });
-  }
-  if (authHeader != apiKey.key) {
-    return res.status(401).json({
-      code: 401,
-      message: "Api Key invalid",
-      data: null,
-    });
+  if (authHeader !== apiKey.key) {
+    return res.status(401).json(createResponse(401, "Api Key invalid"));
   }
   next();
 };
@@ -114,11 +89,7 @@ module.exports.isAuthUserAvailable = async (req, res, next) => {
   });
 
   if (user === null) {
-    return res.status(404).json({
-      code: 404,
-      status: "error",
-      message: "User not found",
-    });
+    return res.status(404).json(createResponse(404, "User not found"));
   }
 
   req.userModel = user;
