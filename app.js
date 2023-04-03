@@ -66,7 +66,7 @@ app.use("/api/v1/mention", mentionRouter);
 app.use("/api/v1/config", configRouter);
 app.use(auth.isAuth, topicPage);
 
-var options = {
+const options = {
   swaggerOptions: {
     authAction: {
       JWT: {
