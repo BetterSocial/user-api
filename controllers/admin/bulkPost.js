@@ -16,6 +16,7 @@ const bulkPostController = async (req, res) => {
         element,
         anonimity
       );
+      console.log("message in loop", message);
       if (!isSuccess) {
         console.log(message);
         let messageForInsert = {
@@ -30,6 +31,7 @@ const bulkPostController = async (req, res) => {
     }
     return SuccessResponse(res, "Post created successfully");
   } catch (e) {
+    console.log("log error in catch", e);
     let messageForInsert = {
       process: "bulk insert error catch",
       message: e.message,
