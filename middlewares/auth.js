@@ -1,4 +1,6 @@
+const { next } = require("cli");
 const jwt = require("jsonwebtoken");
+const { ApiKey } = require("../databases/models");
 
 module.exports.isAuth = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -55,4 +57,27 @@ module.exports.isRefreshToken = async (req, res, next) => {
 
     next();
   });
+};
+
+module.exports.isAdminAuth = async (req, res, next) => {
+  const authHeader = req.headers["api-key"];
+  let apiKey = await ApiKey.findOne({
+    order: [["createdAt", "DESC"]],
+  });
+  console.log("key: ", apiKey.key);
+  if (authHeader === null || authHeader === undefined) {
+    return res.status(401).json({
+      code: 401,
+      message: "Api Key not provide",
+      data: null,
+    });
+  }
+  if (authHeader != apiKey.key) {
+    return res.status(401).json({
+      code: 401,
+      message: "Api Key invalid",
+      data: null,
+    });
+  }
+  next();
 };
