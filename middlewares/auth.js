@@ -2,6 +2,26 @@ const { next } = require("cli");
 const jwt = require("jsonwebtoken");
 const { ApiKey } = require("../databases/models");
 
+async function isAuthTokenValid(token, secret) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, user) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(user);
+      }
+    });
+  });
+}
+
+function createResponse(statusCode, message, data) {
+  return {
+    code: statusCode,
+    message: message,
+    data: data || null,
+  };
+}
+
 module.exports.isAuth = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -59,25 +79,18 @@ module.exports.isAdminAuth = async (req, res, next) => {
   next();
 };
 
-module.exports.isAdminAuth = async (req, res, next) => {
-  const authHeader = req.headers["api-key"];
-  let apiKey = await ApiKey.findOne({
-    order: [["createdAt", "DESC"]],
+module.exports.isAuthUserAvailable = async (req, res, next) => {
+  const user = await User.findOne({
+    where: {
+      user_id: req.userId,
+      is_anonymous: false,
+    },
   });
-  console.log("key: ", apiKey.key);
-  if (authHeader === null || authHeader === undefined) {
-    return res.status(401).json({
-      code: 401,
-      message: "Api Key not provide",
-      data: null,
-    });
+
+  if (user === null) {
+    return res.status(404).json(createResponse(404, "User not found"));
   }
-  if (authHeader != apiKey.key) {
-    return res.status(401).json({
-      code: 401,
-      message: "Api Key invalid",
-      data: null,
-    });
-  }
+
+  req.userModel = user;
   next();
 };
