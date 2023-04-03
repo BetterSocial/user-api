@@ -1,4 +1,5 @@
-const {UserBlockedUser} = require ('../../databases/models')
+const UsersFunction = require('../../databases/functions/users');
+const {UserBlockedUser, User} = require ('../../databases/models')
 const getstreamService = require("../../services/getstream");
 const moment = require('moment')
 const NodeCache = require( "node-cache" );
@@ -6,6 +7,8 @@ const myCache = new NodeCache( { stdTTL: 100, checkperiod: 0 } );
 
 const getFeedChatService = async (req, res) => {
     try {
+        const myAnonymousId = await UsersFunction.findAnonymousUserId(User, req.userId)
+        console.log(myAnonymousId, 'nana')
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
 
@@ -22,11 +25,13 @@ const getFeedChatService = async (req, res) => {
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
             const message = typeof b.object === 'object' ? b.object.message : b.message
+            const constantActor = typeof b.object === 'object' ? b.object.actor : b.actor
             let actor = typeof b.object === 'object' ? b.object.actor : b.actor
             const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity
+            const isOwnPost = actor.id === req.userId || actor.id === myAnonymousId.user_id
             if(isAnonym) {
-                actor = {...actor, data: {
-                    username: "Anonymous"
+                actor = {...actor, id: null, data: {
+                    username: "Anonymous",
                 }}
             }
             if(!newGroup[activity_id]) {
@@ -34,6 +39,7 @@ const getFeedChatService = async (req, res) => {
                     activity_id: activity_id,
                     isSeen: b.isSeen,
                     totalComment: 0,
+                    isOwnPost,
                     totalCommentBadge: 0,
                     isRead:b.isRead,
                     unreadComment: !b.isRead ? 1 : 0,
@@ -57,9 +63,13 @@ const getFeedChatService = async (req, res) => {
             }
             let myReaction = b.reaction
             if(myReaction) {
-                newGroup[activity_id].comments.push({reaction: myReaction, actor: b.actor})
+                myReaction = {...myReaction,isOwningReaction: req.userId === myReaction.user_id || myReaction.user_id === myAnonymousId.user_id }
+                if(myReaction.data.is_anonymous || myReaction.data.anon_user_info_emoji_name) {
+                    myReaction = {...myReaction,  user_id: null, user: {}, }
+                }
+                newGroup[activity_id].comments.push({reaction: myReaction, actor: myReaction.data.is_anonymous ||  myReaction.data.anon_user_info_emoji_name ?  {} : constantActor})
                 newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
-                newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => data.actor.id !== req.userId && data.reaction.kind === 'comment').length || 0
+                newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => constantActor.id !== req.userId && data.reaction.kind === 'comment').length || 0
                 
             }
             return a
