@@ -77,6 +77,10 @@ module.exports = (sequelize, DataTypes) => {
       is_anonymous: {
         type: DataTypes.BOOLEAN, 
         defaultValue: false,
+      },
+      encrypted: {
+        type: DataTypes.STRING,
+        allowNull: true
       }
     },
     {
