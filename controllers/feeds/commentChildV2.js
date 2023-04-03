@@ -9,9 +9,9 @@ const SuccessResponse = require("../../utils/response/SuccessResponse");
  */
 module.exports = async (req, res) => {
   try {
-    const {anonimity} = req?.body;
+    const {anonimity} = req.body;
     let response = await BetterSocialCore.post.commentChild(req, anonimity);
-    if(response?.isSuccess) return SuccessResponse(res, "Comment created successfully");
+    if(response?.isSuccess) return SuccessResponse(res, response.data, "Comment created successfully");
     return ErrorResponse.e500(res, "Failed to create comment: " + response?.message);
   } catch(e) {
     return ErrorResponse.e500(res, e.message)

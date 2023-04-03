@@ -5,16 +5,12 @@ const { getDetailFeed } = require("../../services/getstream");
 const getDetailDomainHandle = async (req, res) => {
     getDetailFeed(req.token, req.params.domainId).then(async (domain) => {
         let data = domain.results[0]
-        console.log('data result')
-        console.log(data)
         let domainPageId = data?.domain?.domain_page_id || data?.og?.domain_page_id
-        console.log(data?.domain)
         let domainCheck = await DomainPage.findOne({
             where: { domain_page_id: domainPageId },
             raw: true
         })
-        console.log('domain')
-        console.log(domainCheck)
+
         if (!data?.domain) data.domain = {}
         if (!domainCheck) {
             data.domain.credder_score = null

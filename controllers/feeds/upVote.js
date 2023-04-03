@@ -15,7 +15,6 @@ module.exports = async (req, res) => {
     let token = req.token;
     let { activity_id, status, feed_group } = req.body;
     let feeds = await getDetailFeed(token, activity_id, feed_group);
-    console.log(feeds, 'susu')
     let feed = feeds.results[0];
     const scoringProcessData = {
       user_id: req.userId,
@@ -35,9 +34,7 @@ module.exports = async (req, res) => {
           }
         }
       }
-      console.log('data0')
       const data = await upVote(activity_id, req.token, feed.actor.id);
-      console.log(data, 'data1')
       countProcess(activity_id, { upvote_count: +1 }, { upvote_count: 1 });
       
       // Send message queue for upvote event

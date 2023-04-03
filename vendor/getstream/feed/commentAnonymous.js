@@ -6,8 +6,7 @@ module.exports = async (anonymousUserId, message, activityId, feedOwnerUserId, a
     const anonymousToken = await createToken(anonymousUserId)
     const clientUser = GetstreamSingleton.getClientInstance(anonymousToken)
     let targetFeed = [`notification:${feedOwnerUserId}`]
-
-    return await clientUser.reactions.add("comment", activityId, {
+    const handleResponse = await clientUser.reactions.add("comment", activityId, {
         text: message,
         count_upvote: 0,
         count_downvote: 0,
@@ -15,7 +14,9 @@ module.exports = async (anonymousUserId, message, activityId, feedOwnerUserId, a
         anon_user_info_color_code: anonUserInfo?.color_code,
         anon_user_info_emoji_name: anonUserInfo?.emoji_name,
         anon_user_info_emoji_code: anonUserInfo?.emoji_code,
+        is_anonymous: anonUserInfo.is_anonymous,
 
         isNotSeen: true
     }, { targetFeeds: targetFeed, userId: anonymousUserId });
+    return handleResponse
 };

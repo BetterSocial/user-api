@@ -81,10 +81,10 @@ const modifyPollPostObject = async (userId, item) => {
     post.mypolling = [];
   }
 
-  let distinctPollingByUserId = await Sequelize.query(
+  let distinctPollingByUserId = await sequelize.query(
     `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id= :polling_id AND polling_option_id != :polling_option_id`,
     {
-      type: sequelize.QueryTypes.SELECT,
+      type: Sequelize.QueryTypes.SELECT,
       replacements: {
         polling_id: post.polling_id,
         polling_option_id: NO_POLL_OPTION_UUID,
@@ -211,7 +211,7 @@ function getFeedDuration(durationFeed) {
   let expiredAt = null;
 
   if (durationFeed !== "never") {
-    let dateMoment = moment().add(durationFeed, 'days');
+    let dateMoment = moment().add(parseInt(durationFeed), 'days');
     expiredAt = dateMoment.toISOString();
   }
 
@@ -250,7 +250,7 @@ async function filterFeeds(userId, feeds = []) {
     let now = moment().valueOf()
     let dateExpired = moment(item?.expired_at).valueOf()
 
-    if (dateExpired > now) continue
+    if (dateExpired < now) continue
     let newItem = { ...item };
 
     if (newItem.anonimity) {

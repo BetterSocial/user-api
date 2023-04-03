@@ -1,5 +1,5 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
 // controller
 const feedController = require("../controllers/feeds/FeedController");
@@ -10,6 +10,7 @@ const CreatePostMiddleware = require("../middlewares/create-post");
 const GenerateAnonymousUsernameMiddleware = require("../middlewares/generate-anonymous-username");
 const CreateCommentMiddleware = require("../middlewares/create-comment");
 const CreateCommentChildMiddleware = require("../middlewares/create-comment-child");
+const BodyValidationMiddleware = require("../middlewares/body-validation");
 
 
 router.post("/post", feed.createPost);
@@ -49,5 +50,6 @@ router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2);
 router.post('/generate-anonymous-username', isAuth, GenerateAnonymousUsernameMiddleware, feed.generateAnonymousUsername)
 router.post("/comment-v2", isAuth ,CreateCommentMiddleware , feed.commentV2);
 router.post("/comment-child-v2", isAuth ,CreateCommentChildMiddleware, feed.commentChildV2);
+router.post("/block-anonymous-post-v2", isAuth, BodyValidationMiddleware.blockAnonymousPostV2, feed.blockAnonymousPostV2);
 
 module.exports = router;

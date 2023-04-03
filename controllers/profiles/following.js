@@ -27,7 +27,6 @@ module.exports = async (req, res) => {
       "UserFollowUser"."user_id_follower", 
       "UserFollowUser"."user_id_followed", 
       "user"."user_id" AS "user.user_id", 
-      "user"."human_id" AS "user.human_id", 
       "user"."country_code" AS "user.country_code", 
       "user"."username" AS "user.username", 
       "user"."real_name" AS "user.real_name", 

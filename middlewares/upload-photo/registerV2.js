@@ -5,7 +5,7 @@ const RegisterV2UploadPhotoMiddleware = async (req, res, next) => {
     /**
      * @type {RegisterBody}
      */
-    const { data } = req?.body;
+    const { data } = req.body;
 
     /**
      * @type {RegisterBodyData}

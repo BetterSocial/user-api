@@ -28,6 +28,9 @@ module.exports = async (req, res) => {
           as: "locations",
         },
       ],
+      attributes: {
+        exclude: ["human_id"]
+      }
     });
     if (user === null) {
       return res.status(404).json({

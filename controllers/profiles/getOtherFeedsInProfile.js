@@ -59,7 +59,6 @@ module.exports = async (req, res) => {
       )
         break;
 
-      console.log(`get feeds from ${offset}`);
       let result = await getstreamService.getOtherFeeds(
         token,
         userFollow ? "user_excl" : "user",
@@ -89,12 +88,9 @@ module.exports = async (req, res) => {
           if (item.anonimity) continue;
           if (item.verb === POST_VERB_POLL) {
             newItem = await modifyPollPostObject(req.userId, item);
-            console.log("newItem");
-            console.log(newItem);
             data.push(newItem);
           } else {
             if (item.post_type === POST_TYPE_LINK) {
-              console.log("masuk post type link");
               if (item.post_type === POST_TYPE_LINK) {
                 let domainPageId = item?.og?.domain_page_id;
                 let credderScoreCache =
@@ -136,7 +132,6 @@ module.exports = async (req, res) => {
       getFeedFromGetstreamIteration++;
     }
 
-    console.log(data.length);
     res.status(200).json({
       code: 200,
       status: "success",

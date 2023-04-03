@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
 
   try {
     const userData = await User.findOne({
-      where: { human_id: req.body.user_id },
+      where: { human_id: req.body.user_id, is_anonymous: false },
     });
     if (userData) {
       if (userData.is_banned) {

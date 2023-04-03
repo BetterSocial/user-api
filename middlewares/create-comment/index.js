@@ -8,7 +8,7 @@ const BodyValidationMiddleware = require("../body-validation")
  * @param {import("express").NextFunction} next 
  */
 const CreateCommentMiddleware = (req, res, next) => {
-    const { anonimity } = req?.body
+    const { anonimity } = req.body
     if(anonimity) return BodyValidationMiddleware.createAnonymousCommentV2(req, res, next)
     return BodyValidationMiddleware.createCommentV2(req, res, next)
 }

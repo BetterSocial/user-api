@@ -1,160 +1,14 @@
 const Bull = require("bull");
 const { v4: uuidv4 } = require("uuid");
-const _ = require("lodash");
-const url = require('url');
 
-const { convertString, convertingUserFormatForLocation } = require("../../utils/custom");
+const { convertingUserFormatForLocation } = require("../../utils/custom");
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
-
-/* commented by Citrahadi, 20220327, since it's not used anymore
-const postTimeQueue = new Bull("addQueuePostTime", connectRedis,
-  {
-    redis: {
-      tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
-      maxRetriesPerRequest: 100,
-      connectTimeout: 30000
-    }
-  }
-);
-postTimeQueue.on('error', (err) => console.log('posttimeque', err));
-postTimeQueue.on('waiting', (e) => console.log('postime: ', e));*/
-
-// const followLocationQueue = new Bull("followLocationQueue", connectRedis,
-//   {
-//     redis: {
-//       tls: {
-//         rejectUnauthorized: false
-//       },
-//       maxRetriesPerRequest: 100,
-//       connectTimeout: 30000
-//     }
-//   }
-// );
-// followLocationQueue.on('error', (err) => console.log('followLocationQueue', err));
-
-
-// const prepopulatedDmQueue = new Bull("prepopulatedDmQueue", connectRedis,
-//   {
-//     redis: {
-//       tls: {
-//         rejectUnauthorized: false
-//       },
-//       maxRetriesPerRequest: 100,
-//       commandTimeout: 30000
-//     }
-//   }
-// );
-// prepopulatedDmQueue.on('error', (err) => console.log('prepopulatedDmQueue', err));
-
-// const followUserQueue = new Bull("followUserQueue", connectRedis,
-//   {
-//     redis: {
-//       tls: {
-//         rejectUnauthorized: false
-//       },
-//       maxRetriesPerRequest: 100,
-//       commandTimeout: 30000
-//     }
-//   }
-// );
-// followUserQueue.on('error', (err) => console.log('followUserQueue', err));
-
-// const followTopicQueue = new Bull("followTopicQueue", connectRedis,
-//   {
-//     redis: {
-//       tls: {
-//         rejectUnauthorized: false
-//       },
-//       maxRetriesPerRequest: 100,
-//       commandTimeout: 30000
-//     }
-//   }
-// );
-// followTopicQueue.on('error', (err) => console.log('followTopicQueue', err));
-
-
-// const addUserToChannel = new Bull("addUserToChannelQueue", connectRedis,
-//   {
-//     redis: {
-//       tls: {
-//         rejectUnauthorized: false
-//       },
-//       maxRetriesPerRequest: 100,
-//       commandTimeout: 30000
-//     }
-//   }
-// );
-// addUserToChannel.on('error', (err) => console.log('addUserToChannelQueue', err));
-
-const addUserToChannelQueue = async (data, options) => {
-    // addUserToChannel.add(data, options);
-    // return addUserToChannel;
-};
-
-// const addUserToTopicChannelQueue = new Bull("addUserToTopicChannelQueue", connectRedis,
-//   {
-//     redis: {
-//       tls: {
-//         rejectUnauthorized: false
-//       },
-//       maxRetriesPerRequest: 100,
-//       commandTimeout: 30000
-//     }
-//   }
-// );
-// addUserToTopicChannelQueue.on('error', (err) => console.log('addUserToTopicChannelQueue', err));
-
-const addUserToTopicChannel = async (data, options) => {
-    // addUserToTopicChannelQueue.add(data, options);
-    // return addUserToTopicChannelQueue;
-};
-
-
-// const locationQueue = new Bull("addUserToChannelQueue", connectRedis,
-//   {
-//     redis: {
-//       tls: {
-//         rejectUnauthorized: false
-//       },
-//       maxRetriesPerRequest: 100,
-//       commandTimeout: 30000
-//     }
-//   }
-// );
-// locationQueue.on('error', (err) => console.log('addUserToChannelQueue', err));
-
-const addToChannelChatQueue = async (locations, userId) => {
-    let loc = locations.map((item) => {
-        if (item.country === "US") {
-            let loc = [];
-            loc.push(convertString(item.neighborhood.toLowerCase(), " ", "-"));
-            loc.push(convertString(item.city.toLowerCase(), " ", "-"));
-            return loc;
-        } else {
-            let loc = [];
-            loc.push(convertString(item.country.toLowerCase(), " ", "-"));
-            return loc;
-        }
-    });
-    let temp = _.union(...loc);
-
-    let data = {
-        user_id: userId,
-        locations: temp,
-    };
-    const options = {
-        jobId: uuidv4(),
-        removeOnComplete: true,
-    };
-    // locationQueue.add(data, options);
-    return locations;
-};
 
 const registerQueue = new Bull("registerQueue", connectRedis,
     {
         redis: {
-            tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
+            tls: { rejectUnauthorized: false, requestCert: true },
             maxRetriesPerRequest: 100,
             connectTimeout: 30000
         }
@@ -164,29 +18,17 @@ const registerQueue = new Bull("registerQueue", connectRedis,
 const registerV2Queue = new Bull("registerV2", connectRedis,
     {
         redis: {
-            tls: { rejectUnauthorized: false, requestCert: true, agent: false, },
+            tls: { rejectUnauthorized: false, requestCert: true },
             maxRetriesPerRequest: 100,
             connectTimeout: 30000
         }
     }
 );
-registerQueue.on('error', (err) => { console.log('posttimeque', /** err **/) });
-registerQueue.on('waiting', (e) => { console.log('postime: ', /** e **/) });
+registerQueue.on('error', (err) => { console.log('error on assigning register queue', err) });
+registerV2Queue.on('error', (err) => { console.log('error on assigning register v2 queue', err) });
 
 const registerServiceQueue = async (token, userId, follows, topics, locations, myAnonUserId) => {
-    // add user To locaitons
     let locationsChannel = convertingUserFormatForLocation(locations);
-
-    // add user to topics
-
-    // created prepopulated dm
-
-
-    // following user
-
-    // following topic
-
-    // following locations
 
     let data = {
         token,
@@ -226,7 +68,7 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
     };
 
     try {
-        registerV2Queue.add(data, options);
+        await registerV2Queue.add(data, options);
     } catch(e) {
         console.log('error', e)
     }
@@ -234,14 +76,6 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
 
 
 module.exports = {
-    //postTimeQueue,
-    // followLocationQueue,
-    // followUserQueue,
-    // followTopicQueue,
-    addToChannelChatQueue,
-    addUserToChannelQueue,
-    addUserToTopicChannel,
-    // prepopulatedDmQueue,
     registerServiceQueue,
     registerV2ServiceQueue,
 };

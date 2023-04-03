@@ -13,7 +13,6 @@ const { filter } = require('lodash')
  */
 const Search = async(req, res) => {
     const { q } = req.query
-    const userId = req.userId
     if(q.length < 2) return res.status(200).json({
         success: true,
         message: 'Your search characters is too few, please input 3 or more characters for search'
@@ -21,9 +20,7 @@ const Search = async(req, res) => {
 
     try {
         const blockDomain = await getBlockDomain(req.userId);
-        // const blockDomain = ["f0433444-8459-4b9a-969b-dc13f98580b3"]
         let filteredBlockDomainArray = blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain)
-        console.log(filteredBlockDomainArray)
 
         let newsLink
         if(filteredBlockDomainArray.length > 0) {

@@ -2,6 +2,7 @@ const Getstream = {
     core: {
         createUser: require('./core/createUser'),
         createToken: require('./core/createToken'),
+        updateUserRemoveHumanId: require('./core/updateUserRemoveHumanId'),
     },
     chat: {
         createTokenChat: require('./chat/createTokenChat'),
@@ -15,10 +16,13 @@ const Getstream = {
         createAnonymousPost: require('./feed/createAnonymousPost'),
         createPost: require('./feed/createPost'),
         getAnonymousFeeds: require('./feed/getAnonymousFeeds'),
+        getPlainFeedById: require('./feed/getPlainFeedById'),
+        getReactionById: require('./feed/getReactionById'),
         followAnonUser: require('./feed/followAnonUser'),
         followUser: require('./feed/followUser'),
         followUserExclusive: require('./feed/followUserExclusive'),
         unfollowAnonUser: require('./feed/unfollowAnonUser'),
+        unfollowAnonUserByBlockAnonPost: require('./feed/unfollowAnonUserByBlockAnonPost'),
         unfollowUser: require('./feed/unfollowUser'),
         unfollowUserExclusive: require('./feed/unfollowUserExclusive'),
     }

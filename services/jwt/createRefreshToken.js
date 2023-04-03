@@ -9,7 +9,7 @@ module.exports = async (userId) => {
     user_id: userId,
     exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
   };
-  const refresh_token = await jwt.sign(
+  const refresh_token = jwt.sign(
     payload,
     process.env.SECRET_REFRESH_TOKEN,
     opts

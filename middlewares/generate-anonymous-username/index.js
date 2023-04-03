@@ -9,7 +9,7 @@ const BodyValidationMiddleware = require("../body-validation")
  * @param {import("express").NextFunction} next 
  */
 const GenerateAnonymousUsernameMiddleware = (req, res, next) => {
-    const { contentType } = req?.body
+    const { contentType } = req.body
     if(contentType === 'post') return BodyValidationMiddleware.generatePostAnonymousUsername(req, res, next)
     else if(contentType === 'comment') return BodyValidationMiddleware.generateCommentAnonymousUsername(req, res, next)
 

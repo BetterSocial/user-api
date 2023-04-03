@@ -1,23 +1,22 @@
 const { getDomain } = require("../../services/getstream");
 const {
-  MAX_FEED_FETCH_LIMIT_DOMAIN,
-  GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DOMAIN_DATA_RETURN_LENGTH,
-  GETSTREAM_TIME_LINEAR_RANKING_METHOD,
   GETSTREAM_TIME_RANDOM_RANKING_METHOD
 } = require("../../helpers/constants");
 const _ = require("lodash");
 
 const { getBlockDomain } = require("../../services/domain");
 const { DomainPage } = require("../../databases/models/");
+const ElasticNewsLink = require("../../elasticsearch/repo/newsLink/ElasticNewsLink");
 
 const MIN_CREDDER_SCORE = 50
 const CREDDER_CHECK_ENABLED = false
 
+const elasticNewsLink = new ElasticNewsLink()
+
 module.exports = async (req, res) => {
-  let { offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH, fetch = MAX_FEED_FETCH_LIMIT_DOMAIN } = req.query
-  console.log(`offset ${offset} limit ${limit}`)
+  let { offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH } = req.query
 
   let domainPageCache = {}
 
@@ -64,8 +63,6 @@ module.exports = async (req, res) => {
             }
           }
 
-          console.log(item)
-
           if (item?.domain?.credderScore >= MIN_CREDDER_SCORE || !CREDDER_CHECK_ENABLED) {
             data.push(item)
           }
@@ -97,7 +94,6 @@ module.exports = async (req, res) => {
       }
     }
 
-    console.log(data.length)
     res.status(200).json({
       code: 200,
       status: "success",

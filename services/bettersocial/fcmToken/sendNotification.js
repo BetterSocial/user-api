@@ -4,8 +4,6 @@ const { FcmToken } = require('../../../databases/models')
 
 const sendNotification = async (userIdFollower, userNameFollower, userIdFollowed, userNameFollowed) => {
     const userTargetToken = await FcmTokenFunction.findTokenByUserId(FcmToken, userIdFollowed)
-    console.log('userTargetToken')
-    console.log(userTargetToken)
 
     const payload = {
         notification: {
@@ -23,7 +21,6 @@ const sendNotification = async (userIdFollower, userNameFollower, userIdFollowed
     };
     if (userTargetToken) {
         messaging().sendToDevice(userTargetToken?.token, payload).then((res) => {
-            console.log(res, 'hehe')
         })
     }
 }

@@ -4,8 +4,6 @@ const { Op } = require('sequelize');
 
 module.exports = async (req, res) => {
   try {
-    // ambil user yang kita follow
-    console.log(req.userId);
     let idUsers = [];
     let usersFollower = await UserFollowUser.findAll({
       where: {
@@ -24,10 +22,10 @@ module.exports = async (req, res) => {
         return item.user_id_followed;
       }
     });
-    console.log(idUsers);
     let users = await User.findAll({
       where: {
         user_id: idUsers,
+        is_anonymous: false,
       },
     });
     res.status(200).json(responseSuccess('Success get populate', users));

@@ -33,6 +33,8 @@ const POST_CHECK_AUTHOR_NOT_FOLLOWING = 2;
 const POST_CHECK_FEED_EXPIRED = 3;
 const POST_CHECK_AUTHOR_BLOCKED = 4;
 
+const POST_VERSION = 2;
+
 const USERS_DEFAULT_IMAGE = 'https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png';
 
 module.exports = {
@@ -56,6 +58,7 @@ module.exports = {
   POST_TYPE_POLL,
   POST_TYPE_STANDARD,
   POST_VERB_POLL,
+  POST_VERSION,
   REDIS_TTL,
   POST_CHECK_FEED_NOT_FOUND,
   POST_CHECK_AUTHOR_NOT_FOLLOWING,

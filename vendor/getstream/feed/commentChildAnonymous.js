@@ -3,7 +3,7 @@ const GetstreamSingleton = require("../singleton");
 const _ = require('lodash');
 const { createToken } = require("../../../services/getstream");
 
-module.exports = async (anonymousUserId, message, reactionId, commentAuthorUserId, postMakerId, parentCommentUserId, anonUserInfo, sendPostNotif = true) => {
+module.exports = async (anonymousUserId, message, reactionId, commentAuthorUserId, postMakerId, parentCommentUserId, anonUserInfo, isAnonimous, sendPostNotif = true) => {
     const anonymousUserToken = await createToken(anonymousUserId);
     const clientUser = GetstreamSingleton.getClientInstance(anonymousUserToken)
     let targetFeed = [`notification:${postMakerId}`, `notification:${parentCommentUserId}`, `notification:${commentAuthorUserId}`]
@@ -24,5 +24,6 @@ module.exports = async (anonymousUserId, message, reactionId, commentAuthorUserI
             anon_user_info_color_code: anonUserInfo?.color_code,
             anon_user_info_emoji_name: anonUserInfo?.emoji_name,
             anon_user_info_emoji_code: anonUserInfo?.emoji_code,
+            is_anonymous: isAnonimous,
         }, { targetFeeds: targetFeed, userId: anonymousUserId });
 };

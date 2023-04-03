@@ -9,7 +9,7 @@ const { isDateExpired } = require("../../utils/date");
  * @param {import("express").Response} res 
  */
 module.exports = async (req, res) => {
-    let { postId } = req?.params
+    let { postId } = req.params
     let response = await getDetailFeed(req.token, postId);
     const feed = response?.results[0]
 

@@ -13,8 +13,6 @@ class ElasticNewsLink extends BetterSocialBaseElasticSearchRepo {
         let { description, title, createdAt, news_link_id, domain_page_id } = newsLinkReference
         const query = `${description} ${title}`
 
-        console.log(`domain id ${domain_page_id}`)
-
         const requestBody = esb
             .requestBodySearch()
             .query(

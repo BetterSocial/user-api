@@ -13,7 +13,7 @@ const BetterSocialCore = require('../../services/bettersocial')
 const UsersFunction = require('../../databases/functions/users')
 
 module.exports = async (req, res) => {
-    const { user_id_followed, follow_source, username_follower, username_followed } = req?.body
+    const { user_id_followed, follow_source, username_follower, username_followed } = req.body
 
     if (req?.userId === user_id_followed) return ErrorResponse.e403(res, "Only allow following other profiles")
 
@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
 
     try {
         await sequelize.transaction(async (t) => {
-            const userFollowUser = await UserFollowUserFunction.registerAddFollowUser(UserFollowUser, UserFollowUserHistory,req?.userId, [user_id_followed], follow_source, t)
+            const userFollowUser = await UserFollowUserFunction.registerAddFollowUser(UserFollowUser, UserFollowUserHistory, req?.userId, [user_id_followed], follow_source, t)
             return userFollowUser
         })
     } catch (e) {
@@ -32,9 +32,12 @@ module.exports = async (req, res) => {
     try {
         await Getstream.feed.followUserExclusive(req?.userId, user_id_followed)
         await Getstream.feed.followUser(req?.token, req?.userId, user_id_followed)
-        
+
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed)
-        await Getstream.feed.followAnonUser(req?.token, req?.userId, anonymousUser?.user_id)
+        const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId)
+        console.log('selfAnonymousUser')
+        console.log(selfAnonymousUser)
+        await Getstream.feed.followAnonUser(req?.token, req?.userId, user_id_followed, selfAnonymousUser?.user_id, anonymousUser?.user_id)
     } catch (e) {
         console.log('Error in follow user v2 getstream')
         console.log(e)
@@ -53,14 +56,13 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, user_id_followed, username_followed)
-        await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, 'f19ce509-e8ae-405f-91cf-ed19ce1ed96e', username_followed)
-    } catch(e) {
+        await BetterSocialCore.fcmToken.sendNotification(req?.userId, username_follower, user_id_followed, username_followed)
+    } catch (e) {
         console.log('Error in follow user v2 fcm')
         console.log(e)
         return ErrorResponse.e409(res, e.message)
     }
-    
+
     return SuccessResponse(res, {
         message: "User has been followed successfully"
     })

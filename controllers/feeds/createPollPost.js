@@ -31,7 +31,6 @@ const getLocationDetail = async (locationId) => {
 module.exports = async (req, res) => {
   try {
     const token = req.token;
-    const now = new Date();
 
     if (token == null) {
       return res.status(401).json({
@@ -63,8 +62,6 @@ module.exports = async (req, res) => {
 
     const validated = v.validate(req.body, schema);
     if (validated.length) {
-      console.log("Error validation");
-      console.log(validated);
       return res.status(403).json({
         message: "Error validation",
         error: validated,
@@ -141,18 +138,6 @@ module.exports = async (req, res) => {
       );
     }
 
-    console.log(resUrl);
-    // let post = await Post.create({
-    //   post_id : uuidv4(),
-    //   author_user_id : req.userId,
-    //   anonymous : anonimity,
-    //   duration : expiredAt,
-    //   topic_id : 1,
-    //   post_content : resUrl
-    // })
-
-    // let postId = post.toJSON().post_id
-
     let post = await sequelize.query(
       `INSERT INTO posts (author_user_id, anonymous, duration, topic_id, post_content, created_at, updated_at)
         VALUES(:authorUserId, :anonymous, :duration, :topicId, :postContent, :createdAt, :updatedAt)
@@ -171,14 +156,6 @@ module.exports = async (req, res) => {
     );
 
     let postId = post[0][0].post_id;
-
-    // let poll = await Polling.create({
-    //   polling_id : uuidv4(),
-    //   post_id : postId,
-    //   user_id : req.userId,
-    //   question : message,
-    //   flg_multiple : multiplechoice
-    // })
 
     let poll = await sequelize.query(
       `INSERT INTO polling 
@@ -203,16 +180,7 @@ module.exports = async (req, res) => {
     console.log(pollId);
 
     let pollsOptionUUIDs = [];
-    for (let i = 0; i < polls.length; i++) {
-      let item = polls[i];
-      // let pollOption = await PollingOption.create({
-      //   polling_option_id : uuidv4(),
-      //   polling_id : pollId,
-      //   option : item.text,
-      //   counter : 0,
-      // })
-
-      // let pollOptionUUID = pollOption.toJSON().polling_option_id
+    for(let item of polls) {
       let pollOption = await sequelize.query(
         `INSERT INTO polling_option 
         (polling_id, option, counter, created_at, updated_at)

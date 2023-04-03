@@ -19,7 +19,6 @@ const sendCommentNotification = async (userTargetId, commentAuthor, message, act
     };
     if (userTargetToken) {
         messaging().sendToDevice(userTargetToken?.token, payload).then((res) => {
-            console.log(res, 'hehe')
         })
     }
 }

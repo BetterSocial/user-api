@@ -47,7 +47,7 @@ function convertTopicWithEmoji(topic) {
 
 function getFirstStringFromSplit(str, splitChar = ',') {
     if(!str) return ""; 
-    const [first] = str?.split(splitChar);
+    const [first] = str.split(splitChar);
     return first;
 }
 
