@@ -10,8 +10,27 @@ const bulkPostController = async (req, res) => {
     }
     for (let index = 0; index < post.length; index++) {
       const element = post[index];
-      const { anonimity: anonymity } = element;
-      await BetterSocialCore.post.createPost(req, anonymity);
+      const { anonimity } = element;
+      let copyReq = {
+        body: element,
+        userId: element.userId,
+      };
+      let { isSuccess, message } = await BetterSocialCore.post.createPost(
+        copyReq,
+        anonimity
+      );
+      console.log("message in loop", message);
+      if (!isSuccess) {
+        console.log(message);
+        let messageForInsert = {
+          process: `bulk insert user ${element.userId}`,
+          message: message,
+        };
+
+        LogError.create({
+          message: JSON.stringify(messageForInsert),
+        });
+      }
     }
     return SuccessResponse(res, "Post created successfully");
   } catch (e) {
