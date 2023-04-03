@@ -61,6 +61,10 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
             postId: result?.activity_id
         })
 
+        if(isAnonimous) {
+            result = {...result, user_id: null, user: {}, target_feeds: []}
+        }
+
         return {
             isSuccess: true,
             data: result
