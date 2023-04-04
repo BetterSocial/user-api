@@ -1,5 +1,6 @@
 const Validator = require("fastest-validator");
 const moment = require("moment");
+const LocationFunction = require("../../databases/functions/location");
 const TopicFunction = require("../../databases/functions/topics");
 
 const UserFollowUserFunction = require("../../databases/functions/userFollowUser");
@@ -11,12 +12,7 @@ const { sequelize } = require("../../databases/models");
 const { 
     Topics,
     User,
-    UserLocation,
-    UserLocationHistory,
-    UserTopic,
-    UserTopicHistory,
-    UserFollowUser,
-    UserFollowUserHistory
+    Locations,
 } = require("../../databases/models");
 const BetterSocialCore = require("../../services/bettersocial");
 const BetterSocialCreateUser = require("../../services/bettersocial/user/BetterSocialCreateUser");
@@ -41,7 +37,7 @@ const registerV2 = async (req, res) => {
      */
     const { data } = req.body;
     const { users, follows, local_community, topics } = data;
-
+    
     let insertedObject = {};
 
     /**
@@ -53,11 +49,13 @@ const registerV2 = async (req, res) => {
             const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
 
             const topicRegistered = await TopicFunction.findAllByTopicIds(Topics, topics, t, true);
+            const locations = await LocationFunction.getAllLocationByIds(Locations, local_community, t);
 
             return {
                 user,
                 anonymousUser,
                 topics: topicRegistered,
+                locations
             };
         });
     } catch (e) {
@@ -107,9 +105,9 @@ const registerV2 = async (req, res) => {
         await registerV2ServiceQueue(
             token,
             insertedObject?.user?.user_id,
-            follows,
+            follows || [],
             insertedObject?.topics,
-            local_community,
+            insertedObject?.locations,
             insertedObject?.anonymousUser?.user_id
         );    
     } catch(e) {
