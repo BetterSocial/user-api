@@ -97,7 +97,6 @@ module.exports = async (req, res) => {
     if (duration_feed !== "never") {
       date = addDays(date, duration_feed);
       expiredAt = date.toISOString();
-      console.log(`${pollsDurationMoment.valueOf()} vs ${date.getTime()}`);
 
       if (pollsDurationMoment.valueOf() > date.getTime()) return res.status(403).json({
         message: "Polling Duration cannot be more than post expiration date",
@@ -176,8 +175,6 @@ module.exports = async (req, res) => {
     );
 
     let pollId = poll[0][0].polling_id;
-    console.log("Polling UUID : ");
-    console.log(pollId);
 
     let pollsOptionUUIDs = [];
     for(let item of polls) {
@@ -200,8 +197,6 @@ module.exports = async (req, res) => {
       let pollOptionUUID = pollOption[0][0].polling_option_id;
       pollsOptionUUIDs.push(pollOptionUUID);
     }
-
-    console.log('location id: ', location_id);
 
     const getUserDetail = async (userId) => {
       try {

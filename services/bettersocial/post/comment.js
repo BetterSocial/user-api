@@ -62,7 +62,6 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
             activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
         };
         await addForCommentPost(scoringProcessData);
-                 console.log('masuk9')
 
         QueueTrigger.addCommentToDb({
             authorUserId: useridFeed,

@@ -39,9 +39,6 @@ module.exports = async (req, res) => {
   let data = [];
   try {
     const token = req.token;
-    console.log(`params : ${req.params.id}`);
-    console.log("other profile id: ", req.params.id);
-    console.log("your id: ", req.userId);
 
     /**
      * lakukan pemeriksaan apakah user tersebut sudah memfollow dengan id tersebut

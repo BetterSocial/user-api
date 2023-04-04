@@ -5,7 +5,10 @@ const BetterSocialFeedGetAnonymousFeeds = async (anonUserId, limit = 10, offset 
     const feed = client.feed("user_anon", anonUserId)
     return await feed.get({
         limit,
-        offset
+        offset,
+        withReactionCounts: true,
+        withOwnReactions: true,
+        withRecentReactions: true
     })
 }
 

@@ -177,8 +177,6 @@ module.exports = async (req, res) => {
       }
     }
 
-    console.log("data.length");
-    console.log(data.length);
     res.status(200).json({
       code: 200,
       status: "success",

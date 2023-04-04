@@ -12,8 +12,6 @@ const getAllLocationByIds = async (locationModel, ids = [], t = null) => {
             raw: true
         }, { transaction: t })
 
-        console.log('locations in function')
-        console.log(locations)
         return Promise.resolve(locations)
     } catch (e) {
         console.log(e)

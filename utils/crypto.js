@@ -42,13 +42,11 @@ const CryptoUtils = {
     },
 
     encryptSignedUserId: (signedUserId) => {
-        console.log(this)
         return CryptoUtils.encrypt(signedUserId).join('/')
     },
 
     decryptAnonymousUserId: (anonymousUserId) => {
         const split = anonymousUserId.split('/')
-        console.log(split)
         const [encrypted, iv, authTag] = split
         return CryptoUtils.decrypt(encrypted, iv, authTag)
     }
