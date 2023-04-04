@@ -31,7 +31,7 @@ const upVoteDomain = require("./upVoteDomain");
 const voteComment = require("./voteComment");
 const isAuthorFollowMe = require('./isAuthorFollowMe')
 const generateAnonymousUsername = require('./generateAnonymousUsername')
-
+const reactionList = require('./reactionList')
 const { createQueuePostTime } = require("./createPostTime");
 const { getFeedChatService } = require("./getFeedChat")
 const { putMainFeed } = require("./updateActivity");
@@ -73,4 +73,5 @@ module.exports = {
   upvote,
   upVoteDomain,
   voteComment,
+  reactionList
 };

@@ -51,5 +51,6 @@ router.post('/generate-anonymous-username', isAuth, GenerateAnonymousUsernameMid
 router.post("/comment-v2", isAuth ,CreateCommentMiddleware , feed.commentV2);
 router.post("/comment-child-v2", isAuth ,CreateCommentChildMiddleware, feed.commentChildV2);
 router.post("/block-anonymous-post-v2", isAuth, BodyValidationMiddleware.blockAnonymousPostV2, feed.blockAnonymousPostV2);
+router.get("/reaction-list/:id", isAuth, feed.reactionList)
 
 module.exports = router;
