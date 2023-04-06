@@ -55,7 +55,6 @@ module.exports = {
   },
 
   addMembers: async (req, res) => {
-    console.log(req.userId);
     let members = [];
     members.push(req.userId);
     let channel = await AddMembersChannel(

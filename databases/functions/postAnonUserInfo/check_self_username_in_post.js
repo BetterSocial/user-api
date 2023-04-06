@@ -19,6 +19,8 @@ module.exports = async(postAnonUserInfoModel, userModel, data, transaction = nul
     const {userId, postId} = data
 
     const anonymousUser = await UsersFunction.findAnonymousUserId(userModel, userId)
+    console.log('anonymousUser')
+    console.log(anonymousUser)
     let postAnonUserInfo = await postAnonUserInfoModel.findOne({
         where: {
             post_id: postId,

@@ -62,8 +62,6 @@ module.exports = async (req, res) => {
       limit: 20,
     })
       .then((list) => {
-        console.log('list.length')
-        console.log(list.length)
         res.status(200).json({
           status: "success",
           code: 200,

@@ -17,7 +17,6 @@ module.exports = async(req, res) => {
     
     try {
         let files = fs.readdirSync('./domains')
-        console.log(files.length)
         let iteration = 0
     
         for(let index in files) {

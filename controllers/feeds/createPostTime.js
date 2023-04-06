@@ -29,7 +29,6 @@ const createQueuePostTime = async (req, res) => {
                     activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
                     source: source,
                 };
-                console.log("view post data:" + scoringProcessData); // TODO
                 const resultJob = await addForViewPost(scoringProcessData);
 
                 return res.status(200).json({

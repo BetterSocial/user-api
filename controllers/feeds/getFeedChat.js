@@ -8,7 +8,6 @@ const myCache = new NodeCache( { stdTTL: 100, checkperiod: 0 } );
 const getFeedChatService = async (req, res) => {
     try {
         const myAnonymousId = await UsersFunction.findAnonymousUserId(User, req.userId)
-        console.log(myAnonymousId, 'nana')
         const data = await getstreamService.notificationGetNewFeed(req.userId, req.token)
         let newFeed = []
 

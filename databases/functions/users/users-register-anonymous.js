@@ -12,7 +12,7 @@ const CryptoUtils = require("../../../utils/crypto");
  */
 module.exports = async (model, userId, transaction = null) => {
     const salt = process.env.BETTER_HASH_SALT;
-    let myTs = moment.utc().format("YYYY-MM-DD HH:mm:ss");
+    let myTs = moment("2023-01-01", "YYYY-MM-DD").format("YYYY-MM-DD HH:mm:ss");
 
     const saltedUserId = salt + userId + salt;
     
@@ -29,12 +29,13 @@ module.exports = async (model, userId, transaction = null) => {
             profile_pic_path: '',
             profile_pic_asset_id: '',
             profile_pic_public_id: '',
-            created_at: myTs,
-            updated_at: myTs,
+            createdAt: myTs,
+            updatedAt: myTs,
             last_active_at: myTs,
             status: "Y",
-            bio: encryptedUserId,
-            is_anonymous: true
+            bio: '',
+            is_anonymous: true,
+            encrypted: encryptedUserId
         },
         { transaction, returning: true}
     );

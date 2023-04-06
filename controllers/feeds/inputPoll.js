@@ -89,8 +89,6 @@ module.exports = async(req, res) => {
     try {
         let transaction = await sequelize.transaction(async (t) => {
             let currentTimeIsoString = moment().utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
-            console.log('currentTimeIsoString')
-            console.log(currentTimeIsoString)
             let logPolling = await LogPolling.create({
                 log_polling_id : uuidv4(),
                 polling_option_id,

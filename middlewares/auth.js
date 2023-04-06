@@ -1,6 +1,6 @@
-const { next } = require("cli");
 const jwt = require("jsonwebtoken");
 const { ApiKey } = require("../databases/models");
+const { User } = require("../databases/models");
 
 async function isAuthTokenValid(token, secret) {
   return new Promise((resolve, reject) => {
