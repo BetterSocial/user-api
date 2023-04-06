@@ -38,5 +38,6 @@ router.post('/register-v2', BodyValidationMiddleware.registerV2, RegisterV2Uploa
 router.post('/blockuser-v2', auth.isAuth, BodyValidationMiddleware.blockUserV2, usersHandler.blockUserV2);
 router.post('/unblockuser-v2', auth.isAuth, BodyValidationMiddleware.unblockUserV2, usersHandler.unblockUserV2);
 router.get('/check-follow', auth.isAuth, usersHandler.checkFollow);
+router.post('/check-follow-batch', auth.isAuth, BodyValidationMiddleware.checkUserFollowStatus, usersHandler.checkFollowBatch);
 
 module.exports = router;
