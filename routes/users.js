@@ -4,6 +4,7 @@ const usersHandler = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 const RegisterV2UploadPhotoMiddleware = require('../middlewares/upload-photo/registerV2');
+const CryptoUtils = require('../utils/crypto');
 
 router.post('/check-username', usersHandler.checkUsername);
 router.post('/register', usersHandler.register);
@@ -36,5 +37,6 @@ router.delete('/fcmtoken', auth.isAuth, usersHandler.removeFcmTokem)
 router.post('/register-v2', BodyValidationMiddleware.registerV2, RegisterV2UploadPhotoMiddleware, usersHandler.registerV2);
 router.post('/blockuser-v2', auth.isAuth, BodyValidationMiddleware.blockUserV2, usersHandler.blockUserV2);
 router.post('/unblockuser-v2', auth.isAuth, BodyValidationMiddleware.unblockUserV2, usersHandler.unblockUserV2);
+router.get('/check-follow', auth.isAuth, usersHandler.checkFollow);
 
 module.exports = router;

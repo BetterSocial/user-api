@@ -18,6 +18,7 @@ const verifyUser = require('./verifyUser');
 const veryfyToken = require('./veryfyToken');
 const fcmToken = require('./fcmToken')
 const removeFcmTokem = require('./removeFcmToken')
+const checkFollow = require('./checkFollow')
 
 const unblockUserV2 = require('./unblockUserV2')
 const blockUserV2 = require('../users/blockUserV2');
@@ -28,6 +29,7 @@ module.exports = {
     blockUser,
     blockUserV2,
     chatSearch,
+    checkFollow,
     checkUsername,
     deleteUser,
     demoVerifyUser,

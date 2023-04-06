@@ -7,7 +7,8 @@
     "dev": "nodemon ./bin/www",
     "test": "jest __tests__",
     "prepare": "husky install",
-    "update-env-dev": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config dev > .env.development"
+    "update-env-dev": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config dev > .env.development",
+    "update-env-prod": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config prd > .env.production"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
