@@ -3,6 +3,7 @@ const BodyValidationSchema = {
     blockUserV2: require('./blockUserV2Schema'),
     changeBio: require('./changeBioSchema'),
     changeProfileImage: require('./changeProfileImageSchema'),
+    checkUserFollowStatus: require('./checkUserFollowStatusSchema'),
     createAnonymousCommentChildV2: require('./createAnonymousCommentChildV2Schema'),
     createAnonymousCommentV2: require('./createAnonymousCommentV2Schema'),
     createAnonymousPollPostV2: require('./createAnonymousPollPostV2Schema'),

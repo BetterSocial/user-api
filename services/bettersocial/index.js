@@ -1,5 +1,6 @@
 const BetterSocialBlockUserV2 = require('./user/BetterSocialBlockUserV2');
 const BetterSocialCheckTargetFollowStatus = require('./user/BetterSocialCheckTargetFollowStatus');
+const BetterSocialCheckTargetFollowStatusBatch = require('./user/BetterSocialCheckTargetFollowStatusBatch');
 const BetterSocialCreateAnonymousUser = require('./user/BetterSocialCreateAnonymousUser');
 const BetterSocialCreateUser = require('./user/BetterSocialCreateUser');
 const BetterSocialUnblockUserV2 = require('./user/BetterSocialUnblockUserV2');
@@ -11,6 +12,7 @@ const BetterSocialCore = {
         blockUser: BetterSocialBlockUserV2,
         unblockUser: BetterSocialUnblockUserV2,
         checkTargetUserFollowStatus: BetterSocialCheckTargetFollowStatus,
+        checkTargetUserFollowStatusBatch: BetterSocialCheckTargetFollowStatusBatch,
     },
     fcmToken: {
         sendNotification: require('./fcmToken/sendNotification'),
