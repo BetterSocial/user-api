@@ -67,6 +67,7 @@ module.exports = async (req, res) => {
       }
     }
     const newData = {
+      ...dataReaction.data,
       count_downvote,
       count_upvote,
       text,
