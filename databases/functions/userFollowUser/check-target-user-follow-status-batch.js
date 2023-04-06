@@ -14,11 +14,6 @@ module.exports = async (userFollowUserModel, selfUserId, targetUserIds = [], tra
     if (userFollowUserModel === null) throw new Error("userFollowUserModel is required")
     if (selfUserId === null) throw new Error("selfUserId is required")
 
-    // if(selfUserId === targetUserId) return {
-    //     isTargetFollowingMe: false,
-    //     isMeFollowingTarget: false
-    // }
-
     if (targetUserIds?.length === 0) return {}
 
     let targetHashes = {}
