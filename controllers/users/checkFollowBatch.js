@@ -12,8 +12,7 @@ const checkFollow = async (req, res) => {
     const { userId } = req
     const { targetUserIds } = req.body
 
-    // const removeDuplicatedUserIds = _.union(targetUserIds)
-    const removeDuplicatedUserIds = targetUserIds
+    const removeDuplicatedUserIds = _.union(targetUserIds)
     const response = await BetterSocialCore.user.checkTargetUserFollowStatusBatch(userId, removeDuplicatedUserIds)
     if(response?.isSuccess) {
         return SuccessResponse(res, response?.targetHashes, 'Check follow status success')
