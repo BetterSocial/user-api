@@ -14,7 +14,7 @@ const bulkPostController = async (req, res) => {
     for (let index = 0; index < post.length; index++) {
       const element = post[index];
       const { anonimity, userId } = element;
-      let token = await createToken(userId);
+      let token = createToken(userId);
       let request = {
         body: element,
         token: token,
