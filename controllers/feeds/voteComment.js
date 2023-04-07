@@ -67,12 +67,16 @@ module.exports = async (req, res) => {
       }
     }
     const newData = {
+      ...dataReaction.data,
       count_downvote,
       count_upvote,
       text,
       targetFeeds
     };
-    const data = await voteComment(activity_id, req.token, newData);
+    let data = await voteComment(activity_id, req.token, newData);
+    if(dataReaction.data.anon_user_info_emoji_name) {
+      data = {...data, user_id: null, user: {}, target_feeds: []}
+    }
     return res.status(200).json(responseSuccess("Success vote comment", data));
   } catch (error) {
     console.log("errro ", error);

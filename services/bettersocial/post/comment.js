@@ -13,14 +13,17 @@ const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonU
 const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     try {
         const { body, userId, token } = req
-
         const { activity_id, message, anon_user_info, sendPostNotif } = body
         const post = await Getstream.feed.getPlainFeedById(activity_id)
-        const useridFeed = await UsersFunction.findActorId(User, post?.actor?.id)
+        let useridFeed = ''
+        if(post.anon_user_info_emoji_name) {
+            useridFeed = await UsersFunction.findSignedUserId(User, post?.actor?.id)
+        } else {
+            useridFeed = await UsersFunction.findActorId(User, post?.actor?.id)
+        }
 
         let detailUser = {}
         let result = {}
-
         let commentAuthor = {
             username: anon_user_info?.color_name + ' ' + anon_user_info?.emoji_name,
             profile_pic_path: USERS_DEFAULT_IMAGE,
@@ -42,7 +45,9 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
                 anonUserInfoEmojiName: anon_user_info?.emoji_name,
             })
         }
-        else result = await Getstream.feed.comment(token, message, activity_id, userId, useridFeed, sendPostNotif)
+        else {
+            result = await Getstream.feed.comment(token, message, activity_id, userId, useridFeed, sendPostNotif)
+        }
 
         if (body?.message?.length > 80) {
             await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
