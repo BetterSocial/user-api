@@ -33,9 +33,9 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
 
         if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
         else {
-            const signPostMaker = await UsersFunction.findSignedUserId(User, postMakerId)
-            const signUserId = await UsersFunction.findSignedUserId(User, commentAuthorUserId)
-            const signUseridFeed = await UsersFunction.findSignedUserId(User, parentCommentUserId)
+            const signPostMaker = await UsersFunction.findSignedUserId(User, postMaker)
+            const signUserId = await UsersFunction.findSignedUserId(User, userId)
+            const signUseridFeed = await UsersFunction.findSignedUserId(User, useridFeed)
             result = await Getstream.feed.commentChild(token, message, reaction_id, signUserId, signPostMaker, signUseridFeed, sendPostNotif)
         }
 
