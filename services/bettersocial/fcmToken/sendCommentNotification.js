@@ -1,10 +1,11 @@
 const { messaging } = require("firebase-admin");
 const FcmTokenFunction = require("../../../databases/functions/fcmToken");
-const { FcmToken } = require('../../../databases/models')
-
+const { FcmToken } = require('../../../databases/models');
+const UsersFunction = require("../../../databases/functions/users");
+const {User} = require('../../../databases/models')
 const sendCommentNotification = async (userTargetId, commentAuthor, message, activity_id) => {
-    const userTargetToken = await FcmTokenFunction.findTokenByUserId(FcmToken, userTargetId)
-
+    const signedUser = await UsersFunction.findSignedUserId(User, userTargetId)
+    const userTargetToken = await FcmTokenFunction.findTokenByUserId(FcmToken, signedUser)
     const payload = {
         notification: {
             title: `${commentAuthor?.username} commented on your post`,
