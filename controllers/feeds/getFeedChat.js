@@ -23,6 +23,7 @@ const getFeedChatService = async (req, res) => {
             const activity_id = (b.reaction && b.reaction.activity_id) || b.id
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
+            const totalComment = typeof b.object === 'object' ? b.object.reaction_counts.comment : 0
             const message = typeof b.object === 'object' ? b.object.message : b.message
             const constantActor = typeof b.object === 'object' ? b.object.actor : b.actor
             let actor = typeof b.object === 'object' ? b.object.actor : b.actor
@@ -37,7 +38,7 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
                     isSeen: b.isSeen,
-                    totalComment: 0,
+                    totalComment: totalComment,
                     isOwnPost,
                     totalCommentBadge: 0,
                     isRead:b.isRead,
@@ -67,7 +68,7 @@ const getFeedChatService = async (req, res) => {
                     myReaction = {...myReaction,  user_id: null, user: {}, }
                 }
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: myReaction.data.is_anonymous ||  myReaction.data.anon_user_info_emoji_name ?  {} : constantActor})
-                newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
+                // newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
                 newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => constantActor.id !== req.userId && data.reaction.kind === 'comment').length || 0
                 
             }
