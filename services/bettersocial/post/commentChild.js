@@ -35,7 +35,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
             let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
             result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
             await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
-                postId: activity_id,
+                postId: reaction?.activity_id,
                 anonUserId: selfUser?.user_id,
                 anonUserInfoColorCode: anon_user_info?.color_code,
                 anonUserInfoColorName: anon_user_info?.color_name,
