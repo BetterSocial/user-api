@@ -10,7 +10,6 @@ module.exports = async (token, message, activityId, commentAuthorUserId, feedOwn
     } else {
         targetFeed = []
     }
-
     return await clientUser.reactions.add("comment", activityId, {
         text: message,
         count_upvote: 0,
