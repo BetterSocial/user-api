@@ -1,10 +1,11 @@
 const UsersFunction = require("../../../databases/functions/users")
 const { countProcess } = require("../../../process")
-const { User} = require("../../../databases/models")
+const { User, PostAnonUserInfo } = require("../../../databases/models")
 const QueueTrigger = require('../../queue/trigger')
 const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
 const sendReplyCommentNotification = require('../fcmToken/sendReplyCommentNotification')
+const PostAnonUserInfoFunction = require("../../../databases/functions/postAnonUserInfo")
 
 const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     try {
@@ -16,7 +17,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
         const post = await Getstream.feed.getPlainFeedById(reaction?.activity_id)
         const postMaker = await UsersFunction.findActorId(User, post?.actor?.id)
         const useridFeed = await UsersFunction.findActorId(User, reaction?.user?.id)
-        
+
         let detailUser = {}
         let result = {}
 
@@ -29,9 +30,19 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
             commentAuthor = await UsersFunction.findUserById(User, userId)
         }
 
-        let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
 
-        if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
+        if (isAnonimous) {
+            let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
+            result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
+            await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+                postId: activity_id,
+                anonUserId: selfUser?.user_id,
+                anonUserInfoColorCode: anon_user_info?.color_code,
+                anonUserInfoColorName: anon_user_info?.color_name,
+                anonUserInfoEmojiCode: anon_user_info?.emoji_code,
+                anonUserInfoEmojiName: anon_user_info?.emoji_name,
+            })
+        }
         else result = await Getstream.feed.commentChild(token, message, reaction_id, userId, postMaker, useridFeed, sendPostNotif)
 
         if (body?.message?.length > 80) {
@@ -61,8 +72,8 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
             postId: result?.activity_id
         })
 
-        if(isAnonimous) {
-            result = {...result, user_id: null, user: {}, target_feeds: []}
+        if (isAnonimous) {
+            result = { ...result, user_id: null, user: {}, target_feeds: [] }
         }
 
         return {
