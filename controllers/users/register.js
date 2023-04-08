@@ -23,6 +23,7 @@ const {
 
 const StreamChat = require("stream-chat").StreamChat;
 const { addForCreateAccount } = require("../../services/score");
+const { USERS_DEFAULT_IMAGE } = require("../../helpers/constants");
 
 
 const changeValue = (items) => {
@@ -59,8 +60,7 @@ const syncUser = async (userId) => {
 
 module.exports = async (req, res) => {
     let returnCloudinary = null;
-    let defaultImage =
-        "https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png";
+    let defaultImage = USERS_DEFAULT_IMAGE
     const schema = {
         users: {
             $$type: "object|empty:false",

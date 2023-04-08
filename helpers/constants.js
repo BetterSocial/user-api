@@ -35,7 +35,7 @@ const POST_CHECK_AUTHOR_BLOCKED = 4;
 
 const POST_VERSION = 2;
 
-const USERS_DEFAULT_IMAGE = 'https://res.cloudinary.com/hpjivutj2/image/upload/v1617245336/Frame_66_1_xgvszh.png';
+const USERS_DEFAULT_IMAGE = 'https://res.cloudinary.com/hpjivutj2/image/upload/v1680929851/default-profile-picture_vrmmdn.png';
 
 module.exports = {
   API_PREFIX_V1,
