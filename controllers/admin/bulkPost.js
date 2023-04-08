@@ -18,7 +18,12 @@ const bulkPostController = async (req, res) => {
       const { anonimity, userId } = element;
       if (anonimity) {
         let anonUserInfo = await generateAnonymousUsername();
-        element.anon_user_info = anonUserInfo;
+        element.anon_user_info = {
+          color_name: anonUserInfo.colorName,
+          color_code: anonUserInfo.colorCode,
+          emoji_name: anonUserInfo.emojiName,
+          emoji_code: anonUserInfo.emojiIcon,
+        };
       }
 
       req.body = element;
