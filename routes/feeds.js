@@ -44,6 +44,7 @@ router.get("/i_vote_comment", isAuth, feed.iVoteComment);
 router.get("/feed-chat/", isAuth, feed.getFeedChatService)
 router.post("/open-graph", isAuth, feed.getOpenGraph)
 router.delete('/:postId', isAuth, feed.deletePost)
+router.delete('/anonymous/:postId', isAuth, feed.deleteAnonymousPost)
 
 router.post("/feed-action-notification/:kind", isAuth, feed.notificationCommentFeed)
 router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2);
