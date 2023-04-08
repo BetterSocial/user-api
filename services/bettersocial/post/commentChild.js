@@ -1,11 +1,10 @@
 const UsersFunction = require("../../../databases/functions/users")
 const { countProcess } = require("../../../process")
-const { User, PostAnonUserInfo } = require("../../../databases/models")
+const { User } = require("../../../databases/models")
 const QueueTrigger = require('../../queue/trigger')
 const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
 const sendReplyCommentNotification = require('../fcmToken/sendReplyCommentNotification')
-const PostAnonUserInfoFunction = require("../../../databases/functions/postAnonUserInfo")
 
 const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     try {
@@ -29,8 +28,6 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
         if (!isAnonimous) {
             commentAuthor = await UsersFunction.findUserById(User, userId)
         }
-        let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
-
         let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
 
         if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
