@@ -29,21 +29,16 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
         if (!isAnonimous) {
             commentAuthor = await UsersFunction.findUserById(User, userId)
         }
+        let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
 
 
-        if (isAnonimous) {
-            let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
-            result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
-            await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
-                postId: reaction?.activity_id,
-                anonUserId: selfUser?.user_id,
-                anonUserInfoColorCode: anon_user_info?.color_code,
-                anonUserInfoColorName: anon_user_info?.color_name,
-                anonUserInfoEmojiCode: anon_user_info?.emoji_code,
-                anonUserInfoEmojiName: anon_user_info?.emoji_name,
-            })
+        if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
+        else {
+            const signPostMaker = await UsersFunction.findSignedUserId(User, postMaker)
+            const signUserId = await UsersFunction.findSignedUserId(User, userId)
+            const signUseridFeed = await UsersFunction.findSignedUserId(User, useridFeed)
+            result = await Getstream.feed.commentChild(token, message, reaction_id, signUserId, signPostMaker, signUseridFeed, sendPostNotif)
         }
-        else result = await Getstream.feed.commentChild(token, message, reaction_id, userId, postMaker, useridFeed, sendPostNotif)
 
         if (body?.message?.length > 80) {
             await countProcess(reaction_id, { comment_count: +1 }, { comment_count: 1 });

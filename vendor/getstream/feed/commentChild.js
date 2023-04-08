@@ -4,9 +4,6 @@ const _ = require('lodash')
 const {User} = require('../../../databases/models')
 module.exports = async (token, message, reactionId, commentAuthorUserId, postMakerId, parentCommentUserId, sendPostNotif = true) => {
     const clientUser = GetstreamSingleton.getClientInstance(token)
-    postMakerId = await UsersFunction.findSignedUserId(User, postMakerId)
-    commentAuthorUserId = await UsersFunction.findSignedUserId(User, commentAuthorUserId)
-    parentCommentUserId = await UsersFunction.findSignedUserId(User, parentCommentUserId)
     let targetFeed = [`notification:${postMakerId}`, `notification:${parentCommentUserId}`, `notification:${commentAuthorUserId}`]
     if (sendPostNotif) {
         targetFeed = _.uniq(targetFeed)
