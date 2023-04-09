@@ -3,9 +3,7 @@ const moment = require('moment')
 const UsersFunction = require("../../../databases/functions/users")
 const { countProcess } = require("../../../process")
 const { User, PostAnonUserInfo } = require("../../../databases/models")
-const sendCommentNotification = require("../fcmToken/sendCommentNotification")
 const { addForCommentPost } = require("../../score")
-const QueueTrigger = require('../../queue/trigger')
 const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo')
@@ -14,19 +12,9 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     try {
         const { body, userId, token } = req
         const { activity_id, message, anon_user_info, sendPostNotif } = body
-        const post = await Getstream.feed.getPlainFeedById(activity_id)
         let useridFeed = undefined
 
-        let result = {}
-        let commentAuthor = {
-            username: anon_user_info?.color_name + ' ' + anon_user_info?.emoji_name,
-            profile_pic_path: USERS_DEFAULT_IMAGE,
-            anon_user_info
-        }
-        if (!isAnonimous) {
-            commentAuthor = await UsersFunction.findUserById(User, userId)
-        }
-        
+        let result = {}        
         if (isAnonimous) {
             let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
             result = await Getstream.feed.commentAnonymous(selfUser?.user_id, message, activity_id, useridFeed, anon_user_info)
