@@ -51,6 +51,7 @@ router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2);
 router.post('/generate-anonymous-username', isAuth, GenerateAnonymousUsernameMiddleware, feed.generateAnonymousUsername)
 router.post("/comment-v2", isAuth ,CreateCommentMiddleware , feed.commentV2);
 router.post("/comment-child-v2", isAuth ,CreateCommentChildMiddleware, feed.commentChildV2);
+router.post("/comment-domain-v2", isAuth, CreateCommentMiddleware, feed.commentDomainV2);
 router.post("/block-anonymous-post-v2", isAuth, BodyValidationMiddleware.blockAnonymousPostV2, feed.blockAnonymousPostV2);
 router.get("/reaction-list/:id", isAuth, feed.reactionList)
 

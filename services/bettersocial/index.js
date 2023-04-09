@@ -24,6 +24,7 @@ const BetterSocialCore = {
         createPost: require('./post/createPost'),
         createPollPost: require('./post/createPollPost'),
         comment: require('./post/comment'),
+        commentDomain: require('./post/commentDomain'),
         commentChild: require('./post/commentChild')
     },
     constantList: {
