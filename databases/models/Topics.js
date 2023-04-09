@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       deleted_at: DataTypes.DATE,
       is_custom_topic: DataTypes.BOOLEAN,
       sort: DataTypes.BIGINT,
+      sign: DataTypes.BOOLEAN,
     },
     {
       sequelize,
