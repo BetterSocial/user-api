@@ -24,6 +24,27 @@ const getFeedChatService = async (req, res) => {
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
             const totalComment = typeof b.object === 'object' ? b.object.reaction_counts.comment : 0
+            const childComment = typeof b.object === 'object' ? b.object?.latest_reactions?.comment : [0]
+            const mapCountLevel2 = childComment.map((comment) => comment?.children_counts?.comment || 0) || [0]
+            let totalCommentLevel3 = []
+            childComment.forEach((comment) => {
+            const mapCount = comment?.latest_children?.comment?.map(
+                (comment) => comment?.children_counts?.comment || 0
+                    );
+                    if (Array.isArray(mapCount)) {
+                    totalCommentLevel3.push(...mapCount);
+                }
+            })
+            let total3 = 0;
+
+            if (totalCommentLevel3.length > 0) {
+                total3 = totalCommentLevel3.reduce((a, b) => a + b);
+            }
+      console.log(total3, 'tata')
+            // childComment?.latest_children?.comment?.forEach((comment) => {
+            //     console.log(comment, 'sambal')
+            // })
+            const commentLevel2 = mapCountLevel2.reduce((a, b)=> a + b)
             const message = typeof b.object === 'object' ? b.object.message : b.message
             const constantActor = typeof b.object === 'object' ? b.object.actor : b.actor
             let actor = typeof b.object === 'object' ? b.object.actor : b.actor
@@ -38,7 +59,7 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
                     isSeen: b.isSeen,
-                    totalComment: totalComment,
+                    totalComment: totalComment + commentLevel2 + total3,
                     isOwnPost,
                     totalCommentBadge: 0,
                     isRead:b.isRead,
