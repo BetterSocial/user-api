@@ -15,6 +15,7 @@ const Getstream = {
         commentChildAnonymous: require('./feed/commentChildAnonymous'),
         createAnonymousPost: require('./feed/createAnonymousPost'),
         createPost: require('./feed/createPost'),
+        deleteNotificationFeed: require('./feed/deleteNotificationFeed'),
         getAnonymousFeeds: require('./feed/getAnonymousFeeds'),
         getPlainFeedById: require('./feed/getPlainFeedById'),
         getReactionById: require('./feed/getReactionById'),

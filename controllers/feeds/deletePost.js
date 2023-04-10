@@ -1,4 +1,5 @@
 const getstreamService = require('../../services/getstream')
+const Getstream = require('../../vendor/getstream')
 
 /**
  * 
@@ -25,6 +26,8 @@ module.exports = async (req, res) => {
 
     try {
         const getstreamDeleteResult = await getstreamService.deleteFeedById(token, 'user_excl', postId)
+        const getstreamDeleteNotificationFeed = await Getstream.feed.deleteNotificationFeed(userId, postId)
+        console.log(getstreamDeleteNotificationFeed)
         return res.status(200).json({
             success: getstreamDeleteResult ? true : false,
         })
