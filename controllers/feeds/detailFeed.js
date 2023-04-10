@@ -11,7 +11,6 @@ module.exports = async (req, res) => {
   let feedItem = feed.results[0];
 
   const feedExpiredAt = moment(feedItem?.expired_at)
-  console.log(feedItem)
 
   if(feedItem?.is_deleted) {
     return ErrorResponse.e404(res, "This post has been deleted")
