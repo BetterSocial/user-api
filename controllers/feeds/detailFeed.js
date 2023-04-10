@@ -4,11 +4,10 @@ const { NO_POLL_OPTION_UUID, POST_TYPE_POLL } = require("../../helpers/constants
 const { getDetailFeed } = require("../../services/getstream");
 const { responseSuccess } = require("../../utils/Responses");
   const stream = require("getstream");
-const Getstream = require("../../vendor/getstream");
 module.exports = async (req, res) => {
   let id = req.query.id;
-  let feedItem = await Getstream.feed.getPlainFeedById(id);
-  
+  let feed = await getDetailFeed(req.token, id);
+  let feedItem = feed.results[0];
   let newItem = { ...feedItem };
   const client = stream.connect(
     process.env.API_KEY,
