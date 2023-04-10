@@ -9,7 +9,8 @@ module.exports = async (token, feedGroup, activityId) => {
   serverClient.activityPartialUpdate({ 
     id: activityId,
     set: {
-      expired_at: moment().toISOString()
+      expired_at: moment().toISOString(),
+      is_deleted: true
     }
   })
 
