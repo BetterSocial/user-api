@@ -1,13 +1,26 @@
-const axios = require("axios");
+const moment = require("moment");
 const { PollingOption, LogPolling, sequelize } = require("../../databases/models");
 const { NO_POLL_OPTION_UUID, POST_TYPE_POLL } = require("../../helpers/constants");
 const { getDetailFeed } = require("../../services/getstream");
 const { responseSuccess } = require("../../utils/Responses");
   const stream = require("getstream");
+const ErrorResponse = require("../../utils/response/ErrorResponse");
 module.exports = async (req, res) => {
   let id = req.query.id;
   let feed = await getDetailFeed(req.token, id);
   let feedItem = feed.results[0];
+
+  const feedExpiredAt = moment(feedItem?.expired_at)
+  console.log(feedItem)
+
+  if(feedItem?.is_deleted) {
+    return ErrorResponse.e404(res, "This post has been deleted")
+  }
+
+  if(feedExpiredAt.isBefore(moment())) {
+    return ErrorResponse.e404(res, "This post has expired and has been deleted automatically")
+  }
+
   let newItem = { ...feedItem };
   const client = stream.connect(
     process.env.API_KEY,
