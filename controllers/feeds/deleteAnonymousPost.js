@@ -1,6 +1,7 @@
 const UsersFunction = require('../../databases/functions/users')
 const getstreamService = require('../../services/getstream')
 const { User } = require('../../databases/models')
+const Getstream = require('../../vendor/getstream')
 
 /**
  * 
@@ -28,6 +29,9 @@ module.exports = async (req, res) => {
 
     try {
         const getstreamDeleteResult = await getstreamService.deleteFeedById(token, 'user_anon', postId)
+        const getstreamDeleteNotificationFeed = await Getstream.feed.deleteNotificationFeed(userId, postId)
+        console.log('getstreamDeleteNotificationFeed')
+        console.log(getstreamDeleteNotificationFeed)
         return res.status(200).json({
             success: getstreamDeleteResult ? true : false,
         })
