@@ -104,7 +104,7 @@ const getFeedChatService = async (req, res) => {
             })
             feedGroup.push({...groupingFeed[i], block: blockCount})
         }
-        feedGroup.sort((a, b) => moment(b.data.last_message_at).unix() - moment(a.data.last_message_at).unix())
+        feedGroup.sort((a, b) => moment(b.data.last_message_at).valueOf() - moment(a.data.last_message_at).valueOf())
         res.status(200).send({
             success: true,
             data:feedGroup,
