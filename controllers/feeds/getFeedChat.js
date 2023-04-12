@@ -16,10 +16,9 @@ const getFeedChatService = async (req, res) => {
             const mapping = data.results[i].activities.map((feed) => ({...feed, isSeen: data.results[i].is_seen, isRead: data.results[i].is_read }))
             newFeed.push(...mapping)
         }
-
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
-            const localDate = moment.utc(b.time).local().format()
+            const localDate = moment.utc().local().format()
             const activity_id = (b.reaction && b.reaction.activity_id) || b.id
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
@@ -36,11 +35,9 @@ const getFeedChatService = async (req, res) => {
                 }
             })
             let total3 = 0;
-
             if (totalCommentLevel3.length > 0) {
                 total3 = totalCommentLevel3.reduce((a, b) => a + b);
             }
-      console.log(total3, 'tata')
             // childComment?.latest_children?.comment?.forEach((comment) => {
             //     console.log(comment, 'sambal')
             // })
@@ -58,6 +55,10 @@ const getFeedChatService = async (req, res) => {
             if(!newGroup[activity_id]) {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
+                    data: {
+                        last_message_at: localDate,
+                        updated_at: localDate,
+                    },
                     isSeen: b.isSeen,
                     totalComment: totalComment + commentLevel2 + total3,
                     isOwnPost,
@@ -72,10 +73,7 @@ const getFeedChatService = async (req, res) => {
                     postMaker: actor,
                     isAnonym:isAnonym ,
                     comments: [],
-                    data: {
-                        last_message_at: localDate,
-                        updated_at: localDate
-                    },
+                    
                
                 }
                 if(actor && typeof actor === 'object') {
@@ -91,7 +89,7 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: myReaction.data.is_anonymous ||  myReaction.data.anon_user_info_emoji_name ?  {} : constantActor})
                 // newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
                 newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => constantActor.id !== req.userId && data.reaction.kind === 'comment').length || 0
-                
+                newGroup[activity_id].data.last_message_at = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment' )?.[0]?.reaction?.created_at
             }
             return a
         }, [])

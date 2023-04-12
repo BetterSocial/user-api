@@ -53,13 +53,12 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
             await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
 
         }
-
+        
         if (useridFeed) {
             detailUser = await UsersFunction.findUserById(User, useridFeed)
         }
 
-
-        if (detailUser?.user_id !== req?.user_id) {
+        if (detailUser?.user_id !== userId) {
             await sendCommentNotification(
                 useridFeed,
                 commentAuthor,
