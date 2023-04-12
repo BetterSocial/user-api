@@ -18,7 +18,7 @@ const getFeedChatService = async (req, res) => {
         }
         let newGroup = {}
         const groupingFeed = newFeed.reduce((a,b, index) => {
-            const localDate = moment.utc().local().format()
+            const localDate = moment.utc(b.time).local().format()
             const activity_id = (b.reaction && b.reaction.activity_id) || b.id
             const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0
             const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0
@@ -52,7 +52,6 @@ const getFeedChatService = async (req, res) => {
                     username: "Anonymous",
                 }}
             }
-            console.log(b?.reaction?.kind, 'silat')
             if(!newGroup[activity_id]) {
                 newGroup[activity_id] = {
                     activity_id: activity_id,
@@ -90,7 +89,9 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id].comments.push({reaction: myReaction, actor: myReaction.data.is_anonymous ||  myReaction.data.anon_user_info_emoji_name ?  {} : constantActor})
                 // newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
                 newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => constantActor.id !== req.userId && data.reaction.kind === 'comment').length || 0
-                newGroup[activity_id].data.last_message_at = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment' )?.[0]?.reaction?.created_at
+                if(newGroup[activity_id]?.comments?.length > 0) {
+                    newGroup[activity_id].data.last_message_at = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment' )?.[0]?.reaction?.created_at
+                }
             }
             return a
         }, [])
@@ -103,6 +104,7 @@ const getFeedChatService = async (req, res) => {
             })
             feedGroup.push({...groupingFeed[i], block: blockCount})
         }
+        feedGroup.sort((a, b) => moment(b.data.last_message_at).unix() - moment(a.data.last_message_at).unix())
         res.status(200).send({
             success: true,
             data:feedGroup,
