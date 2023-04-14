@@ -7,8 +7,8 @@ const v = new Validator();
 
 module.exports = async (req, res) => {
   try {
-    var url_parts = url.parse(req.url, true);
-    var query = url_parts.query;
+    const url_parts = url.parse(req.url, true);
+    const query = url_parts.query;
     const schema = {
       other_user_id: "string|empty:false",
     };
