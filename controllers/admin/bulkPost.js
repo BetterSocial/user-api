@@ -9,12 +9,13 @@ const { CONTENT_TYPE_COMMENT } = require("../../helpers/constants");
 
 const bulkPostController = async (req, res) => {
   try {
-    let { post } = req?.body;
+    let { post } = req?.body || {};
+
     if (post.length < 1) {
       return ErrorResponse.e400(res, "Data not null");
     }
-    for (let index = 0; index < post.length; index++) {
-      const element = post[index];
+    
+    for (let element of post) {
       const { anonimity, userId } = element;
       if (anonimity) {
         let anonUserInfo = await generateAnonymousUsername();
