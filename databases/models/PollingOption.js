@@ -1,11 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-    class PollingOption extends Model {
-        static associate(models) {
-
-        }
-    }
+    class PollingOption extends Model {}
 
     PollingOption.init({
         polling_option_id : { type : DataTypes.UUID, primaryKey : true},

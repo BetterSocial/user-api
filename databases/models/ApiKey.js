@@ -1,9 +1,7 @@
 "use strict";
 const { Model, DataTypes } = require("sequelize");
 module.exports = (sequelize, DataTypess) => {
-  class ApiKey extends Model {
-    static associate(models) {}
-  }
+  class ApiKey extends Model {}
 
   ApiKey.init(
     {

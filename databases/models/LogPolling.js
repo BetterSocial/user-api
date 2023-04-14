@@ -1,11 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-    class LogPolling extends Model {
-        static associate(models) {
-
-        }
-    }
+    class LogPolling extends Model {}
 
     LogPolling.init({
         log_polling_id : { type : DataTypes.UUID, allowNull : false, primaryKey : true},
