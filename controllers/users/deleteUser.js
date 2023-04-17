@@ -6,7 +6,7 @@ const { sequelize, User,
   UserFollowUser,
   UserFollowUserHistory,
   UserFollowDomain,
-  UserFollowDomainHistory} = require("../../databases/models");
+  UserFollowDomainHistory } = require("../../databases/models");
 
 const { Op } = require("sequelize");
 
@@ -78,6 +78,11 @@ module.exports = async (req, res) => {
           ]
         }
       })
+
+      await sequelize.query("REFRESH MATERIALIZED VIEW vwm_user_follower_count")
+      await sequelize.query("REFRESH MATERIALIZED VIEW vwm_user_common_follower_count")
+      await sequelize.query("REFRESH MATERIALIZED VIEW vwm_user_location_follower_count")
+      await sequelize.query("REFRESH MATERIALIZED VIEW vwm_user_topic_follower_count_rank")
 
       const StreamChat = require("stream-chat").StreamChat;
       const serverClient = new StreamChat(process.env.API_KEY, process.env.SECRET);
