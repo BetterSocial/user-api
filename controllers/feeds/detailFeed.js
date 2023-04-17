@@ -70,8 +70,8 @@ module.exports = async (req, res) => {
   }
       const notification = await client.feed('notification', req.userId).get()
       let notifId = []
-      for(let i = 0; i < notification.results.length; i++) {
-        notifId.push(notification.results[i].id)
+      for(let item of notification.results) {
+        notifId.push(item.id)
       }
       await client.feed('notification', req.userId).get({mark_read: notifId, mark_seen: notifId })
  
