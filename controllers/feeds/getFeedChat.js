@@ -91,6 +91,7 @@ const getFeedChatService = async (req, res) => {
                 newGroup[activity_id].totalCommentBadge = newGroup[activity_id].comments.filter((data) => constantActor.id !== req.userId && data.reaction.kind === 'comment').length || 0
                 if(newGroup[activity_id]?.comments?.length > 0) {
                     newGroup[activity_id].data.last_message_at = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment' )?.[0]?.reaction?.created_at
+                    newGroup[activity_id].data.updated_at = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment' )?.[0]?.reaction?.created_at
                 }
             }
             return a
