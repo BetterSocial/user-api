@@ -1,7 +1,6 @@
 const ClientError = require("../../exceptions/ClientError");
 const {
   MAX_FEED_FETCH_LIMIT,
-  MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   POST_VERB_POLL,
 } = require("../../helpers/constants");
 const BlockServices = require("../../services/block/BlockServices");
@@ -11,10 +10,8 @@ const {
 } = require("../../services/blockUser");
 const getBlockDomain = require("../../services/domain/getBlockDomain");
 const ConnectGetstream = require("../../services/getstream/ConnectGetstream");
-const {
-  connectStreamChat,
-} = require("../../services/getstream/connectStreamChat");
 const GetstreamService = require("../../services/getstream/GetstreamService");
+const { filterFeeds } = require("../../utils/post");
 const { modifyPollPostObject } = require("../../utils/post");
 const TopicPageValidator = require("../../validators/topicPage");
 
@@ -28,15 +25,8 @@ class TopicPage {
   }
 
   async getTopicPages(req, res) {
-    let getFeedFromGetstreamIteration = 0;
     let { id } = req.params;
     let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query;
-    // const client = await connectStreamChat(req.userId, req.token)
-
-    // const channels = await client.queryChannels({ id })
-    // const countUnread = await channels[0]?.markRead()
-    // const channels = await client.queryChannels({ id: `topic_${id}` })
-    // const countUnread = await channels[0]?.markRead()
 
     try {
       this._validator.validateGetTopicPages({ id });
@@ -56,20 +46,19 @@ class TopicPage {
       ).getHasBlock(topicPages);
       let data = [];
 
-      for (let index = 0; index < newTopicPagesWithBlock.length; index++) {
-        // validation admin hide post
+      newTopicPagesWithBlock = await filterFeeds(req.userId, newTopicPagesWithBlock)
 
-        const item = newTopicPagesWithBlock[index];
-        if (item.is_hide) {
-          continue;
-        }
-        if (item.verb === POST_VERB_POLL) {
-          let postPoll = await modifyPollPostObject(req.userId, item);
+      for (let post of newTopicPagesWithBlock) {
+        if (post?.is_hide) continue
+
+        if (post.verb === POST_VERB_POLL) {
+          let postPoll = await modifyPollPostObject(req.userId, post);
           data.push(postPoll);
         } else {
-          data.push(item);
+          data.push(post);
         }
       }
+
       res.status(200).json({
         code: 200,
         status: "success",

@@ -243,6 +243,57 @@ async function modifyPostLinkPost(domainPageModel, post) {
   return post
 }
 
+/**
+ * 
+ * @param {Object} post 
+ * @param {Boolean} [isAnonimous = true] 
+ * @returns {Object}
+ */
+function modifyReactionsPost(post, isAnonimous = true) {
+  if(!isAnonimous) return post
+  
+  let newPost = {...post}
+
+  const itemReducer = (acc, next) => {
+    next.user = {}
+    next.user_id = ''
+    next.target_feeds = []
+    next.data.target_feeds = []
+
+    acc.push(next)
+    return acc
+  }
+
+  if(newPost.hasOwnProperty('latest_reactions')) {
+    const upvotes = newPost?.latest_reactions?.upvotes || []
+    const downvotes = newPost?.latest_reactions?.downvotes || []
+    const comments = newPost?.latest_reactions?.comment || []
+
+    let newUpvotes = upvotes.reduce(itemReducer, [])
+    let newDownvotes = downvotes.reduce(itemReducer, [])
+    let newComments = comments.reduce(itemReducer, [])
+
+    newPost.latest_reactions.upvotes = newUpvotes
+    newPost.latest_reactions.downvotes = newDownvotes
+    newPost.latest_reactions.comments = newComments
+  }
+
+  if(newPost.hasOwnProperty('own_reactions')) {
+    const upvotes = newPost?.own_reactions?.upvotes || []
+    const downvotes = newPost?.own_reactions?.downvotes || []
+    const comments = newPost?.own_reactions?.comment || []
+
+    let newUpvotes = upvotes.reduce(itemReducer, [])
+    let newDownvotes = downvotes.reduce(itemReducer, [])
+    let newComments = comments.reduce(itemReducer, [])
+
+    newPost.own_reactions.upvotes = newUpvotes
+    newPost.own_reactions.downvotes = newDownvotes
+    newPost.own_reactions.comments = newComments
+  }
+  return newPost
+}
+
 async function filterFeeds(userId, feeds = []) {
   let newResult = []
 
@@ -259,6 +310,8 @@ async function filterFeeds(userId, feeds = []) {
       newItem.origin = null
       newItem.object = ""
     }
+
+    newItem = modifyReactionsPost(newItem, newItem.anonimity)
 
     let isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0
 
@@ -280,6 +333,7 @@ module.exports = {
   modifyAnonimityPost,
   modifyAnonymousAndBlockPost,
   modifyPollPostObject,
+  modifyReactionsPost,
   getFeedDuration,
   modifyPostLinkPost,
 };

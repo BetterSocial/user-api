@@ -17,6 +17,7 @@ const {
   modifyPollPostObject,
   modifyAnonimityPost,
   isPostBlocked,
+  modifyReactionsPost,
 } = require("../../utils/post");
 const { DomainPage, Locations, User } = require("../../databases/models");
 const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
@@ -44,9 +45,6 @@ module.exports = async (req, res) => {
     });
 
     let listAnonymousPostId = [];
-    // let listAnonymousPostId = listPostAnonymousAuthor.map((value) => {
-    //   return value.post_anonymous_id_blocked;
-    // });
 
     let listBlock = String(listBlockUser + listBlockDomain);
 
@@ -88,8 +86,7 @@ module.exports = async (req, res) => {
         let feeds = response.results;
 
         // Change to conventional loop because map cannot handle await
-        for (let i = 0; i < feeds.length; i++) {
-          let item = feeds[i];
+        for (let item of feeds) {
           // validation admin hide post
           if (item.is_hide) {
             offset++;
@@ -117,7 +114,8 @@ module.exports = async (req, res) => {
 
           // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
           if (now < dateExpired || item.duration_feed == "never") {
-            let newItem = modifyAnonimityPost(item);
+            let newItem = await modifyAnonimityPost(item);
+            newItem = modifyReactionsPost(newItem, newItem.anonimity)
             if (item.verb === POST_VERB_POLL) {
               let postPoll = await modifyPollPostObject(req.userId, item);
               data.push(postPoll);
