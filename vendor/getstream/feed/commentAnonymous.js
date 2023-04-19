@@ -2,10 +2,17 @@ const stream = require("getstream");
 const createToken = require("../core/createToken");
 const GetstreamSingleton = require("../singleton");
 
-module.exports = async (anonymousUserId, message, activityId, feedOwnerUserId, anonUserInfo) => {
+module.exports = async (anonymousUserId, message, activityId, feedOwnerUserId, anonUserInfo, sendPostNotif) => {
     const anonymousToken = await createToken(anonymousUserId)
     const clientUser = GetstreamSingleton.getClientInstance(anonymousToken)
     let targetFeed = [`notification:${feedOwnerUserId}`]
+    if (sendPostNotif) {
+        if (feedOwnerUserId !== anonymousUserId) {
+            targetFeed = [...targetFeed, `notification:${anonymousUserId}`]
+        }
+    } else {
+        targetFeed = []
+    }
     const handleResponse = await clientUser.reactions.add("comment", activityId, {
         text: message,
         count_upvote: 0,
