@@ -11,7 +11,7 @@ const { DomainPage } = require("../../databases/models/");
 const ElasticNewsLink = require("../../elasticsearch/repo/newsLink/ElasticNewsLink");
 
 const MIN_CREDDER_SCORE = 50
-const CREDDER_CHECK_ENABLED = false
+const CREDDER_CHECK_ENABLED = true
 
 const elasticNewsLink = new ElasticNewsLink()
 
