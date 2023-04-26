@@ -255,10 +255,13 @@ function modifyReactionsPost(post, isAnonimous = true) {
   let newPost = {...post}
 
   const itemReducer = (acc, next) => {
-    next.user = {}
-    next.user_id = ''
-    next.target_feeds = []
-    next.data.target_feeds = []
+    if(next.data.anon_user_info_color_name) {
+      next.user = {}
+      next.user_id = ''
+      next.target_feeds = []
+      next.data.target_feeds = []
+    }
+ 
 
     acc.push(next)
     return acc
