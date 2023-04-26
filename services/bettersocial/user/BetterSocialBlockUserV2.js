@@ -22,12 +22,15 @@ const BetterSocialScoreBlockUser = require("../score/block-user");
  */
 const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, params = {}) => {
     const { postId = "", reason = [], message = "" } = params
-    
-    if(selfUserId === targetUserId) return {
+
+    if (selfUserId === targetUserId) return {
         isSuccess: false,
         message: "You can't block yourself"
     }
-    
+
+    const targetAnonymousUserId = await UsersFunction.findAnonymousUserId(User, targetUserId)
+    const selfAnonymousUserId = await UsersFunction.findAnonymousUserId(User, selfUserId)
+
     try {
         await sequelize.transaction(async (t) => {
             await UserFollowUserFunction.userBlock(
@@ -46,6 +49,15 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
                 source,
                 { transaction: t, message, postId, reason }
             )
+
+            await UserBlockUserFunction.userBlock(
+                UserBlockedUser,
+                UserBlockedUserHistory,
+                selfUserId,
+                targetAnonymousUserId?.user_id,
+                source,
+                { transaction: t, message, postId, reason, isAnonymous: true }
+            )
         });
     } catch (e) {
         console.log('Error in block user v2 sql transaction')
@@ -58,7 +70,7 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
 
     try {
         await RedisBlockHelper.resetBlockUserList(selfUserId)
-    } catch(e) {
+    } catch (e) {
         console.log('Error in block user v2 redis')
         console.log(e)
         return {
@@ -73,8 +85,6 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
         await Getstream.feed.unfollowUser(token, selfUserId, targetUserId)
         await Getstream.feed.unfollowUserExclusive(selfUserId, targetUserId)
 
-        const targetAnonymousUserId = await UsersFunction.findAnonymousUserId(User, targetUserId)
-        const selfAnonymousUserId = await UsersFunction.findAnonymousUserId(User, selfUserId)
         await Getstream.feed.unfollowAnonUser(token, selfUserId, targetUserId, selfAnonymousUserId?.user_id, targetAnonymousUserId?.user_id)
         return {
             isSuccess: true,
