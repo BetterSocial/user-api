@@ -46,6 +46,15 @@ module.exports = async (
         message
     }
 
+    const isTargetExist = await userBlockedUserModel.findOne({
+        where: {
+            user_id_blocker: selfUserId,
+            user_id_blocked: targetUserId,
+        },
+    }, { transaction });
+
+    if(isTargetExist) return;
+
     const userBlock = {
         blocked_action_id: uuidv4(),
         user_id_blocker: selfUserId,
