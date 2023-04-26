@@ -36,7 +36,7 @@ const handleBlock = async (req, res) => {
           "user"."profile_pic_asset_id" AS "user.profile_pic_asset_id", 
           "user"."profile_pic_public_id" AS "user.profile_pic_public_id", 
           "user"."status" AS "user.status" FROM "user_blocked_user" AS "UserBlockedUser" 
-          LEFT OUTER JOIN "users" AS "user" ON "UserBlockedUser"."user_id_blocked" = "user"."user_id" 
+          INNER JOIN "users" AS "user" ON "UserBlockedUser"."user_id_blocked" = "user"."user_id" 
           WHERE "UserBlockedUser"."user_id_blocker" = :id AND "UserBlockedUser"."is_anonymous_user" = FALSE;`,
         {
           nest: true,
