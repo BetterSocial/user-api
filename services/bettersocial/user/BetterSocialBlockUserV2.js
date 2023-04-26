@@ -50,7 +50,7 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
                 { transaction: t, message, postId, reason }
             )
 
-            await UserBlockUserFunction.userBlock(
+            if(targetAnonymousUserId?.user_id) await UserBlockUserFunction.userBlock(
                 UserBlockedUser,
                 UserBlockedUserHistory,
                 selfUserId,
