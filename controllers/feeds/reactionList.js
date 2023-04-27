@@ -17,7 +17,7 @@ module.exports = async(req, res) => {
             if(data.data.anon_user_info_emoji_name) {
                 return {...data, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === data.user_id, is_author: data.user_id === anonymActor}
             }
-            return {...data, is_you: req.userId === data.user_id, is_author: data.user_id === anonymActor}
+            return {...data, is_you: req.userId === data.user_id, is_author: data.user_id === post.actor.id}
         })
 
         res.status(200).send({success: true, data: removeSensitiveData, message: 'success get reaction data', total: removeSensitiveData.length})
