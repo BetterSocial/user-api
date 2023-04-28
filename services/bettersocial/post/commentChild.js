@@ -51,7 +51,6 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
             detailUser = await UsersFunction.findUserById(User, useridFeed)
         }
 
-        console.log(detailUser, req.userId, 'sulit')
         if (detailUser?.user_id !== req?.userId) {
             await sendReplyCommentNotification(
                 useridFeed,
