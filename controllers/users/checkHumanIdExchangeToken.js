@@ -31,6 +31,7 @@ const checkHumanIdExchangeToken = async (req, res) => {
             data: false,
             message: "User not found",
             is_banned: false,
+            humanIdData: data
         })
 
 
