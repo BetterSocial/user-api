@@ -6,7 +6,7 @@ const client = stream.connect(process.env.API_KEY, process.env.SECRET);
  * @param {string} userId 
  * @returns {string}
  */
-const createToken = async (userId = null) => {
+const createToken = (userId = null) => {
     if(!userId) throw new Error("userId is required");
  
     const DAYS_IN_SECONDS = 24 * 60 * 60

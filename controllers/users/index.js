@@ -23,6 +23,7 @@ const checkFollowBatch = require('./checkFollowBatch')
 
 const unblockUserV2 = require('./unblockUserV2')
 const blockUserV2 = require('../users/blockUserV2');
+const checkHumanIdExchangeTokenController = require('./checkHumanIdExchangeToken')
 
 module.exports = {
     blockDomain,
@@ -32,6 +33,7 @@ module.exports = {
     chatSearch,
     checkFollow,
     checkFollowBatch,
+    checkHumanIdExchangeTokenController,
     checkUsername,
     deleteUser,
     demoVerifyUser,

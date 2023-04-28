@@ -4,7 +4,6 @@ const usersHandler = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 const RegisterV2UploadPhotoMiddleware = require('../middlewares/upload-photo/registerV2');
-const CryptoUtils = require('../utils/crypto');
 
 router.post('/check-username', usersHandler.checkUsername);
 router.post('/register', usersHandler.register);
@@ -39,5 +38,6 @@ router.post('/blockuser-v2', auth.isAuth, BodyValidationMiddleware.blockUserV2, 
 router.post('/unblockuser-v2', auth.isAuth, BodyValidationMiddleware.unblockUserV2, usersHandler.unblockUserV2);
 router.get('/check-follow', auth.isAuth, usersHandler.checkFollow);
 router.post('/check-follow-batch', auth.isAuth, BodyValidationMiddleware.checkUserFollowStatus, usersHandler.checkFollowBatch);
+router.post('/check-exchange-token', BodyValidationMiddleware.checkHumanIdExchangeToken, usersHandler.checkHumanIdExchangeTokenController)
 
 module.exports = router;
