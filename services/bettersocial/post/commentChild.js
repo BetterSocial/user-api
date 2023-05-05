@@ -1,10 +1,11 @@
 const UsersFunction = require("../../../databases/functions/users")
 const { countProcess } = require("../../../process")
-const { User } = require("../../../databases/models")
+const { User, PostAnonUserInfo } = require("../../../databases/models")
 const QueueTrigger = require('../../queue/trigger')
 const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
 const sendReplyCommentNotification = require('../fcmToken/sendReplyCommentNotification')
+const PostAnonUserInfoFunction = require("../../../databases/functions/postAnonUserInfo")
 
 const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     try {
@@ -35,8 +36,17 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
         }
         let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
 
-        if(isAnonimous) result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
-        else {
+        if(isAnonimous) {
+            result = await Getstream.feed.commentChildAnonymous(selfUser?.user_id, message, reaction_id, selfUser?.userId, postMaker, useridFeed, anon_user_info, isAnonimous, sendPostNotif)
+            await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+                postId: reaction?.activity_id,
+                anonUserId: selfUser?.user_id,
+                anonUserInfoColorCode: anon_user_info?.color_code,
+                anonUserInfoColorName: anon_user_info?.color_name,
+                anonUserInfoEmojiCode: anon_user_info?.emoji_code,
+                anonUserInfoEmojiName: anon_user_info?.emoji_name,
+            })
+        } else {
             const signPostMaker = await UsersFunction.findSignedUserId(User, postMaker)
             const signUserId = await UsersFunction.findSignedUserId(User, userId)
             const signUseridFeed = await UsersFunction.findSignedUserId(User, useridFeed)
