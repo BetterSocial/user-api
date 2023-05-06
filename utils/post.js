@@ -19,7 +19,7 @@ const moment = require('moment')
 const formatLocationGetStream = require("../helpers/formatLocationGetStream");
 const RedisDomainHelper = require("../services/redis/helper/RedisDomainHelper");
 
-const handleCreatePostTO = (userId, postBody, isAnonimous = true) => {
+const handleCreatePostTO = (userId, postBody, isAnonimous = true, locationString = null) => {
   let { privacy, topics, location, message, tagUsers } = postBody;
   let TO = [];
   if (tagUsers && Array.isArray(tagUsers)) {
@@ -42,9 +42,8 @@ const handleCreatePostTO = (userId, postBody, isAnonimous = true) => {
     TO.push("location:everywhere");
   }
 
-  if (location !== null) {
-    let loc = formatLocationGetStream(location);
-    TO.push("location:" + loc);
+  if (locationString !== null) {
+    TO.push("location:" + locationString);
   }
 
   const removeDuplicate = _.union(TO);

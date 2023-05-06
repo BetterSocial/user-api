@@ -11,6 +11,7 @@ const { addForCreatePost } = require('../../score');
 const PostFunction = require('../../../databases/functions/post');
 const PollingFunction = require('../../../databases/functions/polling');
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
+const { convertLocationFromModel } = require('../../../utils');
 
 /**
  * 
@@ -25,6 +26,8 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     let userDetail = {};
     let data = {}
     let locationDetail = {}
+    let locationToPost = 'Everywhere'
+    let locationTO = null
     let post = {}
 
     const isPollPost = body?.verb === POST_VERB_POLL
@@ -42,6 +45,11 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
         const feedExpiredAt = getFeedDuration(body?.duration_feed)
         locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id)
 
+        if(body?.location !== 'Everywhere') {
+            locationToPost = convertLocationFromModel(locationDetail)
+            locationTO = convertLocationFromModel(locationDetail, true)
+        }
+
         data = {
             verb: body?.verb,
             message: body?.message,
@@ -49,7 +57,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             privacy: body?.privacy,
             object: getstreamObjectParam,
             anonimity: isAnonimous,
-            location: body?.location,
+            location: locationToPost,
             duration_feed: body?.duration_feed,
             images_url: uploadedImages,
             expired_at: feedExpiredAt,
@@ -57,7 +65,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             count_downvote: 0,
             post_type: POST_TYPE_STANDARD,
             version: POST_VERSION,
-            to: handleCreatePostTO(req?.userId, req?.body, isAnonimous),
+            to: handleCreatePostTO(req?.userId, req?.body, isAnonimous, locationTO),
         }
 
         /**
@@ -159,7 +167,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             topics: data?.topics,
             privacy: data?.privacy,
             anonimity: data?.anonimity,
-            location_level: body?.location,
+            location_level: locationToPost,
             duration_feed: data?.duration_feed,
             expired_at: (data?.expired_at) ? moment.utc(data?.expired_at).format("YYYY-MM-DD HH:mm:ss") : "",
             images_url: data?.images_url,

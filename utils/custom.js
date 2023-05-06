@@ -87,10 +87,23 @@ const convertingUserFormatForLocation = (locations) => {
     return temp;
 }
 
+const convertLocationFromModel = (locationModel, isTO = false) => {
+    const { location_level, country, city, state, neighborhood } = locationModel;
+    if(!locationModel) return "";
+    if(location_level === 'Country') return country
+    if(location_level === 'State') return state
+    if(location_level === 'City' && isTO) return city?.split(',')[0]?.split(' ').join('-')?.toLowerCase()
+    if(location_level === 'City') return city
+    if(location_level === 'Neighborhood') return neighborhood
+
+    return "";
+}
+
 module.exports = {
     capitalizing,
     convertString,
     convertTopicWithEmoji,
+    convertLocationFromModel,
     dateCreted,
     getToken,
     getFirstStringFromSplit,
