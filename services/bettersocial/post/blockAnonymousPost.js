@@ -3,7 +3,7 @@ const UserFollowUserFunction = require('../../../databases/functions/userFollowU
 const UsersFunction = require('../../../databases/functions/users')
 const { User, UserFollowUser, UserFollowUserHistory, UserBlockedUser, UserBlockedUserHistory, sequelize } = require('../../../databases/models')
 const Getstream = require('../../../vendor/getstream')
-const GetstreamConstant = require('../../../vendor/getstream/constant')
+const RedisBlockHelper = require('../../redis/helper/RedisBlockHelper')
 
 /**
  * @typedef {Object} BetterSocialBlockAnonymousPostV2OptionalParams
@@ -35,6 +35,7 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
     
     const authorAnonymousUserId = post?.actor?.id || null
 
+    console.log(`${selfAnonymousUserId?.user_id} vs ${authorAnonymousUserId}`)
     if (selfAnonymousUserId?.user_id === authorAnonymousUserId) return {
         isSuccess: false,
         message: "You can't block your own post"
@@ -64,6 +65,17 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
         return {
             isSuccess: false,
             message: e?.message || "Error in block user v2 sql transaction"
+        }
+    }
+
+    try {
+        await RedisBlockHelper.resetBlockUserList(selfUserId)
+    } catch (e) {
+        console.log('Error in block user v2 redis')
+        console.log(e)
+        return {
+            isSuccess: false,
+            message: e?.message || "Error in block user v2 redis"
         }
     }
 
