@@ -12,6 +12,15 @@ const PostFunction = require('../../../databases/functions/post');
 const PollingFunction = require('../../../databases/functions/polling');
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 const { convertLocationFromModel } = require('../../../utils');
+const ErrorResponse = require('../../../utils/response/ErrorResponse');
+
+const isEmptyMessageAllowed = (body) => {
+    const isPollPost = body?.verb === POST_VERB_POLL
+    const isBodyEmpty = !body?.message || body?.message === ''
+    const isImageUrlEmpty = !body?.images_url || body?.images_url.length === 0
+
+    return (isBodyEmpty && isImageUrlEmpty && !isPollPost)
+}
 
 /**
  * 
@@ -30,7 +39,13 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     let locationTO = null
     let post = {}
 
+
     const isPollPost = body?.verb === POST_VERB_POLL
+
+    if (isEmptyMessageAllowed(req?.body)) return {
+        success: false,
+        message: 'Post cannot be empty'
+    }
 
     try {
         /**
@@ -45,7 +60,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
         const feedExpiredAt = getFeedDuration(body?.duration_feed)
         locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id)
 
-        if(body?.location !== 'Everywhere') {
+        if (body?.location !== 'Everywhere') {
             locationToPost = convertLocationFromModel(locationDetail)
             locationTO = convertLocationFromModel(locationDetail, true)
         }
@@ -123,7 +138,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
         /**
          * Process if Anonymous Post
          */
-        if(isAnonimous) {
+        if (isAnonimous) {
             data = {
                 ...data,
                 anon_user_info_color_name: body?.anon_user_info?.color_name,
@@ -145,7 +160,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
         if (isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
         else post = await Getstream.feed.createPost(req?.token, data);
 
-        if(isAnonimous) {
+        if (isAnonimous) {
             await PostAnonUserInfoFunction.createAnonUserInfoInPost(PostAnonUserInfo, {
                 postId: post?.id,
                 anonUserId: userDetail?.user_id,

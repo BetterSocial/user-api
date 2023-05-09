@@ -1,5 +1,5 @@
 const Schema = {
-    message: "string|empty:false",
+    message: "string",
     verb: "string|empty:false",
     feedGroup: "string|empty:false",
     privacy: "string|empty:false",
