@@ -11,7 +11,7 @@ const sendCommentNotification = async (userTargetId, commentAuthor, message, act
             title: `${commentAuthor?.username} commented on your post`,
             body: message,
             click_action: "OPEN_ACTIVITY_1",
-            image: commentAuthor?.profile_pic_path,
+            // image: commentAuthor?.profile_pic_path,
         },
         data: {
             feed_id: activity_id,
