@@ -14,6 +14,14 @@ const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonU
 const { convertLocationFromModel } = require('../../../utils');
 const ErrorResponse = require('../../../utils/response/ErrorResponse');
 
+const isEmptyMessageAllowed = (body) => {
+    const isPollPost = body?.verb === POST_VERB_POLL
+    const isBodyEmpty = !body?.message || body?.message === ''
+    const isImageUrlEmpty = !body?.images_url || body?.images_url.length === 0
+
+    return (isBodyEmpty && isImageUrlEmpty && !isPollPost)
+}
+
 /**
  * 
  * @param {import('express').Request} req 
@@ -33,10 +41,8 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
 
 
     const isPollPost = body?.verb === POST_VERB_POLL
-    const isBodyEmpty = !body?.message || body?.message === ''
-    const isImageUrlEmpty = !body?.images_url || body?.images_url.length === 0
 
-    if (isBodyEmpty && isImageUrlEmpty && !isPollPost) return {
+    if (isEmptyMessageAllowed(req?.body)) return {
         success: false,
         message: 'Post cannot be empty'
     }
