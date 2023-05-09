@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
       for (let indexUserTopic in userTopicFollower) {
         let userTopic = userTopicFollower[indexUserTopic]
         delete userTopic.human_id
-        if (userTopic.topic_id === topic.topic_id && userTopic.user_id !== betterAccount.user_id) {
+        if (userTopic.topic_id === topic.topic_id && userTopic.user_id !== betterAccount?.user_id) {
           tempUsers.push({
             ...userTopic,
             viewtype: 'user'
