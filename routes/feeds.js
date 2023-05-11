@@ -20,7 +20,7 @@ router.get("/post/is-author-follow-me/:postId", feed.isAuthorFollowMe);
 router.post("/create-token", feedController.createToken);
 router.get("/feeds", feed.getFeeds);
 router.post("/reaction", feed.createReaction);
-router.get("/reactions", feed.getReaction);
+router.post("/reactions", isAuth, feed.getReaction);
 router.post("/follow-user", feed.followUser);
 router.post("/upvote", feed.upvote);
 router.post("/downvote", feed.downvote);
