@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-    let activity_id = req.body;
+    let {activity_id} = req.body;
     const token = req.token;
     getstreamService
       .getReaction(activity_id, token)
