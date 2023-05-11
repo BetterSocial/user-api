@@ -16,14 +16,14 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-    let {activity_id} = req.body;
+    let {activity_id, limit} = req.body;
     const token = req.token;
     getstreamService
-      .getReaction(activity_id, token)
+      .getReaction(activity_id, token, limit)
       .then((result) => {
         res.status(200).json({
           status: "success",
-          data: result,
+          data: result.results,
         });
       })
       .catch((err) => {
