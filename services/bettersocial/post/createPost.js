@@ -38,7 +38,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     let locationToPost = 'Everywhere'
     let locationTO = null
     let post = {}
-
+    let uploadedImages = body?.images_url || []
 
     const isPollPost = body?.verb === POST_VERB_POLL
 
@@ -55,7 +55,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
         else userDetail = await UsersFunction.findUserById(User, userId);
 
         const getstreamObjectParam = generateDefaultGetstreamObject(body, isAnonimous, userDetail)
-        const uploadedImages = await CloudinaryService.uploadBase64Array(body?.images_url);
+        if(!body?.is_photo_uploaded) uploadedImages = await CloudinaryService.uploadBase64Array(body?.images_url);
 
         const feedExpiredAt = getFeedDuration(body?.duration_feed)
         locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id)
