@@ -1,4 +1,18 @@
 const cloudinary = require('cloudinary').v2
+const fs = require('fs')
+
+/**
+ * 
+ * @param {String} path
+ * @returns {Promise<import('cloudinary').UploadApiResponse>}
+ */
+const upload = async (path) => {
+    if (!path) throw new Error('path is required');    
+    return await cloudinary.uploader.upload(path, {
+        overwrite: false,
+        invalidate: true,
+    });
+}
 
 /**
  * 
@@ -32,6 +46,7 @@ const uploadBase64Array = async (base64Array = []) => {
 
 
 const CloudinaryService = {
+    upload,
     uploadBase64,
     uploadBase64Array
 }
