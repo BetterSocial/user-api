@@ -35,12 +35,13 @@ const BodyValidationMiddleware = {
     createCommentV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createCommentV2),
     createPollPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createPollPostV2),
     createPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.createPostV2),
-    followUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.followUserV2),
+    followUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.followUserV2),
     generateCommentAnonymousUsername: GenerateBodyValidationMiddleware(BodyValidationSchema.generateCommentAnonymousUsername),
     generatePostAnonymousUsername: GenerateBodyValidationMiddleware(BodyValidationSchema.generatePostAnonymousUsername),
     registerV2: GenerateBodyValidationMiddleware(BodyValidationSchema.registerV2),
     unblockUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.unblockUserV2),
-    unfollowUserV2 : GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
+    unfollowUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
+    uploadPhoto: GenerateBodyValidationMiddleware(BodyValidationSchema.uploadPhoto),
 }
 
-module.exports =  BodyValidationMiddleware;
+module.exports = BodyValidationMiddleware;
