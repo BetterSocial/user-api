@@ -5,7 +5,7 @@ const UploadController = require('../controllers/upload');
 const { isAuth } = require('../middlewares/auth');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 
-const upload = Multer({ dest: 'public/uploads/' })
+const upload = Multer({ dest: 'public/uploads/', limits: { fileSize: 10 * 1024 * 1024 } })
 
 UploadRouter.post('/photo', isAuth, upload.single('photo'), UploadController.uploadPhoto);
 UploadRouter.post('/photo-base64', isAuth, BodyValidationMiddleware.uploadPhoto, UploadController.uploadPhotoBase64)
