@@ -32,6 +32,7 @@ const mentionRouter = require("./routes/mention");
 const configRouter = require("./routes/config");
 const adminRouter = require("./routes/adminRouter");
 const stream = require("getstream");
+const UploadRouter = require("./routes/upload");
 initializeApp({ credential: cert(JSON.parse(serviceAccount)) });
 const app = express();
 app.disable("x-powered-by");
@@ -64,6 +65,7 @@ app.use("/api/v1/discovery", discovery);
 app.use("/api/v1/u", linkRouter);
 app.use("/api/v1/mention", mentionRouter);
 app.use("/api/v1/config", configRouter);
+app.use("/api/v1/upload", UploadRouter);
 app.use(auth.isAuth, topicPage);
 
 const options = {

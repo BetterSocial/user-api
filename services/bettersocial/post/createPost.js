@@ -38,9 +38,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     let locationToPost = 'Everywhere'
     let locationTO = null
     let post = {}
-
-
-    const isPollPost = body?.verb === POST_VERB_POLL
+    let uploadedImages = body?.images_url || []
 
     if (isEmptyMessageAllowed(req?.body)) return {
         success: false,
@@ -55,7 +53,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
         else userDetail = await UsersFunction.findUserById(User, userId);
 
         const getstreamObjectParam = generateDefaultGetstreamObject(body, isAnonimous, userDetail)
-        const uploadedImages = await CloudinaryService.uploadBase64Array(body?.images_url);
+        if (!body?.is_photo_uploaded) uploadedImages = await CloudinaryService.uploadBase64Array(body?.images_url);
 
         const feedExpiredAt = getFeedDuration(body?.duration_feed)
         locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id)
@@ -83,71 +81,8 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
             to: handleCreatePostTO(req?.userId, req?.body, isAnonimous, locationTO),
         }
 
-        /**
-         * Process if Poll Post
-         */
-        if (isPollPost) {
-            const pollExpiredAt = getPollPostExpiredAt(body?.pollsduration, body?.duration_feed)
-            if (!pollExpiredAt) return {
-                isSuccess: false,
-                message: "Polling duration cannot be more than post expiration date"
-            }
-
-            const postDate = moment().toISOString()
-
-            const [pollingId, pollsOptionUUIDs] = await sequelize.transaction(async (transaction) => {
-                const postId = await PostFunction.createPollPost(sequelize, {
-                    userId: req?.userId,
-                    anonimity: isAnonimous,
-                    createdAt: postDate,
-                    updatedAt: postDate,
-                    expiredAt: pollExpiredAt,
-                    resUrl: '',
-                }, transaction)
-
-                const pollingId = await PollingFunction.createPollingByPostId(sequelize, {
-                    createdAt: postDate,
-                    updatedAt: postDate,
-                    message: body?.message,
-                    multiplechoice: body?.multiplechoice,
-                    postId: postId,
-                    userId: req?.userId,
-                }, transaction)
-
-                const optionsUUIDs = await PollingFunction.createPollingOptionsByPollId(sequelize, {
-                    polls: body?.polls,
-                    createdAt: postDate,
-                    updatedAt: postDate,
-                    pollId: pollingId,
-                }, transaction)
-
-                return [pollingId, optionsUUIDs]
-            })
-
-            data = {
-                ...data,
-                polling_id: pollingId,
-                polls: pollsOptionUUIDs,
-                post_type: POST_TYPE_POLL,
-                polls_expired_at: getPollsDurationInIso(body?.pollsduration),
-                multiplechoice: body?.multiplechoice,
-                expired_at: pollExpiredAt,
-            }
-        }
-
-        /**
-         * Process if Anonymous Post
-         */
-        if (isAnonimous) {
-            data = {
-                ...data,
-                anon_user_info_color_name: body?.anon_user_info?.color_name,
-                anon_user_info_color_code: body?.anon_user_info?.color_code,
-                anon_user_info_emoji_name: body?.anon_user_info?.emoji_name,
-                anon_user_info_emoji_code: body?.anon_user_info?.emoji_code,
-            }
-        }
-
+        data = await processPollPost(userId, isAnonimous, body, data)
+        data = processAnonymous(isAnonimous, body, data)
     } catch (e) {
         console.log(e)
         return {
@@ -246,4 +181,77 @@ function getPollPostExpiredAt(pollsDuration, durationFeed) {
     } else {
         return moment().add(100, 'years').toISOString()
     }
+}
+
+async function processPollPost(userId, isAnonimous, body, data) {
+    const isPollPost = body?.verb === POST_VERB_POLL
+    if (!isPollPost) return data
+
+    const { message, multiplechoice, polls, pollsduration, duration_feed } = body || {}
+    /**
+     * Process if Poll Post
+     */
+    const pollExpiredAt = getPollPostExpiredAt(pollsduration, duration_feed)
+    if (!pollExpiredAt) return {
+        isSuccess: false,
+        message: "Polling duration cannot be more than post expiration date"
+    }
+
+    const postDate = moment().toISOString()
+
+    const [pollingId, pollsOptionUUIDs] = await sequelize.transaction(async (transaction) => {
+        const postId = await PostFunction.createPollPost(sequelize, {
+            userId: userId,
+            anonimity: isAnonimous,
+            createdAt: postDate,
+            updatedAt: postDate,
+            expiredAt: pollExpiredAt,
+            resUrl: '',
+        }, transaction)
+
+        const pollingId = await PollingFunction.createPollingByPostId(sequelize, {
+            createdAt: postDate,
+            updatedAt: postDate,
+            message: message,
+            multiplechoice: multiplechoice,
+            postId: postId,
+            userId: userId,
+        }, transaction)
+
+        const optionsUUIDs = await PollingFunction.createPollingOptionsByPollId(sequelize, {
+            polls: polls,
+            createdAt: postDate,
+            updatedAt: postDate,
+            pollId: pollingId,
+        }, transaction)
+
+        return [pollingId, optionsUUIDs]
+    })
+
+    return {
+        ...data,
+        polling_id: pollingId,
+        polls: pollsOptionUUIDs,
+        post_type: POST_TYPE_POLL,
+        polls_expired_at: getPollsDurationInIso(pollsduration),
+        multiplechoice: multiplechoice,
+        expired_at: pollExpiredAt,
+    }
+}
+
+function processAnonymous(isAnonimous, body, data) {
+    /**
+     * Process if Anonymous Post
+     */
+    if (isAnonimous) {
+        return {
+            ...data,
+            anon_user_info_color_name: body?.anon_user_info?.color_name,
+            anon_user_info_color_code: body?.anon_user_info?.color_code,
+            anon_user_info_emoji_name: body?.anon_user_info?.emoji_name,
+            anon_user_info_emoji_code: body?.anon_user_info?.emoji_code,
+        }
+    }
+
+    return data
 }

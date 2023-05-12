@@ -9,6 +9,7 @@ const Schema = {
     topics: "array|nullable:true",
     location_id: "string|empty:true",
     images_url: "array|empty:true",
+    is_photo_uploaded: "boolean|optional:true",
 };
 
 module.exports = Schema;
