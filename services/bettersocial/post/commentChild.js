@@ -4,8 +4,8 @@ const { User, PostAnonUserInfo } = require("../../../databases/models")
 const QueueTrigger = require('../../queue/trigger')
 const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
-const sendReplyCommentNotification = require('../fcmToken/sendReplyCommentNotification')
 const PostAnonUserInfoFunction = require("../../../databases/functions/postAnonUserInfo")
+const sendMultiDeviceReplyCommentNotification = require("../fcmToken/sendMultiDeviceReplyCommentNotification")
 
 const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     try {
@@ -62,7 +62,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
         }
 
         if (detailUser?.user_id !== req?.userId) {
-            await sendReplyCommentNotification(
+            await sendMultiDeviceReplyCommentNotification(
                 useridFeed,
                 commentAuthor,
                 message,

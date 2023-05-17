@@ -3,12 +3,12 @@ const moment = require('moment')
 const UsersFunction = require("../../../databases/functions/users")
 const { countProcess } = require("../../../process")
 const { User, PostAnonUserInfo } = require("../../../databases/models")
-const sendCommentNotification = require("../fcmToken/sendCommentNotification")
 const { addForCommentPost } = require("../../score")
 const QueueTrigger = require('../../queue/trigger')
 const Getstream = require('../../../vendor/getstream')
 const { USERS_DEFAULT_IMAGE } = require('../../../helpers/constants')
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo')
+const sendMultiDeviceCommentNotification = require('../fcmToken/sendMultiDeviceCommentNotification')
 
 const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     try {
@@ -60,7 +60,7 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
         }
 
         if (detailUser?.user_id !== userId) {
-            await sendCommentNotification(
+            await sendMultiDeviceCommentNotification(
                 useridFeed,
                 commentAuthor,
                 message,

@@ -17,7 +17,10 @@ const BetterSocialCore = {
     fcmToken: {
         sendNotification: require('./fcmToken/sendNotification'),
         sendCommentNotification: require('./fcmToken/sendCommentNotification'),
-        sendReplyCommentNotification: require('./fcmToken/sendReplyCommentNotification')
+        sendReplyCommentNotification: require('./fcmToken/sendReplyCommentNotification'),
+        sendMultiDeviceNotification: require('./fcmToken/sendMultiDeviceNotification'),
+        sendMultiDeviceCommentNotification: require('./fcmToken/sendMultiDeviceCommentNotification'),
+        sendMultiDeviceReplyCommentNotification: require('./fcmToken/sendMultiDeviceReplyCommentNotification'),
     },
     post: {
         blockAnonymousPost: require('./post/blockAnonymousPost'),
@@ -25,7 +28,7 @@ const BetterSocialCore = {
         createPollPost: require('./post/createPollPost'),
         comment: require('./post/comment'),
         commentDomain: require('./post/commentDomain'),
-        commentChild: require('./post/commentChild')
+        commentChild: require('./post/commentChild'),
     },
     constantList: {
         color: require('./constantList/color'),
@@ -35,7 +38,7 @@ const BetterSocialCore = {
     score: {
         blockUser: require('./score/block-user'),
         unblockUser: require('./score/unblock-user'),
-    }
-}
+    },
+};
 
-module.exports = BetterSocialCore
+module.exports = BetterSocialCore;
