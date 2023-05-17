@@ -10,7 +10,7 @@ const getUserId = async (feed) => {
   if (feed.anonimity) {
     let anonymousId = feed.actor.id;
     let user = await User.findOne({ where: { user_id: anonymousId } });
-    return (userId = CryptoUtils.decryptAnonymousUserId(user.encrypted));
+    return CryptoUtils.decryptAnonymousUserId(user.encrypted);
   }
   userId = feed.actor.id;
   return userId;
