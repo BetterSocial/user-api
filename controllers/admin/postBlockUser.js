@@ -23,7 +23,7 @@ const blockUser = async (userId) => {
     },
   });
 
-  await user.update({ is_banned: true });
+  await user.update({ is_banned: true, status: "N" });
 };
 
 const postBlockUser = async (req, res) => {
