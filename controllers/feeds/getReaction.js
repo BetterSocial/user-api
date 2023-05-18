@@ -3,6 +3,9 @@ const getstreamService = require("../../services/getstream");
 const {User} = require ('../../databases/models')
 
 const Validator = require("fastest-validator");
+const { handleAnonymousData } = require("../../utils");
+const { getAnonymUser } = require("../../utils/getAnonymUser");
+const getPlainFeedById = require("../../vendor/getstream/feed/getPlainFeedById");
 const v = new Validator();
 
 module.exports = async (req, res) => {
@@ -18,22 +21,17 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-    let {activity_id, limit} = req.body;
+    let {activity_id, limit, feed_id} = req.body;
     const token = req.token;
-    const anonymUser = await UsersFunction.findAnonymousUserId(User, req.userId)
+    const detailFeed = await getPlainFeedById(feed_id)
+    const myAnonymUser = await getAnonymUser(req.userId)
+    const anonymActor = await getAnonymUser(detailFeed.actor.id)
     getstreamService
       .getReaction(activity_id, token, limit)
       .then((result) => {
+        // return handleAnonymousData(result.results, req, detailFeed.actor.id, myAnonymUser, anonymActor)
         let mappingNewRes = result.results.map((dataUser) => {
-          let is_you = false
-          if(dataUser?.data?.anon_user_info_emoji_name) {
-            if(anonymUser.user_id === dataUser.user_id) is_you = true
-            return {...dataUser, user_id:null, user: {}, is_you}
-          }
-          if(dataUser?.user_id === req.userId) {
-            is_you = true
-          }
-          return {...dataUser, is_you}
+          return handleAnonymousData(dataUser, req, detailFeed.actor.id, myAnonymUser, anonymActor)
         })
         res.status(200).json({
           status: "success",
