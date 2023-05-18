@@ -99,6 +99,21 @@ const convertLocationFromModel = (locationModel, isTO = false) => {
     return "";
 }
 
+const handleAnonymousData = (data, req, postAuthorId, myAnonymousId, anonymActor) => {
+    let childComment = data.latest_children?.comment || []
+    childComment = childComment.map((child) => {
+    if(child.data.anon_user_info_emoji_name) {
+        return {...child, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === child.user_id, is_author: postAuthorId === myAnonymousId}
+    }
+        return {...child, is_you: req.userId === child.user_id, is_author: child.user_id === postAuthorId}
+    })
+     if(data.data.anon_user_info_emoji_name) {
+        return {...data, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === data.user_id, is_author: postAuthorId === myAnonymousId, latest_children: {comment: childComment}}
+    }
+    return {...data, is_you: req.userId === data.user_id, is_author: data.user_id === postAuthorId, latest_children: {comment: childComment}}
+}
+
+
 module.exports = {
     capitalizing,
     convertString,
@@ -108,4 +123,5 @@ module.exports = {
     getToken,
     getFirstStringFromSplit,
     convertingUserFormatForLocation,
+    handleAnonymousData
 };

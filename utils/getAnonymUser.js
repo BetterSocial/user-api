@@ -3,7 +3,7 @@ const {User} = require ('../databases/models')
 
 
 const getAnonymUser = async ( userId) => {
-     const myAnonymousId = await UsersFunction.findUserById(User, userId)
+     const myAnonymousId = await UsersFunction.findAnonymousUserId(User, userId)
      return myAnonymousId.user_id
 }
 
