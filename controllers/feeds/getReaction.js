@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
         let mappingNewRes = result.results.map((dataUser) => {
           let is_you = false
           if(dataUser?.data?.anon_user_info_emoji_name) {
-            if(anonymUser.user_id === dataUser.userId) is_you = true
+            if(anonymUser.user_id === dataUser.user_id) is_you = true
             return {...dataUser, user_id:null, user: {}, is_you}
           }
           if(dataUser?.user_id === req.userId) {
