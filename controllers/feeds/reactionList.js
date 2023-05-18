@@ -16,7 +16,7 @@ module.exports = async(req, res) => {
         const sortByDate = reaction.results.sort((a, b) => moment(a.created_at).unix() -  moment(b.created_at).unix())
         const removeSensitiveData = sortByDate.map((data) => {
             let children = data.latest_children?.comment || []
-            children = children.map((dataChildren) => {
+            children.map((dataChildren) => {
                 return handleAnonymousData(dataChildren, req, post.actor.id, myAnonymousId, anonymActor)
             })
             return handleAnonymousData(data, req, post.actor.id, myAnonymousId, anonymActor)
