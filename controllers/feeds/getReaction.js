@@ -27,11 +27,10 @@ module.exports = async (req, res) => {
     const myAnonymUser = await getAnonymUser(req.userId)
     getstreamService
       .getReaction(activity_id, token, limit)
-      .then((result) => {
-        // return handleAnonymousData(result.results, req, detailFeed.actor.id, myAnonymUser, anonymActor)
-        let mappingNewRes = result.results.map((dataUser) => {
-          return handleAnonymousData(dataUser, req, detailFeed.actor.id, myAnonymUser)
-        })
+      .then(async(result) => {
+        let mappingNewRes = await Promise.all(result.results.map(async(dataUser) => {
+          return handleAnonymousData(dataUser, req, detailFeed.actor.id, myAnonymUser, dataUser.user_id)
+        })) 
         res.status(200).json({
           status: "success",
           data: mappingNewRes,

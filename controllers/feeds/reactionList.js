@@ -13,13 +13,14 @@ module.exports = async(req, res) => {
         const myAnonymousId = await getAnonymUser(req.userId)
         const reaction = await reactionList(params.id, query.kind, query.limit)
         const sortByDate = reaction.results.sort((a, b) => moment(a.created_at).unix() -  moment(b.created_at).unix())
-        const removeSensitiveData = sortByDate.map((data) => {
+        const removeSensitiveData = await Promise.all(sortByDate.map(async(data) => {
+            const anonymId = await getAnonymUser(data.user_id)
             let children = data.latest_children?.comment || []
             children.map((dataChildren) => {
-                return handleAnonymousData(dataChildren, req, post.actor.id, myAnonymousId)
+                return handleAnonymousData(dataChildren, req, post.actor.id, myAnonymousId, anonymId)
             })
-            return handleAnonymousData(data, req, post.actor.id, myAnonymousId)
-        })
+            return handleAnonymousData(data, req, post.actor.id, myAnonymousId, anonymId)
+        })) 
 
         res.status(200).send({success: true, data: removeSensitiveData, message: 'success get reaction data', total: removeSensitiveData.length})
     } catch(e) {
