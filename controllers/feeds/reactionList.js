@@ -12,18 +12,15 @@ module.exports = async(req, res) => {
         const {params, query} = req
         const post = await Getstream.feed.getPlainFeedById(params.id)
         const myAnonymousId = await getAnonymUser(req.userId)
-        
-        let anonymActor = post?.actor?.id
-        if(post?.anonymous && post?.version < POST_VERSION) anonymActor = await getAnonymUser(anonymActor)
 
         const reaction = await reactionList(params.id, query.kind, query.limit)
         const sortByDate = reaction.results.sort((a, b) => moment(a.created_at).unix() -  moment(b.created_at).unix())
         const removeSensitiveData = sortByDate.map((data) => {
             let children = data.latest_children?.comment || []
             children.map((dataChildren) => {
-                return handleAnonymousData(dataChildren, req, post.actor.id, myAnonymousId, anonymActor)
+                return handleAnonymousData(dataChildren, req, post.actor.id, myAnonymousId)
             })
-            return handleAnonymousData(data, req, post.actor.id, myAnonymousId, anonymActor)
+            return handleAnonymousData(data, req, post.actor.id, myAnonymousId)
         })
 
         res.status(200).send({success: true, data: removeSensitiveData, message: 'success get reaction data', total: removeSensitiveData.length})
