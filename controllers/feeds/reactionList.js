@@ -5,14 +5,12 @@ const {User} = require ('../../databases/models')
 const Getstream = require("../../vendor/getstream")
 const { getAnonymUser } = require("../../utils/getAnonymUser")
 const { handleAnonymousData } = require("../../utils")
-const { POST_VERSION } = require("../../helpers/constants")
 
 module.exports = async(req, res) => {
     try {
         const {params, query} = req
         const post = await Getstream.feed.getPlainFeedById(params.id)
         const myAnonymousId = await getAnonymUser(req.userId)
-
         const reaction = await reactionList(params.id, query.kind, query.limit)
         const sortByDate = reaction.results.sort((a, b) => moment(a.created_at).unix() -  moment(b.created_at).unix())
         const removeSensitiveData = sortByDate.map((data) => {
