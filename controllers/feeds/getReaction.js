@@ -25,13 +25,12 @@ module.exports = async (req, res) => {
     const token = req.token;
     const detailFeed = await getPlainFeedById(feed_id)
     const myAnonymUser = await getAnonymUser(req.userId)
-    const anonymActor = await getAnonymUser(detailFeed.actor.id)
     getstreamService
       .getReaction(activity_id, token, limit)
       .then((result) => {
         // return handleAnonymousData(result.results, req, detailFeed.actor.id, myAnonymUser, anonymActor)
         let mappingNewRes = result.results.map((dataUser) => {
-          return handleAnonymousData(dataUser, req, detailFeed.actor.id, myAnonymUser, anonymActor)
+          return handleAnonymousData(dataUser, req, detailFeed.actor.id, myAnonymUser)
         })
         res.status(200).json({
           status: "success",
