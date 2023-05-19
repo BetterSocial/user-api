@@ -1,5 +1,6 @@
 const emojiUnicode = require("emoji-unicode");
 const _ = require("lodash");
+const { getAnonymUser } = require("./getAnonymUser");
 
 const convertString = (str, from, to) => {
     return str?.split(from)?.join(to);
@@ -99,16 +100,16 @@ const convertLocationFromModel = (locationModel, isTO = false) => {
     return "";
 }
 
-const handleAnonymousData = (data, req, postAuthorId, myAnonymousId, anonymActor) => {
+const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anonymId) => {
     let childComment = data.latest_children?.comment || []
-    childComment = childComment.map((child) => {
+    childComment = await Promise.all(childComment.map(async(child) => {
     if(child.data.anon_user_info_emoji_name) {
-        return {...child, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === child.user_id, is_author: postAuthorId === myAnonymousId}
+        return {...child, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === child.user_id, is_author: postAuthorId === child.user_id}
     }
         return {...child, is_you: req.userId === child.user_id, is_author: child.user_id === postAuthorId}
-    })
+    })) 
      if(data.data.anon_user_info_emoji_name) {
-        return {...data, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === data.user_id, is_author: postAuthorId === myAnonymousId, latest_children: {comment: childComment}}
+        return {...data, user_id: null, user: {}, target_feeds: [], is_you: anonymId === myAnonymousId, is_author: postAuthorId === anonymId, latest_children: {comment: childComment}}
     }
     return {...data, is_you: req.userId === data.user_id, is_author: data.user_id === postAuthorId, latest_children: {comment: childComment}}
 }
