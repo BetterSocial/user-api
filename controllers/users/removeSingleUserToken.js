@@ -17,12 +17,9 @@ module.exports = async (req, res) => {
               message: validate,
             });
         }
-        const exist = await findFcmToken(FcmToken, req.body.fcm_token)
+        const exist = await findFcmToken(FcmToken, req.userId, req.body.fcm_token)
         if (!exist) {
             return ErrorResponse.e404(res, "Token not found")
-        }
-        if (exist.user_id!==req.userId) {
-            return ErrorResponse.e400(res, "Token is not associate with current user logged in")
         }
         await FcmToken.destroy({
             where: {
