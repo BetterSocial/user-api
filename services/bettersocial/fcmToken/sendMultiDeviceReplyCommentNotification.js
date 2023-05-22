@@ -24,7 +24,7 @@ const sendMultiDeviceReplyCommentNotification = async (
                     postTitle ? postTitle.substring(0, 50) : ''
                 }`,
                 body: message,
-                click_action: 'OPEN_ACTIVITY_1',
+                // click_action: 'OPEN_ACTIVITY_1',
                 // image: commentAuthor?.profile_pic_path,
                 },
                 data: {
