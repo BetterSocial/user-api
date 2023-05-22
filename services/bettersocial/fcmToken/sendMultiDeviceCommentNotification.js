@@ -17,7 +17,6 @@ const sendMultiDeviceCommentNotification = async (
     await Promise.all(
         userTargetTokens.map(async (user) => {
             const payload = {
-                token: user.token,
                 notification: {
                     title: `${commentAuthor?.username} commented on your post`,
                     body: message,
@@ -30,7 +29,7 @@ const sendMultiDeviceCommentNotification = async (
                 },
             };
             
-            await messaging().send(payload);
+            await messaging().sendToDevice(user?.token, payload);
         })
     );
 };

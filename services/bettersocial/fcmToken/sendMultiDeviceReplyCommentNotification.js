@@ -9,7 +9,7 @@ const sendMultiDeviceReplyCommentNotification = async (
     message,
     activity_id,
     postTitle = ''
-    ) => {
+) => {
     userTargetId = await UsersFunction.findSignedUserId(User, userTargetId);
     const userTargetTokens = await FcmTokenFunction.findAllTokenByUserId(
         FcmToken,
@@ -18,22 +18,19 @@ const sendMultiDeviceReplyCommentNotification = async (
     await Promise.all(
         userTargetTokens.map(async (user) => {
             const payload = {
-                token: user.token,
                 notification: {
-                title: `${commentAuthor?.username} replied to your comment on ${
-                    postTitle ? postTitle.substring(0, 50) : ''
-                }`,
-                body: message,
-                click_action: 'OPEN_ACTIVITY_1',
-                // image: commentAuthor?.profile_pic_path,
+                    title: `${commentAuthor?.username} replied to your comment on ${postTitle ? postTitle.substring(0, 50) : ''}`,
+                    body: message,
+                    click_action: "OPEN_ACTIVITY_1",
+                    // image: commentAuthor?.profile_pic_path,
                 },
                 data: {
-                feed_id: activity_id,
-                type: 'feed',
-                },
+                    feed_id: activity_id,
+                    type: 'feed'
+                }
             };
 
-            await messaging().send(payload);
+            await messaging().sendToDevice(user?.token, payload)
         })
     );
 };
