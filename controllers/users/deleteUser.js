@@ -6,7 +6,9 @@ const { sequelize, User,
   UserFollowUser,
   UserFollowUserHistory,
   UserFollowDomain,
-  UserFollowDomainHistory } = require("../../databases/models");
+  UserFollowDomainHistory,
+  FcmToken,
+ } = require("../../databases/models");
 
 const { Op } = require("sequelize");
 
@@ -77,6 +79,10 @@ module.exports = async (req, res) => {
             { 'user_id_followed': user_id }
           ]
         }
+      })
+
+      await FcmToken.destroy({
+        where : { user_id }
       })
 
       await sequelize.query("REFRESH MATERIALIZED VIEW vwm_user_follower_count")
