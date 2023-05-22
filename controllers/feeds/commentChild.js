@@ -1,6 +1,6 @@
 const { commentChild } = require("../../services/getstream");
 const QueueTrigger = require("../../services/queue/trigger");
-const {messaging, firestore} = require('firebase-admin')
+const { messaging, firestore } = require('firebase-admin')
 const { FcmToken, User, Post } = require("../../databases/models");
 
 module.exports = async (req, res) => {
@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
       commentId: result?.id,
       postId: result?.activity_id
     })
-     const detailUser = await User.findOne({
+    const detailUser = await User.findOne({
       where: {
         user_id: req.body.useridFeed
       }
@@ -27,32 +27,32 @@ module.exports = async (req, res) => {
       }
     })
     const userToken = await FcmToken.findOne({
-            where: {
-                user_id: req.body.useridFeed
-            }
-        })
+      where: {
+        user_id: req.body.useridFeed
+      }
+    })
     //     const getBadge = await firestore().collection(`${process.env.ENVIRONMENT}UserBadge`).doc(req.body.useridFeed).get()
     // const {badgeCount} = await getBadge.data()
     const payload = {
-    notification: {
-      title: `${detailSendUser.username}  replied to your comment on ${req.body.postTitle ? req.body.postTitle.substring(0, 50) : ''}`,
-      body: message,
-      click_action: "OPEN_ACTIVITY_1",
-      image: detailUser.profile_pic_path,
-      // badge: String(badgeCount + 1)
-    },
-    data: {
-      feed_id: req.body.activityId,
-      type: 'reaction'
+      notification: {
+        title: `${detailSendUser.username}  replied to your comment on ${req.body.postTitle ? req.body.postTitle.substring(0, 50) : ''}`,
+        body: message,
+        click_action: "OPEN_ACTIVITY_1",
+        image: detailUser.profile_pic_path,
+        // badge: String(badgeCount + 1)
+      },
+      data: {
+        feed_id: req.body.activityId,
+        type: 'reaction'
+      }
+    };
+    if (userToken) {
+      if (detailUser.user_id !== detailSendUser.user_id) {
+        messaging().sendToDevice(userToken.token, payload).then((res) => {
+        })
+      }
+
     }
-  };
-      if(userToken) {
-        if(detailUser.user_id !== detailSendUser.user_id) {
-          messaging().sendToDevice(userToken.token, payload).then((res) => {
-          })
-        }
-     
-    } 
     return res.status(200).json({
       code: 200,
       status: "Success comment child",
@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
     console.log(err);
     return res.status(400).json({
       code: 400,
-      status: String(e),
+      status: String(err),
       data: err.detail,
     });
   }
