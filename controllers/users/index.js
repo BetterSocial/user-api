@@ -18,6 +18,7 @@ const verifyUser = require('./verifyUser');
 const veryfyToken = require('./veryfyToken');
 const fcmToken = require('./fcmToken')
 const removeFcmTokem = require('./removeFcmToken')
+const removeSingleFcmToken=require('./removeSingleUserToken')
 const checkFollow = require('./checkFollow')
 const checkFollowBatch = require('./checkFollowBatch')
 
@@ -50,5 +51,6 @@ module.exports = {
     veryfyToken,
     fcmToken,
     removeFcmTokem,
+    removeSingleFcmToken,
     unblockUserV2
 };
