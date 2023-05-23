@@ -104,7 +104,14 @@ const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anony
     let childComment = data.latest_children?.comment || []
     childComment = await Promise.all(childComment.map(async(child) => {
     if(child.data.anon_user_info_emoji_name) {
-        return {...child, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === child.user_id, is_author: postAuthorId === child.user_id}
+        let childCommentLv2 = child.latest_children?.comment || []
+        childCommentLv2 = childCommentLv2.map((child2) => {
+            if(child2.data.anon_user_info_emoji_name) {
+                return {...child2, user_id: null, user: {}, target_feeds: []}
+            }
+            return {...child2}
+        })
+        return {...child, latest_children: {comment: childCommentLv2}, user_id: null, user: {}, target_feeds: [], is_you: myAnonymousId === child.user_id, is_author: postAuthorId === child.user_id}
     }
         return {...child, is_you: req.userId === child.user_id, is_author: child.user_id === postAuthorId}
     })) 
