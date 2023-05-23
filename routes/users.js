@@ -32,6 +32,7 @@ router.post('/rename/:userId', auth.isAuth, usersHandler.renameUser);
 router.get('/chat/search', auth.isAuth, usersHandler.chatSearch)
 router.post('/fcmtoken', auth.isAuth, usersHandler.fcmToken)
 router.delete('/fcmtoken', auth.isAuth, usersHandler.removeFcmTokem)
+router.delete('/fcmtoken-v2', auth.isAuth, usersHandler.removeSingleFcmToken)
 
 router.post('/register-v2', BodyValidationMiddleware.registerV2, RegisterV2UploadPhotoMiddleware, usersHandler.registerV2);
 router.post('/blockuser-v2', auth.isAuth, BodyValidationMiddleware.blockUserV2, usersHandler.blockUserV2);

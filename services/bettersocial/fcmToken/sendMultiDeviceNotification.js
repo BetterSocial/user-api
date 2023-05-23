@@ -16,7 +16,6 @@ const sendMultiDeviceNotification = async (
     await Promise.all(
         userTargetTokens.map(async (user) => {
             const payload = {
-                token: user.token,
                 notification: {
                     title: userNameFollower,
                     body: `${userNameFollower} just started following you. Say 'Hi'!`,
@@ -31,7 +30,7 @@ const sendMultiDeviceNotification = async (
                 },
             };
             
-            await messaging().send(payload);
+            await messaging().sendToDevice(user?.token, payload);
         })
     );
 };
