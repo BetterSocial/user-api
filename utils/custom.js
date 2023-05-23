@@ -1,6 +1,5 @@
 const emojiUnicode = require("emoji-unicode");
 const _ = require("lodash");
-const { getAnonymUser } = require("./getAnonymUser");
 
 const convertString = (str, from, to) => {
     return str?.split(from)?.join(to);
@@ -103,9 +102,9 @@ const convertLocationFromModel = (locationModel, isTO = false) => {
 const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anonymId) => {
     let childComment = data.latest_children?.comment || []
     childComment = await Promise.all(childComment.map(async(child) => {
-    if(child.data.anon_user_info_emoji_name) {
-        let childCommentLv2 = child.latest_children?.comment || []
-        childCommentLv2 = childCommentLv2.map((child2) => {
+    if(child?.data?.anon_user_info_emoji_name) {
+        let childCommentLv2 = child?.latest_children?.comment || []
+        childCommentLv2 = childCommentLv2?.map((child2) => {
             if(child2.data.anon_user_info_emoji_name) {
                 return {...child2, user_id: null, user: {}, target_feeds: []}
             }
