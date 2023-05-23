@@ -81,7 +81,7 @@ const modifyPollPostObject = async (userId, item) => {
   }
 
   let distinctPollingByUserId = await sequelize.query(
-    `SELECT DISTINCT(user_id) from public.log_polling WHERE polling_id= :polling_id AND polling_option_id != :polling_option_id`,
+    `SELECT DISTINCT(user_id) from public.log_polling A WHERE A.polling_id = :polling_id AND A.polling_option_id != :polling_option_id`,
     {
       type: Sequelize.QueryTypes.SELECT,
       replacements: {
@@ -90,7 +90,7 @@ const modifyPollPostObject = async (userId, item) => {
       }
     }
   );
-  let voteCount = distinctPollingByUserId[0]?.length || 0;
+  let voteCount = distinctPollingByUserId?.length || 0;
 
   post.pollOptions = pollOptions;
   post.voteCount = voteCount;
