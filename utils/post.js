@@ -92,11 +92,6 @@ const modifyPollPostObject = async (userId, item) => {
   );
   let voteCount = distinctPollingByUserId?.length || 0;
 
-  console.log('voteCount')
-  console.log(post.polling_id, post.message)
-  console.log(voteCount)
-  console.log(distinctPollingByUserId)
-
   post.pollOptions = pollOptions;
   post.voteCount = voteCount;
 
