@@ -3,8 +3,12 @@ const {User} = require ('../databases/models')
 
 
 const getAnonymUser = async ( userId) => {
-     const myAnonymousId = await UsersFunction.findAnonymousUserId(User, userId)
+     try {
+        const myAnonymousId = await UsersFunction.findAnonymousUserId(User, userId)
      return myAnonymousId.user_id
+     } catch(e) {
+        return null
+     }
 }
 
 module.exports = {
