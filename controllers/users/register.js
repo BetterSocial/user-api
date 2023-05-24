@@ -241,9 +241,9 @@ module.exports = async (req, res) => {
         let userId = user_id.toLowerCase();
 
         await getstreamService.createUser(data, userId);
-        const anonUserId = CryptoUtils.getAnonymousUsername(userId);
+        const anonUsername = CryptoUtils.getAnonymousUsername(userId);
         const token = await getstreamService.createToken(userId);
-        const anonymousToken = await getstreamService.createToken(anonUserId);
+        const anonymousToken = await getstreamService.createToken(anonUsername);
         await createTokenChat(userId);
         await syncUser(userId);
         let dataLocations = await Locations.findAll({
