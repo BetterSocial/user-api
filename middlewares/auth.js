@@ -25,7 +25,7 @@ function createResponse(statusCode, message, data) {
 
 module.exports.isAuth = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = authHeader?.split(" ")[1];
   if (token === null || token === undefined) {
     return res.status(401).json(createResponse(401, "Token not provided"));
   }
