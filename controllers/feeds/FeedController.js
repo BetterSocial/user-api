@@ -16,11 +16,8 @@ exports.createToken = async (req, res) => {
   }
   let { user_id } = req.body;
   const userToken = await getstreamService.createToken(user_id);
-  const anonUserId = CryptoUtils.getAnonymousUsername(userId);
-  const anonymousToken = await getstreamService.createToken(anonUserId);
   return res.status(200).json({
     id: user_id,
     token: userToken,
-    anonymousToken: anonymousToken
   });
 };
