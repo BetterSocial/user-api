@@ -2,7 +2,7 @@ const { User } = require("../../databases/models");
 const getstreamService = require("../../services/getstream");
 const { createRefreshToken } = require("../../services/jwt");
 const Getstream = require("../../vendor/getstream");
-const CryptoUtils = require("../../utils/crypto");
+const UsersFunction = require("../../databases/functions/users");
 
 module.exports = async (req, res) => {
   try {
@@ -21,9 +21,9 @@ module.exports = async (req, res) => {
       await Getstream.core.updateUserRemoveHumanId(userData)
       let user_id = userData.user_id;
       let userId = user_id.toLowerCase();
-      const anonUsername = CryptoUtils.getAnonymousUsername(userId);
+      const anonUser = await UsersFunction.findAnonymousUserId(User, user_id);
       const token = await getstreamService.createToken(userId);
-      const anonymousToken = await getstreamService.createToken(anonUsername);
+      const anonymousToken = await getstreamService.createToken(anonUser.user_id);
       const refresh_token = await createRefreshToken(userId);
       return res.json({
         code: 200,

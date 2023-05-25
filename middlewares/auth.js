@@ -43,15 +43,16 @@ module.exports.isAuth = async (req, res, next) => {
 
 module.exports.isAuthAnonim = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = authHeader?.split(" ")[1];
+  console.log({token})
   if (token === null || token === undefined) {
     return res.status(401).json(createResponse(401, "Token not provided"));
   }
 
   try {
     const tokenPayload = await isAuthTokenValid(token, process.env.SECRET);
-    const user = await UsersFunction.findAnonymousUsername(User, tokenPayload.user_id);
-    if (!user) {
+    const user = await UsersFunction.findUserById(User, tokenPayload.user_id);
+    if (!user || (user && !user.is_anonymous)) {
       return res.status(403).json(createResponse(403, "Forbidden access"));
     }
 
