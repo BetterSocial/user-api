@@ -1,8 +1,8 @@
 const { User } = require("../../databases/models");
 const getstreamService = require("../../services/getstream");
-const jwt = require("jsonwebtoken");
 const { createRefreshToken } = require("../../services/jwt");
 const Getstream = require("../../vendor/getstream");
+const UsersFunction = require("../../databases/functions/users");
 
 module.exports = async (req, res) => {
   try {
@@ -21,7 +21,9 @@ module.exports = async (req, res) => {
       await Getstream.core.updateUserRemoveHumanId(userData)
       let user_id = userData.user_id;
       let userId = user_id.toLowerCase();
+      const anonUser = await UsersFunction.findAnonymousUserId(User, user_id);
       const token = await getstreamService.createToken(userId);
+      const anonymousToken = await getstreamService.createToken(anonUser.user_id);
       const refresh_token = await createRefreshToken(userId);
       return res.json({
         code: 200,
@@ -29,6 +31,7 @@ module.exports = async (req, res) => {
         message: "",
         is_banned: false,
         token: token,
+        anonymousToken: anonymousToken,
         refresh_token: refresh_token,
       });
     } else {

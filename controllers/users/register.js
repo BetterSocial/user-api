@@ -24,6 +24,7 @@ const {
 const StreamChat = require("stream-chat").StreamChat;
 const { addForCreateAccount } = require("../../services/score");
 const { USERS_DEFAULT_IMAGE } = require("../../helpers/constants");
+const UsersFunction = require("../../databases/functions/users");
 
 
 const changeValue = (items) => {
@@ -241,7 +242,9 @@ module.exports = async (req, res) => {
         let userId = user_id.toLowerCase();
 
         await getstreamService.createUser(data, userId);
-        let token = await getstreamService.createToken(userId);
+        const anonUser = await UsersFunction.findAnonymousUserId(User, user_id);
+        const token = await getstreamService.createToken(userId);
+        const anonymousToken = await getstreamService.createToken(anonUser.user_id);
         await createTokenChat(userId);
         await syncUser(userId);
         let dataLocations = await Locations.findAll({
@@ -291,6 +294,7 @@ module.exports = async (req, res) => {
             code: 200,
             data: result,
             token: token,
+            anonymousToken: anonymousToken,
             refresh_token: refresh_token,
         });
     } catch (error) {

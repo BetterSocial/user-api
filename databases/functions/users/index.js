@@ -5,7 +5,8 @@ const UsersFunction = {
     findUserById: require('./find-user-by-id'),
     findUserByHumanId: require('./find-user-by-human-id'),
     findSignedUserId: require('./find-signed-user-id'),
-    findActorId: require('./find-actor-id')
+    findActorId: require('./find-actor-id'),
+    findAnonymousUsername: require('./findAnonymousUsername')
 }
 
 module.exports = UsersFunction;

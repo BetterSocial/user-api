@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { ApiKey } = require("../databases/models");
 const { User } = require("../databases/models");
+const UsersFunction = require("../databases/functions/users");
 
 async function isAuthTokenValid(token, secret) {
   return new Promise((resolve, reject) => {
@@ -24,7 +25,7 @@ function createResponse(statusCode, message, data) {
 
 module.exports.isAuth = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = authHeader?.split(" ")[1];
   if (token === null || token === undefined) {
     return res.status(401).json(createResponse(401, "Token not provided"));
   }
@@ -34,6 +35,31 @@ module.exports.isAuth = async (req, res, next) => {
     req.user = user;
     req.userId = user.user_id;
     req.token = token;
+    next();
+  } catch (err) {
+    return res.status(401).json(createResponse(401, "Token invalid"));
+  }
+};
+
+module.exports.isAuthAnonim = async (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader?.split(" ")[1];
+  console.log({token})
+  if (token === null || token === undefined) {
+    return res.status(401).json(createResponse(401, "Token not provided"));
+  }
+
+  try {
+    const tokenPayload = await isAuthTokenValid(token, process.env.SECRET);
+    const user = await UsersFunction.findUserById(User, tokenPayload.user_id);
+    if (!user || (user && !user.is_anonymous)) {
+      return res.status(403).json(createResponse(403, "Forbidden access"));
+    }
+
+    req.user = user;
+    req.userId = user.user_id;
+    req.token = token;
+    
     next();
   } catch (err) {
     return res.status(401).json(createResponse(401, "Token invalid"));
