@@ -16,8 +16,8 @@ module.exports = async(req, res) => {
         const removeSensitiveData = await Promise.all(sortByDate.map(async(data) => {
             return handleAnonymousData(data, req, post.actor.id, myAnonymousId, data.user_id)
         })) 
-
-        res.status(200).send({success: true, data: removeSensitiveData, message: 'success get reaction data', total: removeSensitiveData.length})
+        const removeDeletedUser = removeSensitiveData.filter((data) => data.user)
+        res.status(200).send({success: true, data: removeDeletedUser, message: 'success get reaction data', total: removeSensitiveData.length})
     } catch(e) {
         res.status(400).send({success: false, data: [], message: 'failed to get reaction list', error: e})
 
