@@ -110,10 +110,18 @@ async function BetterSocialCreateCommentV3(req) {
         let result = {};
         // find comment author by userId provided by token
         let commentAuthor = await UsersFunction.findUserById(User, userId);
-        let postOwnerSignedId = actor.id;
+        let postOwnerId = actor.id;
 
+        // change the actor target to signed one if the post is anonymous
+        // notification purpose
+        if (post.anonimity) {
+            postOwnerId = await UsersFunction.findSignedUserId(User, actor.id);
+        }
+        
+        // check wether requested comment was anonymous
+        // and done by anonymous user
         if (anonimity && anon_user_info && commentAuthor.is_anonymous) {
-            result = await Getstream.feed.commentAnonymous(userId, message, activity_id, actor.id, anon_user_info, sendPostNotif)
+            result = await Getstream.feed.commentAnonymous(userId, message, activity_id, postOwnerId, anon_user_info, sendPostNotif)
             await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
                 postId: activity_id,
                 anonUserId: userId,
@@ -123,22 +131,16 @@ async function BetterSocialCreateCommentV3(req) {
                 anonUserInfoEmojiName: anon_user_info?.emoji_name,
             })
         } else {
-            result = await Getstream.feed.comment(token, message, activity_id, userId, actor.id, sendPostNotif)
+            result = await Getstream.feed.comment(token, message, activity_id, userId, postOwnerId, sendPostNotif)
         }
         
 
         if (body?.message?.length > 80) {
             await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
         }
-
-        // change the actor target to signed one if the post is anonymous
-        // notification purpose
-        if (post.anonimity) {
-            postOwnerSignedId = await UsersFunction.findSignedUserId(User, actor.id);
-        }
         
         await sendMultiDeviceCommentNotification(
-            postOwnerSignedId,
+            postOwnerId,
             commentAuthor,
             message,
             activity_id
