@@ -97,4 +97,75 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     }
 }
 
-module.exports = BetterSocialCreateComment
+async function BetterSocialCreateCommentV3(req) {
+    try {
+        const { body, userId, token } = req
+        const { activity_id, message, anon_user_info, sendPostNotif, anonimity } = body
+        let result = {}
+        let commentAuthor = {
+            username: anon_user_info?.color_name + ' ' + anon_user_info?.emoji_name,
+            profile_pic_path: USERS_DEFAULT_IMAGE,
+            anon_user_info
+        }
+
+
+        if (anonimity) {
+            result = await Getstream.feed.commentAnonymous(req.user_id, message, activity_id, req.user_id, anon_user_info, sendPostNotif)
+            await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+                postId: activity_id,
+                anonUserId: req.user_id,
+                anonUserInfoColorCode: anon_user_info?.color_code,
+                anonUserInfoColorName: anon_user_info?.color_name,
+                anonUserInfoEmojiCode: anon_user_info?.emoji_code,
+                anonUserInfoEmojiName: anon_user_info?.emoji_name,
+            })
+        } else {
+            result = await Getstream.feed.comment(token, message, activity_id, req.user_id, req.actor.id, sendPostNotif)
+        }
+        
+
+        if (body?.message?.length > 80) {
+            await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
+        }
+        
+        await sendMultiDeviceCommentNotification(
+            req.user_id,
+            commentAuthor,
+            message,
+            activity_id
+        )
+
+        const scoringProcessData = {
+            comment_id: result?.id,
+            user_id: userId,
+            feed_id: activity_id,
+            message: message,
+            activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+        };
+        await addForCommentPost(scoringProcessData);
+
+        QueueTrigger.addCommentToDb({
+            authorUserId: req.user_id,
+            comment: message,
+            commenterUserId: userId,
+            commentId: result?.id,
+            postId: activity_id
+        })
+
+        return {
+            isSuccess: true,
+            data: result
+        }
+    } catch (err) {
+        console.log(err)
+        return {
+            isSuccess: false,
+            message: err.message
+        }
+    }
+}
+
+module.exports = {
+    BetterSocialCreateComment,
+    BetterSocialCreateCommentV3
+}

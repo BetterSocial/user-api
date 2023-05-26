@@ -47,9 +47,10 @@ router.delete('/:postId', isAuth, feed.deletePost)
 router.delete('/anonymous/:postId', isAuth, feed.deleteAnonymousPost)
 
 router.post("/feed-action-notification/:kind", isAuth, feed.notificationCommentFeed)
-router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2);
+router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2); // token,1 signed token, 1 anon token
 router.post('/generate-anonymous-username', isAuth, GenerateAnonymousUsernameMiddleware, feed.generateAnonymousUsername)
 router.post("/comment-v2", isAuth ,CreateCommentMiddleware , feed.commentV2);
+router.post('/comment-v3', isAuth, CreatePostMiddleware, feed.commentV3);
 router.post("/comment-child-v2", isAuth ,CreateCommentChildMiddleware, feed.commentChildV2);
 router.post("/comment-domain-v2", isAuth, CreateCommentMiddleware, feed.commentDomainV2);
 router.post("/block-anonymous-post-v2", isAuth, BodyValidationMiddleware.blockAnonymousPostV2, feed.blockAnonymousPostV2);
