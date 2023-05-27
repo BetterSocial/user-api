@@ -4,6 +4,7 @@ const BetterSocialCheckTargetFollowStatusBatch = require('./user/BetterSocialChe
 const BetterSocialCreateAnonymousUser = require('./user/BetterSocialCreateAnonymousUser');
 const BetterSocialCreateUser = require('./user/BetterSocialCreateUser');
 const BetterSocialUnblockUserV2 = require('./user/BetterSocialUnblockUserV2');
+const postComment = require("./post/comment");
 
 const BetterSocialCore = {
     user: {
@@ -26,7 +27,8 @@ const BetterSocialCore = {
         blockAnonymousPost: require('./post/blockAnonymousPost'),
         createPost: require('./post/createPost'),
         createPollPost: require('./post/createPollPost'),
-        comment: require('./post/comment'),
+        comment: postComment.BetterSocialCreateComment,
+        commentV3: postComment.BetterSocialCreateCommentV3,
         commentDomain: require('./post/commentDomain'),
         commentChild: require('./post/commentChild'),
     },

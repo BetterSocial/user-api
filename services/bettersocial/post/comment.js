@@ -34,7 +34,11 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
         }
         
         if (isAnonimous) {
-            let selfUser = await UsersFunction.findAnonymousUserId(User, userId)
+            let selfUser = await UsersFunction.findAnonymousUserId(User, userId);
+            if (!selfUser) {
+                // when comment using anonToken
+                throw new Error("not valid token");
+            }
             result = await Getstream.feed.commentAnonymous(selfUser?.user_id, message, activity_id, useridFeed, anon_user_info, sendPostNotif)
             await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
                 postId: activity_id,
@@ -97,4 +101,82 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     }
 }
 
-module.exports = BetterSocialCreateComment
+async function BetterSocialCreateCommentV3(req) {
+    try {
+        const { body, userId, token } = req
+        const { activity_id, message, anon_user_info, sendPostNotif, anonimity } = body;
+        const post = await Getstream.feed.getPlainFeedById(activity_id);
+        const { actor } = post;
+        let result = {};
+        // find comment author by userId provided by token
+        let commentAuthor = await UsersFunction.findUserById(User, userId);
+        let postOwnerId = actor.id;
+
+        // change the actor target to signed one if the post is anonymous
+        // notification purpose
+        if (post.anonimity) {
+            postOwnerId = await UsersFunction.findSignedUserId(User, actor.id);
+        }
+        
+        // check wether requested comment was anonymous
+        // and done by anonymous user
+        if (anonimity && anon_user_info && commentAuthor.is_anonymous) {
+            result = await Getstream.feed.commentAnonymous(userId, message, activity_id, postOwnerId, anon_user_info, sendPostNotif)
+            await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+                postId: activity_id,
+                anonUserId: userId,
+                anonUserInfoColorCode: anon_user_info?.color_code,
+                anonUserInfoColorName: anon_user_info?.color_name,
+                anonUserInfoEmojiCode: anon_user_info?.emoji_code,
+                anonUserInfoEmojiName: anon_user_info?.emoji_name,
+            })
+        } else {
+            result = await Getstream.feed.comment(token, message, activity_id, userId, postOwnerId, sendPostNotif)
+        }
+        
+
+        if (body?.message?.length > 80) {
+            await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
+        }
+        
+        await sendMultiDeviceCommentNotification(
+            postOwnerId,
+            commentAuthor,
+            message,
+            activity_id
+        )
+
+        const scoringProcessData = {
+            comment_id: result?.id,
+            user_id: userId,
+            feed_id: activity_id,
+            message: message,
+            activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+        };
+        await addForCommentPost(scoringProcessData);
+
+        QueueTrigger.addCommentToDb({
+            authorUserId: userId,
+            comment: message,
+            commenterUserId: userId,
+            commentId: result?.id,
+            postId: activity_id
+        })
+
+        return {
+            isSuccess: true,
+            data: result
+        }
+    } catch (err) {
+        console.log(err)
+        return {
+            isSuccess: false,
+            message: err.message
+        }
+    }
+}
+
+module.exports = {
+    BetterSocialCreateComment,
+    BetterSocialCreateCommentV3
+}
