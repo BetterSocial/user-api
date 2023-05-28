@@ -43,6 +43,7 @@ module.exports = {
       });
 
       await channel.create();
+      client.disconnectUser();
       return res.status(200).json(responseSuccess('Success create channel'));
     } catch (error) {
       return res
@@ -98,8 +99,7 @@ module.exports = {
   },
   sendAnonymous: async (req, res) => {
     const schema = {
-      channelId: 'string|optional:true',
-      members: 'string[]|empty:false',
+      channelId: 'string|empty:false',
       message: 'string|empty:false',
     };
     const validated = v.validate(req.body, schema);
@@ -116,12 +116,7 @@ module.exports = {
 
     client.connectUser({ id: req.userId }, req.token);
 
-    if (!req.body.members.includes(req.userId))
-      req.body.members.push(req.userId);
-
-    const channel = client.channel('messaging', req.body.channelId, {
-      members: req.body.members,
-    });
+    const channel = client.channel('messaging', req.body.channelId);
 
     await channel.create();
 
@@ -143,6 +138,7 @@ module.exports = {
       { type: 'messaging', members: { $in: [req.userId] } },
       [{ last_message_at: -1 }]
     );
+    client.disconnectUser();
     channels = channels.map((channel) => {
       return { ...channel.data };
     });
@@ -160,6 +156,7 @@ module.exports = {
       { type: 'messaging', id: req.params.channelId },
       [{ last_message_at: -1 }]
     );
+    client.disconnectUser();
     if (!channel[0]) {
       return ErrorResponse.e404(res, 'Channel not found');
     }
