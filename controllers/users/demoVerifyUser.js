@@ -2,6 +2,7 @@ const { User } = require("../../databases/models");
 const getstreamService = require("../../services/getstream");
 const jwt = require("jsonwebtoken");
 const { createRefreshToken } = require("../../services/jwt");
+const UsersFunction = require("../../databases/functions/users");
 
 module.exports = async (req, res) => {
   if (process.env.IS_DEMO_LOGIN_ENABLED !== 'true') {
@@ -26,6 +27,8 @@ module.exports = async (req, res) => {
       }
       let user_id = userData.user_id;
       let userId = user_id.toLowerCase();
+      const anonUser = await UsersFunction.findAnonymousUserId(User, user_id);
+      const anonymousToken = await getstreamService.createToken(anonUser.user_id);
       const token = await getstreamService.createToken(userId);
       const refresh_token = await createRefreshToken(userId);
       return res.json({
@@ -34,6 +37,8 @@ module.exports = async (req, res) => {
         message: "",
         token: token,
         refresh_token: refresh_token,
+        anonymousToken: anonymousToken,
+        is_banned: false,
       });
     } else {
       return res.status(200).json({
