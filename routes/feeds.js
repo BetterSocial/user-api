@@ -56,6 +56,8 @@ router.post("/comment-child-v2", isAuth, CreateCommentChildMiddleware, feed.comm
 router.post("/comment-child-v3", isAuthV2, CreateCommentChildMiddleware, feed.commentChildV3.standart);
 router.post("/comment-child-v3-anonymous", isAuthAnonim, CreateCommentChildMiddleware, feed.commentChildV3.anonymous);
 router.post("/comment-domain-v2", isAuth, CreateCommentMiddleware, feed.commentDomainV2);
+router.post("/comment-domain-v3", isAuthV2, CreateCommentMiddleware, feed.commentDomainV3.standart);
+router.post("/comment-domain-v3-anonymous", isAuthAnonim, CreateCommentMiddleware, feed.commentDomainV3.anonymous);
 router.post("/block-anonymous-post-v2", isAuth, BodyValidationMiddleware.blockAnonymousPostV2, feed.blockAnonymousPostV2);
 router.get("/reaction-list/:id", isAuth, feed.reactionList)
 

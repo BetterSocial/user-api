@@ -9,6 +9,7 @@ const commentChildV2 = require("./commentChildV2");
 const commentChildV3 = require("./commentChildV3");
 const commentDomain = require('./commentDomain')
 const commentDomainV2 = require('./commentDomainV2')
+const commentDomainV3 = require('./commentDomainV3');
 const createPollPost = require("./createPollPost");
 const createPost = require("./createPost");
 const createPostV2 = require("./createPostV2");
@@ -52,6 +53,7 @@ module.exports = {
   commentChildV3,
   commentDomain,
   commentDomainV2,
+  commentDomainV3,
   createPollPost,
   createPost,
   createPostV2,
