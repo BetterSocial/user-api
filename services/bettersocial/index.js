@@ -33,7 +33,8 @@ const BetterSocialCore = {
         commentV3Anonymous: postComment.BetterSocialCreateCommentV3Anonymous,
         commentDomain: require('./post/commentDomain'),
         commentChild: postCommentChild.BetterSocialCreateCommentChild,
-        commentChildV3: postCommentChild.BetterSocialCreateCommentChildV3
+        commentChildV3: postCommentChild.BetterSocialCreateCommentChildV3,
+        commentChildV3Anonymous: postCommentChild.BetterSocialCreateCommentChildV3Anonymous
     },
     constantList: {
         color: require('./constantList/color'),

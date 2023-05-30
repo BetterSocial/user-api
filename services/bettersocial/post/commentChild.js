@@ -99,7 +99,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
 const BetterSocialCreateCommentChildV3 = async (req) => {
     try {
         const { body, userId, token } = req;
-        const { reaction_id, message, anon_user_info, sendPostNotif, postTitle, anonimity } = body;
+        const { reaction_id, message, anon_user_info, sendPostNotif, postTitle } = body;
 
         const reaction = await Getstream.feed.getReactionById(reaction_id);
         const feed = await Getstream.feed.getPlainFeedById(reaction?.activity_id);
@@ -109,8 +109,6 @@ const BetterSocialCreateCommentChildV3 = async (req) => {
 
         // owner of post / parent commment
         const postMakerId = reaction?.user_id;
-        
-        let result = {}
 
         let commentAuthor = {
             username: anon_user_info?.color_name + ' ' + anon_user_info?.emoji_name,
@@ -118,26 +116,9 @@ const BetterSocialCreateCommentChildV3 = async (req) => {
             anon_user_info
         }
 
-        // if the child comment mean not to be anonymous
-        // find the child comment author detail
-        if (!anonimity) {
-            commentAuthor = await UsersFunction.findUserById(User, userId)
-        }
 
-        if(anonimity) {
-            result = await Getstream.feed.commentChildAnonymous(userId, message, reaction_id, userId, postMakerId, userIdFeed, anon_user_info, anonimity, sendPostNotif)
-            await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
-                postId: reaction?.activity_id,
-                anonUserId: userId,
-                anonUserInfoColorCode: anon_user_info?.color_code,
-                anonUserInfoColorName: anon_user_info?.color_name,
-                anonUserInfoEmojiCode: anon_user_info?.emoji_code,
-                anonUserInfoEmojiName: anon_user_info?.emoji_name,
-            })
-        } else {
-            const signedPostMakerId = await UsersFunction.findSignedUserId(User, postMakerId)
-            result = await Getstream.feed.commentChild(token, message, reaction_id, userId, signedPostMakerId, signedUserIdFeed, sendPostNotif)
-        }
+        const signedPostMakerId = await UsersFunction.findSignedUserId(User, postMakerId)
+        const result = await Getstream.feed.commentChild(token, message, reaction_id, userId, signedPostMakerId, signedUserIdFeed, sendPostNotif)
 
         if (body?.message?.length > 80) {
             await countProcess(reaction_id, { comment_count: +1 }, { comment_count: 1 });
@@ -159,10 +140,6 @@ const BetterSocialCreateCommentChildV3 = async (req) => {
             postId: result?.activity_id
         })
 
-        if (anonimity) {
-            result = { ...result, user_id: null, user: {}, target_feeds: [] }
-        }
-
         return {
             isSuccess: true,
             data: result
@@ -176,8 +153,73 @@ const BetterSocialCreateCommentChildV3 = async (req) => {
     }
 }
 
+const BetterSocialCreateCommentChildV3Anonymous = async (req) => {
+    try {
+        const { body, userId } = req;
+        const { reaction_id, message, anon_user_info, sendPostNotif, postTitle } = body;
+
+        const reaction = await Getstream.feed.getReactionById(reaction_id);
+        const feed = await Getstream.feed.getPlainFeedById(reaction?.activity_id);
+        // owner of feed
+        const userIdFeed = feed?.actor?.id;
+        const signedUserIdFeed = await UsersFunction.findSignedUserId(User, userIdFeed);
+
+        // owner of post / parent commment
+        const postMakerId = reaction?.user_id;
+    
+
+        let commentAuthor = {
+            username: anon_user_info?.color_name + ' ' + anon_user_info?.emoji_name,
+            profile_pic_path: USERS_DEFAULT_IMAGE,
+            anon_user_info
+        }
+
+        const result = await Getstream.feed.commentChildAnonymous(userId, message, reaction_id, userId, postMakerId, userIdFeed, anon_user_info, true, sendPostNotif)
+        await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+            postId: reaction?.activity_id,
+            anonUserId: userId,
+            anonUserInfoColorCode: anon_user_info?.color_code,
+            anonUserInfoColorName: anon_user_info?.color_name,
+            anonUserInfoEmojiCode: anon_user_info?.emoji_code,
+            anonUserInfoEmojiName: anon_user_info?.emoji_name,
+        })
+
+        if (body?.message?.length > 80) {
+            await countProcess(reaction_id, { comment_count: +1 }, { comment_count: 1 });
+        }
+
+        await sendMultiDeviceReplyCommentNotification(
+            signedUserIdFeed,
+            commentAuthor,
+            message,
+            reaction_id,
+            postTitle
+        )
+
+        QueueTrigger.addCommentToDb({
+            authorUserId: postMakerId,
+            comment: message,
+            commenterUserId: userId,
+            commentId: result?.id,
+            postId: result?.activity_id
+        })
+
+        return {
+            isSuccess: true,
+            data: { ...result, user_id: null, user: {}, target_feeds: [] }
+        }
+    } catch (err) {
+        console.log(err)
+        return {
+            isSuccess: false,
+            message: err.message
+        }
+    }
+}
+
 
 module.exports = {
     BetterSocialCreateCommentChild,
-    BetterSocialCreateCommentChildV3
+    BetterSocialCreateCommentChildV3,
+    BetterSocialCreateCommentChildV3Anonymous
 }
