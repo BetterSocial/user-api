@@ -30,6 +30,7 @@ const BetterSocialCore = {
         createPollPost: require('./post/createPollPost'),
         comment: postComment.BetterSocialCreateComment,
         commentV3: postComment.BetterSocialCreateCommentV3,
+        commentV3Anonymous: postComment.BetterSocialCreateCommentV3Anonymous,
         commentDomain: require('./post/commentDomain'),
         commentChild: postCommentChild.BetterSocialCreateCommentChild,
         commentChildV3: postCommentChild.BetterSocialCreateCommentChildV3

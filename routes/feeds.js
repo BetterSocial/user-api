@@ -5,7 +5,7 @@ const router = express.Router();
 const feedController = require("../controllers/feeds/FeedController");
 
 const feed = require("../controllers/feeds");
-const { isAuth } = require("../middlewares/auth");
+const { isAuth, isAuthV2, isAuthAnonim } = require("../middlewares/auth");
 const CreatePostMiddleware = require("../middlewares/create-post");
 const GenerateAnonymousUsernameMiddleware = require("../middlewares/generate-anonymous-username");
 const CreateCommentMiddleware = require("../middlewares/create-comment");
@@ -50,7 +50,8 @@ router.post("/feed-action-notification/:kind", isAuth, feed.notificationCommentF
 router.post("/post-v2", isAuth, CreatePostMiddleware ,feed.createPostV2);
 router.post('/generate-anonymous-username', isAuth, GenerateAnonymousUsernameMiddleware, feed.generateAnonymousUsername)
 router.post("/comment-v2", isAuth ,CreateCommentMiddleware , feed.commentV2);
-router.post('/comment-v3', isAuth, CreateCommentMiddleware , feed.commentV3);
+router.post('/comment-v3', isAuthV2, CreateCommentMiddleware , feed.commentV3.standart);
+router.post('/comment-v3-anonymous', isAuthAnonim, CreateCommentMiddleware , feed.commentV3.anonymous);
 router.post("/comment-child-v2", isAuth ,CreateCommentChildMiddleware, feed.commentChildV2);
 router.post("/comment-child-v3", isAuth ,CreateCommentChildMiddleware, feed.commentChildV3);
 router.post("/comment-domain-v2", isAuth, CreateCommentMiddleware, feed.commentDomainV2);
