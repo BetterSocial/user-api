@@ -17,6 +17,7 @@ const standart = async (req, res) => {
   }
 }
 
+// anonymous route
 const anonymous = async (req, res) => {
   try {
     let response = await BetterSocialCore.post.commentChildV3Anonymous(req);
