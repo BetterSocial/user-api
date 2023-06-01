@@ -58,4 +58,82 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     }
 }
 
-module.exports = BetterSocialCreateComment
+const BetterSocialCreateCommentV3 = async (req) => {
+    try {
+        const { body, userId, token } = req
+        const { activity_id, message, sendPostNotif } = body;
+
+        const result = await Getstream.feed.comment(token, message, activity_id, userId, null, sendPostNotif)
+
+        await _countProcess(activity_id, body);
+        await _scoringAfterComment(result.id, userId, activity_id, message)
+
+        return {
+            isSuccess: true,
+            data: result
+        }
+    } catch (err) {
+        console.log(err)
+        return {
+            isSuccess: false,
+            message: err.message
+        }
+    }
+}
+
+const BetterSocialCreateCommentV3Anonymous = async (req) => {
+    try {
+        const { body, userId } = req
+        const { activity_id, message, anon_user_info } = body
+
+        const result = await Getstream.feed.commentAnonymous(userId, message, activity_id, null, anon_user_info)
+        await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+            postId: activity_id,
+            anonUserId: userId,
+            anonUserInfoColorCode: anon_user_info?.color_code,
+            anonUserInfoColorName: anon_user_info?.color_name,
+            anonUserInfoEmojiCode: anon_user_info?.emoji_code,
+            anonUserInfoEmojiName: anon_user_info?.emoji_name,
+        })
+
+        await _countProcess(activity_id, body);
+        await _scoringAfterComment(result.id, userId, activity_id, message)
+
+        return {
+            isSuccess: true,
+            data: result
+        }
+    } catch (err) {
+        console.log(err)
+        return {
+            isSuccess: false,
+            message: err.message
+        }
+    }
+}
+
+const _scoringAfterComment = async (commentId, userId, activityId, message) => {
+
+    const scoringProcessData = {
+        comment_id: commentId,
+        user_id: userId,
+        feed_id: activityId,
+        message: message,
+        activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+    };
+
+    await addForCommentPost(scoringProcessData);
+}
+
+const _countProcess = async (activityId, body) => {
+    if (body?.message?.length > 80) {
+        await countProcess(activityId, { comment_count: +1 }, { comment_count: 1 });
+    }
+    return;
+}
+
+module.exports = {
+    BetterSocialCreateComment,
+    BetterSocialCreateCommentV3,
+    BetterSocialCreateCommentV3Anonymous
+}

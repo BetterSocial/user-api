@@ -4,13 +4,13 @@ const router = express.Router();
 // controller
 const feedController = require('../controllers/feeds/FeedController');
 
-const feed = require('../controllers/feeds');
-const { isAuth } = require('../middlewares/auth');
-const CreatePostMiddleware = require('../middlewares/create-post');
-const GenerateAnonymousUsernameMiddleware = require('../middlewares/generate-anonymous-username');
-const CreateCommentMiddleware = require('../middlewares/create-comment');
-const CreateCommentChildMiddleware = require('../middlewares/create-comment-child');
-const BodyValidationMiddleware = require('../middlewares/body-validation');
+const feed = require("../controllers/feeds");
+const { isAuth, isAuthV2, isAuthAnonim } = require("../middlewares/auth");
+const CreatePostMiddleware = require("../middlewares/create-post");
+const GenerateAnonymousUsernameMiddleware = require("../middlewares/generate-anonymous-username");
+const CreateCommentMiddleware = require("../middlewares/create-comment");
+const CreateCommentChildMiddleware = require("../middlewares/create-comment-child");
+const BodyValidationMiddleware = require("../middlewares/body-validation");
 
 router.post('/post', feed.createPost);
 router.post('/post/poll', feed.createPollPost);
@@ -59,7 +59,7 @@ router.post(
   feed.generateAnonymousUsername
 );
 router.post('/comment-v2', isAuth, CreateCommentMiddleware, feed.commentV2);
-router.post('/comment-v3', isAuth, CreateCommentMiddleware, feed.commentV3);
+router.post('/comment-v3', isAuth, CreateCommentMiddleware, feed.commentV3.standart);
 router.post(
   '/comment-child-v2',
   isAuth,
@@ -79,5 +79,11 @@ router.post(
   feed.blockAnonymousPostV2
 );
 router.get('/reaction-list/:id', isAuth, feed.reactionList);
+router.post('/comment-v3-anonymous', isAuthAnonim, CreateCommentMiddleware , feed.commentV3.anonymous);
+router.post("/comment-child-v3", isAuthV2, CreateCommentChildMiddleware, feed.commentChildV3.standart);
+router.post("/comment-child-v3-anonymous", isAuthAnonim, CreateCommentChildMiddleware, feed.commentChildV3.anonymous);
+router.post("/comment-domain-v2", isAuth, CreateCommentMiddleware, feed.commentDomainV2);
+router.post("/comment-domain-v3", isAuthV2, CreateCommentMiddleware, feed.commentDomainV3.standart);
+router.post("/comment-domain-v3-anonymous", isAuthAnonim, CreateCommentMiddleware, feed.commentDomainV3.anonymous);
 
 module.exports = router;

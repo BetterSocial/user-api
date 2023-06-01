@@ -9,18 +9,19 @@ const SuccessResponse = require("../../utils/response/SuccessResponse");
  */
 const standart = async (req, res) => {
   try {
-    let response = await BetterSocialCore.post.commentV3(req);
-    if(response?.isSuccess) return SuccessResponse(res, "Comment created successfully");
+    let response = await BetterSocialCore.post.commentChildV3(req);
+    if(response?.isSuccess) return SuccessResponse(res, response.data, "Comment created successfully");
     return ErrorResponse.e500(res, "Failed to create comment: " + response?.message);
   } catch(e) {
     return ErrorResponse.e500(res, e.message)
   }
 }
 
+// anonymous route
 const anonymous = async (req, res) => {
   try {
-    let response = await BetterSocialCore.post.commentV3Anonymous(req);
-    if(response?.isSuccess) return SuccessResponse(res, "Comment created successfully");
+    let response = await BetterSocialCore.post.commentChildV3Anonymous(req);
+    if(response?.isSuccess) return SuccessResponse(res, response.data, "Comment created successfully");
     return ErrorResponse.e500(res, "Failed to create comment: " + response?.message);
   } catch(e) {
     return ErrorResponse.e500(res, e.message)

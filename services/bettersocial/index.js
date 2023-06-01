@@ -5,6 +5,8 @@ const BetterSocialCreateAnonymousUser = require('./user/BetterSocialCreateAnonym
 const BetterSocialCreateUser = require('./user/BetterSocialCreateUser');
 const BetterSocialUnblockUserV2 = require('./user/BetterSocialUnblockUserV2');
 const postComment = require("./post/comment");
+const postCommentChild = require('./post/commentChild');
+const postCommentDomain = require('./post/commentDomain');
 
 const BetterSocialCore = {
     user: {
@@ -29,8 +31,13 @@ const BetterSocialCore = {
         createPollPost: require('./post/createPollPost'),
         comment: postComment.BetterSocialCreateComment,
         commentV3: postComment.BetterSocialCreateCommentV3,
-        commentDomain: require('./post/commentDomain'),
-        commentChild: require('./post/commentChild'),
+        commentV3Anonymous: postComment.BetterSocialCreateCommentV3Anonymous,
+        commentDomain: postCommentDomain.BetterSocialCreateComment,
+        commentDomainV3: postCommentDomain.BetterSocialCreateCommentV3,
+        commentDomainV3Anonymous: postCommentDomain.BetterSocialCreateCommentV3Anonymous,
+        commentChild: postCommentChild.BetterSocialCreateCommentChild,
+        commentChildV3: postCommentChild.BetterSocialCreateCommentChildV3,
+        commentChildV3Anonymous: postCommentChild.BetterSocialCreateCommentChildV3Anonymous
     },
     constantList: {
         color: require('./constantList/color'),

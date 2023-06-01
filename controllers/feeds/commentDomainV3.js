@@ -9,7 +9,7 @@ const SuccessResponse = require("../../utils/response/SuccessResponse");
  */
 const standart = async (req, res) => {
   try {
-    let response = await BetterSocialCore.post.commentV3(req);
+    let response = await BetterSocialCore.post.commentDomainV3(req);
     if(response?.isSuccess) return SuccessResponse(res, "Comment created successfully");
     return ErrorResponse.e500(res, "Failed to create comment: " + response?.message);
   } catch(e) {
@@ -19,7 +19,7 @@ const standart = async (req, res) => {
 
 const anonymous = async (req, res) => {
   try {
-    let response = await BetterSocialCore.post.commentV3Anonymous(req);
+    let response = await BetterSocialCore.post.commentDomainV3Anonymous(req);
     if(response?.isSuccess) return SuccessResponse(res, "Comment created successfully");
     return ErrorResponse.e500(res, "Failed to create comment: " + response?.message);
   } catch(e) {
