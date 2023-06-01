@@ -40,6 +40,7 @@ const reactionList = require('./reactionList')
 const { createQueuePostTime } = require("./createPostTime");
 const { getFeedChatService } = require("./getFeedChat")
 const { putMainFeed } = require("./updateActivity");
+const getOneFeedChatService = require('./getOneFeedChat');
 
 module.exports = {
   blockAnonymousPostV2,
@@ -69,6 +70,7 @@ module.exports = {
   followUser,
   generateAnonymousUsername,
   getFeedChatService,
+  getOneFeedChatService,
   getFeeds,
   getFeedUser,
   getOpenGraph,
@@ -83,5 +85,5 @@ module.exports = {
   upvote,
   upVoteDomain,
   voteComment,
-  reactionList
+  reactionList,
 };
