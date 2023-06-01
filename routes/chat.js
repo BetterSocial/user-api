@@ -14,5 +14,6 @@ router.get(
   auth.isAuthAnonim,
   chatController.getChannel
 );
+router.post('/', auth.isAuthAnonim, chatController.sendMessage);
 
 module.exports = router;

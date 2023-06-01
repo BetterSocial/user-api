@@ -33,7 +33,7 @@ module.exports = {
         process.env.SECRET
       );
 
-      client.connectUser({ id: req.userId }, req.token);
+      await client.connectUser({ id: req.userId }, req.token);
 
       if (!req.body.members.includes(req.userId))
         req.body.members.push(req.userId);
@@ -43,7 +43,7 @@ module.exports = {
       });
 
       await channel.create();
-      client.disconnectUser();
+      await client.disconnectUser();
       return res.status(200).json(responseSuccess('Success create channel'));
     } catch (error) {
       return res
@@ -114,7 +114,7 @@ module.exports = {
       process.env.SECRET
     );
 
-    client.connectUser({ id: req.userId }, req.token);
+    await client.connectUser({ id: req.userId }, req.token);
 
     const channel = client.channel('messaging', req.body.channelId);
 
@@ -133,12 +133,12 @@ module.exports = {
       process.env.API_KEY,
       process.env.SECRET
     );
-    client.connectUser({ id: req.userId }, req.token);
+    await client.connectUser({ id: req.userId }, req.token);
     let channels = await client.queryChannels(
       { type: 'messaging', members: { $in: [req.userId] } },
       [{ last_message_at: -1 }]
     );
-    client.disconnectUser();
+    await client.disconnectUser();
     channels = channels.map((channel) => {
       return { ...channel.data };
     });
@@ -151,15 +151,48 @@ module.exports = {
       process.env.API_KEY,
       process.env.SECRET
     );
-    client.connectUser({ id: req.userId }, req.token);
+    await client.connectUser({ id: req.userId }, req.token);
     const channel = await client.queryChannels(
       { type: 'messaging', id: req.params.channelId },
       [{ last_message_at: -1 }]
     );
-    client.disconnectUser();
+    await client.disconnectUser();
     if (!channel[0]) {
       return ErrorResponse.e404(res, 'Channel not found');
     }
     res.status(200).json(responseSuccess('Success', channel[0].data));
+  },
+  sendMessage: async (req, res) => {
+    const schema = {
+      members: 'string[]|empty:false',
+      message: 'string|empty:false',
+    };
+    const validated = v.validate(req.body, schema);
+    if (validated.length)
+      return res.status(403).json({
+        message: 'Error validation',
+        error: validated,
+      });
+    if (!req.body.members.includes(req.userId))
+      req.body.members.push(req.userId);
+
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
+
+    await client.connectUser({ id: req.userId }, req.token);
+
+    const channel = client.channel('messaging', { members: req.body.members });
+
+    await channel.create();
+
+    const message = await channel.sendMessage({
+      user_id: req.userId,
+      text: req.body.message,
+      ...req.body,
+    });
+    await client.disconnectUser();
+    return res.status(200).json(responseSuccess('sent', message));
   },
 };
