@@ -62,11 +62,10 @@ const BetterSocialCreateCommentV3 = async (req) => {
     try {
         const { body, userId, token } = req
         const { activity_id, message, sendPostNotif } = body;
-        console.log("HERE?")
 
         const result = await Getstream.feed.comment(token, message, activity_id, userId, null, sendPostNotif)
 
-        await _countProcess(body);
+        await _countProcess(activity_id, body);
         await _scoringAfterComment(result.id, userId, activity_id, message)
 
         return {
@@ -97,7 +96,7 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
             anonUserInfoEmojiName: anon_user_info?.emoji_name,
         })
 
-        await _countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
+        await _countProcess(activity_id, body);
         await _scoringAfterComment(result.id, userId, activity_id, message)
 
         return {
@@ -126,10 +125,11 @@ const _scoringAfterComment = async (commentId, userId, activityId, message) => {
     await addForCommentPost(scoringProcessData);
 }
 
-const _countProcess = async (body) => {
+const _countProcess = async (activityId, body) => {
     if (body?.message?.length > 80) {
-        await countProcess(activity_id, { comment_count: +1 }, { comment_count: 1 });
+        await countProcess(activityId, { comment_count: +1 }, { comment_count: 1 });
     }
+    return;
 }
 
 module.exports = {
