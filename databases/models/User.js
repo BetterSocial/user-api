@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -12,38 +12,38 @@ module.exports = (sequelize, DataTypes) => {
       // models.User.hasMany(models.UserFollowUser);
 
       models.User.hasMany(models.UserFollowUser, {
-        foreignKey: "user_id_follower",
-        as: "following",
+        foreignKey: 'user_id_follower',
+        as: 'following',
       });
 
       models.User.hasMany(models.UserFollowUser, {
-        foreignKey: "user_id_followed",
-        as: "follower",
+        foreignKey: 'user_id_followed',
+        as: 'follower',
       });
       models.User.hasMany(models.UserBlockedUser, {
-        foreignKey: "user_id_blocker",
-        as: "blocker"
+        foreignKey: 'user_id_blocker',
+        as: 'blocker',
       });
       models.User.hasMany(models.UserBlockedUser, {
-        foreignKey: "user_id_blocked",
-        as: "blocked"
+        foreignKey: 'user_id_blocked',
+        as: 'blocked',
       });
 
       models.User.belongsToMany(models.Topics, {
-        through: "user_topics",
-        foreignKey: "user_id",
-        as: "topics",
+        through: 'user_topics',
+        foreignKey: 'user_id',
+        as: 'topics',
       });
 
       models.User.belongsToMany(models.Locations, {
-        through: "user_location",
-        foreignKey: "user_id",
-        as: "locations",
+        through: 'user_location',
+        foreignKey: 'user_id',
+        as: 'locations',
       });
       models.User.belongsToMany(models.UserLocation, {
-        through: "user_location",
-        foreignKey: "user_id",
-        as: "user_locations",
+        through: 'user_location',
+        foreignKey: 'user_id',
+        as: 'user_locations',
       });
     }
   }
@@ -56,12 +56,12 @@ module.exports = (sequelize, DataTypes) => {
       real_name: { type: DataTypes.STRING, allowNull: true },
       createdAt: {
         type: DataTypes.DATE,
-        field: "created_at",
+        field: 'created_at',
         allowNull: false,
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: "updated_at",
+        field: 'updated_at',
         allowNull: false,
       },
       last_active_at: { type: DataTypes.DATE, allowNull: false },
@@ -71,22 +71,30 @@ module.exports = (sequelize, DataTypes) => {
       status: { type: DataTypes.BOOLEAN, allowNull: false },
       bio: { type: DataTypes.TEXT, allowNull: true },
       is_banned: {
-        type: DataTypes.BOOLEAN, 
+        type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
       is_anonymous: {
-        type: DataTypes.BOOLEAN, 
+        type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
       encrypted: {
         type: DataTypes.STRING,
-        allowNull: true
-      }
+        allowNull: true,
+      },
+      allowAnonDm: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      onlyReceivedAnonDmFromUserFollowing: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       sequelize,
-      modelName: "User",
-      tableName: "users",
+      modelName: 'User',
+      tableName: 'users',
       underscored: true,
     }
   );
