@@ -15,7 +15,6 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
 const { Op } = require('sequelize');
-const { saveChat } = require('../../databases/functions/chat');
 const v = new Validator();
 
 module.exports = {
@@ -55,7 +54,6 @@ module.exports = {
         .json(responseError(error.message, error, error.code ?? error.status));
     }
   },
-
   addChannelModerator: async (req, res) => {
     const schema = {
       channelId: 'string|empty:false',
@@ -88,7 +86,6 @@ module.exports = {
       error: message,
     });
   },
-
   addMembers: async (req, res) => {
     let members = [];
     members.push(req.userId);
@@ -149,7 +146,6 @@ module.exports = {
         // Send Push Notification
       })
     );
-    await saveChat({ user_id: req.userId, channelId, message });
 
     await client.disconnectUser();
     return res.status(200).json(responseSuccess('sent', chat));
@@ -257,17 +253,25 @@ module.exports = {
 
       const targets = members.filter((member) => member !== req.userId);
       targets.map(async (target) => {
-        await ChatAnonUserInfo.create({
-          channelId: channel.id,
-          myAnonUserId: req.userId,
-          targetUserId: target,
-          anon_user_info_color_code,
-          anon_user_info_color_name,
-          anon_user_info_emoji_code,
-          anon_user_info_emoji_name,
+        const exist = await ChatAnonUserInfo.count({
+          where: {
+            channelId: channel.id,
+            myAnonUserId: req.userId,
+            targetUserId: target,
+          },
         });
+        if (!exist) {
+          await ChatAnonUserInfo.create({
+            channelId: channel.id,
+            myAnonUserId: req.userId,
+            targetUserId: target,
+            anon_user_info_color_code,
+            anon_user_info_color_name,
+            anon_user_info_emoji_code,
+            anon_user_info_emoji_name,
+          });
+        }
       });
-      await saveChat({ user_id: req.userId, channelId: channel.id, message });
 
       await client.disconnectUser();
 
@@ -277,25 +281,34 @@ module.exports = {
     }
   },
   getMyAnonProfile: async (req, res) => {
-    const schema = {
-      channelId: 'string',
-    };
-    const validated = v.validate(req.body, schema);
-    if (validated.length)
-      return res.status(403).json({
-        message: 'Error validation',
-        error: validated,
-      });
+    const target = await UsersFunction.findUserById(
+      User,
+      req.params.targetUserId
+    );
+    if (!target) {
+      return ErrorResponse.e404(req, 'target user not found');
+    }
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
 
     const myAnonUserId = await UsersFunction.findAnonymousUserId(
       User,
       req.userId
     );
-    const { channelId } = req.body;
+    const token = client.createToken(myAnonUserId.user_id);
+
+    await client.connectUser({ id: myAnonUserId.user_id }, token);
+
+    const channel = client.channel('messaging', {
+      members: [req.params.targetUserId, myAnonUserId.user_id],
+    });
+
     const haveChat = await ChatAnonUserInfo.findOne({
       where: {
-        channelId,
-        targetUserId: req.params.userId,
+        channelId: channel.id,
+        targetUserId: req.params.targetUserId,
         myAnonUserId: myAnonUserId.user_id,
       },
     });
@@ -320,6 +333,7 @@ module.exports = {
         anon_user_info_color_code: color.code,
       };
     }
+    await client.disconnectUser();
     return res.status(200).json(responseSuccess('Success', anonUserInfo));
   },
 };

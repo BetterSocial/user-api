@@ -1,5 +1,5 @@
 'use strict';
-const { Model } = require('sequelize');
+const { Model, Sequelize } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class ChatAnonUserInfo extends Model {
     /**
@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true,
+        defaultValue: Sequelize.UUIDV4,
       },
       channelId: DataTypes.STRING,
       targetUserId: DataTypes.STRING,

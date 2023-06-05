@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
         copyUser.onlyReceivedAnonDmFromUserFollowing
       ) {
         const indexFollowedMe = user.dataValues.following.findIndex(
-          (value) => value.user_id_followed === req.userId
+          (value) => value.user_id_follower === req.userId
         );
         if (indexFollowedMe > -1) {
           copyUser.isAnonMessageEnabled = true;

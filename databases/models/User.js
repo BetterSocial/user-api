@@ -54,16 +54,6 @@ module.exports = (sequelize, DataTypes) => {
       country_code: { type: DataTypes.STRING, allowNull: false },
       username: { type: DataTypes.STRING, allowNull: false, unique: true },
       real_name: { type: DataTypes.STRING, allowNull: true },
-      createdAt: {
-        type: DataTypes.DATE,
-        field: 'created_at',
-        allowNull: false,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        field: 'updated_at',
-        allowNull: false,
-      },
       last_active_at: { type: DataTypes.DATE, allowNull: false },
       profile_pic_path: { type: DataTypes.STRING, allowNull: true },
       profile_pic_asset_id: { type: DataTypes.STRING, allowNull: true },
@@ -95,7 +85,8 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'User',
       tableName: 'users',
-      underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
     }
   );
   return User;
