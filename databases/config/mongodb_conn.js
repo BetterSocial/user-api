@@ -29,12 +29,17 @@ let db;
 
 const getDb = async () => {
   if (db) {
-    // console.debug("mongodb already connected, just use it");
+    console.debug("mongodb already connected, just use it");
     return db;
   } else {
     console.debug("try to create mongodb connection");
-    await client.connect();
-    db = client.db(config.database);
+    try {
+      await client.connect();
+      db = client.db(config.database);
+      console.log("mongodb connected")
+    } catch(e) {
+      console.debug('Error while connecting to mongodb: ' + e);
+    }
 
     return db;
   }

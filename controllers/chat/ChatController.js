@@ -6,15 +6,14 @@ const { User, ChatAnonUserInfo } = require('../../databases/models');
 
 const formatLocationGetstream = require('../../helpers/formatLocationGetStream');
 const {
-  CreateChannel,
   AddMembersChannel,
-  WatchChannel,
 } = require('../../services/chat');
 const addModerators = require('./addModerators');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
 const { Op } = require('sequelize');
+const createToken = require('../../vendor/getstream/core/createToken');
 const v = new Validator();
 
 module.exports = {
@@ -208,7 +207,49 @@ module.exports = {
 
     res.status(200).json(responseSuccess('Success', data));
   },
-  sendMessage: async (req, res) => {
+  initChat: async (req, res) => {
+    try {
+      const schema = {
+        members: 'string[]|empty:false',
+        message: 'string|empty:false',
+      };
+      const validated = v.validate(req.body, schema);
+      if (validated.length)
+        return res.status(403).json({
+          message: 'Error validation',
+          error: validated,
+        });
+      const {
+        members,
+        message
+      } = req.body;
+      if (!members.includes(req.userId)) members.push(req.userId);
+
+      const client = StreamChat.getInstance(
+        process.env.API_KEY,
+        process.env.SECRET
+      );
+
+      await client.connectUser({ id: req.userId }, req.token);
+
+      const channel = client.channel('messaging', { members });
+
+      await channel.create();
+
+      const chat = await channel.sendMessage({
+        user_id: req.userId,
+        text: message,
+        ...req.body,
+      });
+
+      await client.disconnectUser();
+
+      return res.status(200).json(responseSuccess('sent', chat));
+    } catch (error) {
+      return ErrorResponse.e400(res, error.message);
+    }
+  },
+  initChatAnonymous: async (req, res) => {
     try {
       const schema = {
         members: 'string[]|empty:false',
@@ -281,10 +322,13 @@ module.exports = {
     }
   },
   getMyAnonProfile: async (req, res) => {
+    const targetUserId = req.params.targetUserId;
+
     const target = await UsersFunction.findUserById(
       User,
-      req.params.targetUserId
+      targetUserId
     );
+
     if (!target) {
       return ErrorResponse.e404(req, 'target user not found');
     }
@@ -297,40 +341,42 @@ module.exports = {
       User,
       req.userId
     );
-    const token = client.createToken(myAnonUserId.user_id);
 
-    await client.connectUser({ id: myAnonUserId.user_id }, token);
+    await client.connectUser({ id: req.userId }, req.token);
 
     const channel = client.channel('messaging', {
-      members: [req.params.targetUserId, myAnonUserId.user_id],
+      members: [targetUserId, req.userId],
     });
+
+    await channel.create();
 
     const haveChat = await ChatAnonUserInfo.findOne({
       where: {
-        channelId: channel.id,
-        targetUserId: req.params.targetUserId,
-        myAnonUserId: myAnonUserId.user_id,
+        channelId: channel.id || "",
+        targetUserId: targetUserId,
+        myAnonUserId: req.userId,
       },
     });
 
+    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+    const color = BetterSocialConstantListUtils.getRandomColor();
     let anonUserInfo = {
-      targetUserId: haveChat.targetUserId,
-      myAnonUserId: haveChat.myAnonUserId,
-      anon_user_info_emoji_name: haveChat.anon_user_info_emoji_name,
-      anon_user_info_emoji_code: haveChat.anon_user_info_emoji_code,
-      anon_user_info_color_name: haveChat.anon_user_info_color_name,
-      anon_user_info_color_code: haveChat.anon_user_info_color_code,
+      targetUserId: targetUserId,
+      myAnonUserId: req.userId,
+      anon_user_info_emoji_name: emoji.name,
+      anon_user_info_emoji_code: emoji.emoji,
+      anon_user_info_color_name: color.color,
+      anon_user_info_color_code: color.code,
     };
-    if (!haveChat) {
-      const emoji = BetterSocialConstantListUtils.getRandomEmoji();
-      const color = BetterSocialConstantListUtils.getRandomColor();
+
+    if (haveChat) {
       anonUserInfo = {
-        targetUserId: req.params.userId,
-        myAnonUserId: myAnonUserId.user_id,
-        anon_user_info_emoji_name: emoji.name,
-        anon_user_info_emoji_code: emoji.emoji,
-        anon_user_info_color_name: color.color,
-        anon_user_info_color_code: color.code,
+        targetUserId: targetUserId,
+        myAnonUserId: req.userId,
+        anon_user_info_emoji_name: haveChat.anon_user_info_emoji_name,
+        anon_user_info_emoji_code: haveChat.anon_user_info_emoji_code,
+        anon_user_info_color_name: haveChat.anon_user_info_color_name,
+        anon_user_info_color_code: haveChat.anon_user_info_color_code,
       };
     }
     await client.disconnectUser();
