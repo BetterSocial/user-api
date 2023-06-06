@@ -336,11 +336,6 @@ module.exports = {
       process.env.SECRET
     );
 
-    const myAnonUserId = await UsersFunction.findAnonymousUserId(
-      User,
-      req.userId
-    );
-
     await client.connectUser({ id: req.userId }, req.token);
 
     const channel = client.channel('messaging', {
