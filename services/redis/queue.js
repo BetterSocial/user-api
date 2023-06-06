@@ -62,6 +62,9 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
         locations
     }
 
+    console.log('data')
+    console.log(data)
+
     const options = {
         jobId: uuidv4(),
         removeOnComplete: true,
