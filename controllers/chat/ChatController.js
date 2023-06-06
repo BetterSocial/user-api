@@ -13,7 +13,6 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
 const { Op } = require('sequelize');
-const createToken = require('../../vendor/getstream/core/createToken');
 const v = new Validator();
 
 module.exports = {
