@@ -1,3 +1,5 @@
+const mainFeedFollowing = require('./feed/mainFeedFollowing');
+
 const Getstream = {
     core: {
         createUser: require('./core/createUser'),
@@ -26,6 +28,8 @@ const Getstream = {
         unfollowAnonUserByBlockAnonPost: require('./feed/unfollowAnonUserByBlockAnonPost'),
         unfollowUser: require('./feed/unfollowUser'),
         unfollowUserExclusive: require('./feed/unfollowUserExclusive'),
+        followMainFeedFollowing: mainFeedFollowing.follow,
+        unfollowMainFeedFollowing: mainFeedFollowing.unfollow
     }
 }
 

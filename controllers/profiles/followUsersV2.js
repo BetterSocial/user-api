@@ -30,8 +30,15 @@ module.exports = async (req, res) => {
     }
 
     try {
-        await Getstream.feed.followUserExclusive(req?.userId, user_id_followed)
-        await Getstream.feed.followUser(req?.token, req?.userId, user_id_followed)
+        const followUserExclusive = Getstream.feed.followUserExclusive(req?.userId, user_id_followed);
+        const followUser = Getstream.feed.followUser(req?.token, req?.userId, user_id_followed);
+        const followMainFeedFollowing = Getstream.feed.followMainFeedFollowing(req?.token, req?.userId, user_id_followed);
+
+        // follow certain targeted feeds
+        // - exclusive
+        // - user
+        // - main_feed_following
+        await Promise.all([followUserExclusive, followUser, followMainFeedFollowing])
 
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed)
         const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId)

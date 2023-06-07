@@ -29,8 +29,13 @@ module.exports = async (req, res) => {
     }
 
     try {
-        await Getstream.feed.unfollowUserExclusive(req?.userId, user_id_followed)
-        await Getstream.feed.unfollowUser(req?.token, req?.userId, user_id_followed)
+        // unfollow targeted feeds
+        const unfollowUserExcl = Getstream.feed.unfollowUserExclusive(req?.userId, user_id_followed);
+        const unfollowUser = Getstream.feed.unfollowUser(req?.token, req?.userId, user_id_followed);
+        const unfollowMainFeedFollowing = Getstream.feed.unfollowMainFeedFollowing(req?.token, req?.userId, user_id_followed);
+        
+        await Promise.all([unfollowUserExcl, unfollowUser, unfollowMainFeedFollowing]);
+
 
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed)
         const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId)
