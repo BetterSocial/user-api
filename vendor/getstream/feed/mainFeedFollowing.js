@@ -6,7 +6,7 @@ const follow = async(token, userIdFollower, userIdFollowed) => {
     // get requested user feed
     const feed = client.feed(GetstreamConstant.MAIN_FEED_FOLLOWING_NAME, userIdFollower, token);
     // follow targeted user feed
-    return feed.follow(GetstreamConstant.MAIN_FEED_FOLLOWING_NAME, userIdFollowed);
+    return feed.follow(GetstreamConstant.USER_EXCLUSIVE_FEED_NAME, userIdFollowed);
 }
 
 const unfollow = async(token, userIdFollower, userIdFollowed) => {
@@ -14,7 +14,7 @@ const unfollow = async(token, userIdFollower, userIdFollowed) => {
     // follow targeted user feed
     const feed = client.feed(GetstreamConstant.MAIN_FEED_FOLLOWING_NAME, userIdFollower, token)
     // un-follow targeted user feed
-    return feed.unfollow(GetstreamConstant.MAIN_FEED_FOLLOWING_NAME, userIdFollowed);
+    return feed.unfollow(GetstreamConstant.USER_EXCLUSIVE_FEED_NAME, userIdFollowed);
 }
 
 module.exports = {
