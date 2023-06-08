@@ -16,6 +16,8 @@ const { handleBlock } = require('./blocking');
 const { anonDmPrivacySettings } = require('./anonDmPrivacySettings');
 const followUserV2 = require('./followUsersV2');
 const unfollowUserV2 = require('./unfollowUsersV2');
+const followUserV3 = require("./followUserV3");
+const unfollowUserV3 = require('./unfollowUserV3');
 
 module.exports = {
   changeImageProfile,
@@ -36,4 +38,6 @@ module.exports = {
   anonDmPrivacySettings,
   followUserV2,
   unfollowUserV2,
+  followUserV3,
+  unfollowUserV3
 };

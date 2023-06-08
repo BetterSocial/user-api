@@ -32,18 +32,20 @@ module.exports = async (req, res) => {
     try {
         const followUserExclusive = Getstream.feed.followUserExclusive(req?.userId, user_id_followed);
         const followUser = Getstream.feed.followUser(req?.token, req?.userId, user_id_followed);
+        const followMainFeedFollowing = Getstream.feed.followMainFeedFollowing(req?.token, req?.userId, user_id_followed);
 
         // follow certain targeted feeds
         // - exclusive
         // - user
-        await Promise.all([followUserExclusive, followUser])
+        // - main_feed_following
+        await Promise.all([followUserExclusive, followUser, followMainFeedFollowing])
 
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed)
         const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId)
 
         await Getstream.feed.followAnonUser(req?.token, req?.userId, user_id_followed, selfAnonymousUser?.user_id, anonymousUser?.user_id)
     } catch (e) {
-        console.log('Error in follow user v2 getstream')
+        console.log('Error in follow user v3 getstream')
         console.log(e)
         return ErrorResponse.e409(res, e.message)
     }
@@ -55,14 +57,14 @@ module.exports = async (req, res) => {
             activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
         });
     } catch (e) {
-        console.log('Error in follow user v2 scoring')
+        console.log('Error in follow user v3 scoring')
         return ErrorResponse.e409(res, e.message)
     }
 
     try {
         await BetterSocialCore.fcmToken.sendMultiDeviceNotification(req?.userId, username_follower, user_id_followed, username_followed)
     } catch (e) {
-        console.log('Error in follow user v2 fcm')
+        console.log('Error in follow user v3 fcm')
         console.log(e)
         return ErrorResponse.e409(res, e.message)
     }
