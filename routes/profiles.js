@@ -94,4 +94,11 @@ router.patch('/settings', Auth.isAuth, profileController.anonDmPrivacySettings);
  * End of User Anonimity Changes
  */
 
+/**
+ * follow / unfollow user v3
+ */
+
+router.post("/follow-user-v3", Auth.isAuthV2, BodyValidationMiddleware.followUserV2, profileController.followUserV3)
+router.post("/unfollow-user-v3", Auth.isAuthV2, BodyValidationMiddleware.unfollowUserV2, profileController.unfollowUserV3)
+
 module.exports = router;
