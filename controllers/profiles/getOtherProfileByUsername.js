@@ -30,49 +30,45 @@ module.exports = async (req, res) => {
         status: 'error',
         message: 'User not found',
       });
-    } else {
-      let copyUser = { ...user.dataValues };
-      delete copyUser.following;
-      delete copyUser.follower;
+    }
+    let copyUser = { ...user.dataValues };
+    delete copyUser.following;
+    delete copyUser.follower;
 
-      copyUser.following = user.dataValues.following.length;
-      copyUser.following_symbol = checkMoreOrLess(
-        user.dataValues.following.length
-      );
-      copyUser.follower = user.dataValues.follower.length;
-      copyUser.follower_symbol = checkMoreOrLess(
-        user.dataValues.follower.length
-      );
+    copyUser.following = user.dataValues.following.length;
+    copyUser.following_symbol = checkMoreOrLess(
+      user.dataValues.following.length
+    );
+    copyUser.follower = user.dataValues.follower.length;
+    copyUser.follower_symbol = checkMoreOrLess(user.dataValues.follower.length);
 
-      let findIndex = user.dataValues.follower.findIndex(
+    let findIndex = user.dataValues.follower.findIndex(
+      (value) => value.user_id_follower === req.userId
+    );
+    const isUserFollowingMe = user.dataValues.following.findIndex(
+      (value) => value.user_id_followed === req.userId
+    );
+
+    copyUser.is_following = findIndex > -1 ? true : false;
+    copyUser.isSignedMessageEnabled = isUserFollowingMe > -1 ? true : false;
+    copyUser.isAnonMessageEnabled = false;
+    if (copyUser.allowAnonDm && !copyUser.onlyReceivedAnonDmFromUserFollowing) {
+      copyUser.isAnonMessageEnabled = true;
+    }
+    if (copyUser.allowAnonDm && copyUser.onlyReceivedAnonDmFromUserFollowing) {
+      const indexFollowedMe = user.dataValues.following.findIndex(
         (value) => value.user_id_follower === req.userId
       );
-      copyUser.is_following = findIndex > -1 ? true : false;
-      copyUser.isAnonMessageEnabled = false;
-      if (
-        copyUser.allowAnonDm &&
-        !copyUser.onlyReceivedAnonDmFromUserFollowing
-      ) {
+      if (indexFollowedMe > -1) {
         copyUser.isAnonMessageEnabled = true;
       }
-      if (
-        copyUser.allowAnonDm &&
-        copyUser.onlyReceivedAnonDmFromUserFollowing
-      ) {
-        const indexFollowedMe = user.dataValues.following.findIndex(
-          (value) => value.user_id_follower === req.userId
-        );
-        if (indexFollowedMe > -1) {
-          copyUser.isAnonMessageEnabled = true;
-        }
-      }
-
-      return res.json({
-        status: 'success',
-        code: 200,
-        data: copyUser,
-      });
     }
+
+    return res.status(200).json({
+      status: 'success',
+      code: 200,
+      data: copyUser,
+    });
   } catch (error) {
     const { status, data } = error.response;
     return res.status(500).json({
