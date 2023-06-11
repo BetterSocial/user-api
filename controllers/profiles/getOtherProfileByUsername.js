@@ -50,19 +50,11 @@ module.exports = async (req, res) => {
     );
 
     copyUser.is_following = findIndex > -1 ? true : false;
-    copyUser.isSignedMessageEnabled = isUserFollowingMe > -1 ? true : false;
-    copyUser.isAnonMessageEnabled = false;
-    if (copyUser.allowAnonDm && !copyUser.onlyReceivedAnonDmFromUserFollowing) {
-      copyUser.isAnonMessageEnabled = true;
-    }
-    if (copyUser.allowAnonDm && copyUser.onlyReceivedAnonDmFromUserFollowing) {
-      const indexFollowedMe = user.dataValues.following.findIndex(
-        (value) => value.user_id_follower === req.userId
-      );
-      if (indexFollowedMe > -1) {
-        copyUser.isAnonMessageEnabled = true;
-      }
-    }
+    copyUser.isSignedMessageEnabled =
+      isUserFollowingMe > -1 || !copyUser.onlyReceivedDmFromUserFollowing;
+
+    copyUser.isAnonMessageEnabled =
+      copyUser.allowAnonDm && copyUser.isSignedMessageEnabled;
 
     return res.status(200).json({
       status: 'success',

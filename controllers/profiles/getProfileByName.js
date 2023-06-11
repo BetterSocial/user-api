@@ -34,12 +34,11 @@ module.exports = async (req, res) => {
 
     let clonedUser = { ...user.toJSON() };
 
+    clonedUser.isSignedMessageEnabled = false;
     clonedUser.isAnonMessageEnabled = false;
-    if (
-      clonedUser.allowAnonDm &&
-      !clonedUser.onlyReceivedAnonDmFromUserFollowing
-    ) {
-      clonedUser.isAnonMessageEnabled = true;
+    if (!clonedUser.onlyReceivedDmFromUserFollowing) {
+      clonedUser.isSignedMessageEnabled = true;
+      clonedUser.isAnonMessageEnabled = clonedUser.allowAnonDm;
     }
 
     return res.json({

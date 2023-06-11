@@ -8,7 +8,7 @@ exports.anonDmPrivacySettings = async (req, res) => {
   try {
     const schema = {
       allowAnonDm: 'boolean',
-      onlyReceivedAnonDmFromUserFollowing: 'boolean',
+      onlyReceivedDmFromUserFollowing: 'boolean',
     };
     const validate = v.validate(req.body, schema);
     if (validate.length) {
@@ -18,20 +18,20 @@ exports.anonDmPrivacySettings = async (req, res) => {
         message: validate,
       });
     }
-    const { allowAnonDm, onlyReceivedAnonDmFromUserFollowing } = req.body;
-    if (onlyReceivedAnonDmFromUserFollowing) {
-      const countFollower = await UserFollowUser.count({
-        where: { user_id_followed: req.userId },
+    const { allowAnonDm, onlyReceivedDmFromUserFollowing } = req.body;
+    if (onlyReceivedDmFromUserFollowing) {
+      const countFollowing = await UserFollowUser.count({
+        where: { user_id_follower: req.userId },
       });
-      if (countFollower < 20) {
+      if (countFollowing < 20) {
         return ErrorResponse.e403(
           res,
-          `Cant change setting, user's follower is less than 20`
+          `To protect your connections anonymity, you need to follow at least 20 users to enable this option`
         );
       }
     }
     await User.update(
-      { allowAnonDm, onlyReceivedAnonDmFromUserFollowing },
+      { allowAnonDm, onlyReceivedDmFromUserFollowing },
       { where: { user_id: req.userId } }
     );
     return res.status(200).json({ message: 'Success' });
