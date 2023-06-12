@@ -10,7 +10,7 @@ router.get(
   Auth.isAuth,
   profileController.getOtherProfilebyUsername
 );
-router.get('/get-profile/:username', profileController.getProfileByName);
+router.get('/get-profile/:username', Auth.isAuth, profileController.getProfileByName);
 router.get('/block/', Auth.isAuth, profileController.handleBlock);
 router.post('/set-following', Auth.isAuth, profileController.setFollowing);
 router.post('/unset-following', Auth.isAuth, profileController.unSetFollowing);

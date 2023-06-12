@@ -31,7 +31,9 @@ exports.anonDmPrivacySettings = async (req, res) => {
       }
     }
     await User.update(
-      { allowAnonDm, onlyReceivedDmFromUserFollowing },
+      { 
+        allow_anon_dm: allowAnonDm, 
+        only_received_dm_from_user_following: onlyReceivedDmFromUserFollowing },
       { where: { user_id: req.userId } }
     );
     return res.status(200).json({ message: 'Success' });

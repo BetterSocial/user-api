@@ -133,9 +133,9 @@ module.exports = {
 
     const anonReceivers = await ChatAnonUserInfo.findAll({
       where: {
-        channelId,
-        targetUserId: req.userId,
-        myAnonUserId: { [Op.in]: userIds },
+        channel_id: channelId,
+        target_user_id: req.userId,
+        my_anon_user_id: { [Op.in]: userIds },
       },
     });
 
@@ -184,7 +184,7 @@ module.exports = {
     data.members = await Promise.all(
       Object.values(channel[0].state.members).map(async (dt) => {
         if (!dt.user.name) {
-          const filter = { channelId: req.params.channelId };
+          const filter = { channel_id: req.params.channelId };
           if (dt.role === 'owner') {
             filter.myAnonUserId = dt.user_id;
           } else {
@@ -295,16 +295,16 @@ module.exports = {
       targets.map(async (target) => {
         const exist = await ChatAnonUserInfo.count({
           where: {
-            channelId: channel.id,
-            myAnonUserId: req.userId,
-            targetUserId: target,
+            channel_id: channel.id,
+            my_anon_user_id: req.userId,
+            target_user_id: target,
           },
         });
         if (!exist) {
           await ChatAnonUserInfo.create({
-            channelId: channel.id,
-            myAnonUserId: req.userId,
-            targetUserId: target,
+            channel_id: channel.id,
+            my_anon_user_id: req.userId,
+            target_user_id: target,
             anon_user_info_color_code,
             anon_user_info_color_name,
             anon_user_info_emoji_code,
@@ -346,9 +346,9 @@ module.exports = {
 
     const haveChat = await ChatAnonUserInfo.findOne({
       where: {
-        channelId: channel.id || "",
-        targetUserId: targetUserId,
-        myAnonUserId: req.userId,
+        channel_id: channel.id || "",
+        target_user_id: targetUserId,
+        my_anon_user_id: req.userId,
       },
     });
 
