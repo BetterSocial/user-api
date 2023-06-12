@@ -8,7 +8,7 @@ console.log({connectRedis})
 const registerQueue = new Bull("registerQueue", connectRedis,
     {
         redis: {
-            // tls: { rejectUnauthorized: false, requestCert: true },
+            tls: { rejectUnauthorized: false, requestCert: true },
             maxRetriesPerRequest: 100,
             connectTimeout: 30000
         }
@@ -18,7 +18,7 @@ const registerQueue = new Bull("registerQueue", connectRedis,
 const registerV2Queue = new Bull("registerV2", connectRedis,
     {
         redis: {
-            // tls: { rejectUnauthorized: false, requestCert: true },
+            tls: { rejectUnauthorized: false, requestCert: true },
             maxRetriesPerRequest: 100,
             connectTimeout: 30000
         }

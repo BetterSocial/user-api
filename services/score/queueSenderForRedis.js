@@ -9,7 +9,7 @@ const scoringProcessQueue = new Bull(
   connectRedis,
   {
     redis: {
-      // tls: { rejectUnauthorized: false, requestCert: true},
+      tls: { rejectUnauthorized: false, requestCert: true},
       maxRetriesPerRequest: 100,
       connectTimeout: 30000
     }

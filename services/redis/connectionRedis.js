@@ -7,11 +7,11 @@ const Redis = require("ioredis");
  */
 console.log(process.env.REDIS_URL)
 const client = new Redis(String(process.env.REDIS_URL), {
-  // tls: {
-    // rejectUnauthorized: false,
-    // requestCert: true,
-    // agent: false,
-  // },
+  tls: {
+    rejectUnauthorized: false,
+    requestCert: true,
+    agent: false,
+  },
 });
 client.on("connect", function () {
   console.error("redis connect");
