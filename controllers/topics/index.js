@@ -1,3 +1,4 @@
+const { followMainFeedTopic, unfollowMainFeedTopic } = require("../../services/getstream");
 const ClientError = require("../../exceptions/ClientError");
 const TopicService = require("../../services/postgres/TopicService");
 const TopicValidator = require("../../validators/topic");
@@ -5,7 +6,7 @@ const topics = require("./topics");
 const getFollowedTopic = require("./getFollowedTopic");
 const { Topics, UserTopic, UserTopicHistory, sequelize } = require("../../databases/models");
 const UserTopicService = require("../../services/postgres/UserTopicService");
-const { QueryTypes } = require('sequelize')
+const { QueryTypes } = require('sequelize');
 
 const getFollowTopic = async (req, res) => {
     try {
@@ -64,7 +65,6 @@ const putFollowTopic = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
         if (error instanceof ClientError) {
             return res.status(error.statusCode).json({
                 "code": error.statusCode,
@@ -127,10 +127,67 @@ const getTopics = async (req, res) => {
     }
 }
 
+const followTopicV2 = async (req, res) => {
+    try {
+      const { name } = req.body;
+      const { token, userId } = req;
+
+      TopicValidator.validatePutTopicFollow({ name });
+  
+      const topicService = new TopicService(Topics);
+      const topic = await topicService.getTopicByName(name);
+      const { topic_id } = topic;
+      const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
+      const result = await userTopicService.followTopic(userId, topic_id);
+      
+      const message = await _afterPutTopic(result, token, userId);
+  
+      res.status(200).json({
+        status: "success",
+        code: 200,
+        data: !result,
+        message,
+      });
+
+    } catch (error) {
+        if (error instanceof ClientError) {
+            return res.status(error.statusCode).json({
+                "code": error.statusCode,
+                "status": 'fail',
+                "message": error.message,
+                "data": "null"
+            });
+        }
+        return res.status(500).json({
+            "code": error.statusCode,
+            "status": 'error',
+            "message": 'Internal server error',
+            "data": "null"
+        });
+    }
+  };
+
+const _afterPutTopic = async (topic, token, userId) => {
+    // follow / unfollow main feed topic
+    if (!topic) {
+        await unfollowMainFeedTopic(token, userId);
+    } else {
+        await followMainFeedTopic(token, userId);
+    }
+  
+    const message = topic
+    ? "Success delete topic user v2"
+    : "Success add topic user v2";
+
+    return message;
+}
+  
+
 module.exports = {
     topics,
     putFollowTopic,
     getFollowTopic,
     getFollowedTopic,
-    getTopics
+    getTopics,
+    followTopicV2
 };
