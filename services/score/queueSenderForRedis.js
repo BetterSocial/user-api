@@ -1,7 +1,6 @@
 const Bull = require("bull");
 const { v4: uuidv4 } = require("uuid");
 const connectRedis = process.env.REDIS_URL;
-console.log({connectRedis})
 
 // init the scoring process queue object, to be used on sending message to the queue
 const scoringProcessQueue = new Bull(

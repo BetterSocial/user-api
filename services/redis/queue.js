@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const { convertingUserFormatForLocation } = require("../../utils/custom");
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
-console.log({connectRedis})
+
 const registerQueue = new Bull("registerQueue", connectRedis,
     {
         redis: {

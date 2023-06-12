@@ -17,7 +17,6 @@ client.on("connect", function () {
   console.error("redis connect");
 });
 client.on("error", function (error) {
-  console.log("ERRROR ", error)
   console.error("connection error ", /** error **/);
 });
 client.on("ready", function () {
