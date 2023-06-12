@@ -48,12 +48,11 @@ module.exports = async (req, res) => {
       let copyUser = { ...user.dataValues };
       delete copyUser.following;
       delete copyUser.follower;
+      copyUser.isSignedMessageEnabled = false;
       copyUser.isAnonMessageEnabled = false;
-      if (
-        copyUser.allowAnonDm &&
-        !copyUser.onlyReceivedAnonDmFromUserFollowing
-      ) {
-        copyUser.isAnonMessageEnabled = true;
+      if (!copyUser.only_received_dm_from_user_following) {
+        copyUser.isSignedMessageEnabled = true;
+        copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm;
       }
 
       copyUser.following = user.dataValues.following.length;

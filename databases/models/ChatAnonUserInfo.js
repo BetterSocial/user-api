@@ -19,9 +19,9 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
       },
-      channelId: DataTypes.STRING,
-      targetUserId: DataTypes.STRING,
-      myAnonUserId: DataTypes.STRING,
+      channel_id: DataTypes.STRING,
+      target_user_id: DataTypes.STRING,
+      my_anon_user_id: DataTypes.STRING,
       anon_user_info_color_name: DataTypes.STRING,
       anon_user_info_color_code: DataTypes.STRING,
       anon_user_info_emoji_name: DataTypes.STRING,
@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'ChatAnonUserInfo',
-      tableName: 'chatAnonUserInfo',
+      tableName: 'chat_anon_user_info',
       timestamps: true,
     }
   );

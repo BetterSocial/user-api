@@ -72,11 +72,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      allowAnonDm: {
+      allow_anon_dm: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },
-      onlyReceivedAnonDmFromUserFollowing: {
+      only_received_dm_from_user_following: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
