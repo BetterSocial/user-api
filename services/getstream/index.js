@@ -10,7 +10,7 @@ const upVote = require("./upVote");
 const downVote = require("./downVote");
 const comment = require("./comment");
 const like = require("./like");
-const { followTopic, followTopics } = require("./followTopic");
+const { followTopic, followTopics, followMainFeedTopic, unfollowMainFeedTopic } = require("./followTopic");
 const { followLocation } = require("./followLocation");
 const deleteFeed = require("./deleteFeed");
 const commentChild = require("./commentChild");
@@ -29,6 +29,7 @@ const getOtherFeeds = require("./getOtherFeeds");
 const {notificationGetNewFeed} = require("./notificationFeed")
 const {notificationFollowFeed} = require("./notificationFollowFeed")
 const {notificationCommentFeed} = require("./notificationActionFeed")
+
 module.exports = {
   childDownvote,
   childUpvote,
@@ -49,6 +50,8 @@ module.exports = {
   followUser,
   followUserExclusive,
   followUsers,
+  followMainFeedTopic,
+  unfollowMainFeedTopic,
   getDetailDomain,
   getDetailFeed,
   getDomain,
