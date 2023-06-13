@@ -1,5 +1,5 @@
-const moment = require('moment')
-const getstreamService = require("../../services/getstream");
+const moment = require('moment');
+const getstreamService = require('../../services/getstream');
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
@@ -7,20 +7,20 @@ const {
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DATA_RETURN_LENGTH,
   POST_TYPE_LINK,
-} = require("../../helpers/constants");
+} = require('../../helpers/constants');
 const {
   getListBlockUser,
   getListBlockPostAnonymousAuthor,
-} = require("../../services/blockUser");
-const getBlockDomain = require("../../services/domain/getBlockDomain");
+} = require('../../services/blockUser');
+const getBlockDomain = require('../../services/domain/getBlockDomain');
 const {
   modifyPollPostObject,
   modifyAnonimityPost,
   isPostBlocked,
   modifyReactionsPost,
-} = require("../../utils/post");
-const { DomainPage, Locations, User } = require("../../databases/models");
-const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
+} = require('../../utils/post');
+const { DomainPage, Locations, User } = require('../../databases/models');
+const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 
 module.exports = async (req, res) => {
   let {
@@ -53,9 +53,9 @@ module.exports = async (req, res) => {
       include: [
         {
           model: Locations,
-          as: "locations",
+          as: 'locations',
           through: { attributes: [] },
-          attributes: ["neighborhood"],
+          attributes: ['neighborhood'],
         },
       ],
     });
@@ -77,10 +77,10 @@ module.exports = async (req, res) => {
           offset,
         };
 
-        console.log("get feeds with " + paramGetFeeds.offset);
+        console.log('get feeds with ' + paramGetFeeds.offset);
         let response = await getstreamService.getFeeds(
           token,
-          "main_feed",
+          'main_feed',
           paramGetFeeds
         );
         let feeds = response.results;
@@ -113,9 +113,9 @@ module.exports = async (req, res) => {
           let dateExpired = moment(item?.expired_at).valueOf();
 
           // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
-          if (now < dateExpired || item.duration_feed == "never") {
+          if (now < dateExpired || item.duration_feed == 'never') {
             let newItem = await modifyAnonimityPost(item);
-            newItem = modifyReactionsPost(newItem, newItem.anonimity)
+            newItem = modifyReactionsPost(newItem, newItem.anonimity);
             if (item.verb === POST_VERB_POLL) {
               let postPoll = await modifyPollPostObject(req.userId, item);
               data.push(postPoll);
@@ -166,8 +166,8 @@ module.exports = async (req, res) => {
         getFeedFromGetstreamIteration++;
       } catch (err) {
         console.log(err);
-        res.status(403).json({
-          status: "failed",
+        return res.status(403).json({
+          status: 'failed',
           data: null,
           offset,
           error: err,
@@ -175,9 +175,9 @@ module.exports = async (req, res) => {
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       code: 200,
-      status: "success",
+      status: 'success',
       data: data,
       offset,
     });
@@ -187,7 +187,7 @@ module.exports = async (req, res) => {
       code: 500,
       data: null,
       offset,
-      message: "Internal server error",
+      message: 'Internal server error',
       error: error,
     });
   }
