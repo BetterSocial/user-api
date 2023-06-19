@@ -12,8 +12,10 @@ module.exports = {
   EVENT_UNFOLLOW_USER: "unfollow-user",
   EVENT_UNBLOCK_USER: "unblock-user",
 
-  QUEUE_ADD_USER_POST_COMMENT: 'addUserPostComment',
-  QUEUE_DELETE_USER_POST_COMMENT: 'deleteUserPostComment',
+  QUEUE_ADD_USER_POST_COMMENT: "addUserPostComment",
+  QUEUE_DELETE_USER_POST_COMMENT: "deleteUserPostComment",
 
   DB_COLLECTION_USER_POST_SCORE: "user_post_score",
+  EVENT_FOLLOW_F2_USER: "follow-f2-users",
+  EVENT_UNFOLLOW_F2_USER: "unfollow-f2-users",
 };
