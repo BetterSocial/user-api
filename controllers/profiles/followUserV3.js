@@ -11,6 +11,7 @@ const Getstream = require("../../vendor/getstream")
 const { addForFollowUser } = require('../../services/score')
 const BetterSocialCore = require('../../services/bettersocial')
 const UsersFunction = require('../../databases/functions/users')
+const { sendFollowMainFeedF2 } = require('../../services/queue/mainFeedF2')
 
 module.exports = async (req, res) => {
     const { user_id_followed, follow_source, username_follower, username_followed } = req.body
@@ -33,12 +34,12 @@ module.exports = async (req, res) => {
         const followUserExclusive = Getstream.feed.followUserExclusive(req?.userId, user_id_followed);
         const followUser = Getstream.feed.followUser(req?.token, req?.userId, user_id_followed);
         const followMainFeedFollowing = Getstream.feed.followMainFeedFollowing(req?.token, req?.userId, user_id_followed);
-
+        const sendJobF2User = sendFollowMainFeedF2(req.userId, user_id_followed);
         // follow certain targeted feeds
         // - exclusive
         // - user
         // - main_feed_following
-        await Promise.all([followUserExclusive, followUser, followMainFeedFollowing])
+        await Promise.all([followUserExclusive, followUser, followMainFeedFollowing, sendJobF2User]);
 
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed)
         const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId)
