@@ -106,10 +106,11 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
       post_type: POST_TYPE_STANDARD,
       version: POST_VERSION,
       to: handleCreatePostTO(
-        userDetail.user_id,
+        req.userId,
         req?.body,
         isAnonimous,
-        locationTO
+        locationTO,
+        userDetail.user_id
       ),
     };
 
