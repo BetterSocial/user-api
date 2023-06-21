@@ -44,11 +44,8 @@ module.exports = async (req, res) => {
 
         for (let i in feeds) {
           let item = feeds[i];
-          const newslink = await NewsLink.findOne({
-            where: { news_link_id: item.content.news_link_id },
-          });
 
-          if (newslink.priority === 2) {
+          if (feeds[i]?.domain?.priority === 2) {
             offset++;
             continue;
           }
