@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class NewsLink extends Model {
     /**
@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.DomainPage, { as: 'newsLinkDomain', foreignKey: 'domain_page_id', targetKey: 'domain_page_id'})
+      this.belongsTo(models.DomainPage, {
+        as: 'newsLinkDomain',
+        foreignKey: 'domain_page_id',
+        targetKey: 'domain_page_id',
+      });
     }
   }
   NewsLink.init(
@@ -19,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
       },
-      news_url: DataTypes.STRING ,
+      news_url: DataTypes.STRING,
       domain_page_id: DataTypes.STRING,
       site_name: DataTypes.STRING,
       title: DataTypes.STRING,
@@ -31,18 +35,19 @@ module.exports = (sequelize, DataTypes) => {
       created_article: DataTypes.INTEGER,
       createdAt: {
         type: DataTypes.DATE,
-        field: "created_at",
+        field: 'created_at',
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: "updated_at",
+        field: 'updated_at',
       },
       post_id: DataTypes.STRING,
+      priority: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: "NewsLink",
-      tableName: "news_link",
+      modelName: 'NewsLink',
+      tableName: 'news_link',
       timestamps: true,
     }
   );
