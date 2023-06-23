@@ -5,9 +5,7 @@ const { responseSuccess, responseError } = require('../../utils/Responses');
 const { User, ChatAnonUserInfo } = require('../../databases/models');
 
 const formatLocationGetstream = require('../../helpers/formatLocationGetStream');
-const {
-  AddMembersChannel,
-} = require('../../services/chat');
+const { AddMembersChannel } = require('../../services/chat');
 const addModerators = require('./addModerators');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
@@ -97,114 +95,138 @@ module.exports = {
       .json(responseSuccess('Success add members channel', channel));
   },
   sendAnonymous: async (req, res) => {
-    const schema = {
-      channelId: 'string|empty:false',
-      message: 'string|empty:false',
-    };
-    const validated = v.validate(req.body, schema);
-    if (validated.length)
-      return res.status(403).json({
-        message: 'Error validation',
-        error: validated,
+    try {
+      const schema = {
+        channelId: 'string|empty:false',
+        message: 'string|empty:false',
+      };
+      const validated = v.validate(req.body, schema);
+      if (validated.length)
+        return res.status(403).json({
+          message: 'Error validation',
+          error: validated,
+        });
+
+      const { channelId, message } = req.body;
+
+      const client = StreamChat.getInstance(
+        process.env.API_KEY,
+        process.env.SECRET
+      );
+
+      await client.connectUser({ id: req.userId }, req.token);
+
+      const channel = client.channel('messaging', channelId);
+
+      await channel.create();
+
+      const chat = await channel.sendMessage({
+        user_id: req.userId,
+        text: message,
+        ...req.body,
+      });
+      const channelMembers = await channel.queryMembers({
+        id: { $ne: req.userId },
+      });
+      const userIds = channelMembers.members.map((member) => member.user_id);
+
+      const anonReceivers = await ChatAnonUserInfo.findAll({
+        where: {
+          channel_id: channelId,
+          target_user_id: req.userId,
+          my_anon_user_id: { [Op.in]: userIds },
+        },
       });
 
-    const { channelId, message } = req.body;
+      await Promise.all(
+        anonReceivers.map(async (chatInfo) => {
+          // Send Push Notification
+        })
+      );
 
-    const client = StreamChat.getInstance(
-      process.env.API_KEY,
-      process.env.SECRET
-    );
-
-    await client.connectUser({ id: req.userId }, req.token);
-
-    const channel = client.channel('messaging', channelId);
-
-    await channel.create();
-
-    const chat = await channel.sendMessage({
-      user_id: req.userId,
-      text: message,
-      ...req.body,
-    });
-    const channelMembers = await channel.queryMembers({
-      id: { $ne: req.userId },
-    });
-    const userIds = channelMembers.members.map((member) => member.user_id);
-
-    const anonReceivers = await ChatAnonUserInfo.findAll({
-      where: {
-        channel_id: channelId,
-        target_user_id: req.userId,
-        my_anon_user_id: { [Op.in]: userIds },
-      },
-    });
-
-    await Promise.all(
-      anonReceivers.map(async (chatInfo) => {
-        // Send Push Notification
-      })
-    );
-
-    await client.disconnectUser();
-    return res.status(200).json(responseSuccess('sent', chat));
+      await client.disconnectUser();
+      return res.status(200).json(responseSuccess('sent', chat));
+    } catch (error) {
+      return res.status(error.statusCode ?? error.status ?? 400).json({
+        status: 'error',
+        code: error.statusCode ?? error.status ?? 400,
+        message: error.message,
+      });
+    }
   },
   getChannels: async (req, res) => {
-    const client = StreamChat.getInstance(
-      process.env.API_KEY,
-      process.env.SECRET
-    );
-    await client.connectUser({ id: req.userId }, req.token);
-    let channels = await client.queryChannels(
-      { type: 'messaging', members: { $in: [req.userId] } },
-      [{ last_message_at: -1 }]
-    );
-    await client.disconnectUser();
-    channels = channels.map((channel) => {
-      return { ...channel.data };
-    });
-    return res
-      .status(200)
-      .json(responseSuccess('Success retrieve channels', channels));
+    try {
+      const client = StreamChat.getInstance(
+        process.env.API_KEY,
+        process.env.SECRET
+      );
+      await client.connectUser({ id: req.userId }, req.token);
+      let channels = await client.queryChannels(
+        { type: 'messaging', members: { $in: [req.userId] } },
+        [{ last_message_at: -1 }]
+      );
+      await client.disconnectUser();
+      channels = channels.map((channel) => {
+        return { ...channel.data };
+      });
+      return res
+        .status(200)
+        .json(responseSuccess('Success retrieve channels', channels));
+    } catch (error) {
+      return res.status(error.statusCode ?? error.status ?? 400).json({
+        status: 'error',
+        code: error.statusCode ?? error.status ?? 400,
+        message: error.message,
+      });
+    }
   },
   getChannel: async (req, res) => {
-    const client = StreamChat.getInstance(
-      process.env.API_KEY,
-      process.env.SECRET
-    );
-    await client.connectUser({ id: req.userId }, req.token);
-    const channel = await client.queryChannels(
-      { type: 'messaging', id: req.params.channelId },
-      [{ last_message_at: -1 }]
-    );
-    await client.disconnectUser();
-    if (!channel[0]) {
-      return ErrorResponse.e404(res, 'Channel not found');
-    }
-    const { data } = channel[0];
-    data.members = await Promise.all(
-      Object.values(channel[0].state.members).map(async (dt) => {
-        if (!dt.user.name) {
-          const filter = { channel_id: req.params.channelId };
-          if (dt.role === 'owner') {
-            filter.myAnonUserId = dt.user_id;
+    try {
+      const client = StreamChat.getInstance(
+        process.env.API_KEY,
+        process.env.SECRET
+      );
+      await client.connectUser({ id: req.userId }, req.token);
+      const channel = await client.queryChannels(
+        { type: 'messaging', id: req.params.channelId },
+        [{ last_message_at: -1 }]
+      );
+      await client.disconnectUser();
+      if (!channel[0]) {
+        return ErrorResponse.e404(res, 'Channel not found');
+      }
+      const { data } = channel[0];
+      data.members = await Promise.all(
+        Object.values(channel[0].state.members).map(async (dt) => {
+          if (!dt.user.name) {
+            const filter = { channel_id: req.params.channelId };
+            if (dt.role === 'owner') {
+              filter.myAnonUserId = dt.user_id;
+            } else {
+              filter.targetUserId = dt.user_id;
+            }
+            const anonInfo = await ChatAnonUserInfo.findOne({ where: filter });
+            return {
+              ...dt,
+              anon_user_info_color_code: anonInfo.anon_user_info_color_code,
+              anon_user_info_color_name: anonInfo.anon_user_info_color_name,
+              anon_user_info_emoji_code: anonInfo.anon_user_info_emoji_code,
+              anon_user_info_emoji_name: anonInfo.anon_user_info_emoji_name,
+            };
           } else {
-            filter.targetUserId = dt.user_id;
+            return dt;
           }
-          const anonInfo = await ChatAnonUserInfo.findOne({ where: filter });
-          return {
-            ...dt,
-            anon_user_info_color_code: anonInfo.anon_user_info_color_code,
-            anon_user_info_color_name: anonInfo.anon_user_info_color_name,
-            anon_user_info_emoji_code: anonInfo.anon_user_info_emoji_code,
-            anon_user_info_emoji_name: anonInfo.anon_user_info_emoji_name,
-          };
-        } else {
-          return dt;
-        }
-      })
-    );
+        })
+      );
 
-    res.status(200).json(responseSuccess('Success', data));
+      return res.status(200).json(responseSuccess('Success', data));
+    } catch (error) {
+      return res.status(error.statusCode ?? error.status ?? 400).json({
+        status: 'error',
+        code: error.statusCode ?? error.status ?? 400,
+        message: error.message,
+      });
+    }
   },
   initChat: async (req, res) => {
     try {
@@ -218,10 +240,7 @@ module.exports = {
           message: 'Error validation',
           error: validated,
         });
-      const {
-        members,
-        message
-      } = req.body;
+      const { members, message } = req.body;
       if (!members.includes(req.userId)) members.push(req.userId);
 
       const client = StreamChat.getInstance(
@@ -323,10 +342,7 @@ module.exports = {
   getMyAnonProfile: async (req, res) => {
     const targetUserId = req.params.targetUserId;
 
-    const target = await UsersFunction.findUserById(
-      User,
-      targetUserId
-    );
+    const target = await UsersFunction.findUserById(User, targetUserId);
 
     if (!target) {
       return ErrorResponse.e404(req, 'target user not found');
@@ -346,7 +362,7 @@ module.exports = {
 
     const haveChat = await ChatAnonUserInfo.findOne({
       where: {
-        channel_id: channel.id || "",
+        channel_id: channel.id || '',
         target_user_id: targetUserId,
         my_anon_user_id: req.userId,
       },
@@ -375,5 +391,30 @@ module.exports = {
     }
     await client.disconnectUser();
     return res.status(200).json(responseSuccess('Success', anonUserInfo));
+  },
+  readChannel: async (req, res) => {
+    try {
+      const { channelId } = req.params;
+      const client = StreamChat.getInstance(
+        process.env.API_KEY,
+        process.env.SECRET
+      );
+
+      await client.connectUser({ id: req.userId }, req.token);
+
+      const channel = client.channel('messaging', channelId);
+
+      await channel.watch();
+
+      const readed = await channel.markRead();
+
+      return res.status(200).json({ data: readed });
+    } catch (error) {
+      return res.status(error.statusCode ?? error.status ?? 400).json({
+        status: 'error',
+        code: error.statusCode ?? error.status ?? 400,
+        message: error.message,
+      });
+    }
   },
 };
