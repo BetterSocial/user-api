@@ -405,14 +405,8 @@ module.exports = {
       const channel = client.channel('messaging', channelId);
 
       await channel.watch();
-      console.log('unread message before:', channel.countUnread());
 
       const readed = await channel.markRead();
-
-      console.log(
-        'unread message after:',
-        channel.countUnread(readed.event.last_read_message_id)
-      );
 
       return res.status(200).json({ data: readed });
     } catch (error) {
