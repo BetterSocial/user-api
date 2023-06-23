@@ -43,9 +43,6 @@ const handleCreatePostTO = (
   } else {
     TO.push(`notification:${userId}`);
   }
-  if (process.env.ENVIRONMENT === 'dev') {
-    TO.push(`notification:${'f871c9fd-ab79-41af-97df-d8f7fff44d0d'}`);
-  }
   TO.push('user:bettersocial');
 
   if (topics !== null) {
