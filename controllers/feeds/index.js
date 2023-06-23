@@ -13,6 +13,7 @@ const commentDomainV3 = require('./commentDomainV3');
 const createPollPost = require('./createPollPost');
 const createPost = require('./createPost');
 const createPostV2 = require('./createPostV2');
+const createPostV3 = require('./createPostV3');
 const createReaction = require('./createReaction');
 const deleteAnonymousPost = require('./deleteAnonymousPost');
 const deleteFeed = require('./deleteFeed');
@@ -59,6 +60,7 @@ module.exports = {
   createPollPost,
   createPost,
   createPostV2,
+  createPostV3,
   createQueuePostTime,
   createReaction,
   deleteAnonymousPost,

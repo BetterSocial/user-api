@@ -57,6 +57,7 @@ router.post(
   feed.notificationCommentFeed
 );
 router.post('/post-v2', isAuth, CreatePostMiddleware, feed.createPostV2);
+router.post('/post-v3', isAuth, CreatePostMiddleware, feed.createPostV3);
 router.post(
   '/generate-anonymous-username',
   isAuth,

@@ -5,10 +5,14 @@ const {
   DomainPage,
   sequelize,
   Sequelize,
-} = require("../databases/models");
-const { NO_POLL_OPTION_UUID, POST_TYPE_LINK, POST_VERB_POLL } = require("../helpers/constants");
-const _ = require("lodash");
-const moment = require('moment')
+} = require('../databases/models');
+const {
+  NO_POLL_OPTION_UUID,
+  POST_TYPE_LINK,
+  POST_VERB_POLL,
+} = require('../helpers/constants');
+const _ = require('lodash');
+const moment = require('moment');
 
 /**
  *
@@ -16,10 +20,16 @@ const moment = require('moment')
  * @param {Object} postBody
  */
 
-const formatLocationGetStream = require("../helpers/formatLocationGetStream");
-const RedisDomainHelper = require("../services/redis/helper/RedisDomainHelper");
+const formatLocationGetStream = require('../helpers/formatLocationGetStream');
+const RedisDomainHelper = require('../services/redis/helper/RedisDomainHelper');
 
-const handleCreatePostTO = (userId, postBody, isAnonimous = true, locationString = null) => {
+const handleCreatePostTO = (
+  userId,
+  postBody,
+  isAnonimous = true,
+  locationString = null,
+  targetUser = null
+) => {
   let { privacy, topics, location, message, tagUsers } = postBody;
   let TO = [];
   if (tagUsers && Array.isArray(tagUsers)) {
@@ -28,25 +38,26 @@ const handleCreatePostTO = (userId, postBody, isAnonimous = true, locationString
   }
 
   TO.push(`main_feed:${userId}`);
-  TO.push(`notification:${userId}`);
-  if(process.env.ENVIRONMENT === 'dev') {
-    TO.push(`notification:${'f871c9fd-ab79-41af-97df-d8f7fff44d0d'}`);
+  if (targetUser) {
+    TO.push(`notification:${targetUser}`);
+  } else {
+    TO.push(`notification:${userId}`);
   }
-  TO.push("user:bettersocial");
+  TO.push('user:bettersocial');
 
   if (topics !== null) {
     filterAllTopics(message, topics).forEach((value) => {
-      TO.push("topic:" + value);
+      TO.push('topic:' + value);
     });
   }
 
-  if (privacy.toLowerCase() === "public") {
+  if (privacy.toLowerCase() === 'public') {
     if (!isAnonimous) TO.push(`user:${userId}`);
-    TO.push("location:everywhere");
+    TO.push('location:everywhere');
   }
 
   if (locationString !== null) {
-    TO.push("location:" + locationString);
+    TO.push('location:' + locationString);
   }
 
   const removeDuplicate = _.union(TO);
@@ -90,7 +101,7 @@ const modifyPollPostObject = async (userId, item) => {
       replacements: {
         polling_id: post.polling_id,
         polling_option_id: NO_POLL_OPTION_UUID,
-      }
+      },
     }
   );
   let voteCount = distinctPollingByUserId?.length || 0;
@@ -134,7 +145,7 @@ const modifyAnonimityPost = (item) => {
     newItem.actor = {};
     newItem.to = [];
     newItem.origin = null;
-    newItem.object = "";
+    newItem.object = '';
   }
 
   return newItem;
@@ -154,7 +165,7 @@ const isPostBlocked = (
   if (listBlock.includes(item.actor.id)) return true;
 
   // Check locations
-  return (!myLocations.includes(item.location) && item.location != "Everywhere")
+  return !myLocations.includes(item.location) && item.location != 'Everywhere';
 };
 
 /**
@@ -170,7 +181,7 @@ const filterAllTopics = (text, topics = []) => {
     return acc;
   }, []);
 
-  return [...new Set([...topicsFromTextWithoutHashtag, ...topics])]
+  return [...new Set([...topicsFromTextWithoutHashtag, ...topics])];
   // return topics;
 };
 
@@ -180,7 +191,7 @@ const filterAllTopics = (text, topics = []) => {
  */
 const insertTopics = async (topics = []) => {
   let lastTopic = await Topics.findOne({
-    order: [["topic_id", "DESC"]],
+    order: [['topic_id', 'DESC']],
     limit: 1,
     raw: true,
   });
@@ -196,10 +207,10 @@ const insertTopics = async (topics = []) => {
         defaults: {
           topic_id: topicIndex,
           name: topic,
-          icon_path: "",
+          icon_path: '',
           is_custom_topic: true,
           created_at: new Date(),
-          categories: "",
+          categories: '',
         },
       });
     } catch (e) {
@@ -212,121 +223,129 @@ const insertTopics = async (topics = []) => {
 function getFeedDuration(durationFeed) {
   let expiredAt = null;
 
-  if (durationFeed !== "never") {
+  if (durationFeed !== 'never') {
     let dateMoment = moment().add(parseInt(durationFeed), 'days');
     expiredAt = dateMoment.toISOString();
   }
 
-  return expiredAt
+  return expiredAt;
 }
 
-
 async function modifyPostLinkPost(domainPageModel, post) {
-  if (post?.post_type !== POST_TYPE_LINK) return post
+  if (post?.post_type !== POST_TYPE_LINK) return post;
 
-  let domainPageId = post?.og?.domain_page_id
-  let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId)
+  let domainPageId = post?.og?.domain_page_id;
+  let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(
+    domainPageId
+  );
   if (credderScoreCache) {
-    post.credderScore = credderScoreCache
-    post.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(domainPageId)
+    post.credderScore = credderScoreCache;
+    post.credderLastChecked =
+      await RedisDomainHelper.getDomainCredderLastChecked(domainPageId);
   } else {
     let dataDomain = await domainPageModel.findOne({
       where: { domain_page_id: domainPageId },
-      raw: true
-    })
+      raw: true,
+    });
 
-    await RedisDomainHelper.setDomainCredderScore(domainPageId, dataDomain.credder_score)
-    await RedisDomainHelper.setDomainCredderLastChecked(domainPageId, dataDomain.credder_last_checked)
+    await RedisDomainHelper.setDomainCredderScore(
+      domainPageId,
+      dataDomain.credder_score
+    );
+    await RedisDomainHelper.setDomainCredderLastChecked(
+      domainPageId,
+      dataDomain.credder_last_checked
+    );
 
-    post.credderScore = dataDomain.credder_score
-    post.credderLastChecked = dataDomain.credder_last_checked
+    post.credderScore = dataDomain.credder_score;
+    post.credderLastChecked = dataDomain.credder_last_checked;
   }
 
-  return post
+  return post;
 }
 
 /**
- * 
- * @param {Object} post 
- * @param {Boolean} [isAnonimous = true] 
+ *
+ * @param {Object} post
+ * @param {Boolean} [isAnonimous = true]
  * @returns {Object}
  */
 function modifyReactionsPost(post, isAnonimous = true) {
-  if(!isAnonimous) return post
-  
-  let newPost = {...post}
+  if (!isAnonimous) return post;
+
+  let newPost = { ...post };
 
   const itemReducer = (acc, next) => {
-    if(next.data.anon_user_info_color_name) {
-      next.user = {}
-      next.user_id = ''
-      next.target_feeds = []
-      next.data.target_feeds = []
+    if (next.data.anon_user_info_color_name) {
+      next.user = {};
+      next.user_id = '';
+      next.target_feeds = [];
+      next.data.target_feeds = [];
     }
- 
 
-    acc.push(next)
-    return acc
+    acc.push(next);
+    return acc;
+  };
+
+  if (newPost.hasOwnProperty('latest_reactions')) {
+    const upvotes = newPost?.latest_reactions?.upvotes || [];
+    const downvotes = newPost?.latest_reactions?.downvotes || [];
+    const comments = newPost?.latest_reactions?.comment || [];
+
+    let newUpvotes = upvotes.reduce(itemReducer, []);
+    let newDownvotes = downvotes.reduce(itemReducer, []);
+    let newComments = comments.reduce(itemReducer, []);
+
+    newPost.latest_reactions.upvotes = newUpvotes;
+    newPost.latest_reactions.downvotes = newDownvotes;
+    newPost.latest_reactions.comments = newComments;
   }
 
-  if(newPost.hasOwnProperty('latest_reactions')) {
-    const upvotes = newPost?.latest_reactions?.upvotes || []
-    const downvotes = newPost?.latest_reactions?.downvotes || []
-    const comments = newPost?.latest_reactions?.comment || []
+  if (newPost.hasOwnProperty('own_reactions')) {
+    const upvotes = newPost?.own_reactions?.upvotes || [];
+    const downvotes = newPost?.own_reactions?.downvotes || [];
+    const comments = newPost?.own_reactions?.comment || [];
 
-    let newUpvotes = upvotes.reduce(itemReducer, [])
-    let newDownvotes = downvotes.reduce(itemReducer, [])
-    let newComments = comments.reduce(itemReducer, [])
+    let newUpvotes = upvotes.reduce(itemReducer, []);
+    let newDownvotes = downvotes.reduce(itemReducer, []);
+    let newComments = comments.reduce(itemReducer, []);
 
-    newPost.latest_reactions.upvotes = newUpvotes
-    newPost.latest_reactions.downvotes = newDownvotes
-    newPost.latest_reactions.comments = newComments
+    newPost.own_reactions.upvotes = newUpvotes;
+    newPost.own_reactions.downvotes = newDownvotes;
+    newPost.own_reactions.comments = newComments;
   }
-
-  if(newPost.hasOwnProperty('own_reactions')) {
-    const upvotes = newPost?.own_reactions?.upvotes || []
-    const downvotes = newPost?.own_reactions?.downvotes || []
-    const comments = newPost?.own_reactions?.comment || []
-
-    let newUpvotes = upvotes.reduce(itemReducer, [])
-    let newDownvotes = downvotes.reduce(itemReducer, [])
-    let newComments = comments.reduce(itemReducer, [])
-
-    newPost.own_reactions.upvotes = newUpvotes
-    newPost.own_reactions.downvotes = newDownvotes
-    newPost.own_reactions.comments = newComments
-  }
-  return newPost
+  return newPost;
 }
 
 async function filterFeeds(userId, feeds = []) {
-  let newResult = []
+  let newResult = [];
 
   for (let item of feeds || []) {
-    let now = moment().valueOf()
-    let dateExpired = moment(item?.expired_at).valueOf()
+    let now = moment().valueOf();
+    let dateExpired = moment(item?.expired_at).valueOf();
 
-    if (dateExpired < now) continue
+    if (dateExpired < now) continue;
     let newItem = { ...item };
 
     if (newItem.anonimity) {
-      newItem.actor = {}
-      newItem.to = []
-      newItem.origin = null
-      newItem.object = ""
+      newItem.actor = {};
+      newItem.to = [];
+      newItem.origin = null;
+      newItem.object = '';
     }
 
-    newItem = modifyReactionsPost(newItem, newItem.anonimity)
+    newItem = modifyReactionsPost(newItem, newItem.anonimity);
 
-    let isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0
+    let isValidPollPost =
+      item.verb === POST_VERB_POLL && item?.polls?.length > 0;
 
-    if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem)
-    else newItem = await modifyPostLinkPost(DomainPage, newItem)
+    if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem);
+    else newItem = await modifyPostLinkPost(DomainPage, newItem);
 
     newResult.push(newItem);
   }
 
-  return newResult
+  return newResult;
 }
 
 module.exports = {
