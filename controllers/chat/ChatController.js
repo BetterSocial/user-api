@@ -1,8 +1,14 @@
 const { StreamChat } = require('stream-chat');
+const moment = require('moment');
 const Validator = require('fastest-validator');
 const { responseSuccess, responseError } = require('../../utils/Responses');
 
-const { User, ChatAnonUserInfo } = require('../../databases/models');
+const {
+  User,
+  ChatAnonUserInfo,
+  Topics,
+  UserTopic,
+} = require('../../databases/models');
 
 const formatLocationGetstream = require('../../helpers/formatLocationGetStream');
 const { AddMembersChannel } = require('../../services/chat');
@@ -11,6 +17,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
 const { Op } = require('sequelize');
+const { updateLastReadTopic } = require('../../databases/functions/userTopic');
 const v = new Validator();
 
 module.exports = {
@@ -394,7 +401,17 @@ module.exports = {
   },
   readChannel: async (req, res) => {
     try {
+      const schema = {
+        channelType: 'string|empty:false',
+      };
+      const validated = v.validate(req.body, schema);
+      if (validated.length)
+        return res.status(403).json({
+          message: 'Error validation',
+          error: validated,
+        });
       const { channelId } = req.params;
+      const { channelType } = req.body;
       const client = StreamChat.getInstance(
         process.env.API_KEY,
         process.env.SECRET
@@ -402,11 +419,24 @@ module.exports = {
 
       await client.connectUser({ id: req.userId }, req.token);
 
-      const channel = client.channel('messaging', channelId);
+      const channel = client.channel(channelType, channelId);
 
       await channel.watch();
 
       const readed = await channel.markRead();
+
+      if (channelType === 'topics') {
+        const topic = await Topics.findOne({
+          where: { name: channelId },
+          raw: true,
+        });
+        await updateLastReadTopic(
+          UserTopic,
+          moment(readed?.event?.created_at),
+          req.userId,
+          topic.topic_id
+        );
+      }
 
       return res.status(200).json({ data: readed });
     } catch (error) {

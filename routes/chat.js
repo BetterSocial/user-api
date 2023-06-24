@@ -27,7 +27,7 @@ router.post(
 );
 router.post(
   '/channels/:channelId/read',
-  auth.isAuthAnonim,
+  auth.isAuth,
   chatController.readChannel
 );
 
