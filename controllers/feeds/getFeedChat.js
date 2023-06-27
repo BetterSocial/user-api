@@ -49,7 +49,10 @@ const getFeedChatService = async (req, res) => {
             const isOwnPost = actor.id === req.userId || actor.id === myAnonymousId.user_id
             if(isAnonym) {
                 actor = {...actor, id: null, data: {
-                    username: "Anonymous",
+                    username: `Anonymous ${b.object?.anon_user_info_emoji_name}`,
+                    emoji_code: b.object?.anon_user_info_emoji_code,
+                    color_code: b.object?.anon_user_info_color_code
+
                 }}
             }
             if(!newGroup[activity_id]) {
