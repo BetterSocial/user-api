@@ -15,23 +15,22 @@ const v = new Validator();
 
 module.exports = {
   createChannel: async (req, res) => {
+    const schema = {
+      members: 'string[]|empty:false',
+      channelId: 'string|empty:false',
+    };
+    const validated = v.validate(req.body, schema);
+    if (validated.length)
+      return res.status(403).json({
+        message: 'Error validation',
+        error: validated,
+      });
+
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
     try {
-      const schema = {
-        members: 'string[]|empty:false',
-        channelId: 'string|empty:false',
-      };
-      const validated = v.validate(req.body, schema);
-      if (validated.length)
-        return res.status(403).json({
-          message: 'Error validation',
-          error: validated,
-        });
-
-      const client = StreamChat.getInstance(
-        process.env.API_KEY,
-        process.env.SECRET
-      );
-
       await client.connectUser({ id: req.userId }, req.token);
 
       if (!req.body.members.includes(req.userId))
@@ -45,6 +44,7 @@ module.exports = {
       await client.disconnectUser();
       return res.status(200).json(responseSuccess('Success create channel'));
     } catch (error) {
+      await client.disconnectUser();
       return res
         .status(error.code ?? error.status ?? 400)
         .json(responseError(error.message, error, error.code ?? error.status));
@@ -95,25 +95,24 @@ module.exports = {
       .json(responseSuccess('Success add members channel', channel));
   },
   sendAnonymous: async (req, res) => {
+    const schema = {
+      channelId: 'string|empty:false',
+      message: 'string|empty:false',
+    };
+    const validated = v.validate(req.body, schema);
+    if (validated.length)
+      return res.status(403).json({
+        message: 'Error validation',
+        error: validated,
+      });
+
+    const { channelId, message } = req.body;
+
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
     try {
-      const schema = {
-        channelId: 'string|empty:false',
-        message: 'string|empty:false',
-      };
-      const validated = v.validate(req.body, schema);
-      if (validated.length)
-        return res.status(403).json({
-          message: 'Error validation',
-          error: validated,
-        });
-
-      const { channelId, message } = req.body;
-
-      const client = StreamChat.getInstance(
-        process.env.API_KEY,
-        process.env.SECRET
-      );
-
       await client.connectUser({ id: req.userId }, req.token);
 
       const channel = client.channel('messaging', channelId);
@@ -147,6 +146,7 @@ module.exports = {
       await client.disconnectUser();
       return res.status(200).json(responseSuccess('sent', chat));
     } catch (error) {
+      await client.disconnectUser();
       return res.status(error.statusCode ?? error.status ?? 400).json({
         status: 'error',
         code: error.statusCode ?? error.status ?? 400,
@@ -155,11 +155,11 @@ module.exports = {
     }
   },
   getChannels: async (req, res) => {
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
     try {
-      const client = StreamChat.getInstance(
-        process.env.API_KEY,
-        process.env.SECRET
-      );
       await client.connectUser({ id: req.userId }, req.token);
       let channels = await client.queryChannels(
         { type: 'messaging', members: { $in: [req.userId] } },
@@ -173,6 +173,7 @@ module.exports = {
         .status(200)
         .json(responseSuccess('Success retrieve channels', channels));
     } catch (error) {
+      await client.disconnectUser();
       return res.status(error.statusCode ?? error.status ?? 400).json({
         status: 'error',
         code: error.statusCode ?? error.status ?? 400,
@@ -181,11 +182,11 @@ module.exports = {
     }
   },
   getChannel: async (req, res) => {
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
     try {
-      const client = StreamChat.getInstance(
-        process.env.API_KEY,
-        process.env.SECRET
-      );
       await client.connectUser({ id: req.userId }, req.token);
       const channel = await client.queryChannels(
         { type: 'messaging', id: req.params.channelId },
@@ -221,6 +222,7 @@ module.exports = {
 
       return res.status(200).json(responseSuccess('Success', data));
     } catch (error) {
+      await client.disconnectUser();
       return res.status(error.statusCode ?? error.status ?? 400).json({
         status: 'error',
         code: error.statusCode ?? error.status ?? 400,
@@ -229,25 +231,24 @@ module.exports = {
     }
   },
   initChat: async (req, res) => {
+    const schema = {
+      members: 'string[]|empty:false',
+      message: 'string|empty:false',
+    };
+    const validated = v.validate(req.body, schema);
+    if (validated.length)
+      return res.status(403).json({
+        message: 'Error validation',
+        error: validated,
+      });
+    const { members, message } = req.body;
+    if (!members.includes(req.userId)) members.push(req.userId);
+
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
     try {
-      const schema = {
-        members: 'string[]|empty:false',
-        message: 'string|empty:false',
-      };
-      const validated = v.validate(req.body, schema);
-      if (validated.length)
-        return res.status(403).json({
-          message: 'Error validation',
-          error: validated,
-        });
-      const { members, message } = req.body;
-      if (!members.includes(req.userId)) members.push(req.userId);
-
-      const client = StreamChat.getInstance(
-        process.env.API_KEY,
-        process.env.SECRET
-      );
-
       await client.connectUser({ id: req.userId }, req.token);
 
       const channel = client.channel('messaging', { members });
@@ -264,40 +265,40 @@ module.exports = {
 
       return res.status(200).json(responseSuccess('sent', chat));
     } catch (error) {
+      await client.disconnectUser();
       return ErrorResponse.e400(res, error.message);
     }
   },
   initChatAnonymous: async (req, res) => {
+    const schema = {
+      members: 'string[]|empty:false',
+      message: 'string|empty:false',
+      anon_user_info_color_code: 'string|empty:false',
+      anon_user_info_color_name: 'string|empty:false',
+      anon_user_info_emoji_code: 'string|empty:false',
+      anon_user_info_emoji_name: 'string|empty:false',
+    };
+    const validated = v.validate(req.body, schema);
+    if (validated.length)
+      return res.status(403).json({
+        message: 'Error validation',
+        error: validated,
+      });
+    const {
+      members,
+      message,
+      anon_user_info_color_code,
+      anon_user_info_color_name,
+      anon_user_info_emoji_code,
+      anon_user_info_emoji_name,
+    } = req.body;
+    if (!members.includes(req.userId)) members.push(req.userId);
+
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
     try {
-      const schema = {
-        members: 'string[]|empty:false',
-        message: 'string|empty:false',
-        anon_user_info_color_code: 'string|empty:false',
-        anon_user_info_color_name: 'string|empty:false',
-        anon_user_info_emoji_code: 'string|empty:false',
-        anon_user_info_emoji_name: 'string|empty:false',
-      };
-      const validated = v.validate(req.body, schema);
-      if (validated.length)
-        return res.status(403).json({
-          message: 'Error validation',
-          error: validated,
-        });
-      const {
-        members,
-        message,
-        anon_user_info_color_code,
-        anon_user_info_color_name,
-        anon_user_info_emoji_code,
-        anon_user_info_emoji_name,
-      } = req.body;
-      if (!members.includes(req.userId)) members.push(req.userId);
-
-      const client = StreamChat.getInstance(
-        process.env.API_KEY,
-        process.env.SECRET
-      );
-
       await client.connectUser({ id: req.userId }, req.token);
 
       const channel = client.channel('messaging', { members });
@@ -336,6 +337,7 @@ module.exports = {
 
       return res.status(200).json(responseSuccess('sent', chat));
     } catch (error) {
+      await client.disconnectUser();
       return ErrorResponse.e400(res, error.message);
     }
   },
@@ -351,55 +353,58 @@ module.exports = {
       process.env.API_KEY,
       process.env.SECRET
     );
+    try {
+      await client.connectUser({ id: req.userId }, req.token);
 
-    await client.connectUser({ id: req.userId }, req.token);
+      const channel = client.channel('messaging', {
+        members: [targetUserId, req.userId],
+      });
 
-    const channel = client.channel('messaging', {
-      members: [targetUserId, req.userId],
-    });
+      await channel.create();
 
-    await channel.create();
+      const haveChat = await ChatAnonUserInfo.findOne({
+        where: {
+          channel_id: channel.id || '',
+          target_user_id: targetUserId,
+          my_anon_user_id: req.userId,
+        },
+      });
 
-    const haveChat = await ChatAnonUserInfo.findOne({
-      where: {
-        channel_id: channel.id || '',
-        target_user_id: targetUserId,
-        my_anon_user_id: req.userId,
-      },
-    });
-
-    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
-    const color = BetterSocialConstantListUtils.getRandomColor();
-    let anonUserInfo = {
-      targetUserId: targetUserId,
-      myAnonUserId: req.userId,
-      anon_user_info_emoji_name: emoji.name,
-      anon_user_info_emoji_code: emoji.emoji,
-      anon_user_info_color_name: color.color,
-      anon_user_info_color_code: color.code,
-    };
-
-    if (haveChat) {
-      anonUserInfo = {
+      const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+      const color = BetterSocialConstantListUtils.getRandomColor();
+      let anonUserInfo = {
         targetUserId: targetUserId,
         myAnonUserId: req.userId,
-        anon_user_info_emoji_name: haveChat.anon_user_info_emoji_name,
-        anon_user_info_emoji_code: haveChat.anon_user_info_emoji_code,
-        anon_user_info_color_name: haveChat.anon_user_info_color_name,
-        anon_user_info_color_code: haveChat.anon_user_info_color_code,
+        anon_user_info_emoji_name: emoji.name,
+        anon_user_info_emoji_code: emoji.emoji,
+        anon_user_info_color_name: color.color,
+        anon_user_info_color_code: color.code,
       };
+
+      if (haveChat) {
+        anonUserInfo = {
+          targetUserId: targetUserId,
+          myAnonUserId: req.userId,
+          anon_user_info_emoji_name: haveChat.anon_user_info_emoji_name,
+          anon_user_info_emoji_code: haveChat.anon_user_info_emoji_code,
+          anon_user_info_color_name: haveChat.anon_user_info_color_name,
+          anon_user_info_color_code: haveChat.anon_user_info_color_code,
+        };
+      }
+      await client.disconnectUser();
+      return res.status(200).json(responseSuccess('Success', anonUserInfo));
+    } catch (error) {
+      await client.disconnectUser();
+      return ErrorResponse.e400(res, error.message);
     }
-    await client.disconnectUser();
-    return res.status(200).json(responseSuccess('Success', anonUserInfo));
   },
   readChannel: async (req, res) => {
+    const { channelId } = req.params;
+    const client = StreamChat.getInstance(
+      process.env.API_KEY,
+      process.env.SECRET
+    );
     try {
-      const { channelId } = req.params;
-      const client = StreamChat.getInstance(
-        process.env.API_KEY,
-        process.env.SECRET
-      );
-
       await client.connectUser({ id: req.userId }, req.token);
 
       const channel = client.channel('messaging', channelId);
@@ -408,8 +413,10 @@ module.exports = {
 
       const readed = await channel.markRead();
 
+      await client.disconnectUser();
       return res.status(200).json({ data: readed });
     } catch (error) {
+      await client.disconnectUser();
       return res.status(error.statusCode ?? error.status ?? 400).json({
         status: 'error',
         code: error.statusCode ?? error.status ?? 400,
