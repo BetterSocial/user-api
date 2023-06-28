@@ -1,5 +1,5 @@
-'use strict';
-const { Model } = require('sequelize');
+const {Model} = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -13,80 +13,84 @@ module.exports = (sequelize, DataTypes) => {
 
       models.User.hasMany(models.UserFollowUser, {
         foreignKey: 'user_id_follower',
-        as: 'following',
+        as: 'following'
       });
 
       models.User.hasMany(models.UserFollowUser, {
         foreignKey: 'user_id_followed',
-        as: 'follower',
+        as: 'follower'
       });
       models.User.hasMany(models.UserBlockedUser, {
         foreignKey: 'user_id_blocker',
-        as: 'blocker',
+        as: 'blocker'
       });
       models.User.hasMany(models.UserBlockedUser, {
         foreignKey: 'user_id_blocked',
-        as: 'blocked',
+        as: 'blocked'
       });
 
       models.User.belongsToMany(models.Topics, {
         through: 'user_topics',
         foreignKey: 'user_id',
-        as: 'topics',
+        as: 'topics'
       });
 
       models.User.belongsToMany(models.Locations, {
         through: 'user_location',
         foreignKey: 'user_id',
-        as: 'locations',
+        as: 'locations'
       });
       models.User.belongsToMany(models.UserLocation, {
         through: 'user_location',
         foreignKey: 'user_id',
-        as: 'user_locations',
+        as: 'user_locations'
       });
     }
   }
   User.init(
     {
-      user_id: { type: DataTypes.UUID, allowNull: false, primaryKey: true },
-      human_id: { type: DataTypes.STRING, allowNull: false, unique: true },
-      country_code: { type: DataTypes.STRING, allowNull: false },
-      username: { type: DataTypes.STRING, allowNull: false, unique: true },
-      real_name: { type: DataTypes.STRING, allowNull: true },
-      last_active_at: { type: DataTypes.DATE, allowNull: false },
-      profile_pic_path: { type: DataTypes.STRING, allowNull: true },
-      profile_pic_asset_id: { type: DataTypes.STRING, allowNull: true },
-      profile_pic_public_id: { type: DataTypes.STRING, allowNull: true },
-      status: { type: DataTypes.BOOLEAN, allowNull: false },
-      bio: { type: DataTypes.TEXT, allowNull: true },
+      user_id: {type: DataTypes.UUID, allowNull: false, primaryKey: true},
+      human_id: {type: DataTypes.STRING, allowNull: false, unique: true},
+      country_code: {type: DataTypes.STRING, allowNull: false},
+      username: {type: DataTypes.STRING, allowNull: false, unique: true},
+      real_name: {type: DataTypes.STRING, allowNull: true},
+      last_active_at: {type: DataTypes.DATE, allowNull: false},
+      profile_pic_path: {type: DataTypes.STRING, allowNull: true},
+      profile_pic_asset_id: {type: DataTypes.STRING, allowNull: true},
+      profile_pic_public_id: {type: DataTypes.STRING, allowNull: true},
+      status: {type: DataTypes.BOOLEAN, allowNull: false},
+      bio: {type: DataTypes.TEXT, allowNull: true},
       is_banned: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        defaultValue: false
       },
       is_anonymous: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        defaultValue: false
       },
       encrypted: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
       },
       allow_anon_dm: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
+        defaultValue: true
       },
       only_received_dm_from_user_following: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        defaultValue: false
       },
+      is_backdoor_user: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+      }
     },
     {
       sequelize,
       modelName: 'User',
       tableName: 'users',
       createdAt: 'created_at',
-      updatedAt: 'updated_at',
+      updatedAt: 'updated_at'
     }
   );
   return User;
