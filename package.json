@@ -7,12 +7,14 @@
     "dev": "nodemon ./bin/www",
     "test": "jest __tests__",
     "prepare": "husky install",
+    "lint": "eslint . --ext .js",
     "update-env-dev": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config dev > .env.development",
     "update-env-prod": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config prd > .env.production"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
     "axios": "^0.21.1",
+    "bcrypt": "^5.1.0",
     "body-parser": "^1.19.0",
     "bull": "^4.1.4",
     "cli": "^1.0.1",
@@ -51,9 +53,23 @@
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
+    "eslint": "^8.43.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
     "generate-changelog": "^1.8.0",
     "husky": "^7.0.4",
     "jest": "^27.0.3",
+    "lint-staged": "^13.2.3",
     "nodemon": "^2.0.7"
+  },
+  "lint-staged": {
+    "src/**/*.{js,ts,jsx,tsx}": [
+      "npm eslint --cache --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   }
 }
