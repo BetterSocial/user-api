@@ -54,7 +54,9 @@ const getOneFeedChatService = async (req, res) => {
     if (data.results.length < 1) {
       return ErrorResponse.e404(res, 'Feed not found');
     }
-
+    if (moment(data.results[0].expired_at).isBefore(moment().utc())) {
+      return ErrorResponse.e400(res, 'Feed alredy expired');
+    }
     const { comments, upvotes, downvotes } = getReaction(
       req,
       data.results[0].latest_reactions,
