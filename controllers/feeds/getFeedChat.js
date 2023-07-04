@@ -127,6 +127,24 @@ const finalize = (req, id, myReaction, newGroup, activity_id, constantActor) => 
   }
 };
 
+const getFeedGroup = async (groupingFeed) => {
+  const feedGroup = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const feed of groupingFeed) {
+    // eslint-disable-next-line no-await-in-loop
+    const blockCount = await UserBlockedUser.count({
+      where: {
+        post_id: feed.activity_id
+      }
+    });
+    feedGroup.push({...feed, block: blockCount});
+  }
+  feedGroup.sort(
+    (a, b) => moment(b.data.last_message_at).valueOf() - moment(a.data.last_message_at).valueOf()
+  );
+  return feedGroup;
+};
+
 const getFeedChatService = async (req, res) => {
   try {
     const myAnonymousId = await UsersFunction.findAnonymousUserId(User, req.userId);
@@ -189,20 +207,7 @@ const getFeedChatService = async (req, res) => {
       finalize(req, myAnonymousId.user_id, myReaction, newGroup, activity_id, constantActor);
       return a;
     }, []);
-    const feedGroup = [];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const feed of groupingFeed) {
-      // eslint-disable-next-line no-await-in-loop
-      const blockCount = await UserBlockedUser.count({
-        where: {
-          post_id: feed.activity_id
-        }
-      });
-      feedGroup.push({...feed, block: blockCount});
-    }
-    feedGroup.sort(
-      (a, b) => moment(b.data.last_message_at).valueOf() - moment(a.data.last_message_at).valueOf()
-    );
+    const feedGroup = await getFeedGroup(groupingFeed)
     res.status(200).send({
       success: true,
       data: feedGroup,
@@ -224,5 +229,6 @@ module.exports = {
   countLevel2,
   countCommentLv3,
   pushToa,
-  finalize
+  finalize,
+  getFeedGroup
 };

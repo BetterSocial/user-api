@@ -8,7 +8,8 @@ const {
   countCommentLv3,
   finalize,
   getDetail,
-  pushToa
+  pushToa,
+  getFeedGroup
 } = require('./getFeedChat');
 
 const getAnonymousFeedChatService = async (req, res) => {
@@ -69,20 +70,7 @@ const getAnonymousFeedChatService = async (req, res) => {
       finalize(req, mySignedId, myReaction, newGroup, activity_id, constantActor);
       return a;
     }, []);
-    const feedGroup = [];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const feed of groupingFeed) {
-      // eslint-disable-next-line no-await-in-loop
-      const blockCount = await UserBlockedUser.count({
-        where: {
-          post_id: feed.activity_id
-        }
-      });
-      feedGroup.push({...feed, block: blockCount});
-    }
-    feedGroup.sort(
-      (a, b) => moment(b.data.last_message_at).valueOf() - moment(a.data.last_message_at).valueOf()
-    );
+    const feedGroup = await getFeedGroup(groupingFeed)
     res.status(200).send({
       success: true,
       data: feedGroup,
