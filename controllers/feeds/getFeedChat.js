@@ -5,12 +5,14 @@ const getstreamService = require('../../services/getstream');
 
 const mappingFeed = (req, feeds) => {
   const mapping = [];
+  // eslint-disable-next-line no-restricted-syntax
   for (const activity of feeds.activities) {
     try {
       if (
         moment(activity.object.expired_at).isBefore(moment().utc()) ||
         moment(activity.expired_at).isBefore(moment().utc())
       ) {
+        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -29,6 +31,7 @@ const mappingFeed = (req, feeds) => {
 
 const getDetail = (req, b, id) => {
   const activity_id = b.reaction?.activity_id || b.id;
+  const expired_at = b.expired_at || null;
   const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0;
   const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0;
   const totalComment = typeof b.object === 'object' ? b.object.reaction_counts.comment : 0;
@@ -49,6 +52,7 @@ const getDetail = (req, b, id) => {
   }
   return {
     activity_id,
+    expired_at,
     downvote,
     upvote,
     totalComment,
@@ -68,11 +72,12 @@ const countCommentLv3 = (childComment, totalCommentLevel3 = []) => {
   Promise.all(
     childComment.map((comment) => {
       const mapCount = comment?.latest_children?.comment?.map(
-        (comment) => comment?.children_counts?.comment || 0
+        (comment2) => comment2?.children_counts?.comment || 0
       );
       if (Array.isArray(mapCount)) {
         totalCommentLevel3.push(...mapCount);
       }
+      return comment;
     })
   ).then(() => totalCommentLevel3);
   return totalCommentLevel3;
@@ -122,6 +127,24 @@ const finalize = (req, id, myReaction, newGroup, activity_id, constantActor) => 
   }
 };
 
+const getFeedGroup = async (groupingFeed) => {
+  const feedGroup = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const feed of groupingFeed) {
+    // eslint-disable-next-line no-await-in-loop
+    const blockCount = await UserBlockedUser.count({
+      where: {
+        post_id: feed.activity_id
+      }
+    });
+    feedGroup.push({...feed, block: blockCount});
+  }
+  feedGroup.sort(
+    (a, b) => moment(b.data.last_message_at).valueOf() - moment(a.data.last_message_at).valueOf()
+  );
+  return feedGroup;
+};
+
 const getFeedChatService = async (req, res) => {
   try {
     const myAnonymousId = await UsersFunction.findAnonymousUserId(User, req.userId);
@@ -129,16 +152,18 @@ const getFeedChatService = async (req, res) => {
     const data = await getstreamService.notificationGetNewFeed(req.userId, req.token);
     const newFeed = [];
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const feeds of data.results) {
       const mapping = mappingFeed(req, feeds);
       newFeed.push(...mapping);
     }
 
     const newGroup = {};
-    const groupingFeed = newFeed.reduce((a, b, index) => {
+    const groupingFeed = newFeed.reduce((a, b) => {
       const localDate = moment.utc(b.time).local().format();
       const {
         activity_id,
+        expired_at,
         childComment,
         downvote,
         totalComment,
@@ -152,9 +177,9 @@ const getFeedChatService = async (req, res) => {
       const mapCountLevel2 = countLevel2(childComment);
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
 
-      const total3 = totalCommentLevel3.reduce((a, b) => a + b);
+      const total3 = totalCommentLevel3.reduce((acc, curr) => acc + curr);
 
-      const commentLevel2 = mapCountLevel2.reduce((a, b) => a + b);
+      const commentLevel2 = mapCountLevel2.reduce((acc, curr) => acc + curr);
 
       if (!newGroup[activity_id]) {
         pushToa(a, b, newGroup, actor, {
@@ -163,6 +188,7 @@ const getFeedChatService = async (req, res) => {
             last_message_at: localDate,
             updated_at: localDate
           },
+          expired_at,
           isSeen: b.isSeen,
           totalComment: totalComment + commentLevel2 + total3,
           isOwnPost,
@@ -181,18 +207,7 @@ const getFeedChatService = async (req, res) => {
       finalize(req, myAnonymousId.user_id, myReaction, newGroup, activity_id, constantActor);
       return a;
     }, []);
-    const feedGroup = [];
-    for (const feed of groupingFeed) {
-      const blockCount = await UserBlockedUser.count({
-        where: {
-          post_id: feed.activity_id
-        }
-      });
-      feedGroup.push({...feed, block: blockCount});
-    }
-    feedGroup.sort(
-      (a, b) => moment(b.data.last_message_at).valueOf() - moment(a.data.last_message_at).valueOf()
-    );
+    const feedGroup = await getFeedGroup(groupingFeed)
     res.status(200).send({
       success: true,
       data: feedGroup,
@@ -214,5 +229,6 @@ module.exports = {
   countLevel2,
   countCommentLv3,
   pushToa,
-  finalize
+  finalize,
+  getFeedGroup
 };

@@ -1,7 +1,6 @@
-const UsersFunction = require('../../databases/functions/users');
-const { UserBlockedUser, User } = require('../../databases/models');
-const getstreamService = require('../../services/getstream');
 const moment = require('moment');
+const {UserBlockedUser} = require('../../databases/models');
+const getstreamService = require('../../services/getstream');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 
 const constructData = (req, data, datum, constantActor) => {
@@ -12,9 +11,9 @@ const constructData = (req, data, datum, constantActor) => {
   }
   data.push({
     reaction: {
-      ...datum,
+      ...datum
     },
-    actor: datum.user_id ? constantActor : {},
+    actor: datum.user_id ? constantActor : {}
   });
 };
 
@@ -37,7 +36,7 @@ const getReaction = (req, latest_reactions, constantActor) => {
       constructData(req, downvotes, downvote, constantActor);
     });
   }
-  return { comments, upvotes, downvotes };
+  return {comments, upvotes, downvotes};
 };
 
 const getOneFeedChatService = async (req, res) => {
@@ -48,7 +47,7 @@ const getOneFeedChatService = async (req, res) => {
       withReactionCounts: true,
       withOwnReactions: true,
       mark_read: false,
-      mark_seen: false,
+      mark_seen: false
     });
 
     if (data.results.length < 1) {
@@ -57,30 +56,28 @@ const getOneFeedChatService = async (req, res) => {
     if (moment(data.results[0].expired_at).isBefore(moment().utc())) {
       return ErrorResponse.e400(res, 'Feed alredy expired');
     }
-    const { comments, upvotes, downvotes } = getReaction(
+    const {comments, upvotes, downvotes} = getReaction(
       req,
       data.results[0].latest_reactions,
       data.results[0].actor
     );
     let updated_at;
-    let last_message_at = (updated_at = moment
-      .utc(data.results[0].time)
-      .local()
-      .format());
+    let last_message_at = moment.utc(data.results[0].time).local().format();
+    updated_at = last_message_at;
     if (comments.length > 0) {
-      last_message_at = updated_at = comments[0].reaction.created_at;
+      last_message_at = comments[0].reaction.created_at;
+      updated_at = last_message_at;
     }
     const response = {
       activity_id: data.results[0].id,
       data: {
         last_message_at,
-        updated_at,
+        updated_at
       },
+      expired_at: data.results[0].expired_at,
       totalComment: data.results[0].reaction_counts?.comment ?? 0,
       isOwnPost: data.results[0].actor.id === req.userId,
-      totalCommentBadge:
-        comments.filter((comment) => comment.actor.id !== req.userId).length ??
-        0,
+      totalCommentBadge: comments.filter((comment) => comment.actor.id !== req.userId).length ?? 0,
       type: 'post-notif',
       titlePost: data.results[0].object?.message ?? data.results[0].message,
       downvote: data.results[0].reaction_counts?.downvotes ?? 0,
@@ -89,27 +86,27 @@ const getOneFeedChatService = async (req, res) => {
       isAnonym: data.results[0].object?.anonimity ?? data.results[0].anonimity,
       comments,
       upvotes,
-      downvotes,
+      downvotes
     };
 
     const blockCount = await UserBlockedUser.count({
       where: {
-        post_id: response.activity_id,
-      },
+        post_id: response.activity_id
+      }
     });
     response.block = blockCount;
 
     res.status(200).send({
       success: true,
       data: response,
-      message: 'Success get data',
+      message: 'Success get data'
     });
   } catch (e) {
     console.error(e);
     res.status(400).json({
       success: false,
       data: null,
-      message: String(e),
+      message: String(e)
     });
   }
 };
