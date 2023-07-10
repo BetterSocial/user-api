@@ -130,17 +130,11 @@ const getDetail = async (reaction_id) => {
 const BetterSocialCreateCommentChildV3 = async (req) => {
   try {
     const {body, userId, token} = req;
-    const {reaction_id, message, anon_user_info, sendPostNotif, postTitle} = body;
+    const {reaction_id, message, sendPostNotif, postTitle} = body;
 
     const {otherCommentatorNotify, postMakerId, userIdFeed} = await getDetail(reaction_id);
 
     const signedUserIdFeed = await UsersFunction.findSignedUserId(User, userIdFeed);
-
-    const commentAuthor = {
-      username: `${anon_user_info?.color_name} ${anon_user_info?.emoji_name}`,
-      profile_pic_path: USERS_DEFAULT_IMAGE,
-      anon_user_info
-    };
 
     const result = await Getstream.feed.commentChild(
       token,
@@ -159,7 +153,7 @@ const BetterSocialCreateCommentChildV3 = async (req) => {
 
     await sendMultiDeviceReplyCommentNotification(
       signedUserIdFeed,
-      commentAuthor,
+      req.user,
       message,
       reaction_id,
       postTitle
@@ -196,12 +190,6 @@ const BetterSocialCreateCommentChildV3Anonymous = async (req) => {
     );
     const signedUserIdFeed = await UsersFunction.findSignedUserId(User, userIdFeed);
 
-    const commentAuthor = {
-      username: `${anon_user_info?.color_name} ${anon_user_info?.emoji_name}`,
-      profile_pic_path: USERS_DEFAULT_IMAGE,
-      anon_user_info
-    };
-
     const result = await Getstream.feed.commentChildAnonymous(
       userId,
       message,
@@ -214,7 +202,7 @@ const BetterSocialCreateCommentChildV3Anonymous = async (req) => {
       sendPostNotif,
       otherCommentatorNotify
     );
-    await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+    const anonInfo = await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
       postId: reaction?.activity_id,
       anonUserId: userId,
       anonUserInfoColorCode: anon_user_info?.color_code,
@@ -223,6 +211,11 @@ const BetterSocialCreateCommentChildV3Anonymous = async (req) => {
       anonUserInfoEmojiName: anon_user_info?.emoji_name
     });
 
+    const commentAuthor = {
+      username: `Anonymous ${anonInfo?.anon_user_info_emoji_name}`,
+      profile_pic_path: USERS_DEFAULT_IMAGE,
+      anon_user_info
+    };
     if (body?.message?.length > 80) {
       await countProcess(reaction_id, {comment_count: +1}, {comment_count: 1});
     }
