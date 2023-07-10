@@ -1,4 +1,3 @@
-const stream = require('getstream');
 const createToken = require('../core/createToken');
 const GetstreamSingleton = require('../singleton');
 
@@ -20,6 +19,14 @@ module.exports = async (
   } else {
     targetFeed = [];
   }
+  const userAnon = await clientUser.user(anonymousUserId).get();
+
+  if (!userAnon.data.username) {
+    await clientUser
+      .user(anonymousUserId)
+      .update({username: `Anonymous ${anonUserInfo?.emoji_name}`});
+  }
+
   const handleResponse = await clientUser.reactions.add(
     'comment',
     activityId,
@@ -31,8 +38,7 @@ module.exports = async (
       anon_user_info_color_code: anonUserInfo?.color_code,
       anon_user_info_emoji_name: anonUserInfo?.emoji_name,
       anon_user_info_emoji_code: anonUserInfo?.emoji_code,
-      is_anonymous: anonUserInfo?.is_anonymous,
-
+      is_anonymous: anonUserInfo.is_anonymous,
       isNotSeen: true
     },
     {targetFeeds: targetFeed, userId: anonymousUserId}

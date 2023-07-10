@@ -15,6 +15,22 @@ const {USERS_DEFAULT_IMAGE} = require('../../../helpers/constants');
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 const sendMultiDeviceCommentNotification = require('../fcmToken/sendMultiDeviceCommentNotification');
 
+const capitalize = (s) => {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+const scoringAfterComment = async (commentId, userId, activityId, message) => {
+  const scoringProcessData = {
+    comment_id: commentId,
+    user_id: userId,
+    feed_id: activityId,
+    message,
+    activity_time: moment.utc().format('YYYY-MM-DD HH:mm:ss')
+  };
+  await addForCommentPost(scoringProcessData);
+};
+
 const BetterSocialCreateComment = async (req, isAnonimous = true) => {
   try {
     const {body, userId, token} = req;
@@ -30,10 +46,7 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     let detailUser = {};
     let result = {};
     const commentAuthorEmojiName = anon_user_info?.emoji_name;
-    const capitalize = (s) => {
-      if (typeof s !== 'string') return '';
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    };
+
     let commentAuthor = {
       username: `Anonymous ${capitalize(commentAuthorEmojiName)}`,
       profile_pic_path: USERS_DEFAULT_IMAGE,
@@ -176,9 +189,6 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
     // find signed feedOwnerId
     const signedFeedOwnerId = await UsersFunction.findSignedUserId(User, actor.id);
 
-    // find comment author by userId provided by token
-    const commentAuthor = await UsersFunction.findUserById(User, userId);
-
     const result = await Getstream.feed.commentAnonymous(
       userId,
       message,
@@ -187,7 +197,8 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
       anon_user_info,
       sendPostNotif
     );
-    await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
+
+    const anonInfo = await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {
       postId: activity_id,
       anonUserId: userId,
       anonUserInfoColorCode: anon_user_info?.color_code,
@@ -202,7 +213,7 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
 
     await sendMultiDeviceCommentNotification(
       signedFeedOwnerId,
-      commentAuthor,
+      {username: `Anonymous ${capitalize(anonInfo.anon_user_info_emoji_name)}`},
       message,
       activity_id
     );
@@ -228,17 +239,6 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
       message: err.message
     };
   }
-};
-
-const scoringAfterComment = async (commentId, userId, activityId, message) => {
-  const scoringProcessData = {
-    comment_id: commentId,
-    user_id: userId,
-    feed_id: activityId,
-    message,
-    activity_time: moment.utc().format('YYYY-MM-DD HH:mm:ss')
-  };
-  await addForCommentPost(scoringProcessData);
 };
 
 module.exports = {
