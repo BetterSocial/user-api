@@ -1,7 +1,8 @@
 const moment = require('moment');
-const {UserBlockedUser} = require('../../databases/models');
+const {UserBlockedUser, User} = require('../../databases/models');
 const getstreamService = require('../../services/getstream');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
+const UsersFunction = require('../../databases/functions/users');
 
 const constructData = (req, data, datum, constantActor) => {
   datum.isOwningReaction = req.userId === datum.user_id;
@@ -39,6 +40,22 @@ const getReaction = (req, latest_reactions, constantActor) => {
   return {comments, upvotes, downvotes};
 };
 
+async function checkIsOwnPost(tokenUserId, userId) {
+  if (tokenUserId === userId) return true;
+
+  const signedUserId = UsersFunction.findSignedUserId(tokenUserId, User);
+  if (signedUserId === userId) return true;
+
+  try {
+    const anonymousUserId = await UsersFunction.findAnonymousUserId(tokenUserId, User);
+    if (anonymousUserId?.user_id === userId) return true;
+  } catch (e) {
+    return false;
+  }
+
+  return false;
+}
+
 const getOneFeedChatService = async (req, res) => {
   try {
     const data = await getstreamService.getFeeds(req.token, 'notification', {
@@ -68,6 +85,12 @@ const getOneFeedChatService = async (req, res) => {
       last_message_at = comments[0].reaction.created_at;
       updated_at = last_message_at;
     }
+
+    const actor = data?.results[0]?.actor;
+    if (data?.results[0]?.anonimity) {
+      actor.data.username = `Anonymous ${data?.results[0]?.anon_user_info_emoji_name}`;
+    }
+
     const response = {
       activity_id: data.results[0].id,
       data: {
@@ -76,13 +99,13 @@ const getOneFeedChatService = async (req, res) => {
       },
       expired_at: data.results[0].expired_at,
       totalComment: data.results[0].reaction_counts?.comment ?? 0,
-      isOwnPost: data.results[0].actor.id === req.userId,
+      isOwnPost: await checkIsOwnPost(req.userId, data.results[0].actor.id),
       totalCommentBadge: comments.filter((comment) => comment.actor.id !== req.userId).length ?? 0,
       type: 'post-notif',
       titlePost: data.results[0].object?.message ?? data.results[0].message,
       downvote: data.results[0].reaction_counts?.downvotes ?? 0,
       upvote: data.results[0].reaction_counts?.upvotes ?? 0,
-      postMaker: data.results[0].actor,
+      postMaker: actor,
       isAnonym: data.results[0].object?.anonimity ?? data.results[0].anonimity,
       comments,
       upvotes,
@@ -110,4 +133,5 @@ const getOneFeedChatService = async (req, res) => {
     });
   }
 };
+
 module.exports = getOneFeedChatService;
