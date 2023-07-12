@@ -89,6 +89,10 @@ const getOneFeedChatService = async (req, res) => {
     const actor = data?.results[0]?.actor;
     if (data?.results[0]?.anonimity) {
       actor.data.username = `Anonymous ${data?.results[0]?.anon_user_info_emoji_name}`;
+      actor.data.anon_user_info_emoji_name = data?.results[0]?.anon_user_info_emoji_name;
+      actor.data.anon_user_info_emoji_code = data?.results[0]?.anon_user_info_emoji_code;
+      actor.data.anon_user_info_color_name = data?.results[0]?.anon_user_info_color_name;
+      actor.data.anon_user_info_color_code = data?.results[0]?.anon_user_info_color_code;
     }
 
     const response = {
