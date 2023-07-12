@@ -1,11 +1,12 @@
 const express = require('express');
+
 const router = express.Router();
 
 // controller
 const feedController = require('../controllers/feeds/FeedController');
 
 const feed = require('../controllers/feeds');
-const { isAuth, isAuthV2, isAuthAnonim } = require('../middlewares/auth');
+const {isAuth, isAuthV2, isAuthAnonim} = require('../middlewares/auth');
 const CreatePostMiddleware = require('../middlewares/create-post');
 const GenerateAnonymousUsernameMiddleware = require('../middlewares/generate-anonymous-username');
 const CreateCommentMiddleware = require('../middlewares/create-comment');
@@ -41,21 +42,13 @@ router.post('/viewpost', feed.createQueuePostTime);
 router.post('/vote_comment', isAuth, feed.voteComment);
 router.get('/i_vote_comment', isAuth, feed.iVoteComment);
 router.get('/feed-chat/', isAuth, feed.getFeedChatService);
-router.get(
-  '/feed-chat/anonymous',
-  isAuthAnonim,
-  feed.getAnonymousFeedChatService
-);
+router.get('/feed-chat/anonymous', isAuthAnonim, feed.getAnonymousFeedChatService);
 router.get('/feed-chat/:feedId', isAuth, feed.getOneFeedChatService);
 router.post('/open-graph', isAuth, feed.getOpenGraph);
 router.delete('/:postId', isAuth, feed.deletePost);
 router.delete('/anonymous/:postId', isAuth, feed.deleteAnonymousPost);
 
-router.post(
-  '/feed-action-notification/:kind',
-  isAuth,
-  feed.notificationCommentFeed
-);
+router.post('/feed-action-notification/:kind', isAuth, feed.notificationCommentFeed);
 router.post('/post-v2', isAuth, CreatePostMiddleware, feed.createPostV2);
 router.post('/post-v3', isAuth, CreatePostMiddleware, feed.createPostV3);
 router.post(
@@ -65,24 +58,9 @@ router.post(
   feed.generateAnonymousUsername
 );
 router.post('/comment-v2', isAuth, CreateCommentMiddleware, feed.commentV2);
-router.post(
-  '/comment-v3',
-  isAuth,
-  CreateCommentMiddleware,
-  feed.commentV3.standart
-);
-router.post(
-  '/comment-child-v2',
-  isAuth,
-  CreateCommentChildMiddleware,
-  feed.commentChildV2
-);
-router.post(
-  '/comment-domain-v2',
-  isAuth,
-  CreateCommentMiddleware,
-  feed.commentDomainV2
-);
+router.post('/comment-v3', isAuth, CreateCommentMiddleware, feed.commentV3.standart);
+router.post('/comment-child-v2', isAuth, CreateCommentChildMiddleware, feed.commentChildV2);
+router.post('/comment-domain-v2', isAuth, CreateCommentMiddleware, feed.commentDomainV2);
 router.post(
   '/block-anonymous-post-v2',
   isAuth,
@@ -108,18 +86,8 @@ router.post(
   CreateCommentChildMiddleware,
   feed.commentChildV3.anonymous
 );
-router.post(
-  '/comment-domain-v2',
-  isAuth,
-  CreateCommentMiddleware,
-  feed.commentDomainV2
-);
-router.post(
-  '/comment-domain-v3',
-  isAuthV2,
-  CreateCommentMiddleware,
-  feed.commentDomainV3.standart
-);
+router.post('/comment-domain-v2', isAuth, CreateCommentMiddleware, feed.commentDomainV2);
+router.post('/comment-domain-v3', isAuthV2, CreateCommentMiddleware, feed.commentDomainV3.standart);
 router.post(
   '/comment-domain-v3-anonymous',
   isAuthAnonim,
