@@ -9,15 +9,12 @@ const SuccessResponse = require('../../utils/response/SuccessResponse');
  */
 module.exports = async (req, res) => {
   try {
-    const { anonimity } = req.body;
-    let response = await BetterSocialCore.post.createPostV3(req, anonimity);
+    const {anonimity} = req.body;
+    const response = await BetterSocialCore.post.createPostV3(req, anonimity);
 
     if (!response?.isSuccess)
-      return ErrorResponse.e500(
-        res,
-        'Failed to create post: ' + response?.message
-      );
-    return SuccessResponse(res, 'Post created successfully');
+      return ErrorResponse.e500(res, `Failed to create post: ${response?.message}`);
+    return SuccessResponse(res, response, 'Post created successfully');
   } catch (e) {
     return ErrorResponse.e500(res, e.message);
   }
