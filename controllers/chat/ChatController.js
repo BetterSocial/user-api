@@ -33,7 +33,7 @@ module.exports = {
       if (!req.body.members.includes(req.userId)) req.body.members.push(req.userId);
 
       const channel = client.channel('messaging', req.body.channelId, {
-        members
+        members: req.body.members
       });
 
       await channel.create();
@@ -121,7 +121,7 @@ module.exports = {
       });
 
       await Promise.all(
-        anonReceivers.map(async (chatInfo) => {
+        anonReceivers.map(async () => {
           // Send Push Notification
         })
       );
@@ -145,7 +145,22 @@ module.exports = {
         {last_message_at: -1}
       ]);
       await client.disconnectUser();
-      channels = channels.map((channel) => ({...channel.data}));
+      channels = channels.map((channel) => {
+        const newChannel = {...channel.data};
+        delete newChannel.config;
+        delete newChannel.own_capabilities;
+
+        const members = [];
+        Object.keys(channel.state.members).forEach((member) => {
+          members.push(channel?.state?.members[member]);
+        });
+
+        return {
+          ...newChannel,
+          members,
+          messages: channel.state.messages
+        };
+      });
       return res.status(200).json(responseSuccess('Success retrieve channels', channels));
     } catch (error) {
       await client.disconnectUser();
