@@ -15,5 +15,6 @@ router.post('/init-chat', auth.isAuth, chatController.initChat);
 router.post('/init-chat-anonymous', auth.isAuthAnonim, chatController.initChatAnonymous);
 router.post('/users/:targetUserId', auth.isAuth, chatController.getMyAnonProfile);
 router.post('/channels/:channelId/read', auth.isAuthAnonim, chatController.readChannel);
+router.post('/channels', auth.isAuthAnonim, chatController.findOrCreateChannel);
 
 module.exports = router;
