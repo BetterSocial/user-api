@@ -188,9 +188,9 @@ module.exports = {
           if (!dt.user.name) {
             const filter = {channel_id: req.params.channelId};
             if (dt.role === 'owner') {
-              filter.myAnonUserId = dt.user_id;
+              filter.my_anon_user_id = dt.user_id;
             } else {
-              filter.targetUserId = dt.user_id;
+              filter.target_user_id = dt.user_id;
             }
             const anonInfo = await ChatAnonUserInfo.findOne({where: filter});
             return {
@@ -398,6 +398,65 @@ module.exports = {
         code: error.statusCode ?? error.status ?? 400,
         message: error.message
       });
+    }
+  },
+  findOrCreateChannel: async (req, res) => {
+    const schema = {
+      members: 'string[]|empty:false'
+    };
+    const validated = v.validate(req.body, schema);
+    if (validated.length)
+      return res.status(403).json({
+        message: 'Error validation',
+        error: validated
+      });
+    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
+    const {members} = req.body;
+    try {
+      if (!members.includes(req.userId)) members.push(req.userId);
+      await client.connectUser({id: req.userId}, req.token);
+
+      const channel = client.channel('messaging', {
+        members
+      });
+      const findOrCreateChannel = await channel.create();
+      findOrCreateChannel.members = await Promise.all(
+        findOrCreateChannel.members.map(async (member) => {
+          if (member.role === 'owner') {
+            const anonInfo = await ChatAnonUserInfo.findOne({
+              where: {
+                channel_id: findOrCreateChannel.channel.id,
+                my_anon_user_id: member.user_id
+              }
+            });
+            if (anonInfo) {
+              return {
+                ...member,
+                anon_user_info_color_code: anonInfo.anon_user_info_color_code,
+                anon_user_info_color_name: anonInfo.anon_user_info_color_name,
+                anon_user_info_emoji_code: anonInfo.anon_user_info_emoji_code,
+                anon_user_info_emoji_name: anonInfo.anon_user_info_emoji_name
+              };
+            }
+            const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+            const color = BetterSocialConstantListUtils.getRandomColor();
+            return {
+              ...member,
+              anon_user_info_color_code: color.code,
+              anon_user_info_color_name: color.name,
+              anon_user_info_emoji_code: emoji.code,
+              anon_user_info_emoji_name: emoji.name
+            };
+          }
+          return member;
+        })
+      );
+      await client.disconnectUser();
+
+      return res.status(200).json(findOrCreateChannel);
+    } catch (error) {
+      await client.disconnectUser();
+      return ErrorResponse.e400(res, error.message);
     }
   }
 };
