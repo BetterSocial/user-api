@@ -10,6 +10,7 @@ const addModerators = require('./addModerators');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
+const {CHANNEL_TYPE} = require('../../helpers/constants');
 
 const v = new Validator();
 
@@ -231,7 +232,17 @@ module.exports = {
 
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
-      await client.connectUser({id: req.userId}, req.token);
+      const userModel = await UsersFunction.findUserById(User, req?.userId);
+      /**
+       * @type {import('stream-chat').OwnUserResponse}
+       */
+      const user = {
+        name: userModel?.username?.toLowerCase(),
+        id: req.userId,
+        image: userModel?.profile_pic_path,
+        username: userModel?.username?.toLowerCase()
+      };
+      await client.connectUser(user, req.token);
 
       const channel = client.channel('messaging', {members});
 
@@ -278,7 +289,17 @@ module.exports = {
 
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
-      await client.connectUser({id: req.userId}, req.token);
+      /**
+       * @type {import('stream-chat').OwnUserResponse}
+       */
+      const user = {
+        name: `Anonymous ${anon_user_info_emoji_name}`,
+        id: req.userId,
+        image: '',
+        username: `Anonymous ${anon_user_info_emoji_name}`
+      };
+      await client.connectUser(user, req.token);
+
       if (client.user.name !== `Anonymous ${anon_user_info_emoji_name}`) {
         await client.upsertUser({id: req.userId, name: `Anonymous ${anon_user_info_emoji_name}`});
       }
@@ -286,6 +307,15 @@ module.exports = {
       const channel = client.channel('messaging', {members});
 
       await channel.create();
+      await channel.updatePartial({
+        set: {
+          channel_type: CHANNEL_TYPE.ANONYMOUS,
+          anon_user_info_color_code,
+          anon_user_info_color_name,
+          anon_user_info_emoji_code,
+          anon_user_info_emoji_name
+        }
+      });
 
       const chat = await channel.sendMessage({
         user_id: req.userId,
