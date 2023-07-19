@@ -1,37 +1,37 @@
-const Redis = require("ioredis");
+const Redis = require('ioredis');
 /**
  * this is for local
  */
 /**
  * this is for production
  */
-console.log(process.env.REDIS_URL)
+console.log(process.env.REDIS_URL);
 const client = new Redis(String(process.env.REDIS_URL), {
   tls: {
     rejectUnauthorized: false,
     requestCert: true,
-    agent: false,
-  },
+    agent: false
+  }
 });
-client.on("connect", function () {
-  console.error("redis connect");
+client.on('connect', () => {
+  console.error('redis connect');
 });
-client.on("error", function (error) {
-  console.error("connection error ", /** error **/);
+client.on('error', () => {
+  console.error('connection error ' /** error * */);
 });
-client.on("ready", function () {
-  console.error("redis ready");
+client.on('ready', () => {
+  console.error('redis ready');
 });
-client.on("end", function () {
-  console.error("redis disconnect");
+client.on('end', () => {
+  console.error('redis disconnect');
 });
-process.on("SIGINT", () => {
-  console.log("quit");
+process.on('SIGINT', () => {
+  console.log('quit');
   client.quit();
 });
-process.on("uncaughtException", function (err) {
+process.on('uncaughtException', (err) => {
   console.error(err.stack);
-  console.log("Node NOT Exiting...");
+  console.log('Node NOT Exiting...');
 });
 
 module.exports = client;
