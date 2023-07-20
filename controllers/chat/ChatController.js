@@ -287,6 +287,7 @@ module.exports = {
     } = req.body;
     if (!members.includes(req.userId)) members.push(req.userId);
 
+    console.log('trace 1');
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
       /**
@@ -300,12 +301,13 @@ module.exports = {
       };
       await client.connectUser(user, req.token);
 
+      console.log('trace 2');
       if (client.user.name !== `Anonymous ${anon_user_info_emoji_name}`) {
         await client.upsertUser({id: req.userId, name: `Anonymous ${anon_user_info_emoji_name}`});
       }
 
       const channel = client.channel('messaging', {members});
-
+      console.log('trace 3');
       await channel.create();
       await channel.updatePartial({
         set: {
@@ -316,7 +318,7 @@ module.exports = {
           anon_user_info_emoji_name
         }
       });
-
+      console.log('trace 4');
       const chat = await channel.sendMessage({
         user_id: req.userId,
         text: message,
@@ -324,7 +326,7 @@ module.exports = {
       });
 
       const targets = members.filter((member) => member !== req.userId);
-      targets.map(async (target) => {
+      await targets.map(async (target) => {
         const exist = await ChatAnonUserInfo.count({
           where: {
             channel_id: channel.id,
@@ -332,6 +334,7 @@ module.exports = {
             target_user_id: target
           }
         });
+
         if (!exist) {
           await ChatAnonUserInfo.create({
             channel_id: channel.id,
@@ -345,9 +348,25 @@ module.exports = {
         }
       });
 
+      const targetsUserModel = await UsersFunction.findMultipleUsersById(User, targets);
+      targetsUserModel.push({
+        user_id: req.userId,
+        username: `Anonymous ${anon_user_info_emoji_name}`,
+        profile_pic_path: '',
+        anon_user_info_color_code,
+        anon_user_info_color_name,
+        anon_user_info_emoji_code,
+        anon_user_info_emoji_name
+      });
+
       await client.disconnectUser();
 
-      return res.status(200).json(responseSuccess('sent', chat));
+      return res.status(200).json(
+        responseSuccess('sent', {
+          ...chat,
+          members: targetsUserModel
+        })
+      );
     } catch (error) {
       await client.disconnectUser();
       return ErrorResponse.e400(res, error.message);
