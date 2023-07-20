@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+const {Model, UUIDV4} = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class VoteComments extends Model {
     /**
@@ -13,26 +13,26 @@ module.exports = (sequelize, DataTypes) => {
   }
   VoteComments.init(
     {
-      id: { type: DataTypes.UUID, primaryKey: true },
-      comment_id: { type: DataTypes.UUID, allowNull: false },
-      user_id: { type: DataTypes.UUID, allowNull: false },
-      status: { type: DataTypes.ENUM("upvote", "downvote"), allowNull: false },
+      id: {type: DataTypes.UUID, primaryKey: true, defaultValue: UUIDV4},
+      comment_id: {type: DataTypes.UUID, allowNull: false},
+      user_id: {type: DataTypes.UUID, allowNull: false},
+      status: {type: DataTypes.ENUM('upvote', 'downvote'), allowNull: false},
       createdAt: {
         type: DataTypes.DATE,
-        field: "created_at",
-        allowNull: false,
+        field: 'created_at',
+        allowNull: false
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: "updated_at",
-        allowNull: false,
-      },
+        field: 'updated_at',
+        allowNull: false
+      }
     },
     {
       sequelize,
-      modelName: "VoteComments",
-      tableName: "vote_comments",
-      timestamps: true,
+      modelName: 'VoteComments',
+      tableName: 'vote_comments',
+      timestamps: true
     }
   );
   return VoteComments;

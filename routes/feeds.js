@@ -94,5 +94,6 @@ router.post(
   CreateCommentMiddleware,
   feed.commentDomainV3.anonymous
 );
+router.post('/comment-vote-v2', isAuthV2, feed.commentVoteV2);
 
 module.exports = router;
