@@ -140,7 +140,7 @@ const followTopicV2 = async (req, res) => {
       const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
       const result = await userTopicService.followTopic(userId, topic_id);
       
-      const message = await _afterPutTopic(result, token, userId);
+      const message = await _afterPutTopic(result, token, userId, name);
   
       res.status(200).json({
         status: "success",
@@ -167,12 +167,12 @@ const followTopicV2 = async (req, res) => {
     }
   };
 
-const _afterPutTopic = async (topic, token, userId) => {
+const _afterPutTopic = async (topic, token, userId, name) => {
     // follow / unfollow main feed topic
-    if (!topic) {
-        await unfollowMainFeedTopic(token, userId);
+    if (topic) {
+        await unfollowMainFeedTopic(token, userId, name);
     } else {
-        await followMainFeedTopic(token, userId);
+        await followMainFeedTopic(token, userId, name);
     }
   
     const message = topic
