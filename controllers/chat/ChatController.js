@@ -233,6 +233,7 @@ module.exports = {
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
       const userModel = await UsersFunction.findUserById(User, req?.userId);
+      const targetUserModel = await UsersFunction.findUserById(User, members[0]);
       /**
        * @type {import('stream-chat').OwnUserResponse}
        */
@@ -247,6 +248,14 @@ module.exports = {
       const channel = client.channel('messaging', {members});
 
       await channel.create();
+      if (!channel?.data?.name) {
+        await channel.updatePartial({
+          set: {
+            channel_type: CHANNEL_TYPE.CHAT,
+            name: [userModel?.username, targetUserModel?.username].join(', ')
+          }
+        });
+      }
 
       const chat = await channel.sendMessage({
         user_id: req.userId,
