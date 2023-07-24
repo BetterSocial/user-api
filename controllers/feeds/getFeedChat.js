@@ -65,9 +65,11 @@ const getDetail = (req, b, id) => {
       ...actor,
       id: null,
       data: {
-        username: `Anonymous ${b.object?.anon_user_info_emoji_name}`,
-        emoji_code: b.object?.anon_user_info_emoji_code,
-        color_code: b.object?.anon_user_info_color_code
+        username: `Anonymous ${
+          b.object?.anon_user_info_emoji_name ?? b?.anon_user_info_emoji_name
+        }`,
+        emoji_code: b.object?.anon_user_info_emoji_code ?? b?.anon_user_info_emoji_code,
+        color_code: b.object?.anon_user_info_color_code ?? b?.anon_user_info_color_code
       }
     };
   }
