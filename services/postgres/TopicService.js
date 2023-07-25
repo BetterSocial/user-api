@@ -12,11 +12,8 @@ class TopicService {
     try {
       let result = await this._topic.findOne({
         where: {
-          name: {
-            [Op.iLike]: `%${name}%`
-          }
+          name
         },
-
       })
       if (!result) {
         throw new NotFoundError('Topic not found');
