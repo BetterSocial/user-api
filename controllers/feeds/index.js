@@ -38,11 +38,12 @@ const voteComment = require('./voteComment');
 const isAuthorFollowMe = require('./isAuthorFollowMe');
 const generateAnonymousUsername = require('./generateAnonymousUsername');
 const reactionList = require('./reactionList');
-const { createQueuePostTime } = require('./createPostTime');
-const { getFeedChatService } = require('./getFeedChat');
-const { putMainFeed } = require('./updateActivity');
+const {createQueuePostTime} = require('./createPostTime');
+const {getFeedChatService} = require('./getFeedChat');
+const {putMainFeed} = require('./updateActivity');
 const getOneFeedChatService = require('./getOneFeedChat');
 const getAnonymousFeedChatService = require('./getAnonymousFeedChat');
+const commentVoteV2 = require('./commentVoteV2');
 
 module.exports = {
   blockAnonymousPostV2,
@@ -90,4 +91,5 @@ module.exports = {
   upVoteDomain,
   voteComment,
   reactionList,
+  commentVoteV2
 };
