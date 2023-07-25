@@ -62,26 +62,33 @@ async function getResult(req, reaction, dbVote, targetFeeds) {
       ]);
     }
   } else {
-    await VoteComments.destroy({where: {comment_id: reaction_id, user_id: req.userId}});
+    await VoteComments.update(
+      {status: vote},
+      {where: {comment_id: reaction_id, user_id: req.userId}}
+    );
     if (vote === 'upvote') {
       const count_downvote = reaction.data.count_downvote - 1;
-      [result] = await Promise.all([
-        voteComment(reaction_id, req.token, {
-          ...reaction.data,
-          count_downvote,
-          targetFeeds
-        }),
-        countProcess(reaction_id, {downvote_count: -1}, {upvote_count: 1})
-      ]);
-    } else {
-      const count_upvote = reaction.data.count_upvote - 1;
+      const count_upvote = reaction.data.count_upvote + 1;
       [result] = await Promise.all([
         voteComment(reaction_id, req.token, {
           ...reaction.data,
           count_upvote,
+          count_downvote,
           targetFeeds
         }),
-        countProcess(reaction_id, {upvote_count: -1}, {downvote_count: 1})
+        countProcess(reaction_id, {downvote_count: -1, upvote_count: +1}, {upvote_count: 1})
+      ]);
+    } else {
+      const count_upvote = reaction.data.count_upvote - 1;
+      const count_downvote = reaction.data.count_downvote + 1;
+      [result] = await Promise.all([
+        voteComment(reaction_id, req.token, {
+          ...reaction.data,
+          count_upvote,
+          count_downvote,
+          targetFeeds
+        }),
+        countProcess(reaction_id, {upvote_count: -1, downvote_count: +1}, {downvote_count: 1})
       ]);
     }
   }
