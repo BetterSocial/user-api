@@ -1,6 +1,6 @@
 const moment = require('moment');
 const UsersFunction = require('../../databases/functions/users');
-const {UserBlockedUser, User} = require('../../databases/models');
+const {User} = require('../../databases/models');
 const getstreamService = require('../../services/getstream');
 const {
   mappingFeed,
@@ -24,7 +24,7 @@ const getAnonymousFeedChatService = async (req, res) => {
       newFeed.push(...mapping);
     }
     const newGroup = {};
-    const groupingFeed = newFeed.reduce((a, b, index) => {
+    const groupingFeed = newFeed.reduce((a, b) => {
       const localDate = moment.utc(b.time).local().format();
       const {
         activity_id,
@@ -35,15 +35,16 @@ const getAnonymousFeedChatService = async (req, res) => {
         upvote,
         constantActor,
         isAnonym,
+        isOwnSignedPost,
         isOwnPost,
         message,
         actor
       } = getDetail(req, b, mySignedId);
       const mapCountLevel2 = countLevel2(childComment);
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
-      const total3 = totalCommentLevel3.reduce((a, b) => a + b);
+      const total3 = totalCommentLevel3.reduce((a1, b1) => a1 + b1);
 
-      const commentLevel2 = mapCountLevel2.reduce((a, b) => a + b);
+      const commentLevel2 = mapCountLevel2.reduce((a2, b2) => a2 + b2);
       if (!newGroup[activity_id]) {
         pushToa(a, b, newGroup, actor, {
           activity_id,
@@ -55,6 +56,7 @@ const getAnonymousFeedChatService = async (req, res) => {
           isSeen: b.isSeen,
           totalComment: totalComment + commentLevel2 + total3,
           isOwnPost,
+          isOwnSignedPost,
           totalCommentBadge: 0,
           isRead: b.isRead,
           type: 'post-notif',
@@ -70,7 +72,7 @@ const getAnonymousFeedChatService = async (req, res) => {
       finalize(req, mySignedId, myReaction, newGroup, activity_id, constantActor);
       return a;
     }, []);
-    const feedGroup = await getFeedGroup(groupingFeed)
+    const feedGroup = await getFeedGroup(groupingFeed);
     res.status(200).send({
       success: true,
       data: feedGroup,
