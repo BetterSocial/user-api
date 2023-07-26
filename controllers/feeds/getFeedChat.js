@@ -59,6 +59,7 @@ const getDetail = (req, b, id) => {
   const constantActor = typeof b.object === 'object' ? b.object.actor : b.actor;
   let actor = typeof b.object === 'object' ? b.object.actor : b.actor;
   const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity;
+  const isOwnSignedPost = actor.id === id;
   const isOwnPost = actor.id === req.userId || actor.id === id;
   if (isAnonym) {
     actor = {
@@ -83,6 +84,7 @@ const getDetail = (req, b, id) => {
     message,
     constantActor,
     isAnonym,
+    isOwnSignedPost,
     isOwnPost,
     actor,
     showToast: b.showToast
