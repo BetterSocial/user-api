@@ -122,8 +122,6 @@ async function processPollPost(userId, isAnonimous, body, data) {
       sequelize,
       {
         polls,
-        createdAt: postDate,
-        updatedAt: postDate,
         pollId: pollingId
       },
       transaction
