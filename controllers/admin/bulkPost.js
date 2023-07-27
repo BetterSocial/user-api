@@ -14,9 +14,9 @@ const bulkPostController = async (req, res) => {
     if (post.length < 1) {
       return ErrorResponse.e400(res, "Data not null");
     }
-    
+
     for (let element of post) {
-      const { anonimity, userId } = element;
+      const { anonimity, userId, images_url } = element;
       if (anonimity) {
         let anonUserInfo = await generateAnonymousUsername();
         element.anon_user_info = {
@@ -26,7 +26,11 @@ const bulkPostController = async (req, res) => {
           emoji_code: anonUserInfo.emojiIcon,
         };
       }
-
+      if (images_url.length >= 1) {
+        element.is_photo_uploaded = true;
+      } else {
+        element.is_photo_uploaded = false;
+      }
       req.body = element;
       let token = await createToken(userId);
       req.userId = userId;
