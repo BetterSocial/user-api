@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
     where: {polling_id}
   });
 
-  const {flg_multiple, user_id} = polling.toJSON();
+  const {flg_multiple} = polling.toJSON();
 
   /*
         Check if polling user is author of the post

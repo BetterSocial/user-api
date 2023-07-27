@@ -22,7 +22,7 @@ module.exports = async (sequelizeModel, data, transaction) => {
   const {pollId, polls} = data;
 
   const pollsOptionUUIDs = [];
-  polls.forEach(async (poll, i) => {
+  for (const [i, poll] of polls.entries()) {
     const pollOption = await sequelizeModel.query(
       `INSERT INTO polling_option 
         (polling_id, option, counter, created_at, updated_at)
@@ -42,7 +42,7 @@ module.exports = async (sequelizeModel, data, transaction) => {
 
     const pollOptionUUID = pollOption[0][0].polling_option_id;
     pollsOptionUUIDs.push(pollOptionUUID);
-  });
+  }
 
   return pollsOptionUUIDs;
 };
