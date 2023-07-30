@@ -32,13 +32,10 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
   const {userId, body} = req;
   const filteredTopics = filterAllTopics(body?.message, body?.topics);
 
-  let userDetail = {};
-  let data = {};
-  let locationDetail = {};
+  let userDetail,data,location,feed = {};
   let locationToPost = 'Everywhere';
   let locationTO = null;
-  let post = {};
-  let uploadedImages = body?.images_url || [];
+  let uploadImgs = body?.images_url || [];
 
   if (isEmptyMessageAllowed(req?.body))
     return {
@@ -55,14 +52,14 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
 
     const getstreamObjectParam = generateDefaultGetstreamObject(body, isAnonimous, userDetail);
     if (!body?.is_photo_uploaded)
-      uploadedImages = await CloudinaryService.uploadBase64Array(body?.images_url);
+      uploadImgs = await CloudinaryService.uploadBase64Array(body?.images_url);
 
     const feedExpiredAt = getFeedDuration(body?.duration_feed);
-    locationDetail = await LocationFunction.getLocationDetail(Locations, body?.location_id);
+    location = await LocationFunction.getLocationDetail(Locations, body?.location_id);
 
     if (body?.location !== 'Everywhere') {
-      locationToPost = convertLocationFromModel(locationDetail);
-      locationTO = convertLocationFromModel(locationDetail, true);
+      locationToPost = convertLocationFromModel(location);
+      locationTO = convertLocationFromModel(location, true);
     }
 
     data = {
@@ -74,7 +71,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
       anonimity: isAnonimous,
       location: locationToPost,
       duration_feed: body?.duration_feed,
-      images_url: uploadedImages,
+      images_url: uploadImgs,
       expired_at: feedExpiredAt,
       count_upvote: 0,
       count_downvote: 0,
@@ -93,12 +90,12 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
   }
 
   try {
-    if (isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
-    else post = await Getstream.feed.createPost(req?.token, data);
+    if (isAnonimous) feed = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
+    else feed = await Getstream.feed.createPost(req?.token, data);
 
     if (isAnonimous) {
       await PostAnonUserInfoFunction.createAnonUserInfoInPost(PostAnonUserInfo, {
-        postId: post?.id,
+        postId: feed?.id,
         anonUserId: userDetail?.user_id,
         anonUserInfoColorCode: body?.anon_user_info?.color_code,
         anonUserInfoColorName: body?.anon_user_info?.color_name,
@@ -108,12 +105,12 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     }
 
     insertTopics(filteredTopics);
-    const scoringProcessData = {
-      feed_id: post?.id,
+    const scoringData = {
+      feed_id: feed?.id,
       foreign_id: data?.foreign_id,
-      time: post?.time,
+      time: feed?.time,
       user_id: userDetail.user_id,
-      location: locationDetail?.location_level || '',
+      location: location?.location_level || '',
       message: data?.message,
       topics: data?.topics,
       privacy: data?.privacy,
@@ -126,7 +123,7 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
       images_url: data?.images_url,
       created_at: moment.utc().format('YYYY-MM-DD HH:mm:ss')
     };
-    addForCreatePost(scoringProcessData);
+    addForCreatePost(scoringData);
     return {
       isSuccess: true,
       message: 'Post created successfully'
