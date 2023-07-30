@@ -21,6 +21,7 @@ const {
   processPollPost,
   processAnonymous
 } = require('./createPostV3');
+const sendMultiDeviceTaggedNotification = require('../fcmToken/sendMultiDeviceTaggedNotification');
 
 /**
  *
@@ -32,7 +33,10 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
   const {userId, body} = req;
   const filteredTopics = filterAllTopics(body?.message, body?.topics);
 
-  let userDetail,data,location,feed = {};
+  let userDetail = {};
+  let data = {};
+  let location = {};
+  let feed = {};
   let locationToPost = 'Everywhere';
   let locationTO = null;
   let uploadImgs = body?.images_url || [];
@@ -92,6 +96,15 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
   try {
     if (isAnonimous) feed = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
     else feed = await Getstream.feed.createPost(req?.token, data);
+
+    body.tagUsers?.forEach(async (user_id) => {
+      await sendMultiDeviceTaggedNotification(
+        isAnonimous ? {username: `Anonymous ${body?.anon_user_info?.emoji_name}`} : userDetail,
+        user_id,
+        data.message,
+        feed.id
+      );
+    });
 
     if (isAnonimous) {
       await PostAnonUserInfoFunction.createAnonUserInfoInPost(PostAnonUserInfo, {

@@ -8,6 +8,7 @@ const {sequelize} = require('../../databases/models');
 const {POST_TYPE_POLL} = require('../../helpers/constants');
 const {addForCreatePost} = require('../../services/score');
 const {handleCreatePostTO, filterAllTopics} = require('../../utils/post');
+const sendMultiDeviceTaggedNotification = require('../../services/bettersocial/fcmToken/sendMultiDeviceTaggedNotification');
 
 const v = new Validator();
 
@@ -246,6 +247,9 @@ module.exports = async (req, res) => {
     getstreamService
       .createPost(token, feedGroup, data, req.userId)
       .then((result) => {
+        req.body.tagUsers?.forEach(async (user_id) => {
+          await sendMultiDeviceTaggedNotification(userDetail, user_id, data.message, result.id);
+        });
         // send queue for scoring processing on create post
         const scoringProcessData = {
           feed_id: result.id,

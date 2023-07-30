@@ -22,6 +22,7 @@ const PostFunction = require('../../../databases/functions/post');
 const PollingFunction = require('../../../databases/functions/polling');
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 const {convertLocationFromModel} = require('../../../utils');
+const sendMultiDeviceTaggedNotification = require('../fcmToken/sendMultiDeviceTaggedNotification');
 
 const isEmptyMessageAllowed = (body) => {
   const isPollPost = body?.verb === POST_VERB_POLL;
@@ -231,7 +232,14 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
   try {
     if (isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
     else post = await Getstream.feed.createPost(req?.token, data);
-
+    body.tagUsers?.forEach(async (user_id) => {
+      await sendMultiDeviceTaggedNotification(
+        isAnonimous ? {username: `Anonymous ${body?.anon_user_info?.emoji_name}`} : userDetail,
+        user_id,
+        post.message,
+        post.id
+      );
+    });
     if (isAnonimous) {
       await PostAnonUserInfoFunction.createAnonUserInfoInPost(PostAnonUserInfo, {
         postId: post?.id,
