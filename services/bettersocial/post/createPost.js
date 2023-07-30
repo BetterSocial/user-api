@@ -11,152 +11,16 @@ const CloudinaryService = require('../../../vendor/cloudinary');
 const {User, Locations, PostAnonUserInfo, sequelize} = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
-const {
-  POST_TYPE_STANDARD,
-  POST_TYPE_POLL,
-  POST_VERB_POLL,
-  POST_VERSION
-} = require('../../../helpers/constants');
+const {POST_TYPE_STANDARD, POST_VERSION} = require('../../../helpers/constants');
 const {addForCreatePost} = require('../../score');
-const PostFunction = require('../../../databases/functions/post');
-const PollingFunction = require('../../../databases/functions/polling');
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 const {convertLocationFromModel} = require('../../../utils');
-
-const isEmptyMessageAllowed = (body) => {
-  const isPollPost = body?.verb === POST_VERB_POLL;
-  const isBodyEmpty = !body?.message || body?.message === '';
-  const isImageUrlEmpty = !body?.images_url || body?.images_url.length === 0;
-
-  return isBodyEmpty && isImageUrlEmpty && !isPollPost;
-};
-
-function generateDefaultGetstreamObject(body, isAnonimous = true, userDetail = null) {
-  let defaultGetstreamObject = {
-    verb: body?.verb,
-    message: body?.message,
-    topics: filterAllTopics(body?.message, body?.topics),
-    feed_group: body?.feedGroup
-  };
-
-  if (!isAnonimous) {
-    defaultGetstreamObject = {
-      ...defaultGetstreamObject,
-      username: userDetail?.username,
-      profile_pic_path: userDetail?.profile_pic_path,
-      real_name: userDetail?.real_name
-    };
-  }
-
-  return defaultGetstreamObject;
-}
-
-function getPollsDurationInIso(pollsDuration) {
-  const {day, hour, minute} = pollsDuration;
-  const pollsDurationInIso = moment
-    .utc()
-    .add(day, 'days')
-    .add(hour, 'hours')
-    .add(minute, 'minutes')
-    .toISOString();
-
-  return pollsDurationInIso;
-}
-
-function getPollPostExpiredAt(pollsDuration, durationFeed) {
-  if (durationFeed !== 'never') {
-    const pollDurationMoment = getPollsDurationInIso(pollsDuration);
-    const pollExpiredAt = moment().add(durationFeed, 'days');
-    if (moment(pollDurationMoment).isAfter(pollExpiredAt)) return null;
-
-    return pollExpiredAt.toISOString();
-  }
-  return moment().add(100, 'years').toISOString();
-}
-
-async function processPollPost(userId, isAnonimous, body, data) {
-  const isPollPost = body?.verb === POST_VERB_POLL;
-  if (!isPollPost) return data;
-
-  const {message, multiplechoice, polls, pollsduration, duration_feed} = body || {};
-  /**
-   * Process if Poll Post
-   */
-  const pollExpiredAt = getPollPostExpiredAt(pollsduration, duration_feed);
-  if (!pollExpiredAt)
-    return {
-      isSuccess: false,
-      message: 'Polling duration cannot be more than post expiration date'
-    };
-
-  const postDate = moment().toISOString();
-
-  const [pollingId, pollsOptionUUIDs] = await sequelize.transaction(async (transaction) => {
-    const postId = await PostFunction.createPollPost(
-      sequelize,
-      {
-        userId,
-        anonimity: isAnonimous,
-        createdAt: postDate,
-        updatedAt: postDate,
-        expiredAt: pollExpiredAt,
-        resUrl: ''
-      },
-      transaction
-    );
-
-    const polling = await PollingFunction.createPollingByPostId(
-      sequelize,
-      {
-        createdAt: postDate,
-        updatedAt: postDate,
-        message,
-        multiplechoice,
-        postId,
-        userId
-      },
-      transaction
-    );
-
-    const optionsUUIDs = await PollingFunction.createPollingOptionsByPollId(
-      sequelize,
-      {
-        polls,
-        pollId: polling
-      },
-      transaction
-    );
-
-    return [polling, optionsUUIDs];
-  });
-
-  return {
-    ...data,
-    polling_id: pollingId,
-    polls: pollsOptionUUIDs,
-    post_type: POST_TYPE_POLL,
-    polls_expired_at: getPollsDurationInIso(pollsduration),
-    multiplechoice,
-    expired_at: pollExpiredAt
-  };
-}
-
-function processAnonymous(isAnonimous, body, data) {
-  /**
-   * Process if Anonymous Post
-   */
-  if (isAnonimous) {
-    return {
-      ...data,
-      anon_user_info_color_name: body?.anon_user_info?.color_name,
-      anon_user_info_color_code: body?.anon_user_info?.color_code,
-      anon_user_info_emoji_name: body?.anon_user_info?.emoji_name,
-      anon_user_info_emoji_code: body?.anon_user_info?.emoji_code
-    };
-  }
-
-  return data;
-}
+const {
+  isEmptyMessageAllowed,
+  generateDefaultGetstreamObject,
+  processPollPost,
+  processAnonymous
+} = require('./createPostV3');
 
 /**
  *
@@ -222,7 +86,6 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
     data = await processPollPost(userId, isAnonimous, body, data);
     data = processAnonymous(isAnonimous, body, data);
   } catch (e) {
-    console.log(e);
     return {
       isSuccess: false,
       message: e.message
@@ -269,7 +132,6 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
       message: 'Post created successfully'
     };
   } catch (e) {
-    console.log(e);
     return {
       isSuccess: false,
       message: e.message

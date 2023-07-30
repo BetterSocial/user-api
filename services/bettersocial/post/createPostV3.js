@@ -122,7 +122,7 @@ async function processPollPost(userId, isAnonimous, body, data) {
       sequelize,
       {
         polls,
-        pollId: pollingId
+        pollId: polling
       },
       transaction
     );
@@ -276,4 +276,10 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
   }
 };
 
-module.exports = BetterSocialCreatePostV3;
+module.exports = {
+  BetterSocialCreatePostV3,
+  isEmptyMessageAllowed,
+  generateDefaultGetstreamObject,
+  processPollPost,
+  processAnonymous
+};
