@@ -1,5 +1,5 @@
 const Schema = {
-    bio: "string|empty:false|max:350"
-}
+  bio: 'string|empty:true|max:350'
+};
 
-module.exports = Schema
+module.exports = Schema;
