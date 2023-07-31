@@ -17,17 +17,6 @@ const mappingFeed = (req, feeds) => {
 
     const expiredAtNotNull = activity?.object?.expired_at || activity?.expired_at;
 
-    if (expiredAtNotNull)
-      console.log(
-        'showToast',
-        showToast,
-        ' ',
-        activity?.id,
-        ' ',
-        activity?.object?.expired_at,
-        ' ',
-        activity?.expired_at
-      );
     try {
       if (objectExpiredAt.isBefore(moment().utc()) || activityExpiredAt.isBefore(moment().utc())) {
         // eslint-disable-next-line no-continue
@@ -91,12 +80,12 @@ const getDetail = (req, b, id) => {
   };
 };
 
-const countLevel2 = (childComment) =>
-  childComment.map((comment) => comment?.children_counts?.comment || 0);
+const countLevel2 = (childComment = []) =>
+  childComment?.map((comment) => comment?.children_counts?.comment || 0);
 
-const countCommentLv3 = (childComment, totalCommentLevel3 = []) => {
+const countCommentLv3 = (childComment = [], totalCommentLevel3 = []) => {
   Promise.all(
-    childComment.map((comment) => {
+    childComment?.map((comment) => {
       const mapCount = comment?.latest_children?.comment?.map(
         (comment2) => comment2?.children_counts?.comment || 0
       );
@@ -105,7 +94,9 @@ const countCommentLv3 = (childComment, totalCommentLevel3 = []) => {
       }
       return comment;
     })
-  ).then(() => totalCommentLevel3);
+  )
+    .then(() => totalCommentLevel3)
+    .catch(() => totalCommentLevel3);
   return totalCommentLevel3;
 };
 
@@ -204,9 +195,9 @@ const getFeedChatService = async (req, res) => {
       const mapCountLevel2 = countLevel2(childComment);
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
 
-      const total3 = totalCommentLevel3.reduce((acc, curr) => acc + curr);
+      const total3 = totalCommentLevel3?.reduce((acc, curr) => acc + curr, 0);
 
-      const commentLevel2 = mapCountLevel2.reduce((acc, curr) => acc + curr);
+      const commentLevel2 = mapCountLevel2.reduce((acc, curr) => acc + curr, 0);
 
       if (!newGroup[activity_id]) {
         pushToa(a, b, newGroup, actor, {
@@ -242,6 +233,7 @@ const getFeedChatService = async (req, res) => {
       message: 'Success get data'
     });
   } catch (e) {
+    console.log(e);
     res.status(400).json({
       success: false,
       data: null,
