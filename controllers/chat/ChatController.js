@@ -11,6 +11,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
+const ChatAnonUserInfoFunction = require('../../databases/functions/chatAnonUserInfo');
 
 const v = new Validator();
 
@@ -470,6 +471,20 @@ module.exports = {
       });
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     const {members} = req.body;
+
+    /**
+     *
+     * @param {import('stream-chat').ChannelAPIResponse} channel
+     * @param {*} anonUserInfo
+     */
+    const updateChannelAnonUserInfo = (apiChannel, anonUserInfo) => {
+      apiChannel.channel.anon_user_info_color_code = anonUserInfo.anon_user_info_color_code;
+      apiChannel.channel.anon_user_info_color_name = anonUserInfo.anon_user_info_color_name;
+      apiChannel.channel.anon_user_info_emoji_code = anonUserInfo.anon_user_info_emoji_code;
+      apiChannel.channel.anon_user_info_emoji_name = anonUserInfo.anon_user_info_emoji_name;
+      apiChannel.channel.channel_type = CHANNEL_TYPE.ANONYMOUS;
+    };
+
     try {
       if (!members.includes(req.userId)) members.push(req.userId);
       await client.connectUser({id: req.userId}, req.token);
@@ -480,33 +495,61 @@ module.exports = {
       const findOrCreateChannel = await channel.create();
       findOrCreateChannel.members = await Promise.all(
         findOrCreateChannel.members.map(async (member) => {
-          if (member.role === 'owner') {
-            const anonInfo = await ChatAnonUserInfo.findOne({
-              where: {
-                channel_id: findOrCreateChannel.channel.id,
-                my_anon_user_id: member.user_id
-              }
-            });
-            if (anonInfo) {
-              return {
-                ...member,
-                anon_user_info_color_code: anonInfo.anon_user_info_color_code,
-                anon_user_info_color_name: anonInfo.anon_user_info_color_name,
-                anon_user_info_emoji_code: anonInfo.anon_user_info_emoji_code,
-                anon_user_info_emoji_name: anonInfo.anon_user_info_emoji_name
-              };
+          if (member.role !== 'owner') return member;
+
+          const anonInfo = await ChatAnonUserInfo.findOne({
+            where: {
+              channel_id: findOrCreateChannel.channel.id,
+              my_anon_user_id: member.user_id
             }
-            const emoji = BetterSocialConstantListUtils.getRandomEmoji();
-            const color = BetterSocialConstantListUtils.getRandomColor();
+          });
+
+          let anonUserInfo = {};
+
+          if (anonInfo) {
+            anonUserInfo = anonInfo;
+            updateChannelAnonUserInfo(findOrCreateChannel, anonUserInfo);
             return {
               ...member,
-              anon_user_info_color_code: color.code,
-              anon_user_info_color_name: color.name,
-              anon_user_info_emoji_code: emoji.code,
-              anon_user_info_emoji_name: emoji.name
+              anon_user_info_color_code: anonInfo.anon_user_info_color_code,
+              anon_user_info_color_name: anonInfo.anon_user_info_color_name,
+              anon_user_info_emoji_code: anonInfo.anon_user_info_emoji_code,
+              anon_user_info_emoji_name: anonInfo.anon_user_info_emoji_name
             };
           }
-          return member;
+
+          const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+          const color = BetterSocialConstantListUtils.getRandomColor();
+          anonUserInfo = {
+            anon_user_info_color_code: color.code,
+            anon_user_info_color_name: color.color,
+            anon_user_info_emoji_code: emoji.emoji,
+            anon_user_info_emoji_name: emoji.name
+          };
+
+          updateChannelAnonUserInfo(findOrCreateChannel, anonUserInfo);
+          await ChatAnonUserInfoFunction.createChatAnonUserInfo(
+            ChatAnonUserInfo,
+            findOrCreateChannel.channel.id,
+            req?.userId,
+            members[0],
+            anonUserInfo
+          );
+
+          channel.updatePartial({
+            set: {
+              channel_type: CHANNEL_TYPE.ANONYMOUS,
+              ...anonUserInfo
+            }
+          });
+
+          return {
+            ...member,
+            anon_user_info_color_code: color.code,
+            anon_user_info_color_name: color.name,
+            anon_user_info_emoji_code: emoji.code,
+            anon_user_info_emoji_name: emoji.name
+          };
         })
       );
       await client.disconnectUser();
