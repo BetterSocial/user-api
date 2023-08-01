@@ -9,6 +9,7 @@ const BetterSocialCheckPasswordForDemoLogin = require('./user/BetterSocialCheckP
 const postComment = require('./post/comment');
 const postCommentChild = require('./post/commentChild');
 const postCommentDomain = require('./post/commentDomain');
+const {BetterSocialCreatePostV3} = require('./post/createPostV3')
 
 const BetterSocialCore = {
   user: {
@@ -31,7 +32,7 @@ const BetterSocialCore = {
   post: {
     blockAnonymousPost: require('./post/blockAnonymousPost'),
     createPost: require('./post/createPost'),
-    createPostV3: require('./post/createPostV3'),
+    createPostV3: BetterSocialCreatePostV3,
     createPollPost: require('./post/createPollPost'),
     comment: postComment.BetterSocialCreateComment,
     commentV3: postComment.BetterSocialCreateCommentV3,

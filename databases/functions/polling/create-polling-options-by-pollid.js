@@ -1,9 +1,9 @@
-const { Sequelize } = require("sequelize");
-
 /**
  * @typedef {Object} PollOptionsDataParam
  * @property {String} text
  */
+
+const {Sequelize} = require('sequelize');
 
 /**
  * @typedef {Object} CreatePollingOptionDataParam
@@ -14,35 +14,35 @@ const { Sequelize } = require("sequelize");
  */
 
 /**
- * 
- * @param {Sequelize} sequelizeModel 
- * @param {CreatePollingOptionDataParam} data 
+ *
+ * @param {Sequelize} sequelizeModel
+ * @param {CreatePollingOptionDataParam} data
  */
 module.exports = async (sequelizeModel, data, transaction) => {
-    const { pollId, polls, createdAt, updatedAt } = data;
+  const {pollId, polls} = data;
 
-    let pollsOptionUUIDs = [];
-    for (let poll of polls) {
-        let pollOption = await sequelizeModel.query(
-            `INSERT INTO polling_option 
+  const pollsOptionUUIDs = [];
+  for (const [i, poll] of polls.entries()) {
+    const pollOption = await sequelizeModel.query(
+      `INSERT INTO polling_option 
         (polling_id, option, counter, created_at, updated_at)
         VALUES (:pollingId, :option, :counter, :createdAt, :updatedAt)
         RETURNING polling_option_id`,
-            {
-                replacements: {
-                    pollingId: pollId,
-                    option: poll?.text,
-                    counter: 0,
-                    createdAt: createdAt,
-                    updatedAt: updatedAt,
-                },
-                transaction
-            }
-        );
+      {
+        replacements: {
+          pollingId: pollId,
+          option: poll?.text,
+          counter: 0,
+          createdAt: new Date(new Date().setSeconds(new Date().getSeconds() + i)).toISOString(),
+          updatedAt: new Date(new Date().setSeconds(new Date().getSeconds() + i)).toISOString()
+        },
+        transaction
+      }
+    );
 
-        let pollOptionUUID = pollOption[0][0].polling_option_id;
-        pollsOptionUUIDs.push(pollOptionUUID);
-    }
+    const pollOptionUUID = pollOption[0][0].polling_option_id;
+    pollsOptionUUIDs.push(pollOptionUUID);
+  }
 
-    return pollsOptionUUIDs
-}
+  return pollsOptionUUIDs;
+};
