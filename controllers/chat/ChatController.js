@@ -546,8 +546,8 @@ module.exports = {
           return {
             ...member,
             anon_user_info_color_code: color.code,
-            anon_user_info_color_name: color.name,
-            anon_user_info_emoji_code: emoji.code,
+            anon_user_info_color_name: color.color,
+            anon_user_info_emoji_code: emoji.emoji,
             anon_user_info_emoji_name: emoji.name
           };
         })
