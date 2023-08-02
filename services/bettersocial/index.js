@@ -9,9 +9,12 @@ const BetterSocialCheckPasswordForDemoLogin = require('./user/BetterSocialCheckP
 const postComment = require('./post/comment');
 const postCommentChild = require('./post/commentChild');
 const postCommentDomain = require('./post/commentDomain');
-const {BetterSocialCreatePostV3} = require('./post/createPostV3')
+const {BetterSocialCreatePostV3} = require('./post/createPostV3');
 
 const BetterSocialCore = {
+  chat: {
+    blockAnonUserFromChat: require('./chat/blockAnonUserFromChat')
+  },
   user: {
     createUser: BetterSocialCreateUser,
     createAnonymousUser: BetterSocialCreateAnonymousUser,

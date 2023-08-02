@@ -1,21 +1,14 @@
 const Stream = require('getstream');
+const {StreamChat} = require('stream-chat');
 
 const GetstreamSingleton = (() => {
   let instance;
   let clientInstance;
+  let chatInstance;
 
   const apiKey = process.env.API_KEY;
   const secret = process.env.SECRET;
   const appId = process.env.APP_ID;
-
-  function createToken(userId) {
-    if (!userId) throw new Error('userId is required');
-
-    const DAYS_IN_SECONDS = 24 * 60 * 60;
-    const exp = Math.floor(Date.now() / 1000) + 30 * DAYS_IN_SECONDS;
-    const tempClient = Stream.connect(apiKey, appId);
-    return tempClient.createUserToken(userId, {exp});
-  }
 
   function createInstance() {
     const client = Stream.connect(apiKey, secret, appId);
@@ -24,6 +17,11 @@ const GetstreamSingleton = (() => {
 
   function createClientInstance(clientToken) {
     const client = Stream.connect(apiKey, clientToken, appId);
+    return client;
+  }
+
+  function createChatInstance() {
+    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     return client;
   }
 
@@ -37,6 +35,15 @@ const GetstreamSingleton = (() => {
         instance = createInstance();
       }
       return instance;
+    },
+
+    /**
+     *
+     * @returns {StreamChat}
+     */
+    getChatInstance: () => {
+      chatInstance = createChatInstance();
+      return chatInstance;
     },
 
     /**

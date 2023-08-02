@@ -70,4 +70,11 @@ router.post(
   usersHandler.checkHumanIdExchangeTokenController
 );
 
+router.post(
+  '/block-anon-user-from-chat',
+  auth.isAuth,
+  BodyValidationMiddleware.blockUserV2,
+  usersHandler.blockAnonUserFromChat
+);
+
 module.exports = router;

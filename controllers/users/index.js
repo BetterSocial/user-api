@@ -1,3 +1,4 @@
+const blockAnonUserFromChat = require('./blockAnonUserFromChat');
 const blockDomain = require('./userBlockingDomain');
 const blockPostAnonymous = require('./userBlockPostAnonymous');
 const blockUser = require('./userblocking');
@@ -27,6 +28,7 @@ const verifyUser = require('./verifyUser');
 const veryfyToken = require('./veryfyToken');
 
 module.exports = {
+  blockAnonUserFromChat,
   blockDomain,
   blockPostAnonymous,
   blockUser,
