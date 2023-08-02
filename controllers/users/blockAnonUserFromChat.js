@@ -28,7 +28,7 @@ const blockAnonUserFromChat = async (req, res) => {
       return ErrorResponse.e400(res, response?.message || 'Error in block user v2');
 
     await BetterSocialCore.chat.blockAnonUserFromChat(token, selfUserId, targetUserId);
-    return SuccessResponse(res, {}, '' || 'User has been blocked successfully');
+    return SuccessResponse(res, {}, response?.message || 'User has been blocked successfully');
   } catch (e) {
     return ErrorResponse.e500(res, e?.message || 'Error in block user v2');
   }

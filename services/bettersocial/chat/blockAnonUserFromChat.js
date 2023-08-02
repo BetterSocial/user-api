@@ -27,7 +27,10 @@ const BetterSocialBlockAnonUserFromChat = async (token, selfUserId, targetUserId
       chatClient,
       token,
       channel?.id,
-      'You blocked this contact'
+      'You blocked this contact',
+      {
+        system_message_type: 'block_anon_user'
+      }
     );
   } catch (e) {
     console.log('Error in block user v2');
