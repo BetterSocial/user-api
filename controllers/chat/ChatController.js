@@ -102,7 +102,11 @@ module.exports = {
 
       const channel = client.channel('messaging', channelId);
 
-      await channel.create();
+      const createdChannel = await channel.create();
+      console.log('createdChannel', createdChannel);
+
+      if (createdChannel?.channel?.is_channel_blocked)
+        return res.status(403).json(responseError('Channel is blocked'));
 
       const chat = await channel.sendMessage({
         user_id: req.userId,
@@ -318,7 +322,11 @@ module.exports = {
 
       const channel = client.channel('messaging', {members});
       console.log('trace 3');
-      await channel.create();
+      const createdChannel = await channel.create();
+
+      if (createdChannel?.channel?.is_channel_blocked)
+        return res.status(403).json(responseError('Channel is blocked'));
+
       await channel.updatePartial({
         set: {
           channel_type: CHANNEL_TYPE.ANONYMOUS,
