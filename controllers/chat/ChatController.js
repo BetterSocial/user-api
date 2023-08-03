@@ -404,7 +404,7 @@ module.exports = {
       };
 
       if (createdChannel?.channel?.is_channel_blocked) {
-        return res.status(400).json(responseError('channel is blocked', response));
+        return res.status(400).json(responseError('Channel is blocked', response));
       }
 
       return res.status(200).json(responseSuccess('sent', response));
