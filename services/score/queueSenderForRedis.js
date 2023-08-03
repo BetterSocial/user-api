@@ -1,12 +1,13 @@
 const Bull = require('bull');
 const {v4: uuidv4} = require('uuid');
+const {bullConfig} = require('../../config/redis');
 
 const connectRedis = process.env.REDIS_URL;
 
 // init the scoring process queue object, to be used on sending message to the queue
 const scoringProcessQueue = new Bull('scoringProcessQueue', connectRedis, {
   redis: {
-    tls: {rejectUnauthorized: false, requestCert: true},
+    ...bullConfig,
     maxRetriesPerRequest: 100,
     connectTimeout: 30000
   }
