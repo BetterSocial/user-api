@@ -1,6 +1,7 @@
 const {StreamChat} = require('stream-chat');
 const Validator = require('fastest-validator');
 const {Op} = require('sequelize');
+const {v4: uuidv4} = require('uuid');
 const {responseSuccess, responseError} = require('../../utils/Responses');
 
 const {User, ChatAnonUserInfo} = require('../../databases/models');
@@ -324,9 +325,6 @@ module.exports = {
       console.log('trace 3');
       const createdChannel = await channel.create();
 
-      if (createdChannel?.channel?.is_channel_blocked)
-        return res.status(403).json(responseError('Channel is blocked'));
-
       await channel.updatePartial({
         set: {
           channel_type: CHANNEL_TYPE.ANONYMOUS,
@@ -337,11 +335,32 @@ module.exports = {
         }
       });
       console.log('trace 4');
-      const chat = await channel.sendMessage({
-        user_id: req.userId,
-        text: message,
-        ...req.body
-      });
+
+      // Default mock chat in case of channel is blocked
+      let chat = {
+        message: {
+          id: uuidv4(),
+          cid: createdChannel?.channel?.id,
+          text: message,
+          message,
+          user: {
+            id: req.userId,
+            name: `Anonymous ${anon_user_info_emoji_name}`,
+            image: '',
+            username: `Anonymous ${anon_user_info_emoji_name}`
+          },
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+      };
+
+      if (!createdChannel?.channel?.is_channel_blocked) {
+        chat = await channel.sendMessage({
+          user_id: req.userId,
+          text: message,
+          ...req.body
+        });
+      }
 
       const targets = members.filter((member) => member !== req.userId);
       await targets.map(async (target) => {
@@ -379,12 +398,16 @@ module.exports = {
 
       await client.disconnectUser();
 
-      return res.status(200).json(
-        responseSuccess('sent', {
-          ...chat,
-          members: targetsUserModel
-        })
-      );
+      const response = {
+        ...chat,
+        members: targetsUserModel
+      };
+
+      if (createdChannel?.channel?.is_channel_blocked) {
+        return res.status(400).json(responseError('channel is blocked', response));
+      }
+
+      return res.status(200).json(responseSuccess('sent', response));
     } catch (error) {
       await client.disconnectUser();
       return ErrorResponse.e400(res, error.message);
