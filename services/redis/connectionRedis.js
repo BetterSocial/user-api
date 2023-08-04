@@ -1,18 +1,5 @@
-const Redis = require('ioredis');
-/**
- * this is for local
- */
-/**
- * this is for production
- */
-console.log(process.env.REDIS_URL);
-const client = new Redis(String(process.env.REDIS_URL), {
-  tls: {
-    rejectUnauthorized: false,
-    requestCert: true,
-    agent: false
-  }
-});
+const {redisClient: client} = require('../../config/redis');
+
 client.on('connect', () => {
   console.error('redis connect');
 });

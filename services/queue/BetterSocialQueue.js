@@ -2,6 +2,7 @@ const Bull = require('bull');
 
 const Redis = require('ioredis');
 const {handlerFailure, handlerCompleted, handlerStalled} = require('./handler');
+const {bullConfig} = require('../../config/redis');
 
 let client;
 let subscriber;
@@ -24,10 +25,7 @@ class BetterSocialQueue {
       redis: {
         enableReadyCheck: false,
         maxRetriesPerRequest: null,
-        tls: {
-          rejectUnauthorized: false,
-          requestCert: true
-        }
+        ...bullConfig
       },
       createClient: (type, redisOpts) => {
         switch (type) {

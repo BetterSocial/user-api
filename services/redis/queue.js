@@ -2,12 +2,13 @@ const Bull = require('bull');
 const {v4: uuidv4} = require('uuid');
 
 const {convertingUserFormatForLocation} = require('../../utils/custom');
+const {bullConfig} = require('../../config/redis');
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
 
 const registerQueue = new Bull('registerQueue', connectRedis, {
   redis: {
-    tls: {rejectUnauthorized: false, requestCert: true},
+    ...bullConfig,
     maxRetriesPerRequest: 100,
     connectTimeout: 30000
   }
@@ -15,7 +16,7 @@ const registerQueue = new Bull('registerQueue', connectRedis, {
 
 const registerV2Queue = new Bull('registerV2', connectRedis, {
   redis: {
-    tls: {rejectUnauthorized: false, requestCert: true},
+    ...bullConfig,
     maxRetriesPerRequest: 100,
     connectTimeout: 30000
   }
