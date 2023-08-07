@@ -68,15 +68,12 @@ const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
         case "main_feed_f2":
             feeds = await getMainFeedF2(token, paramGetFeeds);
             return feeds
-            break;
         case "main_feed_topic":
             feeds = await getMainFeedTopic(token, paramGetFeeds);
             return feeds
-            break;
         case "main_feed_broad":
             feeds = await getMainFeedBroad(token, paramGetFeeds);
             return feeds
-            break;
         default:
             feeds = await getMainFeedFollowing(token, paramGetFeeds);
             return feeds
@@ -88,13 +85,10 @@ const feedSwitch = async (feed) => {
     switch(feed) {
         case "main_feed_following":
             return "main_feed_f2";
-            break;
         case "main_feed_f2":
             return "main_feed_topic";
-            break;
         case "main_feed_topic":
             return "main_feed_broad";
-            break;
         default:
           return "main_feed_following"
     }
