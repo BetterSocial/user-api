@@ -158,8 +158,7 @@ module.exports = async (req, res) => {
         if(feeds.length == 0){
             offset = 0
             feed = await feedSwitch(feed)
-            break;
-            // continue;
+            continue;
         }
         // Change to conventional loop because map cannot handle await
         for (let item of feeds) {
