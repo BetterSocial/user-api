@@ -24,6 +24,7 @@ const downvote = require('./downVote');
 const downVoteDomain = require('./downVoteDomain');
 const followUser = require('./followUser');
 const getFeeds = require('./getFeeds');
+const getFeedsV2 = require('./getFeedsV2');
 const getFeedUser = require('./getFeedUser');
 const getOpenGraph = require('./getOpenGraph');
 const getReaction = require('./getReaction');
@@ -77,6 +78,7 @@ module.exports = {
   getFeedChatService,
   getOneFeedChatService,
   getFeeds,
+  getFeedsV2,
   getFeedUser,
   getOpenGraph,
   getReaction,

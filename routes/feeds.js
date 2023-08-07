@@ -19,6 +19,7 @@ router.post('/post/poll/input', feed.inputPoll);
 router.get('/post/is-author-follow-me/:postId', feed.isAuthorFollowMe);
 router.post('/create-token', feedController.createToken);
 router.get('/feeds', feed.getFeeds);
+router.get('/feeds-v2', feed.getFeedsV2);
 router.post('/reaction', feed.createReaction);
 router.post('/reactions', isAuth, feed.getReaction);
 router.post('/follow-user', feed.followUser);
