@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 const profileController = require('../controllers/profiles');
 const Auth = require('../middlewares/auth');
@@ -25,11 +26,7 @@ router.post(
   BodyValidationMiddleware.changeProfileImage,
   profileController.changeImageProfile
 );
-router.delete(
-  '/remove-image',
-  Auth.isAuth,
-  profileController.removeImageProfile
-);
+router.delete('/remove-image', Auth.isAuth, profileController.removeImageProfile);
 router.get('/get-my-profile', Auth.isAuth, profileController.getMyProfile);
 router.get('/following', Auth.isAuth, profileController.following);
 router.post(
@@ -51,11 +48,7 @@ router.post(
   BodyValidationMiddleware.changeProfileImage,
   profileController.changeImageProfile
 );
-router.delete(
-  '/remove-image/:id',
-  Auth.isAuth,
-  profileController.removeImageProfile
-);
+router.delete('/remove-image/:id', Auth.isAuth, profileController.removeImageProfile);
 router.get('/get-my-profile/:id', Auth.isAuth, profileController.getMyProfile);
 router.get('/following/:id', Auth.isAuth, profileController.following);
 router.post(
@@ -84,11 +77,7 @@ router.post(
   BodyValidationMiddleware.unfollowUserV2,
   profileController.unfollowUserV2
 );
-router.get(
-  '/self-anonymous-feeds',
-  Auth.isAuth,
-  profileController.getSelfAnonymousFeedsInProfile
-);
+router.get('/self-anonymous-feeds', Auth.isAuth, profileController.getSelfAnonymousFeedsInProfile);
 router.patch('/settings', Auth.isAuth, profileController.anonDmPrivacySettings);
 /**
  * End of User Anonimity Changes
@@ -98,7 +87,7 @@ router.patch('/settings', Auth.isAuth, profileController.anonDmPrivacySettings);
  * follow / unfollow user v3
  */
 
-router.post("/follow-user-v3", Auth.isAuthV2, BodyValidationMiddleware.followUserV2, profileController.followUserV3)
-router.post("/unfollow-user-v3", Auth.isAuthV2, BodyValidationMiddleware.unfollowUserV2, profileController.unfollowUserV3)
+// router.post("/follow-user-v3", Auth.isAuthV2, BodyValidationMiddleware.followUserV2, profileController.followUserV3)
+// router.post("/unfollow-user-v3", Auth.isAuthV2, BodyValidationMiddleware.unfollowUserV2, profileController.unfollowUserV3)
 
 module.exports = router;
