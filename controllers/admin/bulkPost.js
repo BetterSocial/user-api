@@ -141,4 +141,7 @@ const generateAnonymousUsername = async () => {
   }
 };
 
-module.exports = bulkPostController;
+module.exports = {
+  bulkPostController,
+  generateAnonymousUsername,
+};

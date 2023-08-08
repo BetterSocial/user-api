@@ -27,7 +27,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     let result = {};
 
     let commentAuthor = {
-      username: `Anonymous` + ` ${anon_user_info?.emoji_name}`,
+      username: `Anonymous ${anon_user_info?.emoji_name}`,
       profile_pic_path: USERS_DEFAULT_IMAGE,
       anon_user_info
     };
@@ -117,7 +117,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
 const getDetail = async (reaction_id) => {
   const reaction = await Getstream.feed.getReactionById(reaction_id);
   const otherCommentatorNotify =
-    reaction.latest_children.comment.map((cmnt) => `notification:${cmnt.user_id}`) || [];
+    reaction?.latest_children?.comment?.map((cmnt) => `notification:${cmnt.user_id}`) || [];
   const feed = await Getstream.feed.getPlainFeedById(reaction?.activity_id);
   // owner of feed
   const userIdFeed = feed?.actor?.id;
