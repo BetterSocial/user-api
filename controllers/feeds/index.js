@@ -45,6 +45,7 @@ const {putMainFeed} = require('./updateActivity');
 const getOneFeedChatService = require('./getOneFeedChat');
 const getAnonymousFeedChatService = require('./getAnonymousFeedChat');
 const commentVoteV2 = require('./commentVoteV2');
+const feedSync = require('./feedSync');
 
 module.exports = {
   blockAnonymousPostV2,
@@ -93,5 +94,6 @@ module.exports = {
   upVoteDomain,
   voteComment,
   reactionList,
-  commentVoteV2
+  commentVoteV2,
+  feedSync
 };

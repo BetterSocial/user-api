@@ -49,6 +49,7 @@ router.post('/open-graph', isAuth, feed.getOpenGraph);
 router.delete('/:postId', isAuth, feed.deletePost);
 router.delete('/anonymous/:postId', isAuth, feed.deleteAnonymousPost);
 
+router.get('/feed-sync/:userId', feed.feedSync);
 router.post('/feed-action-notification/:kind', isAuth, feed.notificationCommentFeed);
 router.post('/post-v2', isAuth, CreatePostMiddleware, feed.createPostV2);
 router.post('/post-v3', isAuth, CreatePostMiddleware, feed.createPostV3);
