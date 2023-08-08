@@ -3,8 +3,8 @@ const {redisClient: client} = require('../../config/redis');
 client.on('connect', () => {
   console.error('redis connect');
 });
-client.on('error', () => {
-  console.error('connection error ' /** error * */);
+client.on('error', (error) => {
+  console.error('connection error ', error);
 });
 client.on('ready', () => {
   console.error('redis ready');

@@ -11,7 +11,7 @@ const redisConfig = IS_LOCAL_REDIS
       }
     };
 
-const redisClient = new Redis(String(process.env.REDIS_URL), redisConfig);
+const redisClient = new Redis(String(process.env.REDIS_TLS_URL), redisConfig);
 
 const bullConfig = IS_LOCAL_REDIS
   ? {}
