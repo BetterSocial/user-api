@@ -18,4 +18,5 @@ module.exports = {
   DB_COLLECTION_USER_POST_SCORE: "user_post_score",
   EVENT_FOLLOW_F2_USER: "follow-f2-users",
   EVENT_UNFOLLOW_F2_USER: "unfollow-f2-users",
+  EVENT_SYNC_FEED: "syncUserFeedQueue",
 };
