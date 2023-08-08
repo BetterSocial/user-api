@@ -5,9 +5,9 @@ const redisConfig = IS_LOCAL_REDIS
   ? {}
   : {
       tls: {
-        rejectUnauthorized: false,
-        requestCert: true,
-        agent: false
+        rejectUnauthorized: false
+        // requestCert: true,
+        // agent: false
       }
     };
 
@@ -17,8 +17,8 @@ const bullConfig = IS_LOCAL_REDIS
   ? {}
   : {
       tls: {
-        rejectUnauthorized: false,
-        requestCert: true
+        rejectUnauthorized: false
+        // requestCert: true
       }
     };
 
