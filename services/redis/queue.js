@@ -6,14 +6,6 @@ const {bullConfig} = require('../../config/redis');
 
 const connectRedis = process.env.REDIS_TLS_URL ? process.env.REDIS_TLS_URL : process.env.REDIS_URL;
 
-const registerQueue = new Bull('registerQueue', connectRedis, {
-  redis: {
-    ...bullConfig,
-    maxRetriesPerRequest: 100,
-    connectTimeout: 30000
-  }
-});
-
 const registerV2Queue = new Bull('registerV2', connectRedis, {
   redis: {
     ...bullConfig,
@@ -21,34 +13,12 @@ const registerV2Queue = new Bull('registerV2', connectRedis, {
     connectTimeout: 30000
   }
 });
-registerQueue.on('error', (err) => {
-  console.log('error on assigning register queue', err);
-});
+
 registerV2Queue.on('error', (err) => {
   console.log('error on assigning register v2 queue', err);
 });
 
-const registerServiceQueue = async (token, userId, follows, topics, locations, myAnonUserId) => {
-  const locationsChannel = convertingUserFormatForLocation(locations);
-
-  const data = {
-    token,
-    userId,
-    locationsChannel,
-    follows,
-    topics,
-    anonUserId: myAnonUserId,
-    locations
-  };
-
-  const options = {
-    jobId: uuidv4(),
-    removeOnComplete: true
-  };
-
-  const status = await registerQueue.add(data, options);
-  return status;
-};
+let registerServiceQueue;
 
 const registerV2ServiceQueue = async (token, userId, follows, topics, locations, myAnonUserId) => {
   const locationsChannel = convertingUserFormatForLocation(locations);
