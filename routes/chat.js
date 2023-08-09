@@ -5,6 +5,7 @@ const chatController = require('../controllers/chat/ChatController');
 
 const auth = require('../middlewares/auth');
 const isTargetUserAllowingAnonDMMiddleware = require('../middlewares/chat/isTargetUserAllowingAnonDMMiddleware');
+const SuccessMiddleware = require('../middlewares/success');
 
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
@@ -21,6 +22,12 @@ router.post(
   auth.isAuthAnonim,
   isTargetUserAllowingAnonDMMiddleware,
   chatController.findOrCreateChannel
+);
+router.post(
+  '/channels/check-allow-anon-dm-status',
+  auth.isAuthAnonim,
+  isTargetUserAllowingAnonDMMiddleware,
+  SuccessMiddleware
 );
 
 module.exports = router;

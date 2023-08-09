@@ -6,6 +6,7 @@ const BetterSocialCreateAnonymousUser = require('./user/BetterSocialCreateAnonym
 const BetterSocialCreateUser = require('./user/BetterSocialCreateUser');
 const BetterSocialUnblockUserV2 = require('./user/BetterSocialUnblockUserV2');
 const BetterSocialCheckPasswordForDemoLogin = require('./user/BetterSocialCheckPasswordForDemoLogin');
+const BetterSocialCheckIsTargetAllowingAnonDM = require('./user/BetterSocialCheckIsTargetAllowingAnonDM');
 const postComment = require('./post/comment');
 const postCommentChild = require('./post/commentChild');
 const postCommentDomain = require('./post/commentDomain');
@@ -20,6 +21,7 @@ const BetterSocialCore = {
     createAnonymousUser: BetterSocialCreateAnonymousUser,
     blockUser: BetterSocialBlockUserV2,
     unblockUser: BetterSocialUnblockUserV2,
+    checkIsTargetAllowingAnonDM: BetterSocialCheckIsTargetAllowingAnonDM,
     checkTargetUserFollowStatus: BetterSocialCheckTargetFollowStatus,
     checkTargetUserFollowStatusBatch: BetterSocialCheckTargetFollowStatusBatch,
     checkPasswordForDemoLogin: BetterSocialCheckPasswordForDemoLogin
