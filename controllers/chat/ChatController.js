@@ -104,7 +104,6 @@ module.exports = {
       const channel = client.channel('messaging', channelId);
 
       const createdChannel = await channel.create();
-      console.log('createdChannel', createdChannel);
 
       if (createdChannel?.channel?.is_channel_blocked)
         return res.status(403).json(responseError('Channel is blocked'));
@@ -249,7 +248,7 @@ module.exports = {
         image: userModel?.profile_pic_path,
         username: userModel?.username
       };
-      console.log('user', user);
+
       await client.connectUser(user, req.token);
 
       const channel = client.channel('messaging', {members});
@@ -307,7 +306,6 @@ module.exports = {
     } = req.body;
     if (!members.includes(req.userId)) members.push(req.userId);
 
-    console.log('trace 1');
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
       /**
@@ -321,13 +319,11 @@ module.exports = {
       };
       await client.connectUser(user, req.token);
 
-      console.log('trace 2');
       if (client.user.name !== `Anonymous ${anon_user_info_emoji_name}`) {
         await client.upsertUser({id: req.userId, name: `Anonymous ${anon_user_info_emoji_name}`});
       }
 
       const channel = client.channel('messaging', {members});
-      console.log('trace 3');
       const createdChannel = await channel.create();
 
       await channel.updatePartial({
@@ -339,7 +335,6 @@ module.exports = {
           anon_user_info_emoji_name
         }
       });
-      console.log('trace 4');
 
       // Default mock chat in case of channel is blocked
       let chat = {

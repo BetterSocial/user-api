@@ -16,10 +16,6 @@ const isTargetUserAllowingAnonDMMiddleware = async (req, res, next) => {
   if (!user?.allow_anon_dm)
     return ErrorResponse.e400(res, 'This user does not want to receive anonymous messages');
 
-  console.log(
-    'user?.only_received_dm_from_user_following',
-    user?.only_received_dm_from_user_following
-  );
   if (user?.only_received_dm_from_user_following) {
     const signedUserId = await UsersFunction.findSignedUserId(User, req?.userId);
     const currentUserStatus = await UserFollowUserFunction.checkTargetUserFollowStatus(
@@ -27,7 +23,6 @@ const isTargetUserAllowingAnonDMMiddleware = async (req, res, next) => {
       signedUserId,
       user?.user_id
     );
-    console.log('\n isTargetFollowingCurrentUser \n', currentUserStatus);
 
     if (!currentUserStatus?.isTargetFollowingMe)
       return ErrorResponse.e400(res, 'This user does not want to receive anonymous messages');
