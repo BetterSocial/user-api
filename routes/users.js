@@ -8,6 +8,7 @@ const BodyValidationMiddleware = require('../middlewares/body-validation');
 const RegisterV2UploadPhotoMiddleware = require('../middlewares/upload-photo/registerV2');
 const VerifyUserV2Middleware = require('../middlewares/verify-user');
 const {redisClient} = require('../config/redis');
+const checkHumanIdExchangeTokenDummy = require('../controllers/users/checkHumanIdExchangeTokenDummy');
 
 const rateLimiter = expressLimiter(router, redisClient);
 
@@ -86,6 +87,12 @@ router.post(
   '/check-exchange-token',
   BodyValidationMiddleware.checkHumanIdExchangeToken,
   usersHandler.checkHumanIdExchangeTokenController
+);
+
+router.post(
+  '/check-exchange-token-dummy',
+  BodyValidationMiddleware.checkHumanIdExchangeToken,
+  checkHumanIdExchangeTokenDummy
 );
 
 router.post(
