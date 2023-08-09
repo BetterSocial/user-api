@@ -1,6 +1,4 @@
-const UsersFunction = require("../../databases/functions/users");
 const getstreamService = require("../../services/getstream");
-const {User} = require ('../../databases/models')
 
 const Validator = require("fastest-validator");
 const { handleAnonymousData } = require("../../utils");
@@ -21,16 +19,24 @@ module.exports = async (req, res) => {
         message: validate,
       });
     }
-    let {activity_id, limit, feed_id} = req.body;
+    let { activity_id, limit, feed_id } = req.body;
     const token = req.token;
-    const detailFeed = await getPlainFeedById(feed_id)
-    const myAnonymUser = await getAnonymUser(req.userId)
+    const detailFeed = await getPlainFeedById(feed_id);
+    const myAnonymUser = await getAnonymUser(req.userId);
     getstreamService
       .getReaction(activity_id, token, limit)
-      .then(async(result) => {
-        let mappingNewRes = await Promise.all(result.results.map(async(dataUser) => {
-          return handleAnonymousData(dataUser, req, detailFeed.actor.id, myAnonymUser, dataUser.user_id)
-        })) 
+      .then(async (result) => {
+        let mappingNewRes = await Promise.all(
+          result.results.map(async (dataUser) => {
+            return handleAnonymousData(
+              dataUser,
+              req,
+              detailFeed.actor.id,
+              myAnonymUser,
+              dataUser.user_id
+            );
+          })
+        );
         res.status(200).json({
           status: "success",
           data: mappingNewRes,
