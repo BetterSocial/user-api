@@ -1,4 +1,5 @@
 const getstreamService = require("../../services/getstream");
+const moment = require("moment");
 
 const Validator = require("fastest-validator");
 const { handleAnonymousData } = require("../../utils");
@@ -36,6 +37,9 @@ module.exports = async (req, res) => {
               dataUser.user_id
             );
           })
+        );
+        mappingNewRes = mappingNewRes.sort(
+          (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix()
         );
         res.status(200).json({
           status: "success",
