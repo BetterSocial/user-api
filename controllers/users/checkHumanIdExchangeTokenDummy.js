@@ -2,8 +2,6 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 
 const SuccessResponse = require('../../utils/response/SuccessResponse');
 
-const HumanIdService = require('../../vendor/humanid');
-
 const {User} = require('../../databases/models');
 
 const UsersFunction = require('../../databases/functions/users');
@@ -16,13 +14,14 @@ const {createRefreshToken} = require('../../services/jwt');
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-const checkHumanIdExchangeToken = async (req, res) => {
+const checkHumanIdExchangeTokenDummy = async (req, res) => {
   const {token} = req?.body || {};
   if (!token) {
     return ErrorResponse.e500(res, 'Token is required');
   }
 
-  const verifyTokenResponse = await HumanIdService.verifyExchangeToken(token);
+  const verifyTokenResponse = {success: true, data: {appUserId: token}};
+
   if (verifyTokenResponse.success) {
     const {data} = verifyTokenResponse || {};
     const {appUserId} = data || {};
@@ -61,4 +60,4 @@ const checkHumanIdExchangeToken = async (req, res) => {
   return ErrorResponse.e500(res, verifyTokenResponse.message);
 };
 
-module.exports = checkHumanIdExchangeToken;
+module.exports = checkHumanIdExchangeTokenDummy;
