@@ -107,6 +107,7 @@ module.exports = {
 
       if (
         req.user.is_anonymous &&
+        createdChannel.channel.anon_user_info_emoji_name &&
         client.user.name !== `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`
       ) {
         await client.upsertUser({
