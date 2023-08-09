@@ -254,13 +254,17 @@ module.exports = {
       const channel = client.channel('messaging', {members});
 
       await channel.create();
-      if (!channel?.data?.name) {
-        await channel.updatePartial({
-          set: {
-            channel_type: CHANNEL_TYPE.CHAT,
-            name: [userModel?.username, targetUserModel?.username].join(', ')
-          }
-        });
+      try {
+        if (!channel?.data?.name) {
+          await channel.updatePartial({
+            set: {
+              channel_type: CHANNEL_TYPE.CHAT,
+              name: [userModel?.username, targetUserModel?.username].join(', ')
+            }
+          });
+        }
+      } catch (e) {
+        console.log(e);
       }
 
       const chat = await channel.sendMessage({
