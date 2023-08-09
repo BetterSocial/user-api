@@ -39,7 +39,7 @@ const checkHumanIdExchangeToken = async (req, res) => {
         humanIdData: data
       });
 
-    if (user && user?.is_banned) return ErrorResponse.e400(res, 'User has banned by admin');
+    if (user?.is_banned) return ErrorResponse.e400(res, 'User has banned by admin');
 
     const anonymousUser = await UsersFunction.findAnonymousUserId(User, user?.user_id);
     const userId = user?.user_id?.toLowerCase();
