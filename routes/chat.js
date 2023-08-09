@@ -4,6 +4,8 @@ const router = express.Router();
 const chatController = require('../controllers/chat/ChatController');
 
 const auth = require('../middlewares/auth');
+const isTargetUserAllowingAnonDMMiddleware = require('../middlewares/chat/isTargetUserAllowingAnonDMMiddleware');
+const SuccessMiddleware = require('../middlewares/success');
 
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
@@ -15,6 +17,17 @@ router.post('/init-chat', auth.isAuth, chatController.initChat);
 router.post('/init-chat-anonymous', auth.isAuthAnonim, chatController.initChatAnonymous);
 router.post('/users/:targetUserId', auth.isAuth, chatController.getMyAnonProfile);
 router.post('/channels/:channelId/read', auth.isAuthAnonim, chatController.readChannel);
-router.post('/channels', auth.isAuthAnonim, chatController.findOrCreateChannel);
+router.post(
+  '/channels',
+  auth.isAuthAnonim,
+  isTargetUserAllowingAnonDMMiddleware,
+  chatController.findOrCreateChannel
+);
+router.post(
+  '/channels/check-allow-anon-dm-status',
+  auth.isAuthAnonim,
+  isTargetUserAllowingAnonDMMiddleware,
+  SuccessMiddleware
+);
 
 module.exports = router;
