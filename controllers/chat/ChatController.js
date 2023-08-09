@@ -244,10 +244,10 @@ module.exports = {
        * @type {import('stream-chat').OwnUserResponse}
        */
       const user = {
-        name: userModel?.username?.toLowerCase(),
+        name: userModel?.username,
         id: req.userId,
         image: userModel?.profile_pic_path,
-        username: userModel?.username?.toLowerCase()
+        username: userModel?.username
       };
       await client.connectUser(user, req.token);
 
