@@ -14,12 +14,11 @@ module.exports = async (req, res) => {
       (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix()
     );
     sortByDate = sortByDate.map((commentRes) => {
-      const sortComment = commentRes?.latest_children?.comment.sort(
+      const sortComment = commentRes?.latest_children?.comment?.sort(
         (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix()
       );
       return { ...commentRes, latest_children: { comment: sortComment } };
     });
-    console.log({ sortByDate }, "jika");
 
     const removeSensitiveData = await Promise.all(
       sortByDate.map(async (data) => {
