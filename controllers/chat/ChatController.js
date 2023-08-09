@@ -249,6 +249,7 @@ module.exports = {
         image: userModel?.profile_pic_path,
         username: userModel?.username
       };
+      console.log('user', user);
       await client.connectUser(user, req.token);
 
       const channel = client.channel('messaging', {members});
