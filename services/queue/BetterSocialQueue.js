@@ -2,10 +2,10 @@ const Bull = require('bull');
 
 const Redis = require('ioredis');
 const {handlerFailure, handlerCompleted, handlerStalled} = require('./handler');
-const {bullConfig} = require('../../config/redis');
+const {bullConfig, redisClient} = require('../../config/redis');
 
-let client;
-let subscriber;
+let client = redisClient;
+let subscriber = redisClient;
 
 class BetterSocialQueue {
   /**
@@ -40,7 +40,7 @@ class BetterSocialQueue {
             }
             return subscriber;
           case 'bclient':
-            return new Redis(redisUrl, redisOpts);
+            return redisClient;
           default:
             throw new Error('Unexpected connection type: ', type);
         }
