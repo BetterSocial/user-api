@@ -157,7 +157,7 @@ module.exports = async (req, res) => {
         const feeds = await getActivtiesOnFeed(feed, token, paramGetFeeds)
         if(feeds.length == 0){
             if (feed=='main_feed_broad'){
-              break
+              break;
             }else{
               offset = 0
               feed = await feedSwitch(feed)
