@@ -2,7 +2,7 @@ const Bull = require('bull');
 
 const Redis = require('ioredis');
 const {handlerFailure, handlerCompleted, handlerStalled} = require('./handler');
-const {bullConfig, redisClient} = require('../../config/redis');
+const {bullConfig, redisClient, redisUrl} = require('../../config/redis');
 
 let client = redisClient;
 let subscriber = redisClient;
@@ -19,8 +19,6 @@ class BetterSocialQueue {
     // let redisUrl = process.env.REDIS_TLS_URL
 
     // Comment below for heroku redis
-    const redisUrl = process.env.REDIS_URL;
-
     const createClientOptions = {
       redis: {
         enableReadyCheck: false,
