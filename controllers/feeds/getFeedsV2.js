@@ -156,9 +156,13 @@ module.exports = async (req, res) => {
 
         const feeds = await getActivtiesOnFeed(feed, token, paramGetFeeds)
         if(feeds.length == 0){
-            offset = 0
-            feed = await feedSwitch(feed)
-            continue;
+            if (feed=='main_feed_broad'){
+              break;
+            }else{
+              offset = 0
+              feed = await feedSwitch(feed)
+              continue;
+            }
         }
         // Change to conventional loop because map cannot handle await
         for (let item of feeds) {
