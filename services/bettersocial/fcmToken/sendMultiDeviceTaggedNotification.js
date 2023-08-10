@@ -23,8 +23,8 @@ const sendMultiDeviceTaggedNotification = async (
           title: `${userAuthor?.username} tagged you in a post: ${
             message ? message.substring(0, 50) : ''
           }`,
-          body: message,
-          click_action: 'OPEN_ACTIVITY_1'
+          body: message
+          // click_action: 'OPEN_ACTIVITY_1'
         },
         data: {
           feed_id: activity_id,

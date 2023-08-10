@@ -17,8 +17,8 @@ const sendMultiDeviceCommentNotification = async (
       const payload = {
         notification: {
           title: `${commentAuthor?.username} commented on your post`,
-          body: message,
-          click_action: 'OPEN_ACTIVITY_1'
+          body: message
+          // click_action: 'OPEN_ACTIVITY_1'
           // image: commentAuthor?.profile_pic_path,
         },
         data: {

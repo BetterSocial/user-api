@@ -1,4 +1,5 @@
 const express = require('express');
+const expressLimiter = require('express-limiter');
 
 const router = express.Router();
 const usersHandler = require('../controllers/users');
@@ -6,18 +7,35 @@ const auth = require('../middlewares/auth');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 const RegisterV2UploadPhotoMiddleware = require('../middlewares/upload-photo/registerV2');
 const VerifyUserV2Middleware = require('../middlewares/verify-user');
+const {redisClient} = require('../config/redis');
+
+const rateLimiter = expressLimiter(router, redisClient);
+
+const verifyUserRateLimiter = rateLimiter({
+  lookup: 'connection.remoteAddress',
+  method: '*',
+  total: 10,
+  expire: 1000 * 60 * 60,
+  onRateLimited: (req, res) =>
+    res.status(429).json({
+      code: 429,
+      message: 'Too many requests, please try again later.'
+    })
+});
 
 router.post('/check-username', usersHandler.checkUsername);
 router.post('/register', usersHandler.register);
 router.post('/demo-verify-user', usersHandler.demoVerifyUser);
 router.post(
   '/demo-verify-user-v2',
+  verifyUserRateLimiter,
   BodyValidationMiddleware.verifyUser,
   VerifyUserV2Middleware,
   usersHandler.demoVerifyUser
 );
 router.post(
   '/password-verify-user',
+  verifyUserRateLimiter,
   BodyValidationMiddleware.checkPasswordForDemoLogin,
   usersHandler.checkPasswordForDemoLogin
 );
