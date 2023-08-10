@@ -1,6 +1,8 @@
 const Redis = require('ioredis');
 
 const IS_LOCAL_REDIS = false;
+const redisUrl = process.env.REDIS_TLS_URL;
+
 const redisConfig = IS_LOCAL_REDIS
   ? {}
   : {
@@ -11,7 +13,7 @@ const redisConfig = IS_LOCAL_REDIS
       }
     };
 
-const redisClient = new Redis(String(process.env.REDIS_TLS_URL), redisConfig);
+const redisClient = new Redis(String(redisUrl), redisConfig);
 
 const bullConfig = IS_LOCAL_REDIS
   ? {}
@@ -24,5 +26,6 @@ const bullConfig = IS_LOCAL_REDIS
 
 module.exports = {
   redisClient,
-  bullConfig
+  bullConfig,
+  redisUrl
 };
