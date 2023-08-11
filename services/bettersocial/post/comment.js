@@ -139,14 +139,13 @@ async function BetterSocialCreateCommentV3(req) {
     const {actor} = feed;
     // find comment author by userId provided by token
     const commentAuthor = await UsersFunction.findUserById(User, userId);
-    const feedOwnerId = await UsersFunction.findSignedUserId(User, actor.id);
 
     const result = await Getstream.feed.comment(
       token,
       message,
       activity_id,
       userId,
-      feedOwnerId,
+      actor.id,
       sendPostNotif
     );
 
@@ -154,7 +153,7 @@ async function BetterSocialCreateCommentV3(req) {
       await countProcess(activity_id, {comment_count: +1}, {comment_count: 1});
     }
 
-    await sendMultiDeviceCommentNotification(feedOwnerId, commentAuthor, message, activity_id);
+    await sendMultiDeviceCommentNotification(actor.id, commentAuthor, message, activity_id);
 
     await scoringAfterComment(result.id, userId, activity_id, message);
 
