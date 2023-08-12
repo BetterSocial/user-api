@@ -84,10 +84,10 @@ const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
 const feedSwitch = async (feed) => {
     switch(feed) {
         case "main_feed_following":
-            return "main_feed_f2";
-        case "main_feed_f2":
             return "main_feed_topic";
         case "main_feed_topic":
+            return "main_feed_f2";
+        case "main_feed_f2":
             return "main_feed_broad";
         default:
           return "main_feed_following"
