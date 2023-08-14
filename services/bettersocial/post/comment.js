@@ -153,7 +153,8 @@ async function BetterSocialCreateCommentV3(req) {
       await countProcess(activity_id, {comment_count: +1}, {comment_count: 1});
     }
 
-    await sendMultiDeviceCommentNotification(actor.id, commentAuthor, message, activity_id);
+    if (!(await UsersFunction.checkIsMe(User, actor?.id, userId)))
+      await sendMultiDeviceCommentNotification(actor.id, commentAuthor, message, activity_id);
 
     await scoringAfterComment(result.id, userId, activity_id, message);
 
@@ -210,12 +211,13 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
       await countProcess(activity_id, {comment_count: +1}, {comment_count: 1});
     }
 
-    await sendMultiDeviceCommentNotification(
-      signedFeedOwnerId,
-      {username: `Anonymous ${capitalize(anonInfo.anon_user_info_emoji_name)}`},
-      message,
-      activity_id
-    );
+    if (!(await UsersFunction.checkIsMe(User, actor?.id, userId)))
+      await sendMultiDeviceCommentNotification(
+        signedFeedOwnerId,
+        {username: `Anonymous ${capitalize(anonInfo.anon_user_info_emoji_name)}`},
+        message,
+        activity_id
+      );
 
     await scoringAfterComment(result.id, userId, activity_id, message);
 
