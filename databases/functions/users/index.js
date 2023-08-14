@@ -7,6 +7,7 @@ const findUserByHumanId = require('./find-user-by-human-id');
 const findSignedUserId = require('./find-signed-user-id');
 const findActorId = require('./find-actor-id');
 const findAnonymousUsername = require('./findAnonymousUsername');
+const checkIsMe = require('./check-is-me');
 
 const UsersFunction = {
   register,
@@ -17,7 +18,8 @@ const UsersFunction = {
   findUserByHumanId,
   findSignedUserId,
   findActorId,
-  findAnonymousUsername
+  findAnonymousUsername,
+  checkIsMe
 };
 
 module.exports = UsersFunction;

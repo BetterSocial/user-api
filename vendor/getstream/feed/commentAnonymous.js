@@ -38,7 +38,7 @@ module.exports = async (
       anon_user_info_color_code: anonUserInfo?.color_code,
       anon_user_info_emoji_name: anonUserInfo?.emoji_name,
       anon_user_info_emoji_code: anonUserInfo?.emoji_code,
-      is_anonymous: anonUserInfo.is_anonymous,
+      is_anonymous: anonUserInfo?.is_anonymous,
       isNotSeen: true
     },
     {targetFeeds: targetFeed, userId: anonymousUserId}
