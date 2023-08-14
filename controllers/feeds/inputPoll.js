@@ -104,7 +104,8 @@ module.exports = async (req, res) => {
           {
             where: {
               polling_option_id
-            }
+            },
+            order: [['created_at', 'ASC']]
           },
           {transaction: t}
         );
