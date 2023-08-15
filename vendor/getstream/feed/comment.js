@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const GetstreamSingleton = require('../singleton');
 
 module.exports = async (
@@ -6,10 +8,11 @@ module.exports = async (
   activityId,
   commentAuthorUserId,
   feedOwnerUserId,
-  sendPostNotif = true
+  sendPostNotif = true,
+  postNotifTo = []
 ) => {
   const clientUser = GetstreamSingleton.getClientInstance(token);
-  let targetFeed = [`notification:${feedOwnerUserId}`];
+  let targetFeed = [...postNotifTo, `notification:${feedOwnerUserId}`];
   if (sendPostNotif) {
     if (feedOwnerUserId !== commentAuthorUserId) {
       targetFeed = [...targetFeed, `notification:${commentAuthorUserId}`];
@@ -17,7 +20,7 @@ module.exports = async (
   } else {
     targetFeed = [];
   }
-
+  const target = _.union(targetFeed);
   const data = await clientUser.reactions.add(
     'comment',
     activityId,
@@ -27,7 +30,7 @@ module.exports = async (
       count_downvote: 0,
       isNotSeen: true
     },
-    {targetFeeds: targetFeed, userId: commentAuthorUserId}
+    {targetFeeds: target, userId: commentAuthorUserId}
   );
 
   return data;

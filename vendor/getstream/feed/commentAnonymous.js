@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const createToken = require('../core/createToken');
 const GetstreamSingleton = require('../singleton');
 
@@ -7,11 +8,12 @@ module.exports = async (
   activityId,
   feedOwnerUserId,
   anonUserInfo,
-  sendPostNotif
+  sendPostNotif,
+  postNotifTo = []
 ) => {
   const anonymousToken = await createToken(anonymousUserId);
   const clientUser = GetstreamSingleton.getClientInstance(anonymousToken);
-  let targetFeed = [`notification:${feedOwnerUserId}`];
+  let targetFeed = [...postNotifTo, `notification:${feedOwnerUserId}`];
   if (sendPostNotif) {
     if (feedOwnerUserId !== anonymousUserId) {
       targetFeed = [...targetFeed, `notification:${anonymousUserId}`];
@@ -20,7 +22,7 @@ module.exports = async (
     targetFeed = [];
   }
   const userAnon = await clientUser.user(anonymousUserId).get();
-
+  const target = _.union(targetFeed);
   if (!userAnon.data.username) {
     await clientUser
       .user(anonymousUserId)
@@ -41,7 +43,7 @@ module.exports = async (
       is_anonymous: anonUserInfo?.is_anonymous,
       isNotSeen: true
     },
-    {targetFeeds: targetFeed, userId: anonymousUserId}
+    {targetFeeds: target, userId: anonymousUserId}
   );
   return handleResponse;
 };

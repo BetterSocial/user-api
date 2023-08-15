@@ -14,6 +14,7 @@ const {USERS_DEFAULT_IMAGE} = require('../../../helpers/constants');
 
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 const sendMultiDeviceCommentNotification = require('../fcmToken/sendMultiDeviceCommentNotification');
+const {getDetailFeed} = require('../../getstream');
 
 const capitalize = (s) => {
   if (typeof s !== 'string') return '';
@@ -135,10 +136,18 @@ async function BetterSocialCreateCommentV3(req) {
   try {
     const {body, userId, token} = req;
     const {activity_id, message, sendPostNotif} = body;
-    const feed = await Getstream.feed.getPlainFeedById(activity_id);
+    const {
+      results: [feed]
+    } = await getDetailFeed(activity_id);
     const {actor} = feed;
     // find comment author by userId provided by token
     const commentAuthor = await UsersFunction.findUserById(User, userId);
+    const postNotifTo = [];
+    for (let i = 0; i < feed.latest_reactions.comment?.length || 0; i += 1) {
+      if (feed.latest_reactions.comment[i].kind === 'comment') {
+        postNotifTo.push(`notification:${feed.latest_reactions.comment[i].user_id}`);
+      }
+    }
 
     const result = await Getstream.feed.comment(
       token,
@@ -146,7 +155,8 @@ async function BetterSocialCreateCommentV3(req) {
       activity_id,
       userId,
       actor.id,
-      sendPostNotif
+      sendPostNotif,
+      postNotifTo
     );
 
     if (body?.message?.length > 80) {
@@ -184,10 +194,18 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
     const {body, userId} = req;
     const {activity_id, message, anon_user_info, sendPostNotif} = body;
     // find feed
-    const feed = await Getstream.feed.getPlainFeedById(activity_id);
+    const {
+      results: [feed]
+    } = await getDetailFeed(activity_id);
     const {actor} = feed;
     // find signed feedOwnerId
     const signedFeedOwnerId = await UsersFunction.findSignedUserId(User, actor.id);
+    const postNotifTo = [];
+    for (let i = 0; i < feed.latest_reactions.comment?.length || 0; i += 1) {
+      if (feed.latest_reactions.comment[i].kind === 'comment') {
+        postNotifTo.push(`notification:${feed.latest_reactions.comment[i].user_id}`);
+      }
+    }
 
     const result = await Getstream.feed.commentAnonymous(
       userId,
@@ -195,7 +213,8 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
       activity_id,
       actor.id,
       anon_user_info,
-      sendPostNotif
+      sendPostNotif,
+      postNotifTo
     );
 
     const anonInfo = await PostAnonUserInfoFunction.createAnonUserInfoInComment(PostAnonUserInfo, {

@@ -9,7 +9,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 
 module.exports = async (req, res) => {
   const {id} = req.query;
-  const feed = await getDetailFeed(req.token, id);
+  const feed = await getDetailFeed(id);
   const feedItem = feed.results[0];
 
   const feedExpiredAt = moment(feedItem?.expired_at);
