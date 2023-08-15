@@ -133,17 +133,16 @@ const finalize = (req, id, myReaction, newGroup, activity_id, constantActor) => 
       newGroup[activity_id].comments.filter(
         (data) => constantActor.id !== req.userId && data.reaction.kind === 'comment'
       )?.length || 0;
-    if (newGroup[activity_id]?.comments?.length > 0) {
-      newGroup[activity_id].data.last_message_at = newGroup[activity_id].comments
-        .filter((data) => data.reaction.kind === 'comment')
-        ?.sort(
-          (a, b) => new Date(a.reaction.created_at) - new Date(b.reaction.created_at)
-        )?.[0]?.reaction?.created_at;
-      newGroup[activity_id].data.updated_at = newGroup[activity_id].comments
-        .filter((data) => data.reaction.kind === 'comment')
-        ?.sort(
-          (a, b) => new Date(a.reaction.updated_at) - new Date(b.reaction.updated_at)
-        )?.[0]?.reaction?.created_at;
+    const listComment = newGroup[activity_id]?.comments?.filter(
+      (data) => data.reaction.kind === 'comment'
+    );
+    if (listComment.length > 0) {
+      newGroup[activity_id].data.last_message_at = listComment?.sort(
+        (a, b) => new Date(a.reaction.created_at) - new Date(b.reaction.created_at)
+      )?.[0]?.reaction?.created_at;
+      newGroup[activity_id].data.updated_at = listComment?.sort(
+        (a, b) => new Date(a.reaction.updated_at) - new Date(b.reaction.updated_at)
+      )?.[0]?.reaction?.created_at;
     }
   }
 };
