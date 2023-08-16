@@ -1,27 +1,25 @@
-const { User, Topics, UserFollowUser, sequelize, Sequelize, NewsLink, DomainPage } = require('../../databases/models')
-const { Op, fn, col, QueryTypes } = require('sequelize')
-const _ = require('lodash')
-const { getDomain } = require('../../services/getstream')
-const { getBlockDomain } = require('../../services/domain')
-const { filter } = require('lodash')
+const {QueryTypes} = require('sequelize');
+
+const {sequelize} = require('../../databases/models');
 
 /**
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- * @returns 
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
  */
 const Search = async (req, res) => {
-    const { q } = req.query
-    const userId = req.userId
-    if (q.length < 2) return res.status(200).json({
-        success: true,
-        message: 'Your search characters is too few, please input 3 or more characters for search'
-    })
+  const {q} = req.query;
+  const {userId} = req;
+  if (q.length < 2)
+    return res.status(200).json({
+      success: true,
+      message: 'Your search characters is too few, please input 3 or more characters for search'
+    });
 
-    try {
-        let topics = await sequelize.query(
-            `SELECT 
+  try {
+    const topics = await sequelize.query(
+      `SELECT 
             "Topic".*,
             count("topicFollower"."user_id") 
                 AS "followersCount",
@@ -39,36 +37,35 @@ const Search = async (req, res) => {
         ORDER BY
             "user_id_follower" ASC,
             "followersCount" DESC
-            LIMIT 10`, {
-            type: QueryTypes.SELECT,
-            replacements: {
-                userId,
-                likeQuery: `%${q}%`
-            }
-        })
+            LIMIT :limit`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          userId,
+          likeQuery: `%${q}%`,
+          limit: 50
+        }
+      }
+    );
 
-        let followedTopic = topics.filter((item, index) => {
-            return item.user_id_follower !== null
-        })
+    const followedTopic = topics.filter((item) => item.user_id_follower !== null);
 
-        let unfollowedTopic = topics.filter((item, index) => {
-            return item.user_id_follower === null
-        })
+    const unfollowedTopic = topics.filter((item) => item.user_id_follower === null);
 
-        return res.status(200).json({
-            success: true,
-            message: `Search ${q}`,
-            followedTopic,
-            unfollowedTopic,
-        })
-    } catch (e) {
-        console.log('e')
-        console.log(e)
-        return res.status(200).json({
-            success: false,
-            message: e,
-        })
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: `Search ${q}`,
+      followedTopic,
+      unfollowedTopic
+    });
+  } catch (e) {
+    console.log('e');
+    console.log(e);
+    return res.status(200).json({
+      success: false,
+      message: e
+    });
+  }
+};
 
-module.exports = Search
+module.exports = Search;

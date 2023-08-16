@@ -1,88 +1,84 @@
-const { User, Topics, UserFollowUser, sequelize, Sequelize, NewsLink, DomainPage } = require('../../databases/models')
-const { Op, fn, col, QueryTypes } = require('sequelize')
-const _ = require('lodash')
-const { getDomain } = require('../../services/getstream')
-const { getBlockDomain } = require('../../services/domain')
-const { filter } = require('lodash')
+const {Op} = require('sequelize');
+const {NewsLink, DomainPage} = require('../../databases/models');
+
+const {getBlockDomain} = require('../../services/domain');
 
 /**
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- * @returns 
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
  */
-const Search = async(req, res) => {
-    const { q } = req.query
-    if(q.length < 2) return res.status(200).json({
-        success: true,
-        message: 'Your search characters is too few, please input 3 or more characters for search'
-    })
+const Search = async (req, res) => {
+  const {q} = req.query;
+  if (q.length < 2)
+    return res.status(200).json({
+      success: true,
+      message: 'Your search characters is too few, please input 3 or more characters for search'
+    });
 
-    try {
-        const blockDomain = await getBlockDomain(req.userId);
-        let filteredBlockDomainArray = blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain)
+  try {
+    const blockDomain = await getBlockDomain(req.userId);
+    const filteredBlockDomainArray =
+      blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain);
 
-        let newsLink
-        if(filteredBlockDomainArray.length > 0) {
-            newsLink = await NewsLink.findAll({
-                where: {
-                    [Op.or] : [
-                        { site_name : { [Op.iLike] : `%${q}%`}},
-                        { title : { [Op.iLike] : `%${q}%`}},
-                        { description : { [Op.iLike] : `%${q}%`}},
-                        { url : { [Op.iLike] : `%${q}%`}},
-                    ],
-                    domain_page_id: { [Op.notIn] : filteredBlockDomainArray.map((item) => item.domain_page_id)}
-                },
-                limit: 10,
-                order: [
-                    ['created_at', 'DESC']
-                ],
-                include : [
-                    {
-                        model: DomainPage,
-                        as: 'newsLinkDomain',
-                        attributes: ['domain_name', 'logo', "credder_score", "credder_last_checked"],
-                    }
-                ]
-            })    
-        } else {
-            newsLink = await NewsLink.findAll({
-                where: {
-                    [Op.or] : [
-                        { site_name : { [Op.iLike] : `%${q}%`}},
-                        { title : { [Op.iLike] : `%${q}%`}},
-                        { description : { [Op.iLike] : `%${q}%`}},
-                        { url : { [Op.iLike] : `%${q}%`}},
-                    ],
-                },
-                limit: 10,
-                order: [
-                    ['created_at', 'DESC']
-                ],
-                include : [
-                    {
-                        model: DomainPage,
-                        as: 'newsLinkDomain',
-                        attributes: ['domain_name', 'logo', "credder_score", "credder_last_checked"],
-                    }
-                ]
-            })    
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: `Search ${q}`,
-            news : newsLink || []
-        })
-    }catch(e) {
-        console.log('e')
-        console.log(e)
-        return res.status(200).json({
-            success: false,
-            message: e,
-        })
+    let newsLink;
+    if (filteredBlockDomainArray.length > 0) {
+      newsLink = await NewsLink.findAll({
+        where: {
+          [Op.or]: [
+            {site_name: {[Op.iLike]: `%${q}%`}},
+            {title: {[Op.iLike]: `%${q}%`}},
+            {description: {[Op.iLike]: `%${q}%`}},
+            {url: {[Op.iLike]: `%${q}%`}}
+          ],
+          domain_page_id: {[Op.notIn]: filteredBlockDomainArray.map((item) => item.domain_page_id)}
+        },
+        limit: 50,
+        order: [['created_at', 'DESC']],
+        include: [
+          {
+            model: DomainPage,
+            as: 'newsLinkDomain',
+            attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked']
+          }
+        ]
+      });
+    } else {
+      newsLink = await NewsLink.findAll({
+        where: {
+          [Op.or]: [
+            {site_name: {[Op.iLike]: `%${q}%`}},
+            {title: {[Op.iLike]: `%${q}%`}},
+            {description: {[Op.iLike]: `%${q}%`}},
+            {url: {[Op.iLike]: `%${q}%`}}
+          ]
+        },
+        limit: 50,
+        order: [['created_at', 'DESC']],
+        include: [
+          {
+            model: DomainPage,
+            as: 'newsLinkDomain',
+            attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked']
+          }
+        ]
+      });
     }
-}
 
-module.exports =  Search
+    return res.status(200).json({
+      success: true,
+      message: `Search ${q}`,
+      news: newsLink || []
+    });
+  } catch (e) {
+    console.log('e');
+    console.log(e);
+    return res.status(200).json({
+      success: false,
+      message: e
+    });
+  }
+};
+
+module.exports = Search;
