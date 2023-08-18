@@ -65,7 +65,7 @@ const registerV2 = async (req, res) => {
    */
   try {
     token = await BetterSocialCore.user.createUser(insertedObject?.user);
-    anonymousToken = await Getstream.core.createToken(
+    anonymousToken = Getstream.core.createToken(
       insertedObject?.anonymousUser?.user_id?.toLowerCase()
     );
     await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
