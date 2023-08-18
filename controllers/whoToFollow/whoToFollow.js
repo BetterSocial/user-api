@@ -1,131 +1,124 @@
-const { Topics, Locations, User, sequelize } = require("../../databases/models");
-const { Op } = require("sequelize");
-const _ = require('lodash');
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 const Validator = require('fastest-validator');
-const v = new Validator();
+const {Topics, Locations, sequelize} = require('../../databases/models');
 
-const MAX_ITEM_PER_GROUP = 5;
+const v = new Validator();
 
 module.exports = async (req, res) => {
   const schema = {
-    topics: "string[]|empty:false",
-    locations: "string[]|empty:false"
+    topics: 'string[]|empty:false',
+    locations: 'string[]|empty:false'
   };
 
-  let topics = JSON.parse(decodeURI(req.query.topics || []))
-  let locations = JSON.parse(decodeURI(req.query.locations || []))
+  const topics = JSON.parse(decodeURI(req.query.topics || []));
+  const locations = JSON.parse(decodeURI(req.query.locations || []));
 
-  const validate = v.validate({ topics, locations }, schema);
+  const validate = v.validate({topics, locations}, schema);
   if (validate.length) {
     return res.status(403).json({
       code: 403,
-      status: "error",
-      message: validate,
+      status: 'error',
+      message: validate
     });
   }
 
   try {
-    let topicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id IN (:topics)`
+    const topicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id IN (:topics) AND topic_follower_rank <= 10 order BY topic_follower_rank ASC`;
 
-    let locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (:locations)`
+    const locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (:locations) AND follower_rank <= 10 order BY follower_rank ASC`;
 
-    let userTopicFollowerQueryResult = await sequelize.query(topicsQuery, {
+    const userTopicFollowerQueryResult = await sequelize.query(topicsQuery, {
       type: sequelize.QueryTypes.SELECT,
       replacements: {
-        topics: topics
+        topics
       }
-    })
-    let userTopicFollower = userTopicFollowerQueryResult
+    });
+    const userTopicFollower = userTopicFollowerQueryResult;
 
-    let userLocationFollowerQueryResult = await sequelize.query(locationQuery, {
+    const userLocationFollowerQueryResult = await sequelize.query(locationQuery, {
       type: sequelize.QueryTypes.SELECT,
       replacements: {
-        locations: locations
+        locations
       }
-    })
-    let userLocationFollower = userLocationFollowerQueryResult
+    });
+    const userLocationFollower = userLocationFollowerQueryResult;
 
-    let TopicsData = await Topics.findAll({
-      where: { 'topic_id': topics },
-      raw: true,
-    })
-
-    let LocationsData = await Locations.findAll({
-      where: { 'location_id': locations },
+    const TopicsData = await Topics.findAll({
+      where: {topic_id: topics},
       raw: true
-    })
+    });
 
-    const betterAccount = await User.findOne({
-      where: {
-        user_id: process.env.BETTER_ADMIN_ID
-      },
-      attributes: {
-        exclude: ['human_id']
-      }
-    })
-    let result = []
-    for (let indexTopic in TopicsData) {
-      let tempUsers = []
-      let topic = TopicsData[indexTopic]
-      if (betterAccount) tempUsers.push(betterAccount)
+    const LocationsData = await Locations.findAll({
+      where: {location_id: locations},
+      raw: true
+    });
 
-      for (let indexUserTopic in userTopicFollower) {
-        let userTopic = userTopicFollower[indexUserTopic]
-        delete userTopic.human_id
-        if (userTopic.topic_id === topic.topic_id && userTopic.user_id !== betterAccount?.user_id) {
+    const result = [];
+    for (const indexTopic in TopicsData) {
+      const tempUsers = [];
+      const topic = TopicsData[indexTopic];
+
+      for (const indexUserTopic in userTopicFollower) {
+        const userTopic = userTopicFollower[indexUserTopic];
+        delete userTopic.human_id;
+        if (tempUsers?.length >= 10) break;
+        if (
+          userTopic.topic_id === topic.topic_id &&
+          userTopic.user_id !== process.env.BETTER_ADMIN_ID
+        ) {
           tempUsers.push({
             ...userTopic,
             viewtype: 'user'
-          })
+          });
         }
       }
 
       result.push({
         viewtype: 'labeltopic',
         name: topic.name,
-        id: topic.topic_id,
-      })
+        id: topic.topic_id
+      });
 
       if (tempUsers.length > 0) {
-        result.push(...tempUsers)
+        result.push(...tempUsers);
       }
     }
-    for (let indexLocation in LocationsData) {
-      let tempUsers = []
-      let location = LocationsData[indexLocation]
+    for (const indexLocation in LocationsData) {
+      const tempUsers = [];
+      const location = LocationsData[indexLocation];
 
-      for (let indexUserLocation in userLocationFollower) {
-        let userLocation = userLocationFollower[indexUserLocation]
-        delete userLocation.human_id
-        if (userLocation.location_id === location.location_id) tempUsers.push({
-          ...userLocation,
-          viewtype: 'user'
-        })
+      for (const indexUserLocation in userLocationFollower) {
+        const userLocation = userLocationFollower[indexUserLocation];
+        delete userLocation.human_id;
+        if (userLocation.location_id === location.location_id && tempUsers?.length < 10)
+          tempUsers.push({
+            ...userLocation,
+            viewtype: 'user'
+          });
       }
 
       if (tempUsers.length > 0) {
         result.push({
           ...location,
-          viewtype: 'labellocation',
-        })
+          viewtype: 'labellocation'
+        });
 
-        result.push(...tempUsers)
+        result.push(...tempUsers);
       }
     }
 
-
-
     return res.status(200).json({
-      status: "success",
+      status: 'success',
       code: 200,
       body: result,
-      success: true,
+      success: true
     });
   } catch (error) {
     return res.json({
       success: false,
       data: 0,
-      message: error?.message,
+      message: error?.message
     });
   }
 };
