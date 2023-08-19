@@ -74,13 +74,13 @@ module.exports = async (req, res) => {
         }
       }
 
-      result.push({
-        viewtype: 'labeltopic',
-        name: topic.name,
-        id: topic.topic_id
-      });
-
       if (tempUsers.length > 0) {
+        result.push({
+          viewtype: 'labeltopic',
+          name: topic.name,
+          id: topic.topic_id
+        });
+
         result.push(...tempUsers);
       }
     }
