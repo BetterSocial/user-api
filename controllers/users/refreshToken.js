@@ -1,22 +1,32 @@
-const getstreamService = require("../../services/getstream");
-const jwt = require("jsonwebtoken");
-const { createRefreshToken } = require("../../services/jwt");
+const {User} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
+const getstreamService = require('../../services/getstream');
+const {createRefreshToken} = require('../../services/jwt');
+const Getstream = require('../../vendor/getstream');
 
 module.exports = async (req, res) => {
-  let userId = req.userId;
+  const {userId} = req;
+
+  let anonymousToken;
+
+  try {
+    const anonymousUser = await UsersFunction.findAnonymousUserId(User, userId);
+    anonymousToken = Getstream.core.createToken(anonymousUser?.user_id);
+  } catch (e) {
+    anonymousToken = null;
+    console.log('Error when creating anonymous token');
+    console.log(e);
+  }
 
   const token = await getstreamService.createToken(userId);
-  const opts = {
-    algorithm: "HS256",
-    noTimestamp: true,
-  };
   const refresh_token = await createRefreshToken(userId);
   return res.json({
     code: 200,
-    message: "Success refresh token",
+    message: 'Success refresh token',
     data: {
-      token: token,
-      refresh_token: refresh_token,
-    },
+      token,
+      refresh_token,
+      anonymousToken
+    }
   });
 };
