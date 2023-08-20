@@ -5,13 +5,21 @@ const v = new Validator();
 
 const GenerateBodyValidationMiddleware = (schema) => {
   const middleware = (req, res, next) => {
-    const validate = v.validate(req?.body, schema);
-    if (validate.length) {
-      console.log('error validation', validate);
-      return res.status(403).json({
-        code: 403,
+    try {
+      const validate = v.validate(req?.body, schema);
+      if (validate.length) {
+        console.log('error validation', validate);
+        return res.status(403).json({
+          code: 403,
+          status: 'error validation',
+          message: validate
+        });
+      }
+    } catch (e) {
+      return res.status(409).json({
+        code: 409,
         status: 'error validation',
-        message: validate
+        message: e
       });
     }
 

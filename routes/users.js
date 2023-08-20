@@ -63,6 +63,12 @@ router.post(
   RegisterV2UploadPhotoMiddleware,
   usersHandler.registerV2
 );
+
+router.post(
+  '/register-v2-without-upload-photo',
+  BodyValidationMiddleware.registerV2,
+  usersHandler.registerV2
+);
 router.post(
   '/blockuser-v2',
   auth.isAuth,
