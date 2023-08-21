@@ -19,6 +19,7 @@ const BodyValidationSchema = {
   generateCommentAnonymousUsername: require('./generateCommentAnonymousUsernameSchema'),
   generatePostAnonymousUsername: require('./generatePostAnonymousUsernameSchema'),
   registerV2: require('./registerV2Schema'),
+  registerV2WithoutUpload: require('./registerV2WithoutUploadSchema'),
   unblockUserV2: require('./unblockUserV2Schema'),
   unfollowUserV2: require('./unfollowUserV2Schema'),
   uploadPhoto: require('./uploadPhotoSchema'),

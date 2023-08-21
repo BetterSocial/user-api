@@ -67,7 +67,7 @@ router.post(
 
 router.post(
   '/register-v2-without-upload-photo',
-  BodyValidationMiddleware.registerV2,
+  BodyValidationMiddleware.registerV2WithoutUpload,
   RegisterV2WithoutUploadPhotoMiddleware,
   usersHandler.registerV2
 );

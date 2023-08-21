@@ -67,6 +67,9 @@ const BodyValidationMiddleware = {
     BodyValidationSchema.generatePostAnonymousUsername
   ),
   registerV2: GenerateBodyValidationMiddleware(BodyValidationSchema.registerV2),
+  registerV2WithoutUpload: GenerateBodyValidationMiddleware(
+    BodyValidationSchema.registerV2WithoutUpload
+  ),
   unblockUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.unblockUserV2),
   unfollowUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
   uploadPhoto: GenerateBodyValidationMiddleware(BodyValidationSchema.uploadPhoto),
