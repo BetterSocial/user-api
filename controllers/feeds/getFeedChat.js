@@ -40,16 +40,16 @@ const mappingFeed = (req, feeds) => {
 const getDetail = (req, b, id) => {
   const activity_id = b.reaction?.activity_id || b.id;
   const expired_at = b?.object?.expired_at || b.expired_at || null;
-  const downvote = typeof b.object === 'object' ? b.object.reaction_counts.downvotes : 0;
-  const upvote = typeof b.object === 'object' ? b.object.reaction_counts.upvotes : 0;
-  const totalComment = typeof b.object === 'object' ? b.object.reaction_counts.comment : 0;
+  const downvote = typeof b.object === 'object' ? b.object.reaction_counts?.downvotes : 0;
+  const upvote = typeof b.object === 'object' ? b.object.reaction_counts?.upvotes : 0;
+  const totalComment = typeof b.object === 'object' ? b.object.reaction_counts?.comment : 0;
   const childComment = typeof b.object === 'object' ? b.object?.latest_reactions?.comment : [0];
   const message = typeof b.object === 'object' ? b.object.message : b.message;
   const constantActor = typeof b.object === 'object' ? b.object.actor : b.actor;
   let actor = typeof b.object === 'object' ? b.object.actor : b.actor;
   const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity;
-  const isOwnSignedPost = actor.id === id;
-  const isOwnPost = actor.id === req.userId || actor.id === id;
+  const isOwnSignedPost = actor?.id === id;
+  const isOwnPost = actor?.id === req.userId || actor?.id === id;
   if (isAnonym) {
     actor = {
       ...actor,
@@ -131,7 +131,7 @@ const finalize = (req, id, myReaction, newGroup, activity_id, constantActor) => 
     // newGroup[activity_id].totalComment = newGroup[activity_id].comments.filter((data) => data.reaction.kind === 'comment').length || 0
     newGroup[activity_id].totalCommentBadge =
       newGroup[activity_id].comments.filter(
-        (data) => constantActor.id !== req.userId && data.reaction.kind === 'comment'
+        (data) => constantActor?.id !== req.userId && data.reaction.kind === 'comment'
       )?.length || 0;
     const listComment = newGroup[activity_id]?.comments?.filter(
       (data) => data.reaction.kind === 'comment'

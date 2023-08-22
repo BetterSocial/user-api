@@ -42,9 +42,9 @@ const getAnonymousFeedChatService = async (req, res) => {
       } = getDetail(req, b, mySignedId);
       const mapCountLevel2 = countLevel2(childComment);
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
-      const total3 = totalCommentLevel3.reduce((a1, b1) => a1 + b1);
+      const total3 = totalCommentLevel3.reduce((a1, b1) => a1 + b1, 0);
 
-      const commentLevel2 = mapCountLevel2.reduce((a2, b2) => a2 + b2);
+      const commentLevel2 = mapCountLevel2.reduce((a2, b2) => a2 + b2, 0);
       if (!newGroup[activity_id]) {
         pushToa(a, b, newGroup, actor, {
           activity_id,
