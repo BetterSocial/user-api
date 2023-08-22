@@ -16,10 +16,10 @@ module.exports = async (req, res) => {
         },
         iosInfo: {
           iosBundleId: firebaseDynamicLinkIOSAppPackage
+        },
+        navigationInfo: {
+          enableForcedRedirect: true
         }
-      },
-      navigationInfo: {
-        enableForcedRedirect: true
       }
     });
 
