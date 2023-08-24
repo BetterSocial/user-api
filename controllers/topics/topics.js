@@ -21,6 +21,11 @@ module.exports = async (req, res) => {
             [Op.not]: null,
             [Op.ne]: ''
           }
+        },
+        sort: {
+          [Op.and]: {
+            [Op.not]: null
+          }
         }
       },
       order: [['sort', 'ASC']]
