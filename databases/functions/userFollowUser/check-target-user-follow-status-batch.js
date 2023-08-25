@@ -1,63 +1,83 @@
-const { Model, Transaction } = require("sequelize")
+/* eslint-disable no-restricted-syntax */
+// eslint-disable-next-line no-unused-vars
+const {Model, Transaction} = require('sequelize');
 
 /**
- * 
- * @param {Model} userFollowUserModel 
- * @param {string} selfUserId 
- * @param {string} targetUserId 
- * @param {Transaction} transaction 
- * @returns 
+ *
+ * @param {Model} userFollowUserModel
+ * @param {string} selfUserId
+ * @param {string} targetUserId
+ * @param {Transaction} transaction
+ * @returns
  */
 
+module.exports = async (userFollowUserModel, userModel, selfUserId, targetUserIds = []) => {
+  if (userFollowUserModel === null) throw new Error('userFollowUserModel is required');
+  if (selfUserId === null) throw new Error('selfUserId is required');
 
-module.exports = async (userFollowUserModel, selfUserId, targetUserIds = [], transaction = null) => {
-    if (userFollowUserModel === null) throw new Error("userFollowUserModel is required")
-    if (selfUserId === null) throw new Error("selfUserId is required")
+  if (targetUserIds?.length === 0) return {};
 
-    if (targetUserIds?.length === 0) return {}
+  const targetHashes = {};
 
-    let targetHashes = {}
+  for (const targetUserId of targetUserIds) {
+    targetHashes[targetUserId] = {
+      isTargetFollowingMe: false,
+      isMeFollowingTarget: false,
+      isAnonymous: true,
+      isExist: false
+    };
+  }
 
-    for (let targetUserId of targetUserIds) {
-        targetHashes[targetUserId] = {
-            isTargetFollowingMe: false,
-            isMeFollowingTarget: false
-        }
-    }
+  const myFollowers = await userFollowUserModel.findAll({
+    where: {
+      user_id_follower: targetUserIds,
+      user_id_followed: selfUserId
+    },
 
-    const myFollowers = await userFollowUserModel.findAll({
-        where: {
-            user_id_follower: targetUserIds,
-            user_id_followed: selfUserId
-        },
+    raw: true
+  });
 
-        raw: true,
-    })
+  const myFollowings = await userFollowUserModel.findAll({
+    where: {
+      user_id_follower: selfUserId,
+      user_id_followed: targetUserIds
+    },
 
-    const myFollowings = await userFollowUserModel.findAll({
-        where: {
-            user_id_follower: selfUserId,
-            user_id_followed: targetUserIds
-        },
+    raw: true
+  });
 
-        raw: true
-    })
+  const isAnonymousCheck = await userModel.findAll({
+    where: {
+      user_id: targetUserIds
+    },
+    attributes: ['user_id', 'is_anonymous'],
 
-    for(let myFollower of myFollowers) {
-        targetHashes[myFollower.user_id_follower] = {
-            ...targetHashes[myFollower.user_id_follower],
-            isTargetFollowingMe: true
-        }
-    }
+    raw: true
+  });
 
-    for(let myFollowing of myFollowings) {
-        targetHashes[myFollowing.user_id_followed] = {
-            ...targetHashes[myFollowing.user_id_followed],
-            isMeFollowingTarget: true
-        }
-    }
+  for (const myFollower of myFollowers) {
+    targetHashes[myFollower.user_id_follower] = {
+      ...targetHashes[myFollower.user_id_follower],
+      isTargetFollowingMe: true
+    };
+  }
 
-    return {
-        targetHashes
-    }
-}
+  for (const myFollowing of myFollowings) {
+    targetHashes[myFollowing.user_id_followed] = {
+      ...targetHashes[myFollowing.user_id_followed],
+      isMeFollowingTarget: true
+    };
+  }
+
+  for (const users of isAnonymousCheck) {
+    targetHashes[users.user_id] = {
+      ...targetHashes[users.user_id],
+      isAnonymous: users.is_anonymous,
+      isExist: true
+    };
+  }
+
+  return {
+    targetHashes
+  };
+};
