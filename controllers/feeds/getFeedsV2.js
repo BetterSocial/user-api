@@ -22,73 +22,24 @@ const {
 const { DomainPage, Locations, User } = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 
-const getMainFeedFollowing = async(token, paramGetFeeds) => {
-    let response = await getstreamService.getFeeds(
-        token,
-        'main_feed_following',
-        paramGetFeeds
-      );
-    let feeds = response.results;
-    return feeds
-}
-
-const getMainFeedF2 = async(token, paramGetFeeds) => {
-    let response = await getstreamService.getFeeds(
-        token,
-        'main_feed_f2',
-        paramGetFeeds
-      );
-    let feeds = response.results;
-    return feeds
-}
-
-const getMainFeedTopic = async(token, paramGetFeeds) => {
-    let response = await getstreamService.getFeeds(
-        token,
-        'main_feed_topic',
-        paramGetFeeds
-      );
-    let feeds = response.results;
-    return feeds
-}
-
-const getMainFeedBroad = async(token, paramGetFeeds) => {
-    let response = await getstreamService.getFeeds(
-        token,
-        'main_feed_broad',
-        paramGetFeeds
-      );
-    let feeds = response.results;
-    return feeds
-}
-
 const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
-    let feeds = []
-    switch(feed) {
-        case "main_feed_f2":
-            feeds = await getMainFeedF2(token, paramGetFeeds);
-            return feeds
-        case "main_feed_topic":
-            feeds = await getMainFeedTopic(token, paramGetFeeds);
-            return feeds
-        case "main_feed_broad":
-            feeds = await getMainFeedBroad(token, paramGetFeeds);
-            return feeds
-        default:
-            feeds = await getMainFeedFollowing(token, paramGetFeeds);
-            return feeds
-    }
-    
+  let response = await getstreamService.getFeeds(
+      token,
+      feed,
+      paramGetFeeds
+    );
+  let feeds = response.results;
+  return feeds
 }
 
 const feedSwitch = async (feed) => {
     switch(feed) {
         case "main_feed_following":
-        //     return "main_feed_topic";
-        // case "main_feed_topic":
             return "main_feed_f2";
         case "main_feed_f2":
             return "main_feed_broad";
+        case "main_feed_broad":
+          return "main_feed";
         default:
           return "main_feed_following"
     }
@@ -156,7 +107,7 @@ module.exports = async (req, res) => {
 
         const feeds = await getActivtiesOnFeed(feed, token, paramGetFeeds)
         if(feeds.length == 0){
-            if (feed=='main_feed_broad'){
+            if (feed=='main_feed'){
               break;
             }else{
               offset = 0
