@@ -24,7 +24,8 @@ module.exports = async (req, res) => {
         },
         sort: {
           [Op.and]: {
-            [Op.not]: null
+            [Op.not]: null,
+            [Op.not]: 0
           }
         }
       },
