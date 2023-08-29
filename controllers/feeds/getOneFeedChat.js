@@ -23,19 +23,15 @@ const getReaction = (req, latest_reactions, constantActor) => {
   const upvotes = [];
   const downvotes = [];
   if (Array.isArray(latest_reactions.comment)) {
-    latest_reactions.comment.map((comment) => {
-      constructData(req, comments, comment, constantActor);
-    });
+    latest_reactions.comment.map((comment) => constructData(req, comments, comment, constantActor));
   }
   if (Array.isArray(latest_reactions.upvotes)) {
-    latest_reactions.upvotes.map((upvote) => {
-      constructData(req, upvotes, upvote, constantActor);
-    });
+    latest_reactions.upvotes.map((upvote) => constructData(req, upvotes, upvote, constantActor));
   }
   if (Array.isArray(latest_reactions.downvotes)) {
-    latest_reactions.downvotes.map((downvote) => {
-      constructData(req, downvotes, downvote, constantActor);
-    });
+    latest_reactions.downvotes.map((downvote) =>
+      constructData(req, downvotes, downvote, constantActor)
+    );
   }
   return {comments, upvotes, downvotes};
 };
@@ -43,11 +39,11 @@ const getReaction = (req, latest_reactions, constantActor) => {
 async function checkIsOwnPost(tokenUserId, userId) {
   if (tokenUserId === userId) return true;
 
-  const signedUserId = UsersFunction.findSignedUserId(tokenUserId, User);
+  const signedUserId = UsersFunction.findSignedUserId(User, tokenUserId);
   if (signedUserId === userId) return true;
 
   try {
-    const anonymousUserId = await UsersFunction.findAnonymousUserId(tokenUserId, User);
+    const anonymousUserId = await UsersFunction.findAnonymousUserId(User, tokenUserId);
     if (anonymousUserId?.user_id === userId) return true;
   } catch (e) {
     return false;
@@ -123,14 +119,14 @@ const getOneFeedChatService = async (req, res) => {
     });
     response.block = blockCount;
 
-    res.status(200).send({
+    return res.status(200).send({
       success: true,
       data: response,
       message: 'Success get data'
     });
   } catch (e) {
     console.error(e);
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       data: null,
       message: String(e)
