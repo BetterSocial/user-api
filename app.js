@@ -115,10 +115,5 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerApiDocumentation, o
 app.use('/api/v1', indexRouter);
 
 app.use(Sentry.Handlers.errorHandler());
-app.use((_, res) => {
-  console.log('error called');
-  res.statusCode = 500;
-  res.send(`${res.sentry}\n`);
-});
 
 module.exports = app;
