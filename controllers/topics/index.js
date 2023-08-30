@@ -227,9 +227,6 @@ const getFollowerList = async (req, res) => {
       }
     });
 
-    console.log('response');
-    console.log(response);
-
     res.status(200).json({
       status: 'success',
       code: 200,
