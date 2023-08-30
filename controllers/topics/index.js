@@ -210,7 +210,7 @@ const getFollowerList = async (req, res) => {
         ON subquery.subquery_user_id_followed = B.user_id
     LEFT JOIN(
         SELECT X.user_id_follower, X.user_id_followed FROM user_follow_user X
-        WHERE X.user_id_follower = ':userId'
+        WHERE X.user_id_follower = :userId
     ) as is_following_subquery
         ON is_following_subquery.user_id_followed = users.user_id
     WHERE LOWER(A.name) = LOWER(:name)
