@@ -92,7 +92,7 @@ async function processPollPost(userId, isAnonimous, body, data) {
 
   const postDate = moment().toISOString();
 
-  const [pollingId, pollsOptionUUIDs] = await sequelize.transaction(async (transaction) => {
+  const [pollingId, pollsOptionUUIDs, postId] = await sequelize.transaction(async (transaction) => {
     const postId = await PostFunction.createPollPost(
       sequelize,
       {
@@ -128,11 +128,12 @@ async function processPollPost(userId, isAnonimous, body, data) {
       transaction
     );
 
-    return [polling, optionsUUIDs];
+    return [polling, optionsUUIDs, postId];
   });
 
   return {
     ...data,
+    foreign_id: postId,
     polling_id: pollingId,
     polls: pollsOptionUUIDs,
     post_type: POST_TYPE_POLL,
@@ -219,7 +220,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
       version: POST_VERSION,
       to: handleCreatePostTO(req.userId, req?.body, isAnonimous, locationTO, userDetail.user_id)
     };
-
+    
     data = await processPollPost(userId, isAnonimous, body, data);
     data = processAnonymous(isAnonimous, body, data);
   } catch (e) {
