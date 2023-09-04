@@ -14,6 +14,7 @@ const bodyParser = require('body-parser');
 
 const swaggerApiDocumentation = require('./swagger/apiDocs.json');
 
+const statusHealthRoute = require('./routes/status-health');
 const topicsRouter = require('./routes/topics');
 const locationsRouter = require('./routes/locations');
 const whoToFollowRouter = require('./routes/whoToFollow');
@@ -64,6 +65,8 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({extended: false, limit: '50mb'}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/status-health', statusHealthRoute);
 
 app.get('/debug-sentry', () => {
   throw new Error('My first Sentry error!');
