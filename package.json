@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
+    "@json2csv/plainjs": "^7.0.3",
     "@sentry/node": "^7.64.0",
     "axios": "^0.21.1",
     "bcrypt": "^5.1.0",
