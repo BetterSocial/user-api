@@ -54,6 +54,18 @@ module.exports = async (req, res) => {
       {
         label: 'Message',
         value: 'message'
+      },
+      {
+        label: 'Post Score',
+        value: 'final_score'
+      },
+      {
+        label: 'User Score',
+        value: 'user_score'
+      },
+      {
+        label: 'Score Details',
+        value: 'score_details'
       }
     ];
 
