@@ -48,6 +48,10 @@ module.exports = async (req, res) => {
         value: 'origin'
       },
       {
+        label: 'Actor',
+        value: 'actor'
+      },
+      {
         label: 'Topics',
         value: 'topics'
       },
