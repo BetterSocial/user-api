@@ -264,7 +264,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
         author_user_id: userDetail.user_id,
         anonymous: isAnonimous,
         duration: moment().utc().add(+body.duration_feed, 'day'),
-        visibility_location_id: body.location_id || null,
+        visibility_location_id: body?.location_id,
         post_content: body.message
       }),
       insertTopics(filteredTopics)
