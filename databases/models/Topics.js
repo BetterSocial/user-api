@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+const {Model} = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class Topics extends Model {
     /**
@@ -9,10 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      models.Topics.belongsToMany(models.User, {
-        through: "user_topics",
-        foreignKey: "topic_id",
-        as: "users",
+      Topics.belongsToMany(models.User, {
+        through: 'user_topics',
+        foreignKey: 'topic_id',
+        as: 'users'
+      });
+      Topics.belongsToMany(models.Post, {
+        through: 'post_topics',
+        foreignKey: 'topic_id',
+        otherKey: 'post_id'
       });
     }
   }
@@ -21,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       topic_id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       name: DataTypes.STRING,
       icon_path: DataTypes.STRING,
@@ -30,14 +35,14 @@ module.exports = (sequelize, DataTypes) => {
       deleted_at: DataTypes.DATE,
       is_custom_topic: DataTypes.BOOLEAN,
       sort: DataTypes.BIGINT,
-      sign: DataTypes.BOOLEAN,
+      sign: DataTypes.BOOLEAN
     },
     {
       sequelize,
-      modelName: "Topics",
-      tableName: "topics",
+      modelName: 'Topics',
+      tableName: 'topics',
       timestamps: false,
-      underscored: true,
+      underscored: true
     }
   );
   return Topics;

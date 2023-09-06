@@ -160,11 +160,13 @@ const BetterSocialCreateCommentChildV3 = async (req) => {
     );
 
     QueueTrigger.addCommentToDb({
-      authorUserId: postMakerId,
-      comment: message,
-      commenterUserId: userId,
+      postId: result?.activity_id,
+      parentCommentId: reaction_id,
       commentId: result?.id,
-      postId: result?.activity_id
+      authorUserId: postMakerId,
+      commenterUserId: userId,
+      isAnonymous: false,
+      comment: message
     });
 
     return {
@@ -229,11 +231,13 @@ const BetterSocialCreateCommentChildV3Anonymous = async (req) => {
     );
 
     QueueTrigger.addCommentToDb({
-      authorUserId: postMakerId,
-      comment: message,
-      commenterUserId: userId,
+      postId: result?.activity_id,
+      parentCommentId: reaction_id,
       commentId: result?.id,
-      postId: result?.activity_id
+      authorUserId: postMakerId,
+      commenterUserId: userId,
+      isAnonymous: true,
+      comment: message
     });
 
     return {

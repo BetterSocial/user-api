@@ -1,5 +1,6 @@
 const moment = require('moment');
 
+const {Op} = require('sequelize');
 const UsersFunction = require('../../../databases/functions/users');
 const {
   filterAllTopics,
@@ -8,7 +9,14 @@ const {
   getFeedDuration
 } = require('../../../utils/post');
 const CloudinaryService = require('../../../vendor/cloudinary');
-const {User, Locations, PostAnonUserInfo, sequelize} = require('../../../databases/models');
+const {
+  User,
+  Locations,
+  PostAnonUserInfo,
+  sequelize,
+  Post,
+  Topics
+} = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
 const {
@@ -250,8 +258,19 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
         anonUserInfoEmojiName: body?.anon_user_info?.emoji_name
       });
     }
-
-    insertTopics(filteredTopics);
+    const [newPost] = await Promise.all([
+      Post.create({
+        post_id: post.id,
+        author_user_id: userDetail.user_id,
+        anonymous: isAnonimous,
+        duration: moment().utc().add(+body.duration_feed, 'day'),
+        visibility_location_id: body.location_id || null,
+        post_content: body.message
+      }),
+      insertTopics(filteredTopics)
+    ]);
+    const topics = await Topics.findAll({where: {name: {[Op.in]: filteredTopics}}});
+    topics.map((topic) => newPost.addTopics(topic));
     const scoringProcessData = {
       feed_id: post?.id,
       foreign_id: data?.foreign_id,
