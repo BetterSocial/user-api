@@ -159,11 +159,12 @@ async function BetterSocialCreateCommentV3(req) {
     await scoringAfterComment(result.id, userId, activity_id, message);
 
     QueueTrigger.addCommentToDb({
+      postId: activity_id,
       authorUserId: userId,
-      comment: message,
-      commenterUserId: userId,
       commentId: result?.id,
-      postId: activity_id
+      commenterUserId: userId,
+      isAnonymous: false,
+      comment: message
     });
 
     return {
@@ -222,11 +223,12 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
     await scoringAfterComment(result.id, userId, activity_id, message);
 
     QueueTrigger.addCommentToDb({
+      postId: activity_id,
       authorUserId: userId,
-      comment: message,
-      commenterUserId: userId,
       commentId: result?.id,
-      postId: activity_id
+      commenterUserId: userId,
+      isAnonymous: true,
+      comment: message
     });
 
     return {
