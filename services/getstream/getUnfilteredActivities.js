@@ -92,6 +92,7 @@ const getUnfilteredActivities = async (req) => {
         continue;
       }
     }
+
     // Change to conventional loop because map cannot handle await
     for (const item of feeds) {
       // validation admin hide post
@@ -116,6 +117,12 @@ const getUnfilteredActivities = async (req) => {
         console.log('Is Blocked => ', item.id);
         item.show_to_user = false;
         item.unshow_reason = 'post is blocked';
+      }
+
+      if (item.time < Date.parse('2023-05-01')) {
+        console.log('Created before 01 May 2023 => ', item.time);
+        item.show_to_user = false;
+        item.unshow_reason = 'Created before 01 May 2023';
       }
 
       // TODO Should be used for testing in dev only. Remove this when done testing (ask Bastian)
