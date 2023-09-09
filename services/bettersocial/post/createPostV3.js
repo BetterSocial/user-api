@@ -1,4 +1,5 @@
 const moment = require('moment');
+const Sentry = require('@sentry/node');
 
 const UsersFunction = require('../../../databases/functions/users');
 const {
@@ -224,6 +225,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
     data = processAnonymous(isAnonimous, body, data);
   } catch (e) {
     console.log('error creating post', e);
+    Sentry.captureException(e);
     return {
       isSuccess: false,
       message: e.message
@@ -278,6 +280,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
       id: post?.id
     };
   } catch (e) {
+    console.log('error creating post sending to getstream', e);
     return {
       isSuccess: false,
       message: e.message
