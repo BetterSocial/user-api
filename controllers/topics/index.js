@@ -181,8 +181,10 @@ const _afterPutTopic = async (topic, token, userId, name) => {
 
 const getFollowerList = async (req, res) => {
   const {userId} = req;
-  const {name, limit = 40} = req.query;
+  const {name, limit = 40, offset = 0, search = null} = req.query;
   try {
+    const searchQuery = search ? `AND LOWER(users.username) LIKE LOWER(:search)` : '';
+
     const query = `
     SELECT users.user_id,
         users.username,
@@ -215,21 +217,26 @@ const getFollowerList = async (req, res) => {
         ON is_following_subquery.user_id_followed = users.user_id
     WHERE LOWER(A.name) = LOWER(:name)
         AND users.is_anonymous = false
+        ${searchQuery}
     ORDER BY subquery.follower_count DESC NULLS last
-    LIMIT :limit`;
+    LIMIT :limit
+    OFFSET :offset`;
 
     const response = await sequelize.query(query, {
       type: QueryTypes.SELECT,
       replacements: {
         userId,
         name,
-        limit
+        limit,
+        offset,
+        search: `%${search}%`
       }
     });
 
     res.status(200).json({
       status: 'success',
       code: 200,
+      next: parseInt(offset, 10) + parseInt(response?.length || 0, 10),
       data: response
     });
   } catch (error) {
