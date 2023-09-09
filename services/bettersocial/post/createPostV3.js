@@ -223,7 +223,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
     data = await processPollPost(userDetail?.user_id, isAnonimous, body, data);
     data = processAnonymous(isAnonimous, body, data);
   } catch (e) {
-    console.log('error creating post', e?.message || e);
+    console.log('error creating post', e);
     return {
       isSuccess: false,
       message: e.message
