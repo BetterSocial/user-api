@@ -119,10 +119,7 @@ const registerV2 = async (req, res) => {
    * Creating scoring queue
    */
   try {
-    const scoringQueueTopic = insertedObject?.topics?.map((topic) => {
-      const temp = {...topic.dataValues};
-      return temp.name;
-    });
+    const scoringQueueTopic = insertedObject?.topics?.map((topic) => topic.name);
     const scoringProcessData = {
       user_id: insertedObject?.user?.user_id,
       register_time: moment().format('YYYY-MM-DD HH:mm:ss'),
