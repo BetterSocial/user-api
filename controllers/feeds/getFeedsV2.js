@@ -1,4 +1,6 @@
 const moment = require('moment');
+const {removeActivityQueue} = require('../../services/score/queueSenderForRedis');
+
 const getstreamService = require('../../services/getstream');
 const {
   POST_VERB_POLL,
@@ -6,44 +8,38 @@ const {
   GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DATA_RETURN_LENGTH,
-  POST_TYPE_LINK,
+  POST_TYPE_LINK
 } = require('../../helpers/constants');
-const {
-  getListBlockUser,
-  getListBlockPostAnonymousAuthor,
-} = require('../../services/blockUser');
+const {getListBlockUser, getListBlockPostAnonymousAuthor} = require('../../services/blockUser');
 const getBlockDomain = require('../../services/domain/getBlockDomain');
 const {
   modifyPollPostObject,
   modifyAnonimityPost,
   isPostBlocked,
-  modifyReactionsPost,
+  modifyReactionsPost
 } = require('../../utils/post');
-const { DomainPage, Locations, User } = require('../../databases/models');
+const {DomainPage, Locations, User} = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 
 const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
-  let response = await getstreamService.getFeeds(
-      token,
-      feed,
-      paramGetFeeds
-    );
-  let feeds = response.results;
-  return feeds
-}
+  console.log('Get activity from getstream => ', feed, paramGetFeeds);
+  const response = await getstreamService.getFeeds(token, feed, paramGetFeeds);
+  const feeds = response.results;
+  return feeds;
+};
 
 const feedSwitch = async (feed) => {
-    switch(feed) {
-        case "main_feed_following":
-            return "main_feed_f2";
-        case "main_feed_f2":
-            return "main_feed_broad";
-        case "main_feed_broad":
-          return "main_feed";
-        default:
-          return "main_feed_following"
-    }
-}
+  switch (feed) {
+    case 'main_feed_following':
+      return 'main_feed_f2';
+    case 'main_feed_f2':
+      return 'main_feed_broad';
+    case 'main_feed_broad':
+      return 'main_feed';
+    default:
+      return 'main_feed_following';
+  }
+};
 
 module.exports = async (req, res) => {
   let {
@@ -53,78 +49,73 @@ module.exports = async (req, res) => {
     feed = 'main_feed_following'
   } = req.query;
 
-  let domainPageCache = {};
+  const domainPageCache = {};
   let getFeedFromGetstreamIteration = 0;
-  let data = [];
+  const data = [];
 
   try {
-    const token = req.token;
+    const {token} = req;
     // START get excluded post parameter
     const listBlockUser = await getListBlockUser(req.userId);
     const listBlockDomain = await getBlockDomain(req.userId);
-    const listPostAnonymousAuthor = await getListBlockPostAnonymousAuthor(
-      req.userId
+    const listPostAnonymousAuthor = await getListBlockPostAnonymousAuthor(req.userId);
+
+    const listAnonymousAuthor = listPostAnonymousAuthor.map(
+      (value) => value.post_anonymous_author_id
     );
 
-    let listAnonymousAuthor = listPostAnonymousAuthor.map((value) => {
-      return value.post_anonymous_author_id;
-    });
+    const listAnonymousPostId = [];
 
-    let listAnonymousPostId = [];
+    const listBlock = String(listBlockUser + listBlockDomain);
 
-    let listBlock = String(listBlockUser + listBlockDomain);
-
-    let myLocations = [];
-    let userLocations = await User.findByPk(req.userId, {
+    const myLocations = [];
+    const userLocations = await User.findByPk(req.userId, {
       include: [
         {
           model: Locations,
           as: 'locations',
-          through: { attributes: [] },
-          attributes: ['neighborhood'],
-        },
-      ],
+          through: {attributes: []},
+          attributes: ['neighborhood']
+        }
+      ]
     });
     userLocations.locations.forEach((loc) => {
       myLocations.push(loc.neighborhood);
     });
     // END get excluded post parameter
     // Get feed from main_feed_following, main_feed_f2, main_feed_topic, main_feed_topic
-    
+
     while (data.length < limit) {
-      if (
-        getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION
-      )
-        break;
+      if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
       try {
-        let paramGetFeeds = {
+        const paramGetFeeds = {
           limit: getstreamLimit,
-          reactions: { own: true, recent: true, counts: true },
-        //   ranking: GETSTREAM_RANKING_METHOD,
+          reactions: {own: true, recent: true, counts: true},
+          //   ranking: GETSTREAM_RANKING_METHOD,
           offset
         };
 
-        const feeds = await getActivtiesOnFeed(feed, token, paramGetFeeds)
-        if(feeds.length == 0){
-            if (feed=='main_feed'){
-              break;
-            }else{
-              offset = 0
-              feed = await feedSwitch(feed)
-              continue;
-            }
+        const feeds = await getActivtiesOnFeed(feed, token, paramGetFeeds);
+        if (feeds.length == 0) {
+          if (feed == 'main_feed') {
+            break;
+          } else {
+            offset = 0;
+            feed = await feedSwitch(feed);
+            continue;
+          }
         }
         // Change to conventional loop because map cannot handle await
-        for (let item of feeds) {
+        for (const item of feeds) {
           // validation admin hide post
           if (item.is_hide) {
-            console.log("Is Hide => ",item.id)
+            console.log('Is Hide => ', item.id);
             offset++;
             continue;
           }
 
-          let isBlocked = isPostBlocked(
+          const isBlocked = isPostBlocked(
             item,
             listAnonymousAuthor,
             listBlock,
@@ -132,8 +123,16 @@ module.exports = async (req, res) => {
             listAnonymousPostId
           );
           if (isBlocked) {
-            console.log("Is Blocked => ",item.id)
+            console.log('Is Blocked => ', item.id);
             offset++;
+            continue;
+          }
+
+          // skip if activity < May 2023 (2023-05-01)
+          if (item.time < Date.parse('2023-05-01')) {
+            console.log('Created before 01 May 2023 => ', item.time);
+            offset++;
+            // TODO: Sent to queue to delete activity
             continue;
           }
 
@@ -141,32 +140,43 @@ module.exports = async (req, res) => {
           // Put user post score in score details
           // await putUserPostScore(item, req.userId);
 
-          let now = moment().valueOf();
-          let dateExpired = moment(item?.expired_at).valueOf();
+          const now = moment().valueOf();
+          const dateExpired = moment(item?.expired_at).valueOf();
+
+          if (now > dateExpired && item.duration_feed !== 'never') {
+            console.log('Is Expired => ', item.expired_at, item.id);
+            removeActivityQueue.add(
+              {
+                feed_group: feed,
+                feed_id: req.userId,
+                activity_id: item.id
+              },
+              {delay: 60000 * 10}
+            );
+          }
 
           // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
           if (now < dateExpired || item.duration_feed == 'never') {
             let newItem = await modifyAnonimityPost(item);
             newItem = modifyReactionsPost(newItem, newItem.anonimity);
             if (item.verb === POST_VERB_POLL) {
-              let postPoll = await modifyPollPostObject(req.userId, item);
+              const postPoll = await modifyPollPostObject(req.userId, item);
               data.push(postPoll);
             } else {
               if (item.post_type === POST_TYPE_LINK) {
-                let domainPageId = item?.og?.domain_page_id;
+                const domainPageId = item?.og?.domain_page_id;
                 if (domainPageId) {
-                  let credderScoreCache =
-                    await RedisDomainHelper.getDomainCredderScore(domainPageId);
+                  const credderScoreCache = await RedisDomainHelper.getDomainCredderScore(
+                    domainPageId
+                  );
                   if (credderScoreCache) {
                     newItem.credderScore = credderScoreCache;
                     newItem.credderLastChecked =
-                      await RedisDomainHelper.getDomainCredderLastChecked(
-                        domainPageId
-                      );
+                      await RedisDomainHelper.getDomainCredderLastChecked(domainPageId);
                   } else {
-                    let dataDomain = await DomainPage.findOne({
-                      where: { domain_page_id: domainPageId },
-                      raw: true,
+                    const dataDomain = await DomainPage.findOne({
+                      where: {domain_page_id: domainPageId},
+                      raw: true
                     });
 
                     if (dataDomain) {
@@ -180,8 +190,7 @@ module.exports = async (req, res) => {
                       );
 
                       newItem.credderScore = dataDomain?.credder_score;
-                      newItem.credderLastChecked =
-                        dataDomain?.credder_last_checked;
+                      newItem.credderLastChecked = dataDomain?.credder_last_checked;
                     }
                   }
                 }
@@ -189,12 +198,12 @@ module.exports = async (req, res) => {
               data.push(newItem);
             }
           }
-        //   console.log("DATA => ", data)
+          //   console.log("DATA => ", data)
           offset++;
 
           if (parseInt(data.length) === parseInt(limit)) break;
         }
-        
+
         getFeedFromGetstreamIteration++;
       } catch (err) {
         console.log(err);
@@ -203,7 +212,7 @@ module.exports = async (req, res) => {
           data: null,
           offset,
           feed,
-          error: err,
+          error: err
         });
       }
     }
@@ -211,9 +220,9 @@ module.exports = async (req, res) => {
     return res.status(200).json({
       code: 200,
       status: 'success',
-      data: data,
+      data,
       offset,
-      feed,
+      feed
     });
   } catch (error) {
     console.log(error);
@@ -223,7 +232,7 @@ module.exports = async (req, res) => {
       offset,
       feed,
       message: 'Internal server error',
-      error: error,
+      error
     });
   }
 };

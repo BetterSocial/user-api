@@ -1,8 +1,17 @@
 const Bull = require('bull');
 const {v4: uuidv4} = require('uuid');
 const {bullConfig, redisUrl} = require('../../config/redis');
+const {QUEUE_REMOVE_ACTIVITY} = require('./constant');
 
 const connectRedis = redisUrl;
+
+const removeActivityQueue = new Bull(QUEUE_REMOVE_ACTIVITY, connectRedis, {
+  redis: {
+    ...bullConfig,
+    maxRetriesPerRequest: 100,
+    connectTimeout: 30000
+  }
+});
 
 // init the scoring process queue object, to be used on sending message to the queue
 const scoringProcessQueue = new Bull('scoringProcessQueue', connectRedis, {
@@ -32,5 +41,6 @@ const sendQueue = async (event, data) => {
 };
 
 module.exports = {
-  sendQueue
+  sendQueue,
+  removeActivityQueue
 };
