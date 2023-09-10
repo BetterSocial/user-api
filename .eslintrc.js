@@ -2,7 +2,8 @@ module.exports = {
   env: {
     browser: true,
     commonjs: true,
-    es2021: true
+    es2021: true,
+    jest: true
   },
   extends: ['airbnb-base', 'prettier'],
   overrides: [
@@ -33,6 +34,10 @@ module.exports = {
     'no-nested-ternary': 'off',
     'no-case-declarations': 'warn',
     'comma-dangle': 'off',
+    'no-plusplus': 'off',
+    'no-await-in-loop': 'off',
+    'prefer-const': 'warn',
+    'no-restricted-syntax': 'off',
     semi: ['error', 'always'],
     'prettier/prettier': [
       2,

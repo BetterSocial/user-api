@@ -1,3 +1,6 @@
+/* eslint-disable no-continue */
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable guard-for-in */
 const _ = require('lodash');
 const moment = require('moment');
 const {
@@ -100,7 +103,10 @@ const modifyPollPostObject = async (userId, item) => {
 
   if (logPolling.length > 0) {
     if (item.multiplechoice) post.mypolling = logPolling;
-    else post.mypolling = logPolling[0];
+    else {
+      const [mypolling] = logPolling;
+      post.mypolling = mypolling;
+    }
     post.isalreadypolling = true;
   } else {
     post.isalreadypolling = false;
@@ -160,7 +166,7 @@ const modifyAnonimityPost = (item) => {
   return newItem;
 };
 
-const isPostBlocked = (item, listAnonymous, listBlock, myLocations, listAnonymousPostIds) => {
+const isPostBlocked = (item, listAnonymous, listBlock, myLocations) => {
   // Check if this anonymous post is from the user that has other blocked anonymous post
   if (listAnonymous.includes(item?.actor?.id) && item?.anonimity) return true;
 
@@ -168,7 +174,7 @@ const isPostBlocked = (item, listAnonymous, listBlock, myLocations, listAnonymou
   if (listBlock.includes(item.actor.id)) return true;
 
   // Check locations
-  return !myLocations.includes(item.location) && item.location != 'Everywhere';
+  return !myLocations.includes(item.location) && item.location !== 'Everywhere';
 };
 
 /**
@@ -183,8 +189,15 @@ const insertTopics = async (topics = []) => {
   });
 
   for (const index in topics) {
+    const isTopicFound = await Topics.findOne({
+      where: {name: topics[index]},
+      raw: true
+    });
+
+    if (isTopicFound) continue;
+
     const topic = topics[index];
-    const topicIndex = parseInt(lastTopic.topic_id) + parseInt(index) + parseInt(1);
+    const topicIndex = parseInt(lastTopic.topic_id, 10) + parseInt(index, 10) + parseInt(1, 10);
 
     try {
       await Topics.findOrCreate({
@@ -209,7 +222,7 @@ function getFeedDuration(durationFeed) {
   let expiredAt = null;
 
   if (durationFeed !== 'never') {
-    const dateMoment = moment().add(parseInt(durationFeed), 'days');
+    const dateMoment = moment().add(parseInt(durationFeed, 10), 'days');
     expiredAt = dateMoment.toISOString();
   }
 

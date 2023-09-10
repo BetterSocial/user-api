@@ -1,5 +1,7 @@
 const moment = require('moment');
+const Sentry = require('@sentry/node');
 
+const {Op} = require('sequelize');
 const UsersFunction = require('../../../databases/functions/users');
 const {
   filterAllTopics,
@@ -8,7 +10,14 @@ const {
   getFeedDuration
 } = require('../../../utils/post');
 const CloudinaryService = require('../../../vendor/cloudinary');
-const {User, Locations, PostAnonUserInfo, sequelize} = require('../../../databases/models');
+const {
+  User,
+  Locations,
+  PostAnonUserInfo,
+  Post,
+  Topics,
+  sequelize
+} = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
 const {
@@ -220,10 +229,11 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
       version: POST_VERSION,
       to: handleCreatePostTO(req.userId, req?.body, isAnonimous, locationTO, userDetail.user_id)
     };
-    
-    data = await processPollPost(userId, isAnonimous, body, data);
+    data = await processPollPost(userDetail?.user_id, isAnonimous, body, data);
     data = processAnonymous(isAnonimous, body, data);
   } catch (e) {
+    console.log('error creating post', e);
+    Sentry.captureException(e);
     return {
       isSuccess: false,
       message: e.message
@@ -252,7 +262,21 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
       });
     }
 
-    insertTopics(filteredTopics);
+    const [newPost] = await Promise.all([
+      Post.create({
+        post_id: post.id,
+        author_user_id: userDetail.user_id,
+        anonymous: isAnonimous,
+        duration: moment().utc().add(+body.duration_feed, 'day'),
+        visibility_location_id: body?.location_id,
+        post_content: body.message
+      }),
+      insertTopics(filteredTopics)
+    ]);
+
+    const topics = await Topics.findAll({where: {name: {[Op.in]: filteredTopics}}});
+    topics.map((topic) => newPost.addTopics(topic));
+
     const scoringProcessData = {
       feed_id: post?.id,
       foreign_id: data?.foreign_id,
@@ -278,6 +302,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
       id: post?.id
     };
   } catch (e) {
+    console.log('error creating post sending to getstream', e);
     return {
       isSuccess: false,
       message: e.message
