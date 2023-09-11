@@ -1,5 +1,6 @@
 const moment = require('moment');
 const Sentry = require('@sentry/node');
+const {v4: uuid} = require('uuid');
 
 const {Op} = require('sequelize');
 const UsersFunction = require('../../../databases/functions/users');
@@ -27,7 +28,6 @@ const {
   POST_VERSION
 } = require('../../../helpers/constants');
 const {addForCreatePost} = require('../../score');
-const PostFunction = require('../../../databases/functions/post');
 const PollingFunction = require('../../../databases/functions/polling');
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 const {convertLocationFromModel} = require('../../../utils');
@@ -84,7 +84,29 @@ function getPollPostExpiredAt(pollsDuration, durationFeed) {
   return moment().add(100, 'years').toISOString();
 }
 
-async function processPollPost(userId, isAnonimous, body, data) {
+async function processPost({userId, isAnonimous, body, data, filteredTopics}) {
+  const [newPost] = await Promise.all([
+    Post.create({
+      post_id: uuid(),
+      author_user_id: userId,
+      anonymous: isAnonimous,
+      duration: moment().utc().add(+body.duration_feed, 'day'),
+      visibility_location_id: body?.location_id,
+      post_content: body.message
+    }),
+    insertTopics(filteredTopics)
+  ]);
+
+  const topics = await Topics.findAll({where: {name: {[Op.in]: filteredTopics}}});
+  topics.map((topic) => newPost.addTopics(topic));
+
+  return {
+    ...data,
+    foreign_id: newPost.post_id
+  };
+}
+
+async function processPollPost(userId, body, data) {
   const isPollPost = body?.verb === POST_VERB_POLL;
   if (!isPollPost) return data;
 
@@ -101,20 +123,7 @@ async function processPollPost(userId, isAnonimous, body, data) {
 
   const postDate = moment().toISOString();
 
-  const [pollingId, pollsOptionUUIDs, postId] = await sequelize.transaction(async (transaction) => {
-    const postId = await PostFunction.createPollPost(
-      sequelize,
-      {
-        userId,
-        anonimity: isAnonimous,
-        createdAt: postDate,
-        updatedAt: postDate,
-        expiredAt: pollExpiredAt,
-        resUrl: ''
-      },
-      transaction
-    );
-
+  const [pollingId, pollsOptionUUIDs] = await sequelize.transaction(async (transaction) => {
     const polling = await PollingFunction.createPollingByPostId(
       sequelize,
       {
@@ -122,7 +131,7 @@ async function processPollPost(userId, isAnonimous, body, data) {
         updatedAt: postDate,
         message,
         multiplechoice,
-        postId,
+        postId: data?.foreign_id,
         userId
       },
       transaction
@@ -137,12 +146,12 @@ async function processPollPost(userId, isAnonimous, body, data) {
       transaction
     );
 
-    return [polling, optionsUUIDs, postId];
+    return [polling, optionsUUIDs];
   });
 
   return {
     ...data,
-    foreign_id: postId,
+    foreign_id: data?.foreign_id,
     polling_id: pollingId,
     polls: pollsOptionUUIDs,
     post_type: POST_TYPE_POLL,
@@ -229,7 +238,15 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
       version: POST_VERSION,
       to: handleCreatePostTO(req.userId, req?.body, isAnonimous, locationTO, userDetail.user_id)
     };
-    data = await processPollPost(userDetail?.user_id, isAnonimous, body, data);
+
+    data = await processPost({
+      userId: userDetail?.user_id,
+      isAnonimous,
+      body,
+      data,
+      filteredTopics
+    });
+    data = await processPollPost(userDetail?.user_id, body, data);
     data = processAnonymous(isAnonimous, body, data);
   } catch (e) {
     console.log('error creating post', e);
@@ -261,21 +278,6 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
         anonUserInfoEmojiName: body?.anon_user_info?.emoji_name
       });
     }
-
-    const [newPost] = await Promise.all([
-      Post.create({
-        post_id: post.id,
-        author_user_id: userDetail.user_id,
-        anonymous: isAnonimous,
-        duration: moment().utc().add(+body.duration_feed, 'day'),
-        visibility_location_id: body?.location_id,
-        post_content: body.message
-      }),
-      insertTopics(filteredTopics)
-    ]);
-
-    const topics = await Topics.findAll({where: {name: {[Op.in]: filteredTopics}}});
-    topics.map((topic) => newPost.addTopics(topic));
 
     const scoringProcessData = {
       feed_id: post?.id,
