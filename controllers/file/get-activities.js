@@ -1,5 +1,7 @@
-const {Parser} = require('@json2csv/plainjs');
-const {getUnfilteredActivities} = require('../../services/getstream/getUnfilteredActivities');
+const { Parser } = require("@json2csv/plainjs");
+const {
+  getUnfilteredActivities,
+} = require("../../services/getstream/getUnfilteredActivities");
 
 module.exports = async (req, res) => {
   try {
@@ -15,75 +17,79 @@ module.exports = async (req, res) => {
         expired_at: activity.expired_at,
         show_to_user: activity.show_to_user,
         unshow_reason: activity.unshow_reason,
-        source_feed: activity.source_feed
+        source_feed: activity.source_feed,
+        final_score: activity.final_score,
+        user_score: activity.user_score,
+        score_details: activity.score_details,
       });
     }
     const fields = [
       {
-        label: 'Id',
-        value: 'id'
+        label: "Id",
+        value: "id",
       },
       {
-        label: 'Date',
-        value: 'time'
+        label: "Date",
+        value: "time",
       },
       {
-        label: 'Expired At',
-        value: 'expired_at'
+        label: "Expired At",
+        value: "expired_at",
       },
       {
-        label: 'Show in app?',
-        value: 'show_to_user'
+        label: "Show in app?",
+        value: "show_to_user",
       },
       {
-        label: 'Reason if not shown in app',
-        value: 'unshow_reason'
+        label: "Reason if not shown in app",
+        value: "unshow_reason",
       },
       {
-        label: 'Source feed',
-        value: 'source_feed'
+        label: "Source feed",
+        value: "source_feed",
       },
       {
-        label: 'Origin',
-        value: 'origin'
+        label: "Origin",
+        value: "origin",
       },
       {
-        label: 'Actor',
-        value: 'actor'
+        label: "Actor",
+        value: "actor",
       },
       {
-        label: 'Topics',
-        value: 'topics'
+        label: "Topics",
+        value: "topics",
       },
       {
-        label: 'Message',
-        value: 'message'
+        label: "Message",
+        value: "message",
       },
       {
-        label: 'Post Score',
-        value: 'final_score'
+        label: "Post Score",
+        value: "final_score",
       },
       {
-        label: 'User Score',
-        value: 'user_score'
+        label: "User Score",
+        value: "user_score",
       },
       {
-        label: 'Score Details',
-        value: 'score_details'
-      }
+        label: "Score Details",
+        value: "score_details",
+      },
     ];
 
-    const json2csv = new Parser({fields});
+    const json2csv = new Parser({ fields });
     const csv = json2csv.parse(data);
-    res.header('Content-Type', 'text/csv');
-    res.attachment('user_activities.csv');
+    console.log(csv);
+    res.header("Content-Type", "text/csv");
+    res.attachment("user_activities.csv");
     return res.send(csv);
   } catch (e) {
     console.log(e.message);
     return res.status(403).json({
       code: 403,
-      status: 'error ',
-      message: 'e'
+      status: "error ",
+      message: "e",
     });
   }
 };
