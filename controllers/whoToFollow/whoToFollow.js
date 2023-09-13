@@ -1,6 +1,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 const Validator = require('fastest-validator');
+const {Op} = require('sequelize');
 const {Topics, Locations, sequelize} = require('../../databases/models');
 
 const v = new Validator();
@@ -45,8 +46,19 @@ module.exports = async (req, res) => {
     const userLocationFollower = userLocationFollowerQueryResult;
 
     const TopicsData = await Topics.findAll({
-      where: {topic_id: topics},
-      raw: true
+      where: {
+        topic_id: topics,
+        deleted_at: null,
+        sign: true,
+        sort: {
+          [Op.and]: {
+            [Op.not]: null,
+            [Op.not]: 0
+          }
+        }
+      },
+      raw: true,
+      order: [['sort', 'ASC']]
     });
 
     const LocationsData = await Locations.findAll({
