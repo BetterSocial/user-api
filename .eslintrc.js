@@ -5,7 +5,7 @@ module.exports = {
     es2021: true,
     jest: true
   },
-  extends: ['airbnb-base', 'prettier'],
+  extends: ['airbnb-base', 'plugin:prettier/recommended'],
   overrides: [
     {
       env: {
@@ -38,18 +38,6 @@ module.exports = {
     'no-await-in-loop': 'off',
     'prefer-const': 'warn',
     'no-restricted-syntax': 'off',
-    semi: ['error', 'always'],
-    'prettier/prettier': [
-      2,
-      {
-        singleQuote: true,
-        bracketSpacing: false,
-        bracketSameLine: true,
-        arrowParens: 'always',
-        printWidth: 100,
-        trailingComma: 'none',
-        proseWrap: 'preserve'
-      }
-    ]
+    semi: ['error', 'always']
   }
 };
