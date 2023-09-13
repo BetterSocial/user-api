@@ -41,7 +41,6 @@ module.exports = async (req, res) => {
 
     const json2csv = new Parser({ fields });
     const csv = json2csv.parse(data);
-    console.log(csv);
     res.header("Content-Type", "text/csv");
     res.attachment("user_activities.csv");
     return res.send(csv);
