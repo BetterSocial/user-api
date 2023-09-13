@@ -24,58 +24,19 @@ module.exports = async (req, res) => {
       });
     }
     const fields = [
-      {
-        label: "Id",
-        value: "id",
-      },
-      {
-        label: "Date",
-        value: "time",
-      },
-      {
-        label: "Expired At",
-        value: "expired_at",
-      },
-      {
-        label: "Show in app?",
-        value: "show_to_user",
-      },
-      {
-        label: "Reason if not shown in app",
-        value: "unshow_reason",
-      },
-      {
-        label: "Source feed",
-        value: "source_feed",
-      },
-      {
-        label: "Origin",
-        value: "origin",
-      },
-      {
-        label: "Actor",
-        value: "actor",
-      },
-      {
-        label: "Topics",
-        value: "topics",
-      },
-      {
-        label: "Message",
-        value: "message",
-      },
-      {
-        label: "Post Score",
-        value: "final_score",
-      },
-      {
-        label: "User Score",
-        value: "user_score",
-      },
-      {
-        label: "Score Details",
-        value: "score_details",
-      },
+      { label: "Id", value: "id" },
+      { label: "Date", value: "time" },
+      { label: "Expired At", value: "expired_at" },
+      { label: "Show in app?", value: "show_to_user" },
+      { label: "Reason if not shown in app", value: "unshow_reason" },
+      { label: "Source feed", value: "source_feed" },
+      { label: "Origin", value: "origin" },
+      { label: "Actor", value: "actor" },
+      { label: "Topics", value: "topics" },
+      { label: "Message", value: "message" },
+      { label: "Post Score", value: "final_score" },
+      { label: "User Score", value: "user_score" },
+      { label: "Score Details", value: "score_details" },
     ];
 
     const json2csv = new Parser({ fields });
