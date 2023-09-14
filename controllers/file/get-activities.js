@@ -2,12 +2,33 @@ const { Parser } = require("@json2csv/plainjs");
 const {
   getUnfilteredActivities,
 } = require("../../services/getstream/getUnfilteredActivities");
+const { getDb } = require("../../databases/config/mongodb_conn");
+const { DB_COLLECTION_USER_SCORE } = require("../../services/score/constant");
+
+const formattedScoreDetails = (data) => {
+  delete data.topics;
+  delete data.u_score;
+  return data;
+};
+
+const getUserScoreDetails = async (authorId) => {
+  const db = await getDb();
+  const userScoreList = await db.collection(DB_COLLECTION_USER_SCORE);
+  const userScoreDoc = await userScoreList.findOne({ _id: authorId });
+  return userScoreDoc;
+};
 
 module.exports = async (req, res) => {
   try {
     const data = [];
+    const userScores = {};
     const activities = await getUnfilteredActivities(req);
     for (const activity of activities.data) {
+      if (!(activity.actor.id in userScores)) {
+        userScores[activity.actor.id] = await getUserScoreDetails(
+          activity.actor.id
+        );
+      }
       data.push({
         id: activity.id,
         message: activity.message,
@@ -20,7 +41,8 @@ module.exports = async (req, res) => {
         source_feed: activity.source_feed,
         final_score: activity.final_score,
         user_score: activity.user_score,
-        score_details: activity.score_details,
+        score_details: formattedScoreDetails(activity.score_details),
+        user_score_details: userScores[activity.actor.id],
       });
     }
     const fields = [
@@ -37,6 +59,7 @@ module.exports = async (req, res) => {
       { label: "Post Score", value: "final_score" },
       { label: "User Score", value: "user_score" },
       { label: "Score Details", value: "score_details" },
+      { label: "User Score Details", value: "user_score_details" },
     ];
 
     const json2csv = new Parser({ fields });
