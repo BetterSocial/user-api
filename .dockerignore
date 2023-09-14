@@ -1,0 +1,16 @@
+.git/
+.docker/
+.husky/
+.vscode/
+
+coverage/
+node_modules/
+
+.env
+.env.*
+docker-compose.yml
+Procfile
+
+.eslintcache
+*.log
+npm-debug.log*

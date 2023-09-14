@@ -1,0 +1,77 @@
+version: '3.5'
+
+services:
+  user-api:
+    image: bettersocial/user-api
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+    command: npm run dev
+    env_file: .env
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/code
+      - /code/node_modules
+    depends_on:
+      - redis
+      - mongo
+      - postgres
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - 6379:6379
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      retries: 3
+      timeout: 5s
+
+  mongo:
+    image: mongo:6-jammy
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: better
+
+  postgres:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=bettersocial
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.2
+    restart: unless-stopped
+    mem_limit: 1GB
+    ports:
+      - 9200:9200
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+
+volumes:
+  postgres_data:
+  mongo_data:
+  redis_data:
+
+networks:
+  default:
+    name: bettersocial-devnetwork
+    driver: bridge
