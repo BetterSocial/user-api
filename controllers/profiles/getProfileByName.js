@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
     const getFollowingCountResult = getFollowingCount?.[0]?.[0]?.count_following;
-    const isFollowingResult = isFollowing?.[0]?.[0]?.length > 0;
+    const isFollowingResult = isFollowing?.[0]?.length > 0;
 
     const clonedUser = {...user.dataValues};
     delete clonedUser.following;
