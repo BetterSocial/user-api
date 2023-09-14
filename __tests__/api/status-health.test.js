@@ -1,14 +1,10 @@
 const request = require('supertest');
-const express = require('express');
-const statusHealthRoute = require('./status-health');
-const statusHealthService = require('../services/status-health.service');
+const statusHealthService = require('../../services/status-health.service');
+const app = require('../../app');
 
-jest.mock('../services/status-health.service', () => ({
+jest.mock('../../services/status-health.service', () => ({
   isReady: jest.fn()
 }));
-
-const app = express();
-app.use('/status-health', statusHealthRoute);
 
 describe('GET /status-health/live', () => {
   it('should return 200 OK', async () => {
