@@ -8,6 +8,41 @@ const {
 const { DomainPage } = require("../../databases/models");
 const RedisDomainHelper = require("../redis/helper/RedisDomainHelper");
 
+const getCredderScoreCache = async (domainPageId) => {
+  const dataCached = {
+    credderScore: null,
+    credderLastChecked: null,
+  };
+  const credderScoreCache = await RedisDomainHelper.getDomainCredderScore(
+    domainPageId
+  );
+  if (credderScoreCache) {
+    dataCached.credderScore = credderScoreCache;
+    dataCached.credderLastChecked =
+      await RedisDomainHelper.getDomainCredderLastChecked(domainPageId);
+  } else {
+    const dataDomain = await DomainPage.findOne({
+      where: { domain_page_id: domainPageId },
+      raw: true,
+    });
+
+    if (dataDomain) {
+      await RedisDomainHelper.setDomainCredderScore(
+        domainPageId,
+        dataDomain?.credder_score
+      );
+      await RedisDomainHelper.setDomainCredderLastChecked(
+        domainPageId,
+        dataDomain?.credder_last_checked
+      );
+
+      dataCached.credderScore = dataDomain?.credder_score;
+      dataCached.credderLastChecked = dataDomain?.credder_last_checked;
+    }
+  }
+  return dataCached;
+};
+
 const activityFormatter = async (
   item,
   feedGroup,
@@ -64,37 +99,11 @@ const activityFormatter = async (
     const postPoll = await modifyPollPostObject(userId, item);
     return postPoll;
   }
-  if (item.post_type === POST_TYPE_LINK) {
-    const domainPageId = item?.og?.domain_page_id;
-    if (domainPageId) {
-      const credderScoreCache = await RedisDomainHelper.getDomainCredderScore(
-        domainPageId
-      );
-      if (credderScoreCache) {
-        newItem.credderScore = credderScoreCache;
-        newItem.credderLastChecked =
-          await RedisDomainHelper.getDomainCredderLastChecked(domainPageId);
-      } else {
-        const dataDomain = await DomainPage.findOne({
-          where: { domain_page_id: domainPageId },
-          raw: true,
-        });
-
-        if (dataDomain) {
-          await RedisDomainHelper.setDomainCredderScore(
-            domainPageId,
-            dataDomain?.credder_score
-          );
-          await RedisDomainHelper.setDomainCredderLastChecked(
-            domainPageId,
-            dataDomain?.credder_last_checked
-          );
-
-          newItem.credderScore = dataDomain?.credder_score;
-          newItem.credderLastChecked = dataDomain?.credder_last_checked;
-        }
-      }
-    }
+  const domainPageId = item?.og?.domain_page_id;
+  if (item.post_type === POST_TYPE_LINK && domainPageId) {
+    const domainCahced = await getCredderScoreCache(domainPageId);
+    newItem.credderScore = domainCahced.credder_score;
+    newItem.credderLastChecked = domainCahced.credder_last_checked;
   }
   return newItem;
 };

@@ -22,7 +22,6 @@ const generateCSV = async (activities) => {
   const userScores = {};
 
   for (const activity of activities.data) {
-    console.log("DEBUG => ", activity, activity == null);
     if (!(activity.actor.id in userScores)) {
       userScores[activity.actor.id] = await getUserScoreDetails(
         activity.actor.id
@@ -60,7 +59,6 @@ const generateCSV = async (activities) => {
     { label: "Score Details", value: "score_details" },
     { label: "User Score Details", value: "user_score_details" },
   ];
-  console.log("DEBUG => ", data);
   const json2csv = new Parser({ fields });
   const csv = json2csv.parse(data);
   return csv;
