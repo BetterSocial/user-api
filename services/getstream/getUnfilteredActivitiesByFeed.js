@@ -14,7 +14,6 @@ const getActivtiesByFeedId = async (feed, id, paramGetFeeds) => {
     paramGetFeeds
   );
   const feeds = response.results;
-  // console.log(" DEBUG => ", feeds);
   return feeds;
 };
 const getUnfilteredActivitiesByFeed = async (req) => {

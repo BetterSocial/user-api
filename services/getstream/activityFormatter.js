@@ -57,8 +57,8 @@ const activityFormatter = async (
     item.show_to_user = false;
     item.unshow_reason = "post is hide";
   }
-  // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
-  let newItem = item; // await modifyAnonimityPost(item);
+
+  let newItem = item;
   newItem = modifyReactionsPost(newItem, newItem.anonimity);
   if (item.verb === POST_VERB_POLL) {
     const postPoll = await modifyPollPostObject(userId, item);
