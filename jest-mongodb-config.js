@@ -8,5 +8,5 @@ module.exports = {
       dbName: 'testing'
     }
   },
-  mongoURLEnvName: 'MONGODB_URI'
+  mongoURLEnvName: 'MONGODB_URL'
 };

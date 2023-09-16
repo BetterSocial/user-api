@@ -7,6 +7,7 @@
     "dev": "nodemon ./bin/www",
     "test": "jest __tests__",
     "test:api": "jest --selectProjects api --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
     "prepare": "husky install",
     "lint": "eslint . --ext .js",
     "update-env-dev": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config dev > .env.development",

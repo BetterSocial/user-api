@@ -17,6 +17,7 @@ const phpArtisan = async (command) =>
       `${executablePhp} ${laravelPath}/artisan ${command}`,
       {
         env: {
+          APP_ENV: 'testing',
           DB_CONNECTION: 'pgsql',
           DB_HOST: process.env.DB_HOST,
           DB_PORT: 5432,
