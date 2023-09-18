@@ -1,16 +1,16 @@
 const {redisClient: client} = require('../../config/redis');
 
 client.on('connect', () => {
-  console.error('redis connect');
+  console.log('redis connect');
 });
 client.on('error', (error) => {
-  console.error('connection error ', error);
+  console.log('connection error ', error);
 });
 client.on('ready', () => {
-  console.error('redis ready');
+  console.log('redis ready');
 });
 client.on('end', () => {
-  console.error('redis disconnect');
+  console.log('redis disconnect');
 });
 process.on('SIGINT', () => {
   console.log('quit');

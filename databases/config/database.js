@@ -38,8 +38,13 @@ module.exports = {
     host: process.env.DB_HOST,
     dialect: 'postgres',
     dialectOptions: {
-      ssl: {require: true, rejectUnauthorized: false}
+      ...(process.env.DB_SSL !== 'false'
+        ? {
+            ssl: {require: true, rejectUnauthorized: false}
+          }
+        : {})
     },
+    logging: false,
     define: {
       timestamps: true,
       freezeTableName: true

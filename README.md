@@ -13,6 +13,28 @@ npm install
 npm run dev
 ```
 
+## Testing
+
+### Prerequisite
+
+1. set `EXECUTABLE_PHP` environment variable in `.env` file. you can run `which php` in your console to find it
+```
+EXECUTABLE_PHP=/path/to/bin/php
+```
+
+2. set `LARAVEL_PATH` environment variable in `.env` file. need to set fullpath to your laravel project that contain migration
+```
+LARAVEL_PATH=/path/to/laravel
+```
+3. you need to create database named "testing" in your Postgresdb
+
+### Running Test
+
+1. To run api (integration) testing
+```bash
+npm run test:api
+```
+
 ## Running with docker
 
 - make sure you already have `.env` file (can see the `.env.example` for some connection to docker services)

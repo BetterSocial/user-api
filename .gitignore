@@ -123,3 +123,4 @@ dist
 .idea
 
 ./service-account.json
+globalConfig.json
