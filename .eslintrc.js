@@ -1,21 +1,15 @@
 module.exports = {
   env: {
-    browser: true,
-    commonjs: true,
+    node: true,
     es2021: true,
-    jest: true
+    'jest/globals': true
   },
-  extends: ['airbnb-base', 'plugin:prettier/recommended'],
+  extends: ['eslint:recommended', 'plugin:prettier/recommended'],
+  plugins: ['prettier'],
+  parserOptions: {
+    ecmaVersion: 'latest'
+  },
   overrides: [
-    {
-      env: {
-        node: true
-      },
-      files: ['.eslintrc.{js,cjs}'],
-      parserOptions: {
-        sourceType: 'script'
-      }
-    },
     {
       env: {
         node: true,
@@ -24,33 +18,10 @@ module.exports = {
       },
       files: ['__tests__/**/*.js'],
       extends: ['eslint:recommended', 'plugin:jest/recommended', 'plugin:prettier/recommended'],
-      plugins: ['jest', 'prettier'],
-      rules: {
-        'no-unused-vars': ['error', {argsIgnorePattern: '^_'}]
-      }
+      plugins: ['jest', 'prettier']
     }
   ],
-  plugins: ['prettier'],
-  parserOptions: {
-    ecmaVersion: 'latest'
-  },
   rules: {
-    'linebreak-style': 'off',
-    'no-console': 'off',
-    'import/prefer-default-export': 'off',
-    'no-use-before-define': 'warn',
-    'no-param-reassign': 'off',
-    'react/prop-types': 'off',
-    camelcase: 'off',
-    'import/no-extraneous-dependencies': 'off',
-    'no-useless-escape': 'warn',
-    'no-nested-ternary': 'off',
-    'no-case-declarations': 'warn',
-    'comma-dangle': 'off',
-    'no-plusplus': 'off',
-    'no-await-in-loop': 'off',
-    'prefer-const': 'warn',
-    'no-restricted-syntax': 'off',
-    semi: ['error', 'always']
+    'no-unused-vars': ['error', {argsIgnorePattern: '^_', varsIgnorePattern: '^_'}]
   }
 };
