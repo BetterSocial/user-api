@@ -4,21 +4,21 @@ module.exports = {
     es2021: true,
     'jest/globals': true
   },
-  extends: ['eslint:recommended', 'plugin:prettier/recommended'],
-  plugins: ['prettier'],
+  extends: ['eslint:recommended', 'plugin:import/recommended', 'plugin:prettier/recommended'],
+  plugins: ['prettier', 'import'],
   parserOptions: {
     ecmaVersion: 'latest'
   },
   overrides: [
     {
-      env: {
-        node: true,
-        es2021: true,
-        'jest/globals': true
-      },
       files: ['__tests__/**/*.js'],
-      extends: ['eslint:recommended', 'plugin:jest/recommended', 'plugin:prettier/recommended'],
-      plugins: ['jest', 'prettier']
+      extends: [
+        'eslint:recommended',
+        'plugin:import/recommended',
+        'plugin:jest/recommended',
+        'plugin:prettier/recommended'
+      ],
+      plugins: ['jest', 'prettier', 'import']
     }
   ],
   rules: {
