@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       post_id: {type: DataTypes.UUID, primaryKey: true},
       author_user_id: {type: DataTypes.UUID, allowNull: false},
+      getstream_activity_id: {type: DataTypes.UUID, allowNull: true},
       anonymous: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
       parent_post_id: {type: DataTypes.UUID},
       audience_id: {type: DataTypes.STRING},

@@ -1,5 +1,9 @@
-const PostFunction = {
-    createPollPost: require('./create-poll-post'),
-}
+const createPollPost = require('./create-poll-post');
+const updateGetstreamActivityId = require('./update-getstream-activity-id');
 
-module.exports = PostFunction
+const PostFunction = {
+  createPollPost,
+  updateGetstreamActivityId
+};
+
+module.exports = PostFunction;
