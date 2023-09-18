@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Locations extends Model {
     /**
@@ -10,9 +10,9 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       models.Locations.belongsToMany(models.User, {
-        through: "user_location",
-        foreignKey: "location_id",
-        as: "users",
+        through: 'user_location',
+        foreignKey: 'location_id',
+        as: 'users'
       });
     }
   }
@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       location_id: {
         type: DataTypes.BIGINT,
-        primaryKey: true,
+        primaryKey: true
       },
       zip: DataTypes.STRING,
       neighborhood: DataTypes.STRING,
@@ -32,18 +32,18 @@ module.exports = (sequelize, DataTypes) => {
       slug_name: DataTypes.TEXT,
       createdAt: {
         type: DataTypes.DATE,
-        field: "created_at",
+        field: 'created_at'
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: "updated_at",
-      },
+        field: 'updated_at'
+      }
     },
     {
       sequelize,
-      modelName: "Locations",
-      tableName: "location",
-      underscored: true,
+      modelName: 'Locations',
+      tableName: 'location',
+      underscored: true
     }
   );
   return Locations;

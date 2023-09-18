@@ -1,11 +1,7 @@
-const stream = require("getstream");
-module.exports = async (token, activityId, feedGroup = "main_feed") => {
-  const client = stream.connect(
-    process.env.API_KEY,
-    process.env.SECRET,
-    process.env.APP_ID
-  );
- 
+const stream = require('getstream');
+module.exports = async (token, activityId, feedGroup = 'main_feed') => {
+  const client = stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);
+
   return client.getActivities({
     ids: [activityId],
     withOwnReactions: true,
@@ -14,6 +10,6 @@ module.exports = async (token, activityId, feedGroup = "main_feed") => {
     ownReactions: true,
     reactions: true,
     withReactionCounts: true,
-    withRecentReactions: true,
+    withRecentReactions: true
   });
 };

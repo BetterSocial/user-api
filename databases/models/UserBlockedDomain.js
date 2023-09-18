@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class UserBlockedDomain extends Model {
     /**
@@ -16,24 +16,24 @@ module.exports = (sequelize, DataTypes) => {
       user_blocked_domain_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
       },
       user_id_blocker: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
       },
       domain_page_id: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: false
       },
-      reason_blocked: DataTypes.JSON,
+      reason_blocked: DataTypes.JSON
     },
     {
       sequelize,
-      modelName: "UserBlockedDomain",
-      tableName: "user_blocked_domain",
+      modelName: 'UserBlockedDomain',
+      tableName: 'user_blocked_domain',
       timestamps: true,
-      underscored: true,
+      underscored: true
     }
   );
   return UserBlockedDomain;

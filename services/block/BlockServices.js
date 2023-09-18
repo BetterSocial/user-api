@@ -1,6 +1,5 @@
-
-const _ = require("lodash");
-const InvariantError = require("../../exceptions/InvariantError");
+const _ = require('lodash');
+const InvariantError = require('../../exceptions/InvariantError');
 
 class BlockServices {
   constructor(userBlock, domainBlock, anonymousBlock) {
@@ -9,7 +8,6 @@ class BlockServices {
     this._anonymousBlock = anonymousBlock;
   }
 
-
   getHasBlock(post) {
     try {
       let newArr = this.#privateProcessBlock(post);
@@ -17,9 +15,8 @@ class BlockServices {
       return this.#processAnonymousBlock(newArr);
     } catch (err) {
       console.log(err);
-      throw new InvariantError('Invalid block proses')
+      throw new InvariantError('Invalid block proses');
     }
-
   }
 
   #privateProcessBlock(post) {

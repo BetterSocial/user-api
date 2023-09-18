@@ -1,29 +1,29 @@
-const BetterSocialElasticSearch = require("../client")
-const esb = require('elastic-builder')
+const BetterSocialElasticSearch = require('../client');
+const esb = require('elastic-builder');
 
 class BetterSocialElasticSearchBaseRepo {
-    #indexName = ''
+  #indexName = '';
 
-    constructor(indexName) {
-        this.indexName = indexName
-    }
+  constructor(indexName) {
+    this.indexName = indexName;
+  }
 
-    getIndexName() {
-        return this.indexName
-    }
+  getIndexName() {
+    return this.indexName;
+  }
 
-    /**
-     * 
-     * @param {esb.RequestBodySearch} body 
-     * @returns 
-     */
-    async search(body) {
-        return await BetterSocialElasticSearch.search(this, body)
-    }
+  /**
+   *
+   * @param {esb.RequestBodySearch} body
+   * @returns
+   */
+  async search(body) {
+    return await BetterSocialElasticSearch.search(this, body);
+  }
 
-    async index(id, item) {
-        return await BetterSocialElasticSearch.index(this, id, item)
-    }
+  async index(id, item) {
+    return await BetterSocialElasticSearch.index(this, id, item);
+  }
 }
 
-module.exports = BetterSocialElasticSearchBaseRepo
+module.exports = BetterSocialElasticSearchBaseRepo;

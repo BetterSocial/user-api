@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class PostDownVoted extends Model {
     /**
@@ -16,18 +16,18 @@ module.exports = (sequelize, DataTypes) => {
       post_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
       },
-      user_id: { type: DataTypes.STRING },
-      counter: { type: DataTypes.BIGINT },
+      user_id: {type: DataTypes.STRING},
+      counter: {type: DataTypes.BIGINT},
       created_at: DataTypes.DATE,
-      updated_at: DataTypes.DATE,
+      updated_at: DataTypes.DATE
     },
     {
       sequelize,
-      modelName: "PostDownVoted",
-      tableName: "post_downvoted",
-      timestamps: false,
+      modelName: 'PostDownVoted',
+      tableName: 'post_downvoted',
+      timestamps: false
     }
   );
   return PostDownVoted;

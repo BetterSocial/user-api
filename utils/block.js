@@ -2,8 +2,8 @@ const {
   BLOCK_POST_ANONYMOUS,
   BLOCK_POST_ANONYMOUS_AUTHOR,
   BLOCK_DOMAIN_KEY,
-  BLOCK_FEED_KEY,
-} = require("../helpers/constants");
+  BLOCK_FEED_KEY
+} = require('../helpers/constants');
 
 const getIdBlockAnonymous = (userId) => {
   return BLOCK_POST_ANONYMOUS + userId;
@@ -25,5 +25,5 @@ module.exports = {
   getIdBlockAnonymous,
   getIdBlockAnonymousAuthor,
   getIdBlockDomain,
-  getIdBlockFeed,
+  getIdBlockFeed
 };

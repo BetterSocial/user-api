@@ -1,4 +1,4 @@
-const client = require("./connectionRedis");
+const client = require('./connectionRedis');
 module.exports = async (key) => {
   try {
     return client.get(key, function (err, result) {

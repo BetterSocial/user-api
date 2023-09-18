@@ -1,4 +1,4 @@
-const GetstreamSingleton = require("../singleton");
+const GetstreamSingleton = require('../singleton');
 
 const yesterdayIso = () => {
   const today = new Date();
@@ -12,8 +12,8 @@ module.exports = async (activityId) => {
     client.activityPartialUpdate({
       id: activityId,
       set: {
-        expired_at: yesterdayIso(),
-      },
+        expired_at: yesterdayIso()
+      }
     });
   } catch (error) {
     throw error;

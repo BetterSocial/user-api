@@ -3,22 +3,9 @@
 const path = require('path');
 const jsonwebtoken = jest.createMockFromModule('jsonwebtoken');
 
-
 function __sign(payload, token, opts) {
-
-    return{
-
-
-
-    }
-
-
-
-
-
-};
-
-
+  return {};
+}
 
 jsonwebtoken.sign = __sign;
 

@@ -1,30 +1,26 @@
-const {
-  UserFollowUser,
-  UserLocation,
-  sequelize,
-} = require("../../databases/models");
+const {UserFollowUser, UserLocation, sequelize} = require('../../databases/models');
 module.exports = async (req, res) => {
   try {
     let userCount = 0;
     let params = req.query;
     let userId = req.userId;
 
-    if (params.privacy.toLowerCase() == "public") {
-      if (params.location.toLowerCase() == "everywhere") {
+    if (params.privacy.toLowerCase() == 'public') {
+      if (params.location.toLowerCase() == 'everywhere') {
         userCount = await UserLocation.count();
       } else {
         userCount = await UserLocation.count({
           where: {
-            location_id: params.location,
-          },
+            location_id: params.location
+          }
         });
       }
     } else {
-      if (params.location.toLowerCase() == "everywhere") {
+      if (params.location.toLowerCase() == 'everywhere') {
         userCount = await UserFollowUser.count({
           where: {
-            user_id_followed: userId,
-          },
+            user_id_followed: userId
+          }
         });
       } else {
         let resultData = await sequelize.query(
@@ -37,22 +33,22 @@ module.exports = async (req, res) => {
       let data = Math.ceil((userCount / 100).toFixed(0)) * 100;
       return res.json({
         code: 200,
-        status: "Success",
-        data: data.toLocaleString("en"),
+        status: 'Success',
+        data: data.toLocaleString('en')
       });
     } else {
       return res.json({
         code: 200,
-        status: "Success",
-        data: "<100",
+        status: 'Success',
+        data: '<100'
       });
     }
   } catch (error) {
     return res.json({
       code: 500,
-      status: "Error",
+      status: 'Error',
       data: 0,
-      message: error.message,
+      message: error.message
     });
   }
 };

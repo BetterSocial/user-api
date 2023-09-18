@@ -1,25 +1,20 @@
-const moment = require("moment");
+const moment = require('moment');
 
-const UserFollowUserFunction = require("../../databases/functions/userFollowUser");
-const ErrorResponse = require("../../utils/response/ErrorResponse");
-const SuccessResponse = require("../../utils/response/SuccessResponse");
+const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
+const ErrorResponse = require('../../utils/response/ErrorResponse');
+const SuccessResponse = require('../../utils/response/SuccessResponse');
 
-const {
-  UserFollowUser,
-  UserFollowUserHistory,
-  User,
-  sequelize,
-} = require("../../databases/models");
-const Getstream = require("../../vendor/getstream");
-const { addForUnfollowUser } = require("../../services/score");
-const UsersFunction = require("../../databases/functions/users");
-const { sendUnFollowMainFeedF2 } = require("../../services/queue/mainFeedF2");
+const {UserFollowUser, UserFollowUserHistory, User, sequelize} = require('../../databases/models');
+const Getstream = require('../../vendor/getstream');
+const {addForUnfollowUser} = require('../../services/score');
+const UsersFunction = require('../../databases/functions/users');
+const {sendUnFollowMainFeedF2} = require('../../services/queue/mainFeedF2');
 
 module.exports = async (req, res) => {
-  const { user_id_followed, follow_source } = req.body;
+  const {user_id_followed, follow_source} = req.body;
 
   if (req?.userId === user_id_followed)
-    return ErrorResponse.e403(res, "Only allow unfollowing other profiles");
+    return ErrorResponse.e403(res, 'Only allow unfollowing other profiles');
 
   if (
     !(await UserFollowUserFunction.checkIsUserFollowing(
@@ -28,7 +23,7 @@ module.exports = async (req, res) => {
       user_id_followed
     ))
   )
-    return ErrorResponse.e409(res, "You have not followed this user");
+    return ErrorResponse.e409(res, 'You have not followed this user');
 
   try {
     await sequelize.transaction(async (t) => {
@@ -43,45 +38,29 @@ module.exports = async (req, res) => {
       return userFollowUser;
     });
   } catch (e) {
-    console.log("Error in unfollow user v2 sql transaction");
+    console.log('Error in unfollow user v2 sql transaction');
     return ErrorResponse.e409(res, e.message);
   }
 
   try {
     // unfollow targeted feeds
-    const unfollowUserExcl = Getstream.feed.unfollowUserExclusive(
-      req?.userId,
-      user_id_followed
-    );
-    const unfollowUser = Getstream.feed.unfollowUser(
-      req?.token,
-      req?.userId,
-      user_id_followed
-    );
+    const unfollowUserExcl = Getstream.feed.unfollowUserExclusive(req?.userId, user_id_followed);
+    const unfollowUser = Getstream.feed.unfollowUser(req?.token, req?.userId, user_id_followed);
     const unfollowMainFeedFollowing = Getstream.feed.unfollowMainFeedFollowing(
       req?.token,
       req?.userId,
       user_id_followed
     );
-    const sendJobUnfollowF2User = sendUnFollowMainFeedF2(
-      req.userId,
-      user_id_followed
-    );
+    const sendJobUnfollowF2User = sendUnFollowMainFeedF2(req.userId, user_id_followed);
     await Promise.all([
       unfollowUserExcl,
       unfollowUser,
       unfollowMainFeedFollowing,
-      sendJobUnfollowF2User,
+      sendJobUnfollowF2User
     ]);
 
-    const anonymousUser = await UsersFunction.findAnonymousUserId(
-      User,
-      user_id_followed
-    );
-    const selfAnonymousUser = await UsersFunction.findAnonymousUserId(
-      User,
-      req?.userId
-    );
+    const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed);
+    const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId);
     await Getstream.feed.unfollowAnonUser(
       req?.token,
       req?.userId,
@@ -90,7 +69,7 @@ module.exports = async (req, res) => {
       anonymousUser?.user_id
     );
   } catch (e) {
-    console.log("Error in unfollow user v2 getstream");
+    console.log('Error in unfollow user v2 getstream');
     console.log(e);
     return ErrorResponse.e409(res, e.message);
   }
@@ -99,14 +78,14 @@ module.exports = async (req, res) => {
     await addForUnfollowUser({
       user_id: req?.user_id ?? req.userId,
       followed_user_id: user_id_followed,
-      activity_time: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
+      activity_time: moment.utc().format('YYYY-MM-DD HH:mm:ss')
     });
   } catch (e) {
-    console.log("Error in unfollow user v2 scoring");
+    console.log('Error in unfollow user v2 scoring');
     return ErrorResponse.e409(res, e.message);
   }
 
   return SuccessResponse(res, {
-    message: "User has been unfollowed successfully",
+    message: 'User has been unfollowed successfully'
   });
 };

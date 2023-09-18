@@ -1,26 +1,26 @@
-const getstreamService = require("../../services/getstream");
-const moment = require("moment");
+const getstreamService = require('../../services/getstream');
+const moment = require('moment');
 
-const Validator = require("fastest-validator");
-const { handleAnonymousData } = require("../../utils");
-const { getAnonymUser } = require("../../utils/getAnonymUser");
-const getPlainFeedById = require("../../vendor/getstream/feed/getPlainFeedById");
+const Validator = require('fastest-validator');
+const {handleAnonymousData} = require('../../utils');
+const {getAnonymUser} = require('../../utils/getAnonymUser');
+const getPlainFeedById = require('../../vendor/getstream/feed/getPlainFeedById');
 const v = new Validator();
 
 module.exports = async (req, res) => {
   try {
     const schema = {
-      activity_id: "string|empty:false",
+      activity_id: 'string|empty:false'
     };
     const validate = v.validate(req.body, schema);
     if (validate.length) {
       return res.status(403).json({
         code: 403,
-        status: "error",
-        message: validate,
+        status: 'error',
+        message: validate
       });
     }
-    let { activity_id, limit, feed_id } = req.body;
+    let {activity_id, limit, feed_id} = req.body;
     const token = req.token;
     const detailFeed = await getPlainFeedById(feed_id);
     const myAnonymUser = await getAnonymUser(req.userId);
@@ -42,23 +42,23 @@ module.exports = async (req, res) => {
           (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix()
         );
         res.status(200).json({
-          status: "success",
-          data: mappingNewRes,
+          status: 'success',
+          data: mappingNewRes
         });
       })
       .catch((err) => {
         res.status(403).json({
-          status: "failed",
+          status: 'failed',
           data: null,
-          error: err,
+          error: err
         });
       });
   } catch (error) {
     return res.status(500).json({
       code: 500,
       data: null,
-      message: "Internal server error",
-      error: error,
+      message: 'Internal server error',
+      error: error
     });
   }
 };

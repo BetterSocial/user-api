@@ -1,6 +1,6 @@
 const PollingFunction = {
-    createPollingByPostId : require('./create-polling-by-postid'),
-    createPollingOptionsByPollId : require('./create-polling-options-by-pollid')
-}
+  createPollingByPostId: require('./create-polling-by-postid'),
+  createPollingOptionsByPollId: require('./create-polling-options-by-pollid')
+};
 
-module.exports = PollingFunction
+module.exports = PollingFunction;

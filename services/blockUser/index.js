@@ -5,5 +5,5 @@ const getListBlockUser = require('./getListBlockUser');
 module.exports = {
   getListBlockUser,
   getListBlockPostAnonymous,
-  getListBlockPostAnonymousAuthor,
+  getListBlockPostAnonymousAuthor
 };

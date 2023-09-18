@@ -1,5 +1,5 @@
-const isDemoLoginViewEnabled = require("./isDemoLoginViewEnabled");
+const isDemoLoginViewEnabled = require('./isDemoLoginViewEnabled');
 
 module.exports = {
-    isDemoLoginViewEnabled
-}
+  isDemoLoginViewEnabled
+};

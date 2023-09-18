@@ -1,20 +1,20 @@
-const { responseError, responseSuccess } = require("../../utils/Responses");
-const { VoteComments } = require("../../databases/models");
+const {responseError, responseSuccess} = require('../../utils/Responses');
+const {VoteComments} = require('../../databases/models');
 module.exports = async (req, res) => {
   try {
     let data = {};
     let activity_id = req.query.id;
     let dataVote = await VoteComments.findOne({
-      where: { comment_id: activity_id, user_id: req.userId },
+      where: {comment_id: activity_id, user_id: req.userId}
     });
     if (dataVote === null) {
-      data.action = "none";
+      data.action = 'none';
     } else {
       data.action = dataVote.status;
     }
-    return res.status(200).json(responseSuccess("Success", data));
+    return res.status(200).json(responseSuccess('Success', data));
   } catch (error) {
-    console.log("error ", error);
-    return res.status(500).json(responseError("Failed i vote", null, 500));
+    console.log('error ', error);
+    return res.status(500).json(responseError('Failed i vote', null, 500));
   }
 };

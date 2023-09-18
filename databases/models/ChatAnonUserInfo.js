@@ -1,5 +1,5 @@
 'use strict';
-const { Model, Sequelize } = require('sequelize');
+const {Model, Sequelize} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class ChatAnonUserInfo extends Model {
     /**
@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
+        defaultValue: Sequelize.UUIDV4
       },
       channel_id: DataTypes.STRING,
       target_user_id: DataTypes.STRING,
@@ -28,18 +28,18 @@ module.exports = (sequelize, DataTypes) => {
       anon_user_info_emoji_code: DataTypes.STRING,
       createdAt: {
         type: DataTypes.DATE,
-        field: 'created_at',
+        field: 'created_at'
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: 'updated_at',
-      },
+        field: 'updated_at'
+      }
     },
     {
       sequelize,
       modelName: 'ChatAnonUserInfo',
       tableName: 'chat_anon_user_info',
-      timestamps: true,
+      timestamps: true
     }
   );
   return ChatAnonUserInfo;

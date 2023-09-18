@@ -1,2 +1,2 @@
-const createRefreshToken = require("./createRefreshToken");
-module.exports = { createRefreshToken };
+const createRefreshToken = require('./createRefreshToken');
+module.exports = {createRefreshToken};

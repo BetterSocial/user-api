@@ -1,7 +1,7 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const configController = require("../controllers/config");
+const configController = require('../controllers/config');
 
-router.get('/is-demo-login-enabled', configController.isDemoLoginViewEnabled)
+router.get('/is-demo-login-enabled', configController.isDemoLoginViewEnabled);
 
 module.exports = router;

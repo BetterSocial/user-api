@@ -1,6 +1,6 @@
 const changeValue = (item) => {
   if (/\s/.test(item)) {
-    return item.split(" ").join("-");
+    return item.split(' ').join('-');
   }
   return item;
 };

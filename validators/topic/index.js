@@ -1,6 +1,6 @@
-const Validator = require("fastest-validator");
-const InvariantError = require("../../exceptions/InvariantError");
-const { getTopicFollowPayloadSchema, putTopicFollowPayloadSchema } = require("./schema");
+const Validator = require('fastest-validator');
+const InvariantError = require('../../exceptions/InvariantError');
+const {getTopicFollowPayloadSchema, putTopicFollowPayloadSchema} = require('./schema');
 const v = new Validator();
 
 const TopicValidator = {
@@ -16,6 +16,6 @@ const TopicValidator = {
       throw new InvariantError(validate[0].message);
     }
   }
-}
+};
 
 module.exports = TopicValidator;

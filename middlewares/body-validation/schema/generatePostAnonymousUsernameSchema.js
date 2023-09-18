@@ -1,9 +1,9 @@
 const Schema = {
-    contentType: {
-        type: 'string',
-        empty: false,
-        enum: ['post'],
-    },
-}
+  contentType: {
+    type: 'string',
+    empty: false,
+    enum: ['post']
+  }
+};
 
-module.exports = Schema
+module.exports = Schema;

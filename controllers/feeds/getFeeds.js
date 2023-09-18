@@ -6,27 +6,24 @@ const {
   GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DATA_RETURN_LENGTH,
-  POST_TYPE_LINK,
+  POST_TYPE_LINK
 } = require('../../helpers/constants');
-const {
-  getListBlockUser,
-  getListBlockPostAnonymousAuthor,
-} = require('../../services/blockUser');
+const {getListBlockUser, getListBlockPostAnonymousAuthor} = require('../../services/blockUser');
 const getBlockDomain = require('../../services/domain/getBlockDomain');
 const {
   modifyPollPostObject,
   modifyAnonimityPost,
   isPostBlocked,
-  modifyReactionsPost,
+  modifyReactionsPost
 } = require('../../utils/post');
-const { DomainPage, Locations, User } = require('../../databases/models');
+const {DomainPage, Locations, User} = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 
 module.exports = async (req, res) => {
   let {
     offset = 0,
     limit = MAX_DATA_RETURN_LENGTH,
-    getstreamLimit = MAX_FEED_FETCH_LIMIT,
+    getstreamLimit = MAX_FEED_FETCH_LIMIT
   } = req.query;
   let domainPageCache = {};
   let getFeedFromGetstreamIteration = 0;
@@ -36,9 +33,7 @@ module.exports = async (req, res) => {
     const token = req.token;
     const listBlockUser = await getListBlockUser(req.userId);
     const listBlockDomain = await getBlockDomain(req.userId);
-    const listPostAnonymousAuthor = await getListBlockPostAnonymousAuthor(
-      req.userId
-    );
+    const listPostAnonymousAuthor = await getListBlockPostAnonymousAuthor(req.userId);
 
     let listAnonymousAuthor = listPostAnonymousAuthor.map((value) => {
       return value.post_anonymous_author_id;
@@ -54,35 +49,28 @@ module.exports = async (req, res) => {
         {
           model: Locations,
           as: 'locations',
-          through: { attributes: [] },
-          attributes: ['neighborhood'],
-        },
-      ],
+          through: {attributes: []},
+          attributes: ['neighborhood']
+        }
+      ]
     });
     userLocations.locations.forEach((loc) => {
       myLocations.push(loc.neighborhood);
     });
 
     while (data.length < limit) {
-      if (
-        getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION
-      )
-        break;
+      if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
       try {
         let paramGetFeeds = {
           limit: getstreamLimit,
-          reactions: { own: true, recent: true, counts: true },
+          reactions: {own: true, recent: true, counts: true},
           ranking: GETSTREAM_RANKING_METHOD,
-          offset,
+          offset
         };
 
         console.log('get feeds with ' + paramGetFeeds.offset);
-        let response = await getstreamService.getFeeds(
-          token,
-          'main_feed',
-          paramGetFeeds
-        );
+        let response = await getstreamService.getFeeds(token, 'main_feed', paramGetFeeds);
         let feeds = response.results;
 
         // Change to conventional loop because map cannot handle await
@@ -123,18 +111,17 @@ module.exports = async (req, res) => {
               if (item.post_type === POST_TYPE_LINK) {
                 let domainPageId = item?.og?.domain_page_id;
                 if (domainPageId) {
-                  let credderScoreCache =
-                    await RedisDomainHelper.getDomainCredderScore(domainPageId);
+                  let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(
+                    domainPageId
+                  );
                   if (credderScoreCache) {
                     newItem.credderScore = credderScoreCache;
                     newItem.credderLastChecked =
-                      await RedisDomainHelper.getDomainCredderLastChecked(
-                        domainPageId
-                      );
+                      await RedisDomainHelper.getDomainCredderLastChecked(domainPageId);
                   } else {
                     let dataDomain = await DomainPage.findOne({
-                      where: { domain_page_id: domainPageId },
-                      raw: true,
+                      where: {domain_page_id: domainPageId},
+                      raw: true
                     });
 
                     if (dataDomain) {
@@ -148,8 +135,7 @@ module.exports = async (req, res) => {
                       );
 
                       newItem.credderScore = dataDomain?.credder_score;
-                      newItem.credderLastChecked =
-                        dataDomain?.credder_last_checked;
+                      newItem.credderLastChecked = dataDomain?.credder_last_checked;
                     }
                   }
                 }
@@ -170,7 +156,7 @@ module.exports = async (req, res) => {
           status: 'failed',
           data: null,
           offset,
-          error: err,
+          error: err
         });
       }
     }
@@ -179,7 +165,7 @@ module.exports = async (req, res) => {
       code: 200,
       status: 'success',
       data: data,
-      offset,
+      offset
     });
   } catch (error) {
     console.log(error);
@@ -188,7 +174,7 @@ module.exports = async (req, res) => {
       data: null,
       offset,
       message: 'Internal server error',
-      error: error,
+      error: error
     });
   }
 };

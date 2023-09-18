@@ -1,19 +1,19 @@
-const { QueryTypes } = require('sequelize')
-const { sequelize } = require('../../databases/models')
+const {QueryTypes} = require('sequelize');
+const {sequelize} = require('../../databases/models');
 
 /**
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- * @returns 
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
  */
 const InitDiscoveryTopicData = async (req, res) => {
-    let { limit = 10, page = 0 } = req.query
+  let {limit = 10, page = 0} = req.query;
 
-    const userId = req.userId
+  const userId = req.userId;
 
-    try {
-        let suggestedTopicsQuery = `SELECT 
+  try {
+    let suggestedTopicsQuery = `SELECT 
                 C.*, 
                 A.topic_id, 
                 COUNT(*) as common,
@@ -30,32 +30,32 @@ const InitDiscoveryTopicData = async (req, res) => {
                 A.topic_id ASC,
                 COALESCE(A.user_id, '') ASC
             LIMIT :limit
-            OFFSET :offset`
+            OFFSET :offset`;
 
-        let topicWithCommonFollowerResult = await sequelize.query(suggestedTopicsQuery, {
-            type: QueryTypes.SELECT,
-            replacements: {
-                userId,
-                limit: limit,
-                offset: page * limit
-            }
-        })
-        let suggestedTopics = topicWithCommonFollowerResult
+    let topicWithCommonFollowerResult = await sequelize.query(suggestedTopicsQuery, {
+      type: QueryTypes.SELECT,
+      replacements: {
+        userId,
+        limit: limit,
+        offset: page * limit
+      }
+    });
+    let suggestedTopics = topicWithCommonFollowerResult;
 
-        return res.status(200).json({
-            success: true,
-            message: `Fetch discovery data success`,
-            suggestedTopics,
-            page: page + 1,
-        })
-    } catch (e) {
-        console.log('e')
-        console.log(e)
-        return res.status(200).json({
-            success: false,
-            message: e,
-        })
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: `Fetch discovery data success`,
+      suggestedTopics,
+      page: page + 1
+    });
+  } catch (e) {
+    console.log('e');
+    console.log(e);
+    return res.status(200).json({
+      success: false,
+      message: e
+    });
+  }
+};
 
-module.exports = InitDiscoveryTopicData
+module.exports = InitDiscoveryTopicData;

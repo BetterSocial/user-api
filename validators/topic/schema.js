@@ -1,12 +1,12 @@
 const putTopicFollowPayloadSchema = {
-  name: { type: 'string' }
-}
+  name: {type: 'string'}
+};
 
 const getTopicFollowPayloadSchema = {
-  name: { type: 'string' }
-}
+  name: {type: 'string'}
+};
 
 module.exports = {
   putTopicFollowPayloadSchema,
-  getTopicFollowPayloadSchema,
-}
+  getTopicFollowPayloadSchema
+};

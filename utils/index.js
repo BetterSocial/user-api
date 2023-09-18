@@ -1,3 +1,3 @@
 module.exports = {
-    ...require('./custom')
-}
+  ...require('./custom')
+};

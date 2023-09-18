@@ -1,5 +1,5 @@
 const Schema = {
-    userId: "string",
-}
+  userId: 'string'
+};
 
-module.exports = Schema
+module.exports = Schema;

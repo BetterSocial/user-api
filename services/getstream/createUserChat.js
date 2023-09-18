@@ -1,6 +1,6 @@
 const StreamChat = require('stream-chat').StreamChat;
 const chatClient = StreamChat.getInstance(process.env.API_KEY, {
-  timeout: 6000,
+  timeout: 6000
 });
 module.exports = async (data, token, userId) => {
   data.id = userId;

@@ -1,44 +1,44 @@
-const QueueInstance = require("./queueInit");
-const { v4: uuid } = require('uuid');
-const Bull = require("bull");
+const QueueInstance = require('./queueInit');
+const {v4: uuid} = require('uuid');
+const Bull = require('bull');
 
 /**
- * 
- * @param {AddCommentToDbQueuePayload} data 
- * @returns 
+ *
+ * @param {AddCommentToDbQueuePayload} data
+ * @returns
  */
-const addCommentToDb= (data) => {
-    /**
-     * @type {Bull.JobOptions}
-     */
-    const options = {
-        jobId: uuid(),
-        removeOnComplete: true
-    }
+const addCommentToDb = (data) => {
+  /**
+   * @type {Bull.JobOptions}
+   */
+  const options = {
+    jobId: uuid(),
+    removeOnComplete: true
+  };
 
-    QueueInstance.addCommentToDbQueue.add(data, options)
-}
+  QueueInstance.addCommentToDbQueue.add(data, options);
+};
 
 /**
- * 
- * @param {DeleteCommentByBlockPayload} data 
- * @returns 
+ *
+ * @param {DeleteCommentByBlockPayload} data
+ * @returns
  */
-const deleteCommentByBlock= (data) => {
-    /**
-     * @type {Bull.JobOptions}
-     */
-    const options = {
-        jobId: uuid(),
-        removeOnComplete: true
-    }
+const deleteCommentByBlock = (data) => {
+  /**
+   * @type {Bull.JobOptions}
+   */
+  const options = {
+    jobId: uuid(),
+    removeOnComplete: true
+  };
 
-    QueueInstance.deleteCommentByBlockTriggerQueue.add(data, options)
-}
+  QueueInstance.deleteCommentByBlockTriggerQueue.add(data, options);
+};
 
 const QueueTrigger = {
-    addCommentToDb,
-    deleteCommentByBlock
-}
+  addCommentToDb,
+  deleteCommentByBlock
+};
 
-module.exports = QueueTrigger
+module.exports = QueueTrigger;

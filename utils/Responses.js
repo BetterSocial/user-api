@@ -3,7 +3,7 @@ module.exports = {
     return {
       code: 200,
       status: message,
-      data: data,
+      data: data
     };
   },
 
@@ -11,7 +11,7 @@ module.exports = {
     return {
       code: code,
       status: message,
-      data: data,
+      data: data
     };
   },
   ResponseSuccess: (res, message = null, code, data = null) => {
@@ -19,7 +19,7 @@ module.exports = {
       code: code,
       status: true,
       message: message,
-      data: data,
+      data: data
     });
   },
 
@@ -28,7 +28,7 @@ module.exports = {
       code: code,
       status: false,
       message: message,
-      data: data,
+      data: data
     });
-  },
+  }
 };

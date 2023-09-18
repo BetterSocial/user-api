@@ -1,19 +1,19 @@
-const { QueryTypes } = require('sequelize')
-const { sequelize } = require('../../databases/models')
+const {QueryTypes} = require('sequelize');
+const {sequelize} = require('../../databases/models');
 
 /**
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- * @returns 
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
  */
 const InitDiscoveryDomainData = async (req, res) => {
-    let { limit = 10, page = 0 } = req.query
+  let {limit = 10, page = 0} = req.query;
 
-    const userId = req.userId
+  const userId = req.userId;
 
-    try {
-        let suggestedDomainsQuery = `SELECT 
+  try {
+    let suggestedDomainsQuery = `SELECT 
                 C.domain_name, C.short_description, C.logo, C.credder_score,
                 A.domain_id_followed, 
                 COUNT(*) as common,
@@ -29,32 +29,32 @@ const InitDiscoveryDomainData = async (req, res) => {
                 common DESC, 
                 A.domain_id_followed ASC
             LIMIT :limit
-            OFFSET :offset`
+            OFFSET :offset`;
 
-        let domainWithCommonFollowerResult = await sequelize.query(suggestedDomainsQuery, {
-            type: QueryTypes.SELECT,
-            replacements: {
-                userId,
-                limit: limit,
-                offset: page * limit
-            }
-        })
-        let suggestedDomains = domainWithCommonFollowerResult
+    let domainWithCommonFollowerResult = await sequelize.query(suggestedDomainsQuery, {
+      type: QueryTypes.SELECT,
+      replacements: {
+        userId,
+        limit: limit,
+        offset: page * limit
+      }
+    });
+    let suggestedDomains = domainWithCommonFollowerResult;
 
-        return res.status(200).json({
-            success: true,
-            message: `Fetch discovery data success`,
-            suggestedDomains,
-            page: page + 1,
-        })
-    } catch (e) {
-        console.log('e')
-        console.log(e)
-        return res.status(200).json({
-            success: false,
-            message: e,
-        })
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: `Fetch discovery data success`,
+      suggestedDomains,
+      page: page + 1
+    });
+  } catch (e) {
+    console.log('e');
+    console.log(e);
+    return res.status(200).json({
+      success: false,
+      message: e
+    });
+  }
+};
 
-module.exports = InitDiscoveryDomainData
+module.exports = InitDiscoveryDomainData;

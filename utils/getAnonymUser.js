@@ -1,16 +1,15 @@
-const UsersFunction = require('../databases/functions/users')
-const {User} = require ('../databases/models')
+const UsersFunction = require('../databases/functions/users');
+const {User} = require('../databases/models');
 
-
-const getAnonymUser = async ( userId) => {
-     try {
-        const myAnonymousId = await UsersFunction.findAnonymousUserId(User, userId)
-     return myAnonymousId.user_id
-     } catch(e) {
-        return null
-     }
-}
+const getAnonymUser = async (userId) => {
+  try {
+    const myAnonymousId = await UsersFunction.findAnonymousUserId(User, userId);
+    return myAnonymousId.user_id;
+  } catch (e) {
+    return null;
+  }
+};
 
 module.exports = {
-    getAnonymUser
-}
+  getAnonymUser
+};

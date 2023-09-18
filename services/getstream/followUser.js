@@ -1,7 +1,7 @@
-const stream = require("getstream");
+const stream = require('getstream');
 const followUser = async (token, userId, feedGroup, status = 1) => {
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
-  const user = client.feed("main_feed", client.userId, token);
+  const user = client.feed('main_feed', client.userId, token);
   if (status == 1) {
     return user.follow(feedGroup, userId);
   } else {
@@ -10,13 +10,13 @@ const followUser = async (token, userId, feedGroup, status = 1) => {
 };
 
 const followUserExclusive = async (userIdFollower, userIdFollowed, status = 1) => {
-  // instantiate a new client (server side) 
+  // instantiate a new client (server side)
   const client = stream.connect(process.env.API_KEY, process.env.SECRET);
-  const user = client.feed("main_feed", userIdFollowed);
+  const user = client.feed('main_feed', userIdFollowed);
   if (status === 1) {
-    return user.follow("user_excl", userIdFollower);
+    return user.follow('user_excl', userIdFollower);
   } else {
-    return user.unfollow("user_excl", userIdFollower);
+    return user.unfollow('user_excl', userIdFollower);
   }
   // const user = client.feed("main_feed", userIdFollower);
   // if (status === 1) {
@@ -32,13 +32,13 @@ const followUsers = async (token, userIds) => {
   const follows = [];
   userIds.map((item) => {
     follows.push({
-      source: "main_feed:" + client.userId,
-      target: "user:" + item.toLowerCase(),
+      source: 'main_feed:' + client.userId,
+      target: 'user:' + item.toLowerCase()
     });
   });
 
   let res = await clientServer.followMany(follows);
-  console.log("follow Users");
+  console.log('follow Users');
   console.log(res);
   return res;
 };
@@ -46,5 +46,5 @@ const followUsers = async (token, userIds) => {
 module.exports = {
   followUser,
   followUsers,
-  followUserExclusive,
+  followUserExclusive
 };

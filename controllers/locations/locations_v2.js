@@ -1,23 +1,23 @@
-const { Locations, sequelize } = require("../../databases/models");
-const { Op } = require("sequelize");
+const {Locations, sequelize} = require('../../databases/models');
+const {Op} = require('sequelize');
 module.exports = async (req, res) => {
   try {
-    let { name, limit = 20, offset = 0 } = req.body;
+    let {name, limit = 20, offset = 0} = req.body;
 
-    let stringToCapitalize = "";
-    let stringToLowerCase = "";
+    let stringToCapitalize = '';
+    let stringToLowerCase = '';
 
     // check attribute name
     if (name === undefined) {
       return res.status(404).json({
-        status: "error",
+        status: 'error',
         code: 404,
-        message: "name is required",
+        message: 'name is required'
       });
     }
 
     // check if name using string
-    if (typeof name === "string") {
+    if (typeof name === 'string') {
       // stringToCapitalize = name
       //   .trim()
       //   .toLowerCase()
@@ -27,9 +27,9 @@ module.exports = async (req, res) => {
       stringToLowerCase = name;
     } else {
       return res.status(404).json({
-        status: "error",
+        status: 'error',
         code: 404,
-        message: "The name format is invalid",
+        message: 'The name format is invalid'
       });
     }
 
@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
     OR A.city ILIKE :nameQuery
     ORDER BY location_rank DESC
     OFFSET :offset
-    LIMIT :limit`
+    LIMIT :limit`;
 
     try {
       const result = await sequelize.query(locationQuery, {
@@ -61,21 +61,21 @@ module.exports = async (req, res) => {
           offset: offset,
           limit: limit
         }
-      })
+      });
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         code: 200,
-        body: result,
+        body: result
       });
     } catch (e) {
-      return res.status(400).json({ error: e })
+      return res.status(400).json({error: e});
     }
   } catch (error) {
-    const { status, data } = error.response;
+    const {status, data} = error.response;
     return res.json({
       code: status,
       data: 0,
-      message: data,
+      message: data
     });
   }
 };

@@ -1,39 +1,39 @@
-const { UserFollowDomain, DomainPage } = require('../../databases/models')
-const { getDetailDomain } = require("../../services/getstream");
+const {UserFollowDomain, DomainPage} = require('../../databases/models');
+const {getDetailDomain} = require('../../services/getstream');
 const {
   MAX_FEED_FETCH_LIMIT,
   GETSTREAM_RANKING_METHOD,
   GETSTREAM_TIME_LINEAR_RANKING_METHOD
-} = require("../../helpers/constants");
-const { convertString } = require("../../utils");
+} = require('../../helpers/constants');
+const {convertString} = require('../../utils');
 
 module.exports = async (req, res) => {
-  let { limit = MAX_FEED_FETCH_LIMIT, offset = 0 } = req.query
+  let {limit = MAX_FEED_FETCH_LIMIT, offset = 0} = req.query;
 
   try {
     const query = {
-      name: "domain",
-      idFeed: convertString(req.params.idfeed, ".", "-"),
+      name: 'domain',
+      idFeed: convertString(req.params.idfeed, '.', '-'),
       limit,
       offset,
-      reactions: { own: true, recent: true, counts: true },
-      ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD,
+      reactions: {own: true, recent: true, counts: true},
+      ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD
     };
     let domain = await DomainPage.findOne({
       where: {
         domain_name: req.params.idfeed
       }
-    })
+    });
 
     let followers = 0;
     if (domain?.domain_page_id) {
-      let { count } = await UserFollowDomain.findAndCountAll({
+      let {count} = await UserFollowDomain.findAndCountAll({
         where: {
           domain_id_followed: domain.domain_page_id
         }
-      })
+      });
 
-      followers = count
+      followers = count;
     }
 
     console.log(query);
@@ -41,9 +41,9 @@ module.exports = async (req, res) => {
 
     res.status(200).json({
       code: 200,
-      status: "success",
+      status: 'success',
       followers,
-      data: resp?.results,
+      data: resp?.results
     });
   } catch (error) {
     console.error(error);
@@ -51,8 +51,8 @@ module.exports = async (req, res) => {
       code: 500,
       data: null,
       followers: 0,
-      message: "Internal server error",
-      error: error,
+      message: 'Internal server error',
+      error: error
     });
   }
 };

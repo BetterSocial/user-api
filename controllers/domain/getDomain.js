@@ -1,13 +1,13 @@
-const { getDomain } = require('../../services/getstream');
+const {getDomain} = require('../../services/getstream');
 const {
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DOMAIN_DATA_RETURN_LENGTH,
-  GETSTREAM_TIME_RANDOM_RANKING_METHOD,
+  GETSTREAM_TIME_RANDOM_RANKING_METHOD
 } = require('../../helpers/constants');
 const _ = require('lodash');
 
-const { getBlockDomain } = require('../../services/domain');
-const { DomainPage, NewsLink } = require('../../databases/models/');
+const {getBlockDomain} = require('../../services/domain');
+const {DomainPage, NewsLink} = require('../../databases/models/');
 const ElasticNewsLink = require('../../elasticsearch/repo/newsLink/ElasticNewsLink');
 
 const MIN_CREDDER_SCORE = 50;
@@ -16,7 +16,7 @@ const CREDDER_CHECK_ENABLED = true;
 const elasticNewsLink = new ElasticNewsLink();
 
 module.exports = async (req, res) => {
-  let { offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH } = req.query;
+  let {offset = 0, limit = MAX_DOMAIN_DATA_RETURN_LENGTH} = req.query;
 
   let domainPageCache = {};
 
@@ -26,17 +26,14 @@ module.exports = async (req, res) => {
     const blockDomain = await getBlockDomain(req.userId);
 
     while (data.length < limit) {
-      if (
-        getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION
-      )
-        break;
+      if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
       try {
         let query = {
           limit,
           offset,
           ranking: GETSTREAM_TIME_RANDOM_RANKING_METHOD,
-          reactions: { own: true, recent: true, counts: true },
+          reactions: {own: true, recent: true, counts: true}
         };
 
         const resp = await getDomain(query);
@@ -60,8 +57,8 @@ module.exports = async (req, res) => {
             item.domain.credderLastChecked = cache.credder_last_checked;
           } else {
             let dataDomain = await DomainPage.findOne({
-              where: { domain_page_id: item.content.domain_page_id },
-              raw: true,
+              where: {domain_page_id: item.content.domain_page_id},
+              raw: true
             });
 
             if (dataDomain) {
@@ -71,23 +68,13 @@ module.exports = async (req, res) => {
             }
           }
 
-          if (
-            item?.domain?.credderScore >= MIN_CREDDER_SCORE ||
-            !CREDDER_CHECK_ENABLED
-          ) {
+          if (item?.domain?.credderScore >= MIN_CREDDER_SCORE || !CREDDER_CHECK_ENABLED) {
             data.push(item);
           }
 
-          const { id, content, content_created_at, domain } = item;
-          const {
-            description,
-            domain_page_id,
-            news_link_id,
-            news_url,
-            site_name,
-            title,
-          } = content;
-          const { image, name } = domain;
+          const {id, content, content_created_at, domain} = item;
+          const {description, domain_page_id, news_link_id, news_url, site_name, title} = content;
+          const {image, name} = domain;
 
           elasticNewsLink.putToIndex({
             id,
@@ -99,7 +86,7 @@ module.exports = async (req, res) => {
             site_name,
             title,
             image,
-            name,
+            name
           });
 
           offset++;
@@ -115,7 +102,7 @@ module.exports = async (req, res) => {
           data: 'asdads',
           message: error,
           error: error,
-          offset,
+          offset
         });
       }
     }
@@ -124,7 +111,7 @@ module.exports = async (req, res) => {
       code: 200,
       status: 'success',
       data: data,
-      offset,
+      offset
     });
   } catch (e) {
     return res.status(500).json({
@@ -132,7 +119,7 @@ module.exports = async (req, res) => {
       data: [],
       message: e,
       error: e,
-      offset,
+      offset
     });
   }
 };

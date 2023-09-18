@@ -1,20 +1,20 @@
-const { User } = require("../../databases/models");
-const getstreamService = require("../../services/getstream");
-const jwt = require("jsonwebtoken");
-const { createRefreshToken } = require("../../services/jwt");
-const UsersFunction = require("../../databases/functions/users");
+const {User} = require('../../databases/models');
+const getstreamService = require('../../services/getstream');
+const jwt = require('jsonwebtoken');
+const {createRefreshToken} = require('../../services/jwt');
+const UsersFunction = require('../../databases/functions/users');
 
 module.exports = async (req, res) => {
   if (process.env.IS_DEMO_LOGIN_ENABLED !== 'true') {
     return res.status(200).json({
       success: false,
       message: 'Demo login is disabled'
-    })
+    });
   }
 
   try {
     const userData = await User.findOne({
-      where: { human_id: req.body.user_id, is_anonymous: false },
+      where: {human_id: req.body.user_id, is_anonymous: false}
     });
     if (userData) {
       if (userData.is_banned) {
@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
           code: 401,
           data: false,
           is_banned: true,
-          message: "User has banned by admin",
+          message: 'User has banned by admin'
         });
       }
       let user_id = userData.user_id;
@@ -34,17 +34,17 @@ module.exports = async (req, res) => {
       return res.json({
         code: 200,
         data: Object.keys(userData).length === 0 ? false : true,
-        message: "",
+        message: '',
         token: token,
         refresh_token: refresh_token,
         anonymousToken: anonymousToken,
-        is_banned: false,
+        is_banned: false
       });
     } else {
       return res.status(200).json({
         code: 500,
         data: false,
-        message: "User not found",
+        message: 'User not found'
       });
     }
   } catch (error) {
@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
     return res.status(200).json({
       code: 500,
       data: false,
-      message: error,
+      message: error
     });
   }
 };
