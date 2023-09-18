@@ -32,6 +32,7 @@ const PollingFunction = require('../../../databases/functions/polling');
 const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonUserInfo');
 const {convertLocationFromModel} = require('../../../utils');
 const sendMultiDeviceTaggedNotification = require('../fcmToken/sendMultiDeviceTaggedNotification');
+const PostFunction = require('../../../databases/functions/post');
 
 const isEmptyMessageAllowed = (body) => {
   const isPollPost = body?.verb === POST_VERB_POLL;
@@ -278,6 +279,8 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
         anonUserInfoEmojiName: body?.anon_user_info?.emoji_name
       });
     }
+
+    await PostFunction.updateGetstreamActivityId(Post, data?.foreign_id, post?.id);
 
     const scoringProcessData = {
       feed_id: post?.id,
