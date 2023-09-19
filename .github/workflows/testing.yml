@@ -83,3 +83,8 @@ jobs:
           DB_PASSWORD: postgres
           DB_NAME: testing
           DB_SSL: false
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
