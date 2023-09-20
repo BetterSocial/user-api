@@ -1,20 +1,19 @@
-const { sequelize } = require('../../databases/models')
-const _ = require('lodash')
-const { QueryTypes } = require('sequelize')
+const {QueryTypes} = require('sequelize');
+const {sequelize} = require('../../databases/models');
 
 /**
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- * @returns 
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
  */
 const InitDiscoveryUserData = async (req, res) => {
-    let { limit = 10, page = 0 } = req.body
+  const {limit = 50, page = 0} = req.body;
 
-    const userId = req.userId
+  const {userId} = req;
 
-    try {
-        let usersWithCommonFollowerQuery = `
+  try {
+    const usersWithCommonFollowerQuery = `
         SELECT 
             A.user_id,
             A.country_code,
@@ -50,32 +49,32 @@ const InitDiscoveryUserData = async (req, res) => {
         COALESCE(CommonUsers.user_match, -1) DESC,
         COALESCE(B.user_id_follower, '') DESC
         LIMIT :limit
-        OFFSET :offset`
+        OFFSET :offset`;
 
-        let usersWithCommonFollowerResult = await sequelize.query(usersWithCommonFollowerQuery, {
-            type: QueryTypes.SELECT,
-            replacements: {
-                userId,
-                limit: limit,
-                offset: page * limit
-            }
-        })
-        let suggestedUsers = usersWithCommonFollowerResult
+    const usersWithCommonFollowerResult = await sequelize.query(usersWithCommonFollowerQuery, {
+      type: QueryTypes.SELECT,
+      replacements: {
+        userId,
+        limit,
+        offset: page * limit
+      }
+    });
+    const suggestedUsers = usersWithCommonFollowerResult;
 
-        return res.status(200).json({
-            success: true,
-            message: `Fetch discovery data success`,
-            suggestedUsers,
-            nextPage: page + 1,
-        })
-    } catch (e) {
-        console.log('e')
-        console.log(e)
-        return res.status(200).json({
-            success: false,
-            message: e,
-        })
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: `Fetch discovery data success`,
+      suggestedUsers,
+      nextPage: page + 1
+    });
+  } catch (e) {
+    console.log('e');
+    console.log(e);
+    return res.status(200).json({
+      success: false,
+      message: e
+    });
+  }
+};
 
-module.exports = InitDiscoveryUserData
+module.exports = InitDiscoveryUserData;
