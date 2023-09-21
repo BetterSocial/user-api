@@ -9,7 +9,7 @@ const {sequelize} = require('../../databases/models');
  * @returns
  */
 const SearchUser = async (req, res) => {
-  const {q} = req.query;
+  const {q, limit = 50} = req.query;
   const {userId} = req;
   if (q.length < 2)
     return res.status(200).json({
@@ -44,12 +44,13 @@ const SearchUser = async (req, res) => {
             ORDER BY 
                 "user_id_follower" ASC,
                 "followersCount" DESC
-            LIMIT 10`,
+            LIMIT :limit`,
       {
         type: QueryTypes.SELECT,
         replacements: {
           likeQuery: `%${q}%`,
-          userId
+          userId,
+          limit
         }
       }
     );
