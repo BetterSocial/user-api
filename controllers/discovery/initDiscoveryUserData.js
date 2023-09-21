@@ -9,12 +9,12 @@ const {QueryTypes} = require('sequelize');
  * @returns
  */
 const InitDiscoveryUserData = async (req, res) => {
-  let {limit = 10, page = 0} = req.body;
+  const {limit = 50, page = 0} = req.body;
 
-  const userId = req.userId;
+  const {userId} = req;
 
   try {
-    let usersWithCommonFollowerQuery = `
+    const usersWithCommonFollowerQuery = `
         SELECT 
             A.user_id,
             A.country_code,

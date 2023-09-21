@@ -1,5 +1,6 @@
 const express = require('express');
 const DiscoveryController = require('../controllers/discovery');
+
 const Router = express.Router();
 
 const {isAuth} = require('../middlewares/auth');
