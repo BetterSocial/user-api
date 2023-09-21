@@ -1,53 +1,52 @@
-const getValue = require("../getValue")
-const setValue = require("../setValue")
+const getValue = require('../getValue');
+const setValue = require('../setValue');
 
-const REDIS_DOMAIN_CREDDER_SCORE_KEY = "DOMAINCREDDERSCORE_"
-const REDIS_DOMAIN_CREDDER_LAST_CHECKED_KEY = "DOMAINCREDDERLASTCHECKED_"
+const REDIS_DOMAIN_CREDDER_SCORE_KEY = 'DOMAINCREDDERSCORE_';
+const REDIS_DOMAIN_CREDDER_LAST_CHECKED_KEY = 'DOMAINCREDDERLASTCHECKED_';
 
 /**
- * 
- * @param {String} domainPageId 
+ *
+ * @param {String} domainPageId
  * @returns Number
  */
-const getDomainCredderScore = async(domainPageId) => {
-    let credderScore = getValue(`${REDIS_DOMAIN_CREDDER_SCORE_KEY}${domainPageId}`)
-    return credderScore
-}
+const getDomainCredderScore = async (domainPageId) => {
+  let credderScore = getValue(`${REDIS_DOMAIN_CREDDER_SCORE_KEY}${domainPageId}`);
+  return credderScore;
+};
 
 /**
- * 
- * @param {String} domainPageId 
- * @returns 
+ *
+ * @param {String} domainPageId
+ * @returns
  */
-const getDomainCredderLastChecked = async(domainPageId) => {
-    let credderLastChecked = getValue(`${REDIS_DOMAIN_CREDDER_LAST_CHECKED_KEY}${domainPageId}`)
-    return credderLastChecked
-}
+const getDomainCredderLastChecked = async (domainPageId) => {
+  let credderLastChecked = getValue(`${REDIS_DOMAIN_CREDDER_LAST_CHECKED_KEY}${domainPageId}`);
+  return credderLastChecked;
+};
 
 /**
- * 
- * @param {String} domainPageId 
- * @param {Number} credderScore 
+ *
+ * @param {String} domainPageId
+ * @param {Number} credderScore
  */
-const setDomainCredderScore = async(domainPageId, credderScore) => {
-    setValue(`${REDIS_DOMAIN_CREDDER_SCORE_KEY}${domainPageId}`, credderScore)
-}
+const setDomainCredderScore = async (domainPageId, credderScore) => {
+  setValue(`${REDIS_DOMAIN_CREDDER_SCORE_KEY}${domainPageId}`, credderScore);
+};
 
 /**
- * 
- * @param {String} domainPageId 
- * @param {Number} lastChecked 
+ *
+ * @param {String} domainPageId
+ * @param {Number} lastChecked
  */
-const setDomainCredderLastChecked = async(domainPageId, lastChecked) => {
-    setValue(`${REDIS_DOMAIN_CREDDER_LAST_CHECKED_KEY}${domainPageId}`, lastChecked)
-}
-
+const setDomainCredderLastChecked = async (domainPageId, lastChecked) => {
+  setValue(`${REDIS_DOMAIN_CREDDER_LAST_CHECKED_KEY}${domainPageId}`, lastChecked);
+};
 
 const RedisDomainHelper = {
-    getDomainCredderLastChecked,
-    getDomainCredderScore,
-    setDomainCredderLastChecked,
-    setDomainCredderScore
-}
+  getDomainCredderLastChecked,
+  getDomainCredderScore,
+  setDomainCredderLastChecked,
+  setDomainCredderScore
+};
 
-module.exports = RedisDomainHelper
+module.exports = RedisDomainHelper;

@@ -12,11 +12,11 @@ const removeImageProfile = require('./removeImageProfile');
 const setFollowing = require('./setFollowing');
 const unSetFollowing = require('./unSetFollowing');
 const updateBio = require('./updateBio');
-const { handleBlock } = require('./blocking');
-const { anonDmPrivacySettings } = require('./anonDmPrivacySettings');
+const {handleBlock} = require('./blocking');
+const {anonDmPrivacySettings} = require('./anonDmPrivacySettings');
 const followUserV2 = require('./followUsersV2');
 const unfollowUserV2 = require('./unfollowUsersV2');
-const followUserV3 = require("./followUserV3");
+const followUserV3 = require('./followUserV3');
 const unfollowUserV3 = require('./unfollowUserV3');
 
 module.exports = {

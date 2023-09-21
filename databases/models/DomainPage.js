@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class DomainPage extends Model {
     /**
@@ -16,27 +16,27 @@ module.exports = (sequelize, DataTypes) => {
       domain_page_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
       },
-      domain_name: { type: DataTypes.STRING },
+      domain_name: {type: DataTypes.STRING},
       logo: DataTypes.STRING,
       short_description: DataTypes.TEXT,
       createdAt: {
         type: DataTypes.DATE,
-        field: "created_at",
+        field: 'created_at'
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: "updated_at",
+        field: 'updated_at'
       },
       credder_score: DataTypes.INTEGER,
-      credder_last_checked: DataTypes.DATE,
+      credder_last_checked: DataTypes.DATE
     },
     {
       sequelize,
-      modelName: "DomainPage",
-      tableName: "domain_page",
-      timestamps: true,
+      modelName: 'DomainPage',
+      tableName: 'domain_page',
+      timestamps: true
     }
   );
   return DomainPage;

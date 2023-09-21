@@ -1,4 +1,4 @@
-const { Model } = require('sequelize');
+const {Model} = require('sequelize');
 
 /**
  *
@@ -7,12 +7,12 @@ const { Model } = require('sequelize');
  * @param {String} token
  */
 module.exports = async (fcmTokenModel, user_id, token) => {
-    const userToken = await fcmTokenModel.findOne({
-        where: {
-            user_id,
-            token,
-        },
-    });
-    
-    return userToken;
+  const userToken = await fcmTokenModel.findOne({
+    where: {
+      user_id,
+      token
+    }
+  });
+
+  return userToken;
 };

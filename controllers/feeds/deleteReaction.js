@@ -1,22 +1,22 @@
-const { deleteReaction } = require("../../services/getstream");
+const {deleteReaction} = require('../../services/getstream');
 module.exports = async (req, res) => {
   try {
-    let { reaction_id } = req.body;
+    let {reaction_id} = req.body;
 
     let result = await deleteReaction(reaction_id, req.token);
     return res.status(200).json({
       code: 200,
       success: true,
-      status: "Success delete reaction",
-      data: result,
+      status: 'Success delete reaction',
+      data: result
     });
   } catch (err) {
     console.log(err);
     return res.status(400).json({
       code: 400,
       success: false,
-      status: "failed delete reaction",
-      data: err.detail,
+      status: 'failed delete reaction',
+      data: err.detail
     });
   }
 };

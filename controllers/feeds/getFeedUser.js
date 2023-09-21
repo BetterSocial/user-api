@@ -1,8 +1,8 @@
-const getstreamService = require("../../services/getstream");
+const getstreamService = require('../../services/getstream');
 module.exports = async (req, res) => {
   const token = req.token;
   getstreamService
-    .getFeeds(token, "user", "")
+    .getFeeds(token, 'user', '')
     .then((result) => {
       let data = [];
       result.results.map((item, index) => {
@@ -14,20 +14,20 @@ module.exports = async (req, res) => {
       });
       res.status(200).json({
         code: 200,
-        status: "success",
+        status: 'success',
         data: {
           results: data,
           next: result.next,
-          duration: result.duration,
-        },
+          duration: result.duration
+        }
       });
     })
     .catch((err) => {
       console.log(err);
       res.status(403).json({
-        status: "failed",
+        status: 'failed',
         data: null,
-        error: err,
+        error: err
       });
     });
 };

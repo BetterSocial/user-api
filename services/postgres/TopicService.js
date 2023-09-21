@@ -1,7 +1,5 @@
-
-const { Op } = require("sequelize");
-const NotFoundError = require("../../exceptions/NotFoundError");
-
+const {Op} = require('sequelize');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class TopicService {
   constructor(topicModel) {
@@ -13,8 +11,8 @@ class TopicService {
       let result = await this._topic.findOne({
         where: {
           name
-        },
-      })
+        }
+      });
       if (!result) {
         throw new NotFoundError('Topic not found');
       }
@@ -23,7 +21,6 @@ class TopicService {
       console.log(error);
       throw new NotFoundError('Topic not found');
     }
-
   }
 
   async search(name) {
@@ -32,12 +29,10 @@ class TopicService {
         where: {
           name: {
             [Op.iLike]: `%${name}%`
-          },
-
-        },
+          }
+        }
         // attributes: ['name']
-
-      })
+      });
       if (!result) {
         throw new NotFoundError('Topic not found');
       }

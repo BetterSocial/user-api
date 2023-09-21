@@ -1,4 +1,4 @@
-const whoToFollow = require("./whoToFollow");
+const whoToFollow = require('./whoToFollow');
 
 module.exports = {
   whoToFollow

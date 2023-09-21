@@ -1,18 +1,14 @@
-const getstreamService = require(".");
+const getstreamService = require('.');
 const {
   MAX_FEED_FETCH_LIMIT,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
-  MAX_DATA_RETURN_LENGTH,
-} = require("../../helpers/constants");
-const { getExcludePostParameters } = require("./excludePostParameters");
-const { activityFormatter } = require("./activityFormatter");
+  MAX_DATA_RETURN_LENGTH
+} = require('../../helpers/constants');
+const {getExcludePostParameters} = require('./excludePostParameters');
+const {activityFormatter} = require('./activityFormatter');
 
 const getActivtiesByFeedId = async (feed, id, paramGetFeeds) => {
-  const response = await getstreamService.getActivitiesByFeed(
-    feed,
-    id,
-    paramGetFeeds
-  );
+  const response = await getstreamService.getActivitiesByFeed(feed, id, paramGetFeeds);
   const feeds = response.results;
   return feeds;
 };
@@ -24,29 +20,23 @@ const getUnfilteredActivitiesByFeed = async (req) => {
     limit = MAX_DATA_RETURN_LENGTH,
     getstreamLimit = MAX_FEED_FETCH_LIMIT,
     feedgroup,
-    feedid,
+    feedid
   } = req.query;
 
   while (data.length < limit) {
-    if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION)
-      break;
+    if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
     const paramGetFeeds = {
       limit: getstreamLimit,
-      reactions: { own: true, recent: true, counts: true },
+      reactions: {own: true, recent: true, counts: true},
       //   ranking: GETSTREAM_RANKING_METHOD,
-      offset,
+      offset
     };
     const excludedPostParameter = await getExcludePostParameters(req.userId);
 
     const feeds = await getActivtiesByFeedId(feedgroup, feedid, paramGetFeeds);
     if (feeds.length !== 0) {
       for (const item of feeds) {
-        const newItem = await activityFormatter(
-          item,
-          feedgroup,
-          req.userId,
-          excludedPostParameter
-        );
+        const newItem = await activityFormatter(item, feedgroup, req.userId, excludedPostParameter);
         data.push(newItem);
         offset++;
 
@@ -61,10 +51,10 @@ const getUnfilteredActivitiesByFeed = async (req) => {
   return {
     data,
     offset,
-    feedgroup,
+    feedgroup
   };
 };
 
 module.exports = {
-  getUnfilteredActivitiesByFeed,
+  getUnfilteredActivitiesByFeed
 };

@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class UserLocationHistory extends Model {
     /**
@@ -13,17 +13,16 @@ module.exports = (sequelize, DataTypes) => {
   }
   UserLocationHistory.init(
     {
-
-      user_id: { type: DataTypes.STRING, allowNull: false, primaryKey: true, },
-      location_id: { type: DataTypes.BIGINT, allowNull: false },
-      action: { type: DataTypes.STRING, allowNull: false },
-      created_at: DataTypes.DATE,
+      user_id: {type: DataTypes.STRING, allowNull: false, primaryKey: true},
+      location_id: {type: DataTypes.BIGINT, allowNull: false},
+      action: {type: DataTypes.STRING, allowNull: false},
+      created_at: DataTypes.DATE
     },
     {
       sequelize,
-      modelName: "UserLocationHistory",
-      tableName: "user_location_history",
-      timestamps: false,
+      modelName: 'UserLocationHistory',
+      tableName: 'user_location_history',
+      timestamps: false
     }
   );
   return UserLocationHistory;

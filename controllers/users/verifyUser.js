@@ -1,13 +1,13 @@
-const { User } = require("../../databases/models");
-const getstreamService = require("../../services/getstream");
-const { createRefreshToken } = require("../../services/jwt");
-const Getstream = require("../../vendor/getstream");
-const UsersFunction = require("../../databases/functions/users");
+const {User} = require('../../databases/models');
+const getstreamService = require('../../services/getstream');
+const {createRefreshToken} = require('../../services/jwt');
+const Getstream = require('../../vendor/getstream');
+const UsersFunction = require('../../databases/functions/users');
 
 module.exports = async (req, res) => {
   try {
     const userData = await User.findOne({
-      where: { human_id: req.body.user_id, is_anonymous: false},
+      where: {human_id: req.body.user_id, is_anonymous: false}
     });
     if (userData) {
       if (userData.is_banned) {
@@ -15,10 +15,10 @@ module.exports = async (req, res) => {
           code: 401,
           data: false,
           is_banned: true,
-          message: "User has banned by admin",
+          message: 'User has banned by admin'
         });
       }
-      await Getstream.core.updateUserRemoveHumanId(userData)
+      await Getstream.core.updateUserRemoveHumanId(userData);
       let user_id = userData.user_id;
       let userId = user_id.toLowerCase();
       const anonUser = await UsersFunction.findAnonymousUserId(User, user_id);
@@ -28,18 +28,18 @@ module.exports = async (req, res) => {
       return res.json({
         code: 200,
         data: Object.keys(userData).length === 0 ? false : true,
-        message: "",
+        message: '',
         is_banned: false,
         token: token,
         anonymousToken: anonymousToken,
-        refresh_token: refresh_token,
+        refresh_token: refresh_token
       });
     } else {
       return res.status(200).json({
         code: 500,
         data: false,
         is_banned: false,
-        message: "User not found",
+        message: 'User not found'
       });
     }
   } catch (error) {
@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
       code: 500,
       data: false,
       is_banned: false,
-      message: error,
+      message: error
     });
   }
 };

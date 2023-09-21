@@ -1,79 +1,85 @@
-const { User, Topics, UserFollowUser, sequelize, Sequelize, NewsLink, DomainPage } = require('../../databases/models')
-const { Op, fn, col, QueryTypes } = require('sequelize')
-const _ = require('lodash')
-const { getDomain } = require('../../services/getstream')
-const { getBlockDomain } = require('../../services/domain')
-const { filter } = require('lodash')
+const {
+  User,
+  Topics,
+  UserFollowUser,
+  sequelize,
+  Sequelize,
+  NewsLink,
+  DomainPage
+} = require('../../databases/models');
+const {Op, fn, col, QueryTypes} = require('sequelize');
+const _ = require('lodash');
+const {getDomain} = require('../../services/getstream');
+const {getBlockDomain} = require('../../services/domain');
+const {filter} = require('lodash');
 
 /**
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- * @returns 
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
  */
 const Search = async (req, res) => {
-    const { q } = req.query
-    const userId = req.userId
-    if (q.length < 2) return res.status(200).json({
-        success: true,
-        message: 'Your search characters is too few, please input 3 or more characters for search'
-    })
+  const {q} = req.query;
+  const userId = req.userId;
+  if (q.length < 2)
+    return res.status(200).json({
+      success: true,
+      message: 'Your search characters is too few, please input 3 or more characters for search'
+    });
 
-    try {
-        const blockDomain = await getBlockDomain(req.userId);
-        // const blockDomain = ["f0433444-8459-4b9a-969b-dc13f98580b3"]
-        let filteredBlockDomainArray = blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain)
+  try {
+    const blockDomain = await getBlockDomain(req.userId);
+    // const blockDomain = ["f0433444-8459-4b9a-969b-dc13f98580b3"]
+    let filteredBlockDomainArray =
+      blockDomain instanceof Array ? blockDomain : JSON.parse(blockDomain);
 
-        let newsLink
-        if (filteredBlockDomainArray.length > 0) {
-            newsLink = await NewsLink.findAll({
-                where: {
-                    [Op.or]: [
-                        { site_name: { [Op.iLike]: `%${q}%` } },
-                        { title: { [Op.iLike]: `%${q}%` } },
-                        { description: { [Op.iLike]: `%${q}%` } },
-                        { url: { [Op.iLike]: `%${q}%` } },
-                    ],
-                    domain_page_id: { [Op.notIn]: filteredBlockDomainArray }
-                },
-                limit: 10,
-                order: [
-                    ['created_at', 'DESC']
-                ],
-                include: [
-                    {
-                        model: DomainPage,
-                        as: 'newsLinkDomain',
-                        attributes: ['domain_name', 'logo'],
-                    }
-                ]
-            })
-        } else {
-            newsLink = await NewsLink.findAll({
-                where: {
-                    [Op.or]: [
-                        { site_name: { [Op.iLike]: `%${q}%` } },
-                        { title: { [Op.iLike]: `%${q}%` } },
-                        { description: { [Op.iLike]: `%${q}%` } },
-                        { url: { [Op.iLike]: `%${q}%` } },
-                    ],
-                },
-                limit: 10,
-                order: [
-                    ['created_at', 'DESC']
-                ],
-                include: [
-                    {
-                        model: DomainPage,
-                        as: 'newsLinkDomain',
-                        attributes: ['domain_name', 'logo'],
-                    }
-                ]
-            })
-        }
+    let newsLink;
+    if (filteredBlockDomainArray.length > 0) {
+      newsLink = await NewsLink.findAll({
+        where: {
+          [Op.or]: [
+            {site_name: {[Op.iLike]: `%${q}%`}},
+            {title: {[Op.iLike]: `%${q}%`}},
+            {description: {[Op.iLike]: `%${q}%`}},
+            {url: {[Op.iLike]: `%${q}%`}}
+          ],
+          domain_page_id: {[Op.notIn]: filteredBlockDomainArray}
+        },
+        limit: 10,
+        order: [['created_at', 'DESC']],
+        include: [
+          {
+            model: DomainPage,
+            as: 'newsLinkDomain',
+            attributes: ['domain_name', 'logo']
+          }
+        ]
+      });
+    } else {
+      newsLink = await NewsLink.findAll({
+        where: {
+          [Op.or]: [
+            {site_name: {[Op.iLike]: `%${q}%`}},
+            {title: {[Op.iLike]: `%${q}%`}},
+            {description: {[Op.iLike]: `%${q}%`}},
+            {url: {[Op.iLike]: `%${q}%`}}
+          ]
+        },
+        limit: 10,
+        order: [['created_at', 'DESC']],
+        include: [
+          {
+            model: DomainPage,
+            as: 'newsLinkDomain',
+            attributes: ['domain_name', 'logo']
+          }
+        ]
+      });
+    }
 
-        let users = await sequelize.query(
-            `SELECT 
+    let users = await sequelize.query(
+      `SELECT 
                 "User".*,
                 count("follower"."user_id_follower") 
                     AS "followersCount",
@@ -97,16 +103,18 @@ const Search = async (req, res) => {
             ORDER BY 
                 "user_id_follower" ASC,
                 "followersCount" DESC
-            LIMIT 10`, {
-            type: QueryTypes.SELECT,
-            replacements: {
-                userId,
-                likeQuery: `%${q}%`
-            }
-        })
+            LIMIT 10`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          userId,
+          likeQuery: `%${q}%`
+        }
+      }
+    );
 
-        let topics = await sequelize.query(
-            `SELECT 
+    let topics = await sequelize.query(
+      `SELECT 
             "Topic".*,
             count("topicFollower"."user_id") 
                 AS "followersCount",
@@ -124,16 +132,18 @@ const Search = async (req, res) => {
         ORDER BY
             "user_id_follower" ASC,
             "followersCount" DESC
-            LIMIT 10`, {
-            type: QueryTypes.SELECT,
-            replacements: {
-                userId,
-                likeQuery: `%${q}%`
-            }
-        })
+            LIMIT 10`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          userId,
+          likeQuery: `%${q}%`
+        }
+      }
+    );
 
-        let domains = await sequelize.query(
-            `SELECT 
+    let domains = await sequelize.query(
+      `SELECT 
                 "Domain"."domain_page_id",
                 "Domain"."domain_name",
 				"Domain"."logo",
@@ -157,57 +167,59 @@ const Search = async (req, res) => {
             ORDER BY
                 "user_id_follower" ASC,
                 "followersCount" DESC
-            LIMIT 10`, {
-            type: QueryTypes.SELECT,
-            replacements: {
-                userId,
-                likeQuery: `%${q}%`
-            }
-        })
+            LIMIT 10`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          userId,
+          likeQuery: `%${q}%`
+        }
+      }
+    );
 
-        let followedDomains = domains.filter((item, index) => {
-            return item.user_id_follower !== null
-        })
+    let followedDomains = domains.filter((item, index) => {
+      return item.user_id_follower !== null;
+    });
 
-        let unfollowedDomains = domains.filter((item, index) => {
-            return item.user_id_follower === null
-        })
+    let unfollowedDomains = domains.filter((item, index) => {
+      return item.user_id_follower === null;
+    });
 
-        let followedUsers = users.filter((item, index) => {
-            return item.user_id_follower !== null
-        })
+    let followedUsers = users.filter((item, index) => {
+      return item.user_id_follower !== null;
+    });
 
-        let unfollowedUsers = users.filter((item, index) => {
-            return item.user_id_follower === null
-        })
+    let unfollowedUsers = users.filter((item, index) => {
+      return item.user_id_follower === null;
+    });
 
-        let followedTopic = topics.filter((item, index) => {
-            return item.user_id_follower !== null
-        })
+    let followedTopic = topics.filter((item, index) => {
+      return item.user_id_follower !== null;
+    });
 
-        let unfollowedTopic = topics.filter((item, index) => {
-            return item.user_id_follower === null
-        })
+    let unfollowedTopic = topics.filter((item, index) => {
+      return item.user_id_follower === null;
+    });
 
-        return res.status(200).json({
-            success: true,
-            message: `Search ${q}`,
-            followedDomains,
-            unfollowedDomains,
-            followedUsers,
-            unfollowedUsers,
-            followedTopic,
-            unfollowedTopic,
-            news: newsLink
-        })
-    } catch (e) {
-        console.log('e')
-        console.log(e)
-        return res.status(200).json({
-            success: false,
-            message: e,
-        })
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: `Search ${q}`,
+      followedDomains,
+      unfollowedDomains,
+      followedUsers,
+      unfollowedUsers,
+      followedTopic,
+      unfollowedTopic,
+      news: newsLink
+    });
+  } catch (e) {
+    console.log('e');
+    console.log(e);
+    return res.status(200).json({
+      success: false,
+      message: e
+    });
+  }
+};
 
-module.exports = Search
+module.exports = Search;

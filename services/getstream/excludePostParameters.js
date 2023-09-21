@@ -1,9 +1,6 @@
-const {
-  getListBlockUser,
-  getListBlockPostAnonymousAuthor,
-} = require("../blockUser");
-const getBlockDomain = require("../domain/getBlockDomain");
-const { Locations, User } = require("../../databases/models");
+const {getListBlockUser, getListBlockPostAnonymousAuthor} = require('../blockUser');
+const getBlockDomain = require('../domain/getBlockDomain');
+const {Locations, User} = require('../../databases/models');
 // START get excluded post parameter
 const getExcludePostParameters = async (userId) => {
   const listBlockUser = await getListBlockUser(userId);
@@ -23,11 +20,11 @@ const getExcludePostParameters = async (userId) => {
     include: [
       {
         model: Locations,
-        as: "locations",
-        through: { attributes: [] },
-        attributes: ["neighborhood"],
-      },
-    ],
+        as: 'locations',
+        through: {attributes: []},
+        attributes: ['neighborhood']
+      }
+    ]
   });
   userLocations.locations.forEach((loc) => {
     myLocations.push(loc.neighborhood);
@@ -37,11 +34,11 @@ const getExcludePostParameters = async (userId) => {
     listAnonymousAuthor,
     listBlock,
     myLocations,
-    listAnonymousPostId,
+    listAnonymousPostId
   };
 };
 
 // END get excluded post parameter
 module.exports = {
-  getExcludePostParameters,
+  getExcludePostParameters
 };

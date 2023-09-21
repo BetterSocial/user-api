@@ -1,5 +1,5 @@
 const Validator = require('fastest-validator');
-const { UserFollowUser, User } = require('../../databases/models');
+const {UserFollowUser, User} = require('../../databases/models');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 
 const v = new Validator();
@@ -8,20 +8,20 @@ exports.anonDmPrivacySettings = async (req, res) => {
   try {
     const schema = {
       allowAnonDm: 'boolean',
-      onlyReceivedDmFromUserFollowing: 'boolean',
+      onlyReceivedDmFromUserFollowing: 'boolean'
     };
     const validate = v.validate(req.body, schema);
     if (validate.length) {
       return res.status(403).json({
         code: 403,
         status: 'error',
-        message: validate,
+        message: validate
       });
     }
-    const { allowAnonDm, onlyReceivedDmFromUserFollowing } = req.body;
+    const {allowAnonDm, onlyReceivedDmFromUserFollowing} = req.body;
     if (onlyReceivedDmFromUserFollowing) {
       const countFollowing = await UserFollowUser.count({
-        where: { user_id_follower: req.userId },
+        where: {user_id_follower: req.userId}
       });
       if (countFollowing < 20) {
         return ErrorResponse.e403(
@@ -31,12 +31,13 @@ exports.anonDmPrivacySettings = async (req, res) => {
       }
     }
     await User.update(
-      { 
-        allow_anon_dm: allowAnonDm, 
-        only_received_dm_from_user_following: onlyReceivedDmFromUserFollowing },
-      { where: { user_id: req.userId } }
+      {
+        allow_anon_dm: allowAnonDm,
+        only_received_dm_from_user_following: onlyReceivedDmFromUserFollowing
+      },
+      {where: {user_id: req.userId}}
     );
-    return res.status(200).json({ message: 'Success' });
+    return res.status(200).json({message: 'Success'});
   } catch (error) {
     return ErrorResponse.e400(res, error.message);
   }

@@ -1,23 +1,23 @@
-const { Locations } = require("../../databases/models");
-const { Op } = require("sequelize");
+const {Locations} = require('../../databases/models');
+const {Op} = require('sequelize');
 module.exports = async (req, res) => {
   try {
-    let { name } = req.body;
+    let {name} = req.body;
 
-    let stringToCapitalize = "";
-    let stringToLowerCase = "";
+    let stringToCapitalize = '';
+    let stringToLowerCase = '';
 
     // check attribute name
     if (name === undefined) {
       return res.status(404).json({
-        status: "error",
+        status: 'error',
         code: 404,
-        message: "name is required",
+        message: 'name is required'
       });
     }
 
     // check if name using string
-    if (typeof name === "string") {
+    if (typeof name === 'string') {
       // stringToCapitalize = name
       //   .trim()
       //   .toLowerCase()
@@ -27,9 +27,9 @@ module.exports = async (req, res) => {
       stringToLowerCase = name;
     } else {
       return res.status(404).json({
-        status: "error",
+        status: 'error',
         code: 404,
-        message: "The name format is invalid",
+        message: 'The name format is invalid'
       });
     }
 
@@ -38,43 +38,43 @@ module.exports = async (req, res) => {
         [Op.or]: [
           {
             neighborhood: {
-              [Op.iLike]: `%${name}%`,
-            },
+              [Op.iLike]: `%${name}%`
+            }
           },
           {
             city: {
-              [Op.iLike]: `%${name}%`,
-            },
+              [Op.iLike]: `%${name}%`
+            }
           },
           {
             state: {
-              [Op.iLike]: `%${stringToCapitalize.toUpperCase()}%`,
-            },
+              [Op.iLike]: `%${stringToCapitalize.toUpperCase()}%`
+            }
           },
           {
             country: {
-              [Op.iLike]: `%${name}%`,
-            },
-          },
+              [Op.iLike]: `%${name}%`
+            }
+          }
         ],
-        status: "Y",
+        status: 'Y'
       },
-      limit: 20,
+      limit: 20
     })
       .then((list) => {
         res.status(200).json({
-          status: "success",
+          status: 'success',
           code: 200,
-          body: list,
+          body: list
         });
       })
       .catch((error) => res.status(400).json(error));
   } catch (error) {
-    const { status, data } = error.response;
+    const {status, data} = error.response;
     return res.json({
       code: status,
       data: 0,
-      message: data,
+      message: data
     });
   }
 };

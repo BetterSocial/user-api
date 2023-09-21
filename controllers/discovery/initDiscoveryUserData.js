@@ -1,5 +1,6 @@
-const {QueryTypes} = require('sequelize');
 const {sequelize} = require('../../databases/models');
+const _ = require('lodash');
+const {QueryTypes} = require('sequelize');
 
 /**
  *
@@ -51,15 +52,15 @@ const InitDiscoveryUserData = async (req, res) => {
         LIMIT :limit
         OFFSET :offset`;
 
-    const usersWithCommonFollowerResult = await sequelize.query(usersWithCommonFollowerQuery, {
+    let usersWithCommonFollowerResult = await sequelize.query(usersWithCommonFollowerQuery, {
       type: QueryTypes.SELECT,
       replacements: {
         userId,
-        limit,
+        limit: limit,
         offset: page * limit
       }
     });
-    const suggestedUsers = usersWithCommonFollowerResult;
+    let suggestedUsers = usersWithCommonFollowerResult;
 
     return res.status(200).json({
       success: true,

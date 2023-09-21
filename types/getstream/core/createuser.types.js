@@ -7,4 +7,4 @@
  * @property {string} created_at
  */
 
-module.exports = GetstreamCreateUserParam
+module.exports = GetstreamCreateUserParam;

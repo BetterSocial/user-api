@@ -1,7 +1,7 @@
-const InvariantError = require("../../exceptions/InvariantError");
-const { GetTopicPagesPayloadSchema, GetTopicPageByIdPayloadSchema } = require("./schema");
+const InvariantError = require('../../exceptions/InvariantError');
+const {GetTopicPagesPayloadSchema, GetTopicPageByIdPayloadSchema} = require('./schema');
 
-const Validator = require("fastest-validator");
+const Validator = require('fastest-validator');
 const v = new Validator();
 
 const TopicPageValidator = {
@@ -16,8 +16,7 @@ const TopicPageValidator = {
     if (validate.length) {
       throw new InvariantError(validate[0].message);
     }
-
   }
-}
+};
 
-module.exports = TopicPageValidator
+module.exports = TopicPageValidator;

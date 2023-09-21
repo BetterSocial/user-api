@@ -3,13 +3,13 @@ module.exports = async (req, res) => {
     return res.json({
       code: 200,
       data: true,
-      message: "",
+      message: ''
     });
   } catch (error) {
     return res.status(500).json({
       code: 500,
       data: false,
-      message: "verifikasi token error",
+      message: 'verifikasi token error'
     });
   }
 };

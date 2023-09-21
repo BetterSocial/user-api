@@ -1,4 +1,4 @@
-const getstreamService = require("../../services/getstream");
+const getstreamService = require('../../services/getstream');
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
@@ -9,30 +9,27 @@ const {
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DATA_RETURN_LENGTH,
   POST_TYPE_LINK,
-  GETSTREAM_TIME_LINEAR_RANKING_METHOD,
-} = require("../../helpers/constants");
+  GETSTREAM_TIME_LINEAR_RANKING_METHOD
+} = require('../../helpers/constants');
 const {
   PollingOption,
   LogPolling,
   sequelize,
   UserFollowUser,
-  DomainPage,
-} = require("../../databases/models");
-const { Op } = require("sequelize");
-const {
-  getListBlockUser,
-  getListBlockPostAnonymous,
-} = require("../../services/blockUser");
-const getBlockDomain = require("../../services/domain/getBlockDomain");
-const _ = require("lodash");
-const lodash = require("lodash");
-const { setData, getValue, delCache } = require("../../services/redis");
-const { convertString } = require("../../utils/custom");
-const { modifyPollPostObject } = require("../../utils/post");
-const RedisDomainHelper = require("../../services/redis/helper/RedisDomainHelper");
+  DomainPage
+} = require('../../databases/models');
+const {Op} = require('sequelize');
+const {getListBlockUser, getListBlockPostAnonymous} = require('../../services/blockUser');
+const getBlockDomain = require('../../services/domain/getBlockDomain');
+const _ = require('lodash');
+const lodash = require('lodash');
+const {setData, getValue, delCache} = require('../../services/redis');
+const {convertString} = require('../../utils/custom');
+const {modifyPollPostObject} = require('../../utils/post');
+const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 
 module.exports = async (req, res) => {
-  let { offset = 0, limit = MAX_FEED_FETCH_LIMIT } = req.query;
+  let {offset = 0, limit = MAX_FEED_FETCH_LIMIT} = req.query;
   let domainPageCache = {};
 
   let getFeedFromGetstreamIteration = 0;
@@ -46,25 +43,22 @@ module.exports = async (req, res) => {
     let userFollow = await UserFollowUser.findOne({
       where: {
         user_id_follower: req.params.id,
-        user_id_followed: req.userId,
-      },
+        user_id_followed: req.userId
+      }
     });
 
     while (data.length < MAX_DATA_RETURN_LENGTH) {
-      if (
-        getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION
-      )
-        break;
+      if (getFeedFromGetstreamIteration === MAX_GET_FEED_FROM_GETSTREAM_ITERATION) break;
 
       let result = await getstreamService.getOtherFeeds(
         token,
-        userFollow ? "user_excl" : "user",
+        userFollow ? 'user_excl' : 'user',
         req.params.id,
         {
-          reactions: { own: true, recent: true, counts: true },
+          reactions: {own: true, recent: true, counts: true},
           limit,
           offset,
-          ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD,
+          ranking: GETSTREAM_TIME_LINEAR_RANKING_METHOD
         }
       );
 
@@ -80,8 +74,8 @@ module.exports = async (req, res) => {
         }
         offset++;
 
-        if (now < dateExpired || item.duration_feed == "never") {
-          let newItem = { ...item };
+        if (now < dateExpired || item.duration_feed == 'never') {
+          let newItem = {...item};
           if (item.anonimity) continue;
           if (item.verb === POST_VERB_POLL) {
             newItem = await modifyPollPostObject(req.userId, item);
@@ -90,18 +84,16 @@ module.exports = async (req, res) => {
             if (item.post_type === POST_TYPE_LINK) {
               if (item.post_type === POST_TYPE_LINK) {
                 let domainPageId = item?.og?.domain_page_id;
-                let credderScoreCache =
-                  await RedisDomainHelper.getDomainCredderScore(domainPageId);
+                let credderScoreCache = await RedisDomainHelper.getDomainCredderScore(domainPageId);
                 if (credderScoreCache) {
                   newItem.credderScore = credderScoreCache;
-                  newItem.credderLastChecked =
-                    await RedisDomainHelper.getDomainCredderLastChecked(
-                      domainPageId
-                    );
+                  newItem.credderLastChecked = await RedisDomainHelper.getDomainCredderLastChecked(
+                    domainPageId
+                  );
                 } else {
                   let dataDomain = await DomainPage.findOne({
-                    where: { domain_page_id: domainPageId },
-                    raw: true,
+                    where: {domain_page_id: domainPageId},
+                    raw: true
                   });
 
                   await RedisDomainHelper.setDomainCredderScore(
@@ -131,18 +123,18 @@ module.exports = async (req, res) => {
 
     res.status(200).json({
       code: 200,
-      status: "success",
+      status: 'success',
       data: data,
-      offset,
+      offset
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       code: 500,
       data: null,
-      message: "Internal server error",
+      message: 'Internal server error',
       error: error,
-      offset,
+      offset
     });
   }
 };

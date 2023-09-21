@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class LimitTopic extends Model {
     /**
@@ -16,18 +16,18 @@ module.exports = (sequelize, DataTypes) => {
       id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       limit: DataTypes.INTEGER,
       created_at: DataTypes.DATE,
-      updated_at: DataTypes.DATE,
+      updated_at: DataTypes.DATE
     },
     {
       sequelize,
-      modelName: "LimitTopics",
-      tableName: "limit_topics",
+      modelName: 'LimitTopics',
+      tableName: 'limit_topics',
       timestamps: false,
-      underscored: true,
+      underscored: true
     }
   );
   return LimitTopic;

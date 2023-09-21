@@ -5,7 +5,7 @@
  * @property {string[]} local_community
  * @property {string[]} topics
  * @property {RegisterBodyData.Users} users
- * 
+ *
  */
 
 /**
@@ -16,7 +16,7 @@
  * @property {string} username
  * @property {string} [real_name]
  * @property {string} [profile_pic_path]
- * @property {import("cloudinary").UploadApiResponse} [cloudinary = {}] 
+ * @property {import("cloudinary").UploadApiResponse} [cloudinary = {}]
  */
 
 /**

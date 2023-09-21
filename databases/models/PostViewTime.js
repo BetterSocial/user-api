@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class PostViewTime extends Model {
     /**
@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       post_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
       },
       user_id: DataTypes.STRING,
       // start_time: DataTypes.BIGINT,
@@ -24,13 +24,13 @@ module.exports = (sequelize, DataTypes) => {
       view_time: DataTypes.BIGINT,
       source: DataTypes.TEXT,
       created_at: DataTypes.DATE,
-      updated_at: DataTypes.DATE,
+      updated_at: DataTypes.DATE
     },
     {
       sequelize,
-      modelName: "PostViewTime",
-      tableName: "post_view_time",
-      timestamps: false,
+      modelName: 'PostViewTime',
+      tableName: 'post_view_time',
+      timestamps: false
     }
   );
   return PostViewTime;

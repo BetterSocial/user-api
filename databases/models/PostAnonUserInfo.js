@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class PostAnonUserInfo extends Model {
     /**
@@ -16,27 +16,27 @@ module.exports = (sequelize, DataTypes) => {
       post_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
       },
-      anon_user_id: { type: DataTypes.STRING },
+      anon_user_id: {type: DataTypes.STRING},
       anon_user_info_color_name: DataTypes.STRING,
       anon_user_info_color_code: DataTypes.STRING,
       anon_user_info_emoji_name: DataTypes.STRING,
       anon_user_info_emoji_code: DataTypes.STRING,
       createdAt: {
         type: DataTypes.DATE,
-        field: "created_at",
+        field: 'created_at'
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: "updated_at",
-      },
+        field: 'updated_at'
+      }
     },
     {
       sequelize,
-      modelName: "PostAnonUserInfo",
-      tableName: "post_anon_user_info",
-      timestamps: true,
+      modelName: 'PostAnonUserInfo',
+      tableName: 'post_anon_user_info',
+      timestamps: true
     }
   );
   return PostAnonUserInfo;

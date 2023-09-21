@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class UserTopicHistory extends Model {
     /**
@@ -13,16 +13,16 @@ module.exports = (sequelize, DataTypes) => {
   }
   UserTopicHistory.init(
     {
-      user_id: { type: DataTypes.STRING, allowNull: false,  primaryKey: true, },
-      topic_id: { type: DataTypes.BIGINT, allowNull: false },
-      action: { type: DataTypes.STRING, allowNull: false },
-      created_at: DataTypes.DATE,
+      user_id: {type: DataTypes.STRING, allowNull: false, primaryKey: true},
+      topic_id: {type: DataTypes.BIGINT, allowNull: false},
+      action: {type: DataTypes.STRING, allowNull: false},
+      created_at: DataTypes.DATE
     },
     {
       sequelize,
-      modelName: "UserTopicHistory",
-      tableName: "user_topic_history",
-      timestamps: false,
+      modelName: 'UserTopicHistory',
+      tableName: 'user_topic_history',
+      timestamps: false
     }
   );
   return UserTopicHistory;

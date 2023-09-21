@@ -1,5 +1,5 @@
-const stream = require("getstream");
-const jwt = require("jsonwebtoken");
+const stream = require('getstream');
+const jwt = require('jsonwebtoken');
 
 module.exports = async (reactionId, kind, token) => {
   const userId = await jwt.decode(token).user_id;
@@ -21,23 +21,19 @@ module.exports = async (reactionId, kind, token) => {
    *  */
   const dataKindUpvotes = await clientServer.reactions.filter({
     activity_id: reactionId,
-    kind: "upvotes",
-    id_gt: "76c51573-227c-4080-89d9-e98def4ea7f5",
+    kind: 'upvotes',
+    id_gt: '76c51573-227c-4080-89d9-e98def4ea7f5'
   });
   const dataKindDownvotes = await clientServer.reactions.filter({
     activity_id: reactionId,
-    kind: "downvotes",
-    id_gt: "76c51573-227c-4080-89d9-e98def4ea7f5",
+    kind: 'downvotes',
+    id_gt: '76c51573-227c-4080-89d9-e98def4ea7f5'
   });
 
-  if (kind === "upvotes") {
-    let reactionDownvotes = dataKindDownvotes.results.filter(
-      (item) => item.user_id === userId
-    );
+  if (kind === 'upvotes') {
+    let reactionDownvotes = dataKindDownvotes.results.filter((item) => item.user_id === userId);
     if (reactionDownvotes.length === 0) {
-      let reactionUpvotes = dataKindUpvotes.results.filter(
-        (item) => item.user_id === userId
-      );
+      let reactionUpvotes = dataKindUpvotes.results.filter((item) => item.user_id === userId);
       if (reactionUpvotes.length === 0) {
         return true;
       } else {
@@ -47,13 +43,9 @@ module.exports = async (reactionId, kind, token) => {
       return false;
     }
   } else {
-    let reactionUpvotes = dataKindUpvotes.results.filter(
-      (item) => item.user_id === userId
-    );
+    let reactionUpvotes = dataKindUpvotes.results.filter((item) => item.user_id === userId);
     if (reactionUpvotes.length === 0) {
-      let reactionDownvotes = dataKindDownvotes.results.filter(
-        (item) => item.user_id === userId
-      );
+      let reactionDownvotes = dataKindDownvotes.results.filter((item) => item.user_id === userId);
       if (reactionDownvotes.length === 0) {
         return true;
       } else {

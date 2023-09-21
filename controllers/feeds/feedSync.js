@@ -1,15 +1,15 @@
-const { EVENT_SYNC_FEED } = require("../../services/score/constant");
-const { syncFeed } = require("../../services/queue/queueInit");
+const {EVENT_SYNC_FEED} = require('../../services/score/constant');
+const {syncFeed} = require('../../services/queue/queueInit');
 
 module.exports = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const {userId} = req.params;
     // TODO: check if user id exist
-    
+
     // add job for sync feed
     let data = {
-        userId
-    }
+      userId
+    };
     syncFeed.add(data);
     return res.status(200).json({
       code: 200,
@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
       code: 500,
       data: null,
       message: 'Internal server error',
-      error: error,
+      error: error
     });
   }
 };

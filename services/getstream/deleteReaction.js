@@ -1,4 +1,4 @@
-const stream = require("getstream");
+const stream = require('getstream');
 
 module.exports = async (reactionId) => {
   const clientUser = stream.connect(process.env.API_KEY, process.env.SECRET);

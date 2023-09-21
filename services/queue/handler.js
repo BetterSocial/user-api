@@ -1,34 +1,32 @@
 const handlerCompleted = (job) => {
   console.log(
-    `============================Completed job ${job.queue.name}===============================`);
+    `============================Completed job ${job.queue.name}===============================`
+  );
   job.remove();
 };
 
 const handlerFailure = (job, err) => {
   if (job.attemptsMade >= job.opts.attempts) {
     console.info(
-      `Job failures above threshold in ${job.queue.name} for: ${JSON.stringify(
-        job.data
-      )}`,
+      `Job failures above threshold in ${job.queue.name} for: ${JSON.stringify(job.data)}`,
       err
     );
     job.remove();
     return null;
   }
   console.info(
-    `Job in ${job.queue.name} failed for: ${JSON.stringify(job.data)} with ${err.message
-    }. ${job.opts.attempts - job.attemptsMade} attempts left`
+    `Job in ${job.queue.name} failed for: ${JSON.stringify(job.data)} with ${err.message}. ${
+      job.opts.attempts - job.attemptsMade
+    } attempts left`
   );
 };
 
 const handlerStalled = (job) => {
-  console.info(
-    `Job in ${job.queue.name} stalled for: ${JSON.stringify(job.data)}`
-  );
+  console.info(`Job in ${job.queue.name} stalled for: ${JSON.stringify(job.data)}`);
 };
 
 module.exports = {
   handlerCompleted,
   handlerFailure,
-  handlerStalled,
+  handlerStalled
 };

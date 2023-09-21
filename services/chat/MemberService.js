@@ -1,24 +1,21 @@
-const {
-  addUserToChannelQueue,
-  addUserToTopicChannel,
-} = require("../../services/redis");
-const { v4: uuidv4 } = require("uuid");
-const { convertString } = require("../../utils/custom");
-const _ = require("lodash");
+const {addUserToChannelQueue, addUserToTopicChannel} = require('../../services/redis');
+const {v4: uuidv4} = require('uuid');
+const {convertString} = require('../../utils/custom');
+const _ = require('lodash');
 
 const addUserToTopic = async (topics, userId) => {
   const options = {
     jobId: uuidv4(),
-    removeOnComplete: true,
+    removeOnComplete: true
   };
 
   let newDataTopic = topics.map((item) => {
-    return convertString(item.toLowerCase(), " ", "-");
+    return convertString(item.toLowerCase(), ' ', '-');
   });
 
   let data = {
     user_id: userId,
-    channelIds: newDataTopic,
+    channelIds: newDataTopic
   };
   const resultJob = await addUserToTopicChannel(data, options);
   return resultJob;
@@ -26,14 +23,14 @@ const addUserToTopic = async (topics, userId) => {
 
 const addUserToLocation = async (locations, userId) => {
   let loc = locations.map((item) => {
-    if (item.country === "US") {
+    if (item.country === 'US') {
       let loc = [];
-      loc.push(convertString(item.neighborhood.toLowerCase(), " ", "-"));
-      loc.push(convertString(item.city.toLowerCase(), " ", "-"));
+      loc.push(convertString(item.neighborhood.toLowerCase(), ' ', '-'));
+      loc.push(convertString(item.city.toLowerCase(), ' ', '-'));
       return loc;
     } else {
       let loc = [];
-      loc.push(convertString(item.country.toLowerCase(), " ", "-"));
+      loc.push(convertString(item.country.toLowerCase(), ' ', '-'));
       return loc;
     }
   });
@@ -41,11 +38,11 @@ const addUserToLocation = async (locations, userId) => {
 
   let data = {
     user_id: userId,
-    channelIds: temp,
+    channelIds: temp
   };
   const options = {
     jobId: uuidv4(),
-    removeOnComplete: true,
+    removeOnComplete: true
   };
 
   const resultJob = await addUserToChannelQueue(data, options);
@@ -54,5 +51,5 @@ const addUserToLocation = async (locations, userId) => {
 
 module.exports = {
   addUserToTopic,
-  addUserToLocation,
+  addUserToLocation
 };
