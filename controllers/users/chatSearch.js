@@ -32,8 +32,8 @@ const chatSearch = async (req, res) => {
     });
     let followed = followedUserSearchQueryResult;
 
-    const followedIds = followed?.map((user) => `'${user.user_id}'`)?.join(',');
-    let additionalQuery = followed?.length > 0 ? `AND A.user_id NOT IN (${followedIds})` : '';
+    const followedIds = followed?.map((user) => user.user_id);
+    let additionalQuery = followed?.length > 0 ? `AND A.user_id NOT IN (:followedIds)` : '';
 
     let moreUserSearchQuery = `
   SELECT B.user_id_follower, B.user_id_followed, * 
@@ -57,7 +57,8 @@ const chatSearch = async (req, res) => {
         offset: userOffset < 0 ? 0 : userOffset,
         query: `%${q}%`,
         userId,
-        limit: limit - (followed?.length || 0)
+        limit: limit - (followed?.length || 0),
+        followedIds
       }
     });
     let moreUsers = moreUserSearchQueryResult;

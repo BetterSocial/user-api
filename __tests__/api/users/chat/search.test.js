@@ -97,7 +97,8 @@ describe('GET /users/chat/search', () => {
     expect(response.body.success).toBe(true);
     expect(response.body.next).toBe(11);
     expect(response.body.followed.length).toBe(5);
-    expect(response.body.moreUsers.length).toBe(5);
+    expect(response.body.moreUsers.length).toBe(6);
+    expect(response.body.followed).toEqual(arrayOfFollowedUsersExpected);
     expect(response.body.moreUsers).toEqual(arrayOfMoreUsersExpected);
   });
 });
