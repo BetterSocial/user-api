@@ -73,6 +73,12 @@ const generateUserAndFollowSeeds = async () => {
   await User.bulkCreate(bulks);
   await UserFollowUser.bulkCreate(followers);
   await UserFollowUser.bulkCreate(followings);
+
+  return {
+    users: bulks,
+    followers,
+    followings
+  };
 };
 
 module.exports = generateUserAndFollowSeeds;

@@ -12,8 +12,17 @@ module.exports = async (req, res) => {
     locations: 'string[]|empty:false'
   };
 
-  const topics = JSON.parse(decodeURI(req.query.topics || []));
-  const locations = JSON.parse(decodeURI(req.query.locations || []));
+  let topics, locations;
+  try {
+    topics = JSON.parse(decodeURI(req.query.topics || []));
+    locations = JSON.parse(decodeURI(req.query.locations || []));
+  } catch (e) {
+    return res.status(403).json({
+      code: 403,
+      status: 'error',
+      message: 'Invalid query'
+    });
+  }
 
   const validate = v.validate({topics, locations}, schema);
   if (validate.length) {
