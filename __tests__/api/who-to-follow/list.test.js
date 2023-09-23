@@ -35,7 +35,7 @@ describe('GET /who-to-follow/list', () => {
     // Expect the first user is MY_USER that is being followed the most on seeds
     expect(response.body.body[1]).toEqual(
       expect.objectContaining({
-        user_id: users[0].user_id
+        user_id: '012345678-1234-1234-1234-123456789012'
       })
     );
   });
