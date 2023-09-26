@@ -181,7 +181,7 @@ const _afterPutTopic = async (topic, token, userId, name) => {
 
 const getFollowerList = async (req, res) => {
   const {userId} = req;
-  const {name, limit = 40, offset = 0, search = null} = req.query;
+  const {name, limit = 50, offset = 0, search = null} = req.query;
   try {
     const searchQuery = search ? `AND LOWER(users.username) LIKE LOWER(:search)` : '';
 
