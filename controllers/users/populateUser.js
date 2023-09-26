@@ -1,30 +1,53 @@
 const {responseError, responseSuccess} = require('../../utils/Responses');
-const {UserFollowUser, User} = require('../../databases/models');
-const {Op} = require('sequelize');
+const {sequelize} = require('../../databases/models');
 
 module.exports = async (req, res) => {
   try {
-    let idUsers = [];
-    let usersFollower = await UserFollowUser.findAll({
-      where: {
-        [Op.or]: [{user_id_follower: req.userId}, {user_id_followed: req.userId}]
+    const {limit = 50, offset = 0} = req.query;
+
+    let queryResults = await sequelize.query(
+      `SELECT 
+        user_id,
+        country_code,
+        username,
+        real_name,
+        created_at,
+        updated_at,
+        last_active_at,
+        status,
+        profile_pic_path,
+        profile_pic_asset_id,
+        profile_pic_public_id,
+        bio,
+        is_banned,
+        is_anonymous 
+        from users INNER JOIN user_follow_user ON users.user_id = user_follow_user.user_id_followed WHERE users.user_id != :userId AND user_follow_user.user_id_follower = :userId AND is_anonymous = false
+      UNION
+      SELECT 
+        user_id,
+        country_code,
+        username,
+        real_name,
+        created_at,
+        updated_at,
+        last_active_at,
+        status,
+        profile_pic_path,
+        profile_pic_asset_id,
+        profile_pic_public_id,
+        bio,
+        is_banned,
+        is_anonymous 
+        from users INNER JOIN user_follow_user ON users.user_id = user_follow_user.user_id_follower WHERE users.user_id != :userId AND user_follow_user.user_id_followed = :userId AND is_anonymous = false
+      LIMIT :limit
+      OFFSET :offset`,
+      {
+        replacements: {userId: req.userId, limit, offset},
+        type: sequelize.QueryTypes.SELECT
       }
-      //   attributes: ['user_id_follower'],
-    });
-    idUsers = usersFollower.map((item) => {
-      if (item.user_id_follower !== req.userId) {
-        return item.user_id_follower;
-      }
-      if (item.user_id_followed !== req.userId) {
-        return item.user_id_followed;
-      }
-    });
-    let users = await User.findAll({
-      where: {
-        user_id: idUsers,
-        is_anonymous: false
-      }
-    });
+    );
+
+    const users = queryResults;
     res.status(200).json(responseSuccess('Success get populate', users));
     // ambil user yang memfollow kita
   } catch (error) {
