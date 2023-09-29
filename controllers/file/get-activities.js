@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
       'Content-Type': 'text/csv',
       'Content-Disposition': 'attachment; filename=user_activities.csv'
     });
-    res.send(csv);
+    res.download(csv);
   } catch (error) {
     console.log(error);
     res.status(403).json({
