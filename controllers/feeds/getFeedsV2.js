@@ -48,10 +48,10 @@ const isValidActivity = async (item, conditions) => {
   const isExpired = now > dateExpired && item.duration_feed !== 'never'
 
   const {listAnonymousAuthor, listBlock, myLocations, listAnonymousPostId, feed, req} = conditions;
-
+  
   if (item.is_hide) {
     // delete if it's expired or user not the author
-    if (isExpired && item.author_id !== req.userId){
+    if (item.actor.id !== req.userId){
       deleteActivityFromUserFeed(feed, req.userId, item.id);
     }
     console.log('Is Hide => ', item.id);
