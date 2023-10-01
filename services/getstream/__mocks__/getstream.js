@@ -1,9 +1,8 @@
 'use strict';
 
-const path = require('path');
 const getstream = jest.createMockFromModule('getstream');
 
-function __connect(apiKey, apiSecret) {
+function __connect() {
   return {
     reactions: {
       addChild: function (kind, reaction, data) {
@@ -163,7 +162,7 @@ function __connect(apiKey, apiSecret) {
     },
 
     //createUser  ||  createPost
-    user: function (userId) {
+    user: function () {
       return {
         create: function (data) {
           if (data.name === 'User') {

@@ -28,7 +28,6 @@ const getDomain = require('./getDomain');
 const getDetailDomain = require('./getDetailDomain');
 const updateActivity = require('./updateActivity');
 const getDetailFeed = require('./getDetailFeed');
-const createUserChat = require('./createUserChat');
 const voteComment = require('./voteComment');
 const getOtherFeeds = require('./getOtherFeeds');
 const getActivitiesByFeed = require('./getActivitiesByFeed');
@@ -45,7 +44,6 @@ module.exports = {
   createReaction,
   createToken,
   createUser,
-  createUserChat,
   deleteFeed,
   deleteFeedById,
   deleteReaction,
