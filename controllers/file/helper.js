@@ -27,14 +27,15 @@ const generateCSV = async (activities) => {
     }
     data.push({
       id: activity.id,
-      message: activity.message,
-      topics: activity.topics,
-      origin: activity.origin,
       time: activity.time,
       expired_at: activity.expired_at,
       show_to_user: activity.show_to_user,
       unshow_reason: activity.unshow_reason,
       source_feed: activity.source_feed,
+      origin: activity.origin,
+      actor: activity.actor.id,
+      topics: activity.topics,
+      message: activity.message,
       final_score: activity.final_score,
       user_score: activity.user_score,
       score_details: formattedScoreDetails(activity.score_details),
