@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     });
     res.download(csv);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(403).json({
       code: 403,
       status: 'error',
