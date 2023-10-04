@@ -54,3 +54,55 @@ describe('GET /topics/follow', () => {
     expect(response.body.message).toEqual('Topic not found');
   });
 });
+
+describe('PUT /topics/follow', () => {
+  test('should return 200 OK with delete topics', async () => {
+    // Execution
+    const response = await request(app)
+      .put('/topics/follow/')
+      .set('Authorization', 'Bearer token')
+      .send({
+        name: 'Topic 1'
+      });
+
+    // Assertion
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe('Success delete topic user');
+  });
+
+  test('should return 200 OK with add topics', async () => {
+    // Execution
+    const response = await request(app)
+      .put('/topics/follow/')
+      .set('Authorization', 'Bearer token')
+      .send({
+        name: 'Topic Outer'
+      });
+
+    // Assertion
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe('Success add topic user');
+  });
+
+  test('should return 404 with topic not found', async () => {
+    // Execution
+    const response = await request(app)
+      .put('/topics/follow/')
+      .set('Authorization', 'Bearer token')
+      .send({
+        name: 'Topic Not Found'
+      });
+    // Assertion
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toBe('Topic not found');
+  });
+
+  test('should return 400 with name field required', async () => {
+    // Execution
+    const response = await request(app).put('/topics/follow/').set('Authorization', 'Bearer token');
+
+    // Assertion
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe("The 'name' field is required.");
+  });
+});
