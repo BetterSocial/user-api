@@ -21,6 +21,7 @@ module.exports = {
       });
     }
     req.userId = TestConstants.MY_USER_ID;
+    req.token = token;
     next();
   }
 };
