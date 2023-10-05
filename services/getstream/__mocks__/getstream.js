@@ -120,12 +120,6 @@ function __connect() {
 
           //getFeed
           get: function () {
-            // expect(query).toEqual({
-            //   limit: 10,
-            //   reactions: {own: true, recent: true, counts: true},
-            //   offset: 0
-            // });
-
             return {
               results: []
             };
@@ -153,12 +147,6 @@ function __connect() {
 
         //getFeed
         get: function () {
-          // expect(query).toEqual({
-          //   limit: 10,
-          //   reactions: {own: true, recent: true, counts: true},
-          //   offset: 0
-          // });
-
           return {
             results: sample_data_activities
           };

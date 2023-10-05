@@ -11,8 +11,7 @@ describe('GET /api/v1/activity/feeds-v2', () => {
     const response = await supertest(app)
       .get('/api/v1/activity/feeds-v2')
       .set('Authorization', 'Bearer token');
-    // console.log('response => ', response.body);
-    // Assertions
+
     expect(response.statusCode).toBe(200);
   });
 });
