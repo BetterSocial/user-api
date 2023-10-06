@@ -1,12 +1,15 @@
 'use strict';
 
-const path = require('path');
 const jsonwebtoken = jest.createMockFromModule('jsonwebtoken');
 
-function __sign(payload, token, opts) {
-  return {};
-}
+const __verify = jest.fn((token, secret, cb) => {
+  if (token !== 'valid-token') {
+    return cb(new Error('Invalid token'), {});
+  }
+  return cb(false, {user_id: 'd24f6c17-f20e-4cc9-8df1-45f1fa4dcf52'});
+});
 
-jsonwebtoken.sign = __sign;
+jsonwebtoken.sign = jest.fn();
+jsonwebtoken.verify = __verify;
 
 module.exports = jsonwebtoken;

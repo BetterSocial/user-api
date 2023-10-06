@@ -1,6 +1,6 @@
 const StreamChat = require('stream-chat').StreamChat;
 
-module.exports = async (channelId, members, token) => {
+module.exports = async (channelId, members) => {
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
 
   try {
