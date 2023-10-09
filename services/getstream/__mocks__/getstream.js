@@ -106,7 +106,6 @@ function __connect() {
       //followLocation
       if (feedGroup === 'main_feed') {
         expect(feedGroup).toBe('main_feed');
-        // expect(token).toBe('Bi9jNv9TCv11TfjkbUz37I75zea2VFue');
       }
 
       // getFeed

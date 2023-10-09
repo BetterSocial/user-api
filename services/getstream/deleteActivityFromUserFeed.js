@@ -6,7 +6,7 @@ module.exports = async (feed, userId, activiyId) => {
     if (!feed || !userId || !activiyId) {
       throw new Error('Invalid parameters');
     }
-    return await removeActivityQueue.add(
+    const deleted = await removeActivityQueue.add(
       {
         feed_group: feed,
         feed_id: userId,
@@ -14,7 +14,10 @@ module.exports = async (feed, userId, activiyId) => {
       },
       {delay: DELAY_TIME}
     );
+    return deleted;
   } catch (error) {
-    console.error(error);
+    return {
+      error: error.message
+    };
   }
 };
