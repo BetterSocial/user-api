@@ -2,6 +2,7 @@ const request = require('supertest');
 const app = require('../../../app');
 const generateUserAndFollowSeeds = require('../__utils__/seeds/users_and_follow_seeds');
 const generateTopicAndUserTopics = require('../__utils__/seeds/topic_and_user_topic_seeds');
+const {createReusableAuthTestSuite} = require('../__authTest__/createReusableAuthTestSuite');
 
 jest.mock('../../../middlewares/auth');
 
@@ -56,6 +57,7 @@ describe('GET /topics/follow', () => {
 });
 
 describe('PUT /topics/follow', () => {
+  createReusableAuthTestSuite(request(app).put('/topics/follow/'));
   test('should return 200 OK with delete topics', async () => {
     // Execution
     const response = await request(app)
