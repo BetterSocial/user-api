@@ -171,7 +171,7 @@ const isPostBlocked = (item, listAnonymous, listBlock, myLocations) => {
   if (listAnonymous.includes(item?.actor?.id) && item?.anonimity) return true;
 
   // Check if this users have been blocked
-  if (listBlock.includes(item.actor.id)) return true;
+  if (listBlock.includes(item?.actor?.id)) return true;
 
   // Check locations
   return !myLocations.includes(item.location) && item.location !== 'Everywhere';

@@ -3,6 +3,7 @@
 const TestConstants = require('../../../__tests__/api/__utils__/constant');
 
 const getstream = jest.createMockFromModule('getstream');
+const sample_data_activities = require('./sample_data_activities');
 
 function __connect() {
   return {
@@ -97,12 +98,34 @@ function __connect() {
       expect(json.exp).toBe(token);
     },
 
+    // getFeeds: function (token, feedGroup, query) {
+    //   expect(token).toBe('Bi9jNv9TCv11TfjkbUz37I75zea2VFue');
+    //   expect(feedGroup).toBe('main_feed_following');
+    // },
+
     //deleteFeed  ||  getfeed  ||  followLocation  || cretePost
     feed: function (feedGroup, userId, token) {
       //followLocation
       if (feedGroup === 'main_feed') {
         expect(feedGroup).toBe('main_feed');
-        expect(token).toBe('Bi9jNv9TCv11TfjkbUz37I75zea2VFue');
+      }
+
+      // getFeed
+      else if (feedGroup === 'main_feed_following') {
+        expect(feedGroup).toBe('main_feed_following');
+        return {
+          //deleteFeed
+          removeActivity: function (data) {
+            expect(data.foreignId).toBe('4fb669a3-06b4-45cc-93b6-41e1336f5103');
+          },
+
+          //getFeed
+          get: function () {
+            return {
+              results: []
+            };
+          }
+        };
       }
 
       //createPost
@@ -112,10 +135,10 @@ function __connect() {
       }
 
       //delete_feed, getfeed
-      else {
-        expect(feedGroup).toBe('example_feed');
-        expect(token).toBe('XRT0XKwzedFMVzUZkcuJROk9Le3VGVj0');
-      }
+      // else {
+      //   expect(feedGroup).toBe('example_feed');
+      //   expect(token).toBe('XRT0XKwzedFMVzUZkcuJROk9Le3VGVj0');
+      // }
 
       return {
         //deleteFeed
@@ -124,8 +147,10 @@ function __connect() {
         },
 
         //getFeed
-        get: function (query) {
-          expect(query).toBe('select_*_from_table');
+        get: function () {
+          return {
+            results: sample_data_activities
+          };
         },
 
         //followLocation || followUser || followTopic
