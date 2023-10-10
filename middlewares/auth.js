@@ -65,9 +65,8 @@ module.exports.isAuthV2 = async (req, res, next) => {
     req.token = token;
     return next();
   } catch (err) {
-    console.log('error', err);
     console.log({err});
-    return res.status(401).json(createResponse(401, 'Token invalidssss'));
+    return res.status(401).json(createResponse(401, 'Token invalid'));
   }
 };
 
