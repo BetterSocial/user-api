@@ -32,7 +32,16 @@ const generateTopicAndUserTopics = async () => {
     updated_at: new Date()
   });
 
-  for (let i = 2; i < 71; i++) {
+  topicBulks.push({
+    topic_id: 200,
+    name: 'Topic Outer',
+    sort: 2,
+    categories: 'Category 1',
+    icon_path: iconPath,
+    created_at: new Date()
+  });
+
+  for (let i = 3; i < 71; i++) {
     topicBulks.push({
       topic_id: i,
       name: 'Topic ' + i,
