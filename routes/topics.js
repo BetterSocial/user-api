@@ -21,4 +21,6 @@ router.get(
   topicsController.getFollowerList
 );
 
+router.get('/subscribeable', isAuth, topicsController.getSubscribeableTopics);
+
 module.exports = router;
