@@ -1,5 +1,7 @@
 'use strict';
 
+const TestConstants = require('../../../__tests__/api/__utils__/constant');
+
 const getstream = jest.createMockFromModule('getstream');
 
 function __connect() {
@@ -89,7 +91,7 @@ function __connect() {
 
     //createToken
     createUserToken: function (userId, json) {
-      expect(userId).toBe('d24f6c17-f20e-4cc9-8df1-45f1fa4dcf52');
+      expect(userId).toBe(TestConstants.MY_USER_ID);
 
       let token = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
       expect(json.exp).toBe(token);

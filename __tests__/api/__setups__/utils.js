@@ -1,5 +1,6 @@
 const {exec} = require('child_process');
 const {User} = require('../../../databases/models');
+const TestConstants = require('../__utils__/constant');
 
 if (process.env.EXECUTABLE_PHP === undefined) {
   throw new Error('Please set EXECUTABLE_PHP env');
@@ -37,10 +38,10 @@ const phpArtisan = async (command) =>
     );
   });
 
-const creatUser = async (data) => {
+const createUser = async (data) => {
   try {
     const user = await User.create({
-      user_id: 'd24f6c17-f20e-4cc9-8df1-45f1fa4dcf52',
+      user_id: TestConstants.MY_USER_ID,
       human_id: 'test',
       country_code: 'ID',
       username: 'test',
@@ -58,5 +59,5 @@ const creatUser = async (data) => {
 
 module.exports = {
   phpArtisan,
-  creatUser
+  createUser
 };

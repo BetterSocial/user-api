@@ -1,8 +1,9 @@
 // jest.mock('createToken');
 
+const TestConstants = require('../../__tests__/api/__utils__/constant');
 const createToken = require('./createToken');
 
 test('create Token works well', async () => {
-  const userId = 'd24f6c17-f20e-4cc9-8df1-45f1fa4dcf52';
+  const userId = TestConstants.MY_USER_ID;
   await createToken(userId);
 });
