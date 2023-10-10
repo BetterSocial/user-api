@@ -1,11 +1,10 @@
 const moment = require('moment');
-const {removeActivityQueue} = require('../../services/score/queueSenderForRedis');
+const deleteActivityFromUserFeed = require('../../services/getstream/deleteActivityFromUserFeed');
 
 const getstreamService = require('../../services/getstream');
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
-  GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DATA_RETURN_LENGTH,
   POST_TYPE_LINK
@@ -42,12 +41,21 @@ const feedSwitch = async (feed) => {
 };
 
 const isValidActivity = async (item, conditions) => {
+  const now = moment().valueOf();
+  const dateExpired = moment(item?.expired_at).valueOf();
+  const INITIAL_REAL_DATA_DATE = '2023-05-01';
+  const isExpired = now > dateExpired && item.duration_feed !== 'never';
+
+  const {listAnonymousAuthor, listBlock, myLocations, listAnonymousPostId, feed, req} = conditions;
+
   if (item.is_hide) {
+    // delete if it's expired or user not the author
+    if (item.actor.id !== req.userId) {
+      deleteActivityFromUserFeed(feed, req.userId, item.id);
+    }
     console.log('Is Hide => ', item.id);
     return false;
   }
-
-  const {listAnonymousAuthor, listBlock, myLocations, listAnonymousPostId, feed, req} = conditions;
 
   const isBlocked = isPostBlocked(
     item,
@@ -62,32 +70,16 @@ const isValidActivity = async (item, conditions) => {
   }
 
   // skip if activity < May 2023 (2023-05-01)
-  if (item.time < Date.parse('2023-05-01')) {
-    console.log('Created before 01 May 2023 => ', item.time);
-    removeActivityQueue.add(
-      {
-        feed_group: feed,
-        feed_id: req.userId,
-        activity_id: item.id
-      },
-      {delay: 60000 * 10}
-    );
+  const initialRealDataDate = Date.parse(INITIAL_REAL_DATA_DATE);
+  if (item.time < initialRealDataDate) {
+    console.log(`Created before ${INITIAL_REAL_DATA_DATE} => `, item.time);
+    deleteActivityFromUserFeed(feed, req.userId, item.id);
     return false;
   }
 
-  const now = moment().valueOf();
-  const dateExpired = moment(item?.expired_at).valueOf();
-
-  if (now > dateExpired && item.duration_feed !== 'never') {
+  if (isExpired) {
     console.log('Is Expired => ', item.expired_at, item.id);
-    removeActivityQueue.add(
-      {
-        feed_group: feed,
-        feed_id: req.userId,
-        activity_id: item.id
-      },
-      {delay: 60000 * 10}
-    );
+    deleteActivityFromUserFeed(feed, req.userId, item.id);
     return false;
   }
 
@@ -131,7 +123,8 @@ module.exports = async (req, res) => {
         }
       ]
     });
-    userLocations.locations.forEach((loc) => {
+
+    userLocations?.locations.forEach((loc) => {
       myLocations.push(loc.neighborhood);
     });
     // END get excluded post parameter
@@ -143,7 +136,6 @@ module.exports = async (req, res) => {
         const paramGetFeeds = {
           limit: getstreamLimit,
           reactions: {own: true, recent: true, counts: true},
-          //   ranking: GETSTREAM_RANKING_METHOD,
           offset
         };
 
