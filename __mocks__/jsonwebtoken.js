@@ -1,12 +1,12 @@
-'use strict';
+const TestConstants = require('../__tests__/api/__utils__/constant');
 
 const jsonwebtoken = jest.createMockFromModule('jsonwebtoken');
 
 const __verify = jest.fn((token, secret, cb) => {
-  if (token !== 'valid-token') {
+  if (token !== 'valid-token' && token !== 'token') {
     return cb(new Error('Invalid token'), {});
   }
-  return cb(false, {user_id: 'd24f6c17-f20e-4cc9-8df1-45f1fa4dcf52'});
+  return cb(false, {user_id: TestConstants.MY_USER_ID});
 });
 
 jsonwebtoken.sign = jest.fn();

@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../../../app');
-const {creatUser} = require('../__setups__/utils');
+const {createUser} = require('../__setups__/utils');
 const {StreamChat} = require('stream-chat');
 const jwt = require('jsonwebtoken');
 
@@ -13,12 +13,13 @@ afterEach(() => {
 
 describe('GET /chat/channels/signed', () => {
   test('should return 200 OK with list of channels', async () => {
-    const user = await creatUser();
+    const user = await createUser();
 
     const response = await request(app)
       .get('/api/v1/chat/channels/signed')
       .set({Authorization: `Bearer valid-token`})
       .expect(200);
+
     expect(response.body).toEqual(
       expect.objectContaining({
         code: 200,

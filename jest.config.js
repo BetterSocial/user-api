@@ -14,10 +14,7 @@ const config = {
     }
   ],
   verbose: true,
-  setupFilesAfterEnv: [
-    '<rootDir>/services/getstream/__mocks__/getstream.js',
-    '<rootDir>/services/jwt/__mocks__/jsonwebtoken.js'
-  ],
+  setupFilesAfterEnv: ['<rootDir>/services/getstream/__mocks__/getstream.js'],
   coverageDirectory: 'coverage',
   coverageReporters: ['lcov', 'text'],
   coveragePathIgnorePatterns: [
