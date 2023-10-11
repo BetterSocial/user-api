@@ -13,8 +13,6 @@ describe('GET /api/v1/activity/feeds-v2', () => {
       .get('/api/v1/activity/feeds-v2')
       .set('Authorization', 'Bearer token');
 
-    console.log(response.body);
-
     expect(response.statusCode).toBe(200);
   });
 });
