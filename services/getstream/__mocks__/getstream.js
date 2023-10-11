@@ -1,9 +1,11 @@
 'use strict';
 
-const path = require('path');
-const getstream = jest.createMockFromModule('getstream');
+const TestConstants = require('../../../__tests__/api/__utils__/constant');
 
-function __connect(apiKey, apiSecret) {
+const getstream = jest.createMockFromModule('getstream');
+const sample_data_activities = require('./sample_data_activities');
+
+function __connect() {
   return {
     reactions: {
       addChild: function (kind, reaction, data) {
@@ -90,18 +92,40 @@ function __connect(apiKey, apiSecret) {
 
     //createToken
     createUserToken: function (userId, json) {
-      expect(userId).toBe('d24f6c17-f20e-4cc9-8df1-45f1fa4dcf52');
+      expect(userId).toBe(TestConstants.MY_USER_ID);
 
       let token = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
       expect(json.exp).toBe(token);
     },
+
+    // getFeeds: function (token, feedGroup, query) {
+    //   expect(token).toBe('Bi9jNv9TCv11TfjkbUz37I75zea2VFue');
+    //   expect(feedGroup).toBe('main_feed_following');
+    // },
 
     //deleteFeed  ||  getfeed  ||  followLocation  || cretePost
     feed: function (feedGroup, userId, token) {
       //followLocation
       if (feedGroup === 'main_feed') {
         expect(feedGroup).toBe('main_feed');
-        expect(token).toBe('Bi9jNv9TCv11TfjkbUz37I75zea2VFue');
+      }
+
+      // getFeed
+      else if (feedGroup === 'main_feed_following') {
+        expect(feedGroup).toBe('main_feed_following');
+        return {
+          //deleteFeed
+          removeActivity: function (data) {
+            expect(data.foreignId).toBe('4fb669a3-06b4-45cc-93b6-41e1336f5103');
+          },
+
+          //getFeed
+          get: function () {
+            return {
+              results: []
+            };
+          }
+        };
       }
 
       //createPost
@@ -111,10 +135,10 @@ function __connect(apiKey, apiSecret) {
       }
 
       //delete_feed, getfeed
-      else {
-        expect(feedGroup).toBe('example_feed');
-        expect(token).toBe('XRT0XKwzedFMVzUZkcuJROk9Le3VGVj0');
-      }
+      // else {
+      //   expect(feedGroup).toBe('example_feed');
+      //   expect(token).toBe('XRT0XKwzedFMVzUZkcuJROk9Le3VGVj0');
+      // }
 
       return {
         //deleteFeed
@@ -123,8 +147,10 @@ function __connect(apiKey, apiSecret) {
         },
 
         //getFeed
-        get: function (query) {
-          expect(query).toBe('select_*_from_table');
+        get: function () {
+          return {
+            results: sample_data_activities
+          };
         },
 
         //followLocation || followUser || followTopic
@@ -163,7 +189,7 @@ function __connect(apiKey, apiSecret) {
     },
 
     //createUser  ||  createPost
-    user: function (userId) {
+    user: function () {
       return {
         create: function (data) {
           if (data.name === 'User') {

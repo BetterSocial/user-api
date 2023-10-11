@@ -63,7 +63,7 @@ module.exports = {
       });
 
     const {channelId, members} = req.body;
-    const {success, message} = await addModerators(channelId, members, req.token);
+    const {success, message} = await addModerators(channelId, members);
     if (!success)
       return res.status(403).json({
         success,
