@@ -4,8 +4,6 @@ const generateUserAndFollowSeeds = require('../__utils__/seeds/users_and_follow_
 const generateTopicAndUserTopics = require('../__utils__/seeds/topic_and_user_topic_seeds');
 const {createReusableAuthTestSuite} = require('../__authTest__/createReusableAuthTestSuite');
 
-jest.mock('../../../middlewares/auth');
-
 beforeEach(async () => {
   await generateUserAndFollowSeeds();
   await generateTopicAndUserTopics();
