@@ -2,13 +2,15 @@ const supertest = require('supertest');
 const app = require('../../../app');
 const generateUserAndFollowSeeds = require('../__utils__/seeds/users_and_follow_seeds');
 const generateUserAndTopicSeeds = require('../__utils__/seeds/users_and_topics_seeds');
+const generateTopicSeeds = require('../__utils__/seeds/topic_seeds');
 const generateUserAndLocationsSeeds = require('../__utils__/seeds/users_and_locations_seeds');
 const refreshAllMaterializedViews = require('../__utils__/seeds/refresh_all_materialized_views_seeds');
 
 describe('GET /who-to-follow/list', () => {
   test('Should return 200 OK when query params provided', async () => {
     const {users} = await generateUserAndFollowSeeds();
-    const {topics} = await generateUserAndTopicSeeds(users);
+    const {topics} = await generateTopicSeeds();
+    await generateUserAndTopicSeeds(users, topics);
     const {locations} = await generateUserAndLocationsSeeds(users);
     await refreshAllMaterializedViews();
 
@@ -42,7 +44,8 @@ describe('GET /who-to-follow/list', () => {
 
   test('Should return 200 OK with no data when query params provided', async () => {
     const {users} = await generateUserAndFollowSeeds();
-    await generateUserAndTopicSeeds(users);
+    const {topics} = await generateTopicSeeds();
+    await generateUserAndTopicSeeds(users, topics);
     await generateUserAndLocationsSeeds(users);
     await refreshAllMaterializedViews();
 

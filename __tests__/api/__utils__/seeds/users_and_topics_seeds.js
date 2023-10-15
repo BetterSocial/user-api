@@ -1,38 +1,33 @@
 const {v4: uuid} = require('uuid');
 
-const {Topics, UserTopic} = require('../../../../databases/models');
+const {UserTopic, UserTopicHistory} = require('../../../../databases/models');
 
-const generateUserAndTopicSeeds = async (users = []) => {
-  const bulks = [];
+const generateUserAndTopicSeeds = async (users = [], topics = []) => {
+  let userTopicBulks = [];
+  let userTopicHistoryBulks = [];
 
-  for (let i = 0; i < 10; i++) {
-    bulks.push({
-      topic_id: parseInt(i, 10) + 1,
-      name: `topic_name_${i}`,
-      icon_path: 'icon_path',
-      categories: 'categories',
-      is_custom_topic: false,
-      created_at: new Date(),
-      updated_at: new Date(),
-      deleted_at: null,
-      sign: true
-    });
-  }
-
-  await Topics.bulkCreate(bulks);
-  const userTopicBulks = users.map((user) => {
-    return {
+  users.map((user) => {
+    userTopicBulks.push({
       user_topics_id: uuid(),
       user_id: user.user_id,
-      topic_id: bulks[0].topic_id,
+      topic_id: topics[0].topic_id,
       createdAt: new Date(),
       updatedAt: new Date()
-    };
+    });
+
+    userTopicHistoryBulks.push({
+      user_id: user.user_id,
+      topic_id: topics[0].topic_id,
+      action: 'in',
+      createdAt: new Date()
+    });
   });
 
   await UserTopic.bulkCreate(userTopicBulks);
+  await UserTopicHistory.bulkCreate(userTopicHistoryBulks);
+
   return {
-    topics: bulks,
+    topics: topics,
     userTopics: userTopicBulks
   };
 };
