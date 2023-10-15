@@ -12,7 +12,7 @@ const generateTopicSeeds = async () => {
       created_at: new Date(),
       flg_show: 'Y',
       is_custom_topic: i > 4,
-      sort: i,
+      sort: parseInt(i, 10) + 1,
       deleted_at: null,
       sign: i < 5
     });
