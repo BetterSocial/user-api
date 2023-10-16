@@ -8,6 +8,7 @@ const topics = require('./topics');
 const getFollowedTopic = require('./getFollowedTopic');
 const {Topics, UserTopic, UserTopicHistory, sequelize} = require('../../databases/models');
 const UserTopicService = require('../../services/postgres/UserTopicService');
+const getSubscribableTopic = require('./getSubscribeableTopic');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -255,5 +256,6 @@ module.exports = {
   getFollowedTopic,
   getFollowerList,
   getTopics,
+  getSubscribableTopic,
   followTopicV2
 };
