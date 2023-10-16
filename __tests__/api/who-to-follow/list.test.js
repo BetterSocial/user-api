@@ -20,8 +20,6 @@ describe('GET /who-to-follow/list', () => {
     );
     expect(response.status).toBe(200);
 
-    console.log(response.body.body);
-
     // Expect label location and label topic exists since they are followed on seeds
     expect(response.body.body).toEqual(
       expect.arrayContaining([
