@@ -29,6 +29,7 @@ router.post(
 router.delete('/remove-image', Auth.isAuth, profileController.removeImageProfile);
 router.get('/get-my-profile', Auth.isAuth, profileController.getMyProfile);
 router.get('/following', Auth.isAuth, profileController.following);
+router.get('/followers', Auth.isAuth, profileController.followers);
 router.post(
   '/update-bio',
   Auth.isAuth,
