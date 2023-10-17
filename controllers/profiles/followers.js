@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
       "user"."country_code" AS "user.country_code", 
       "user"."username" AS "user.username", 
       "user"."real_name" AS "user.real_name", 
+      "user"."bio" AS "user.bio",
       "user"."created_at" AS "user.createdAt", 
       "user"."updated_at" AS "user.updatedAt", 
       "user"."last_active_at" AS "user.last_active_at", 
