@@ -9,6 +9,20 @@ const config = require('../../databases/config/database')[env];
 
 module.exports = async (req, res) => {
   const id = req.userId;
+
+  let filterQuery = '';
+  const {q} = req.query;
+  if (q) {
+    if (q.length < 2) {
+      return res.status(200).json({
+        success: true,
+        message: 'Your search characters is too few, please input 3 or more characters for search'
+      });
+    }
+
+    filterQuery = `AND "user"."username" ILIKE :likeQuery`;
+  }
+
   let sequelize;
   if (config.use_env_variable) {
     sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -48,15 +62,16 @@ module.exports = async (req, res) => {
       END
       AS "user.following"
     FROM "user_follow_user" AS "UserFollowUser" 
-    LEFT OUTER JOIN "users" AS "user" ON "UserFollowUser"."user_id_followed" = "user"."user_id" 
+    LEFT OUTER JOIN "users" AS "user" ON "UserFollowUser"."user_id_follower" = "user"."user_id" 
     WHERE 
       "user"."is_anonymous" = false AND 
       "UserFollowUser"."user_id_followed" = :id AND 
-      "UserFollowUser"."user_id_follower" != :id;`,
+      "UserFollowUser"."user_id_follower" != :id
+      ${filterQuery}`,
     {
       nest: true,
       type: QueryTypes.SELECT,
-      replacements: {id}
+      replacements: {id, likeQuery: `%${q}%`}
     }
   );
 

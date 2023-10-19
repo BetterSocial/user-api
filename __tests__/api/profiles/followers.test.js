@@ -56,4 +56,31 @@ describe('GET /profiles/followers', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.data.length).toEqual(0);
   });
+
+  test('should return 200 OK but query filter less than 3', async () => {
+    // Execution
+    const response = await request(app)
+      .get('/profiles/followers')
+      .query({q: 'a'})
+      .set('Authorization', 'Bearer token');
+    console.log(response);
+
+    // Assertion
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toEqual(
+      'Your search characters is too few, please input 3 or more characters for search'
+    );
+  });
+
+  test('should return 200 OK with filter query username', async () => {
+    // Execution
+    const response = await request(app)
+      .get('/profiles/followers')
+      .query({q: 'username'})
+      .set('Authorization', 'Bearer token');
+
+    // Assertion
+    expect(response.statusCode).toBe(200);
+    expect(response.body.data).toEqual(arrayOfFollowerLisExpected);
+  });
 });
