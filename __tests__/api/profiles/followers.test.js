@@ -1,5 +1,7 @@
 const request = require('supertest');
 const app = require('../../../app');
+const TestConstants = require('../../../__tests__/api/__utils__/constant');
+const {UserFollowUser} = require('../../../databases/models');
 const generateUserAndFollowSeeds = require('../__utils__/seeds/users_and_follow_seeds');
 const generateTopicAndUserTopics = require('../__utils__/seeds/topic_and_user_topic_seeds');
 
@@ -42,5 +44,16 @@ describe('GET /profiles/followers', () => {
     // Assertion
     expect(response.statusCode).toBe(200);
     expect(response.body.data).toEqual(arrayOfFollowerLisExpected);
+  });
+
+  test('should return 200 OK if no have any follower', async () => {
+    await UserFollowUser.destroy({where: {user_id_followed: TestConstants.MY_USER_ID}});
+
+    const response = await request(app)
+      .get('/profiles/followers')
+      .set('Authorization', 'Bearer token');
+    // Assertion
+    expect(response.statusCode).toBe(200);
+    expect(response.body.data.length).toEqual(0);
   });
 });

@@ -9,7 +9,6 @@ const config = require('../../databases/config/database')[env];
 
 module.exports = async (req, res) => {
   const id = req.userId;
-  console.log(id);
   let sequelize;
   if (config.use_env_variable) {
     sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -61,13 +60,6 @@ module.exports = async (req, res) => {
     }
   );
 
-  if (followers === null) {
-    return res.status(404).json({
-      code: 404,
-      status: 'error',
-      message: 'user follower not found'
-    });
-  }
   return res.json({
     status: 'success',
     code: 200,
