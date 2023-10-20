@@ -59,7 +59,7 @@ const BetterSocialUnblockUserV2 = async (token, selfUserId, targetUserId) => {
     );
     return {
       isSuccess: true,
-      message: 'User has been blocked successfully'
+      message: 'User has been unblocked successfully'
     };
   } catch (e) {
     console.log('Error in unblock user v2 getstream');
