@@ -67,7 +67,8 @@ module.exports = async (req, res) => {
       "user"."is_anonymous" = false AND 
       "UserFollowUser"."user_id_followed" = :id AND 
       "UserFollowUser"."user_id_follower" != :id
-      ${filterQuery}`,
+      ${filterQuery}
+    ORDER BY "UserFollowUser"."followed_at" DESC `,
     {
       nest: true,
       type: QueryTypes.SELECT,
