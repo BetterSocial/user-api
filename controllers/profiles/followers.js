@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
         from
           "user_follow_user" AS "UserFollowUserCheckFollower" 
         where 
-          "UserFollowUserCheckFollower"."user_id_follower" = "UserFollowUser"."user_id_followed" AND
+          "UserFollowUserCheckFollower"."user_id_follower" = :id AND
           "UserFollowUserCheckFollower"."user_id_followed" = "UserFollowUser"."user_id_follower" LIMIT 1) IS NOT NULL
       THEN
          true
@@ -67,8 +67,7 @@ module.exports = async (req, res) => {
       "user"."is_anonymous" = false AND 
       "UserFollowUser"."user_id_followed" = :id AND 
       "UserFollowUser"."user_id_follower" != :id
-      ${filterQuery}
-    ORDER BY "UserFollowUser"."followed_at" DESC `,
+      ${filterQuery}`,
     {
       nest: true,
       type: QueryTypes.SELECT,
