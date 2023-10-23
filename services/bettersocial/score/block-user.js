@@ -1,11 +1,11 @@
 const moment = require('moment');
-const {addForUnblockUser, addForBlockUser} = require('../../score');
+const {addForBlockUser} = require('../../score');
 
 const BetterSocialScoreBlockUser = (selfUserId, targetUserId, postId) => {
   const scoringProcessData = {
     user_id: selfUserId,
     feed_id: postId,
-    unblocked_user_id: targetUserId,
+    blocked_user_id: targetUserId,
     activity_time: moment().utc().format('YYYY-MM-DD HH:mm:ss')
   };
 
