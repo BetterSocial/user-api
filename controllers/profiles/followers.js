@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
         from
           "user_follow_user" AS "UserFollowUserCheckFollower" 
         where 
-          "UserFollowUserCheckFollower"."user_id_follower" = "UserFollowUser"."user_id_followed" AND
+          "UserFollowUserCheckFollower"."user_id_follower" = :id AND
           "UserFollowUserCheckFollower"."user_id_followed" = "UserFollowUser"."user_id_follower" LIMIT 1) IS NOT NULL
       THEN
          true
