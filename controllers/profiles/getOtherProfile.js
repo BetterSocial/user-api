@@ -40,11 +40,11 @@ module.exports = async (req, res) => {
     const isFollowingQuery = `SELECT * FROM user_follow_user WHERE user_id_followed= :user_id_followed AND user_id_follower= :user_id_follower`;
 
     const getFollowerCount = await sequelize.query(getFollowerCountQuery, {
-      replacements: {user_id: req.userId}
+      replacements: {user_id: other_user_id}
     });
 
     const getFollowingCount = await sequelize.query(getFollowingCountQuery, {
-      replacements: {user_id: req.userId}
+      replacements: {user_id: other_user_id}
     });
 
     const isFollowing = await sequelize.query(isFollowingQuery, {
