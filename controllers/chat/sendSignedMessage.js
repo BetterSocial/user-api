@@ -14,7 +14,11 @@ const sendSignedMesage = async (req, res) => {
   const schema = {
     channelId: 'string|empty:false',
     message: 'string|empty:false',
-    channelType: 'number|empty:false'
+    channelType: {
+      type: 'enum',
+      values: Object.values(CHANNEL_TYPE),
+      empty: false
+    }
   };
   const validated = v.validate(req.body, schema);
   if (validated.length)
@@ -38,14 +42,11 @@ const sendSignedMesage = async (req, res) => {
       break;
 
     default:
-      break;
+      return res.status(403).json({
+        message: 'Error validation',
+        error: 'Channel type not found'
+      });
   }
-
-  if (!channelTypeDef)
-    return res.status(403).json({
-      message: 'Error validation',
-      error: 'Channel type not found'
-    });
 
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
   try {
@@ -68,9 +69,9 @@ const sendSignedMesage = async (req, res) => {
     return res.status(200).json(responseSuccess('sent', chat));
   } catch (error) {
     await client.disconnectUser();
-    return res.status(error.statusCode ?? error.status ?? 400).json({
+    return res.status(error.statusCode ?? error.status ?? 500).json({
       status: 'error',
-      code: error.statusCode ?? error.status ?? 400,
+      code: error.statusCode ?? error.status ?? 500,
       message: error.message
     });
   }

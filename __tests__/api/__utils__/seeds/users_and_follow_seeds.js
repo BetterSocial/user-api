@@ -9,28 +9,6 @@ const generateUserAndFollowSeeds = async () => {
   const followings = [];
 
   bulks.push({
-    user_id: TestConstants.MY_USER_ID,
-    human_id: `human_id_${0}`,
-    country_code: 'ID',
-    username: `username_${0}`,
-    last_active_at: new Date(),
-    status: 'Y',
-    created_at: new Date(),
-    updated_at: new Date(),
-    real_name: `real_name_${0}`,
-    profile_pic_path: 'profile_pic_path',
-    profile_pic_asset_id: 'profile_pic_asset_id',
-    profile_pic_public_id: 'profile_pic_public_id',
-    bio: 'bio',
-    is_banned: false,
-    is_anonymous: false,
-    encrypted: 'encrypted',
-    allow_anon_dm: true,
-    only_received_dm_from_user_following: false,
-    is_backdoor_user: false
-  });
-
-  bulks.push({
     user_id: TestConstants.MY_ANONYMOUS_USER_ID,
     human_id: `anon_human_id_${0}`,
     country_code: 'ID',
@@ -52,7 +30,29 @@ const generateUserAndFollowSeeds = async () => {
     is_backdoor_user: false
   });
 
-  for (let i = 1; i < 70; i++) {
+  bulks.push({
+    user_id: TestConstants.MY_USER_ID,
+    human_id: `human_id_${0}`,
+    country_code: 'ID',
+    username: `username_${0}`,
+    last_active_at: new Date(),
+    status: 'Y',
+    created_at: new Date(),
+    updated_at: new Date(),
+    real_name: `real_name_${0}`,
+    profile_pic_path: 'profile_pic_path',
+    profile_pic_asset_id: 'profile_pic_asset_id',
+    profile_pic_public_id: 'profile_pic_public_id',
+    bio: 'bio',
+    is_banned: false,
+    is_anonymous: false,
+    encrypted: 'encrypted',
+    allow_anon_dm: true,
+    only_received_dm_from_user_following: false,
+    is_backdoor_user: false
+  });
+
+  for (let i = 2; i < 71; i++) {
     bulks.push({
       user_id: uuid(),
       human_id: `human_id_${i}`,
@@ -83,7 +83,7 @@ const generateUserAndFollowSeeds = async () => {
       });
     }
 
-    if (i > 30 && i <= 60) {
+    if (i > 30 && i <= 60 + 1 /** 1 = Sum of anon user */) {
       followings.push({
         follow_action_id: uuid(),
         user_id_follower: TestConstants.MY_USER_ID,
