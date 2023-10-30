@@ -61,8 +61,7 @@ const sendSignedMesage = async (req, res) => {
 
     const chat = await channel.sendMessage({
       user_id: req.userId,
-      text: message,
-      ...req.body
+      text: message
     });
 
     await client.disconnectUser();
