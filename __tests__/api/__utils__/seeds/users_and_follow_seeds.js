@@ -30,6 +30,28 @@ const generateUserAndFollowSeeds = async () => {
     is_backdoor_user: false
   });
 
+  bulks.push({
+    user_id: TestConstants.MY_ANONYMOUS_USER_ID,
+    human_id: `anon_human_id_${0}`,
+    country_code: 'ID',
+    username: `anon_username_${0}`,
+    last_active_at: new Date(),
+    status: 'Y',
+    created_at: new Date(),
+    updated_at: new Date(),
+    real_name: `anon_real_name_${0}`,
+    profile_pic_path: 'profile_pic_path',
+    profile_pic_asset_id: 'profile_pic_asset_id',
+    profile_pic_public_id: 'profile_pic_public_id',
+    bio: 'bio',
+    is_banned: false,
+    is_anonymous: true,
+    encrypted: 'encrypted',
+    allow_anon_dm: true,
+    only_received_dm_from_user_following: false,
+    is_backdoor_user: false
+  });
+
   for (let i = 1; i < 70; i++) {
     bulks.push({
       user_id: uuid(),
