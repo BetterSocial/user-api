@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
     const user = await User.findOne({
       where: {username: req.params.username},
       attributes: {
-        exclude: ['human_id']
+        exclude: ['human_id', 'is_backdoor_user', 'encrypted']
       }
     });
     if (user === null) {
@@ -17,20 +17,22 @@ module.exports = async (req, res) => {
       });
     }
 
+    const targetUserId = user?.dataValues?.user_id;
+
     const getFollowerCountQuery = `SELECT COUNT(user_follow_user.user_id_follower) as count_follower from user_follow_user WHERE user_id_followed = :user_id`;
     const getFollowingCountQuery = `SELECT COUNT(user_follow_user.user_id_followed) as count_following from user_follow_user WHERE user_id_follower = :user_id`;
     const isFollowingQuery = `SELECT * FROM user_follow_user WHERE user_id_followed= :user_id_followed AND user_id_follower= :user_id_follower`;
 
     const getFollowerCount = await sequelize.query(getFollowerCountQuery, {
-      replacements: {user_id: req.userId}
+      replacements: {user_id: targetUserId}
     });
 
     const getFollowingCount = await sequelize.query(getFollowingCountQuery, {
-      replacements: {user_id: req.userId}
+      replacements: {user_id: targetUserId}
     });
 
     const isFollowing = await sequelize.query(isFollowingQuery, {
-      replacements: {user_id_follower: req?.userId, user_id_followed: user?.dataValues?.user_id}
+      replacements: {user_id_follower: req?.userId, user_id_followed: targetUserId}
     });
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
