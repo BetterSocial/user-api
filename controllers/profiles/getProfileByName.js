@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
       }
     });
 
-    if (!user || user?.dataValues)
+    if (!user?.dataValues)
       return res.json({
         code: 404,
         message: `No user with username ${username} found`,
