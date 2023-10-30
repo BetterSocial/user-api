@@ -12,6 +12,19 @@ const createReusableAuthTestSuite = (superTest) => {
   });
 };
 
+const createReusablePreventAnonymousUserTestSuite = (superTest) => {
+  return test('Should return 403 Forbidden Access if called with anonymous token', async () => {
+    const superTestResponse = await superTest;
+    expect(superTestResponse.statusCode).toBe(403);
+    expect(superTestResponse.body).toEqual({
+      message: 'Forbidden access',
+      data: null,
+      code: 403
+    });
+  });
+};
+
 module.exports = {
-  createReusableAuthTestSuite
+  createReusableAuthTestSuite,
+  createReusablePreventAnonymousUserTestSuite
 };

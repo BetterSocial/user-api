@@ -41,7 +41,7 @@ describe('GET /chat/channels/signed', () => {
       'valid-token'
     );
     expect(StreamChat._instance.queryChannels).toHaveBeenCalledWith(
-      {type: 'messaging', members: {$in: [user.user_id]}},
+      {members: {$in: [user.user_id]}},
       [{last_message_at: -1}]
     );
     expect(StreamChat._instance.disconnectUser).toHaveBeenCalled();

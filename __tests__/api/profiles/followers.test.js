@@ -63,7 +63,6 @@ describe('GET /profiles/followers', () => {
       .get('/profiles/followers')
       .query({q: 'a'})
       .set('Authorization', 'Bearer token');
-    console.log(response);
 
     // Assertion
     expect(response.statusCode).toBe(200);

@@ -159,7 +159,7 @@ module.exports = {
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
       await client.connectUser({id: req.userId}, req.token);
-      let channels = await client.queryChannels({type: 'messaging', members: {$in: [req.userId]}}, [
+      let channels = await client.queryChannels({members: {$in: [req.userId]}}, [
         {last_message_at: -1}
       ]);
       await client.disconnectUser();
