@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
       }
     });
 
-    if (!user)
+    if (!user || user?.dataValues)
       return res.json({
         code: 404,
         message: `No user with username ${username} found`,
@@ -53,8 +53,6 @@ module.exports = async (req, res) => {
     });
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
-    console.log('getFollowerCountResult');
-    console.log(getFollowerCountResult);
     const getFollowingCountResult = getFollowingCount?.[0]?.[0]?.count_following;
     const isFollowingResult = isFollowing?.[0]?.length > 0;
 
