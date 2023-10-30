@@ -29,6 +29,7 @@ const sendSignedMesage = async (req, res) => {
 
   switch (channelType) {
     case CHANNEL_TYPE.CHAT:
+    case CHANNEL_TYPE.ANONYMOUS:
       channelTypeDef = 'messaging';
       break;
 
