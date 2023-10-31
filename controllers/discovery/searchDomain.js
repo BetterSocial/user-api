@@ -11,7 +11,7 @@ const {sequelize} = require('../../databases/models');
 const SearchDomain = async (req, res) => {
   const {q} = req.query;
   const {userId} = req;
-  if (q?.length < 2 || !q)
+  if (!q || q?.length < 2)
     return res.status(200).json({
       success: true,
       message: 'Your search characters is too few, please input 3 or more characters for search'
@@ -27,15 +27,17 @@ const SearchDomain = async (req, res) => {
         "Domain"."credder_score",
         count("domainFollower"."user_id_follower") AS "followersCount",
         (
-          SELECT "f"."user_id_follower" AS "user_id_follower" 
+          SELECT "f"."user_id_follower" 
           FROM "user_follow_domain" AS "f" 
           WHERE "f"."user_id_follower" = :userId 
           AND "f"."domain_id_followed" = "Domain"."domain_page_id"
-        )
+          LIMIT 1
+        ) AS "user_id_follower"
       FROM "domain_page" AS "Domain" 
       LEFT JOIN "user_follow_domain" AS "domainFollower" ON "Domain"."domain_page_id" = "domainFollower"."domain_id_followed" 
       WHERE "Domain"."domain_name" ILIKE :likeQuery 
       GROUP BY 
+        "user_id_follower",
         "Domain"."domain_page_id",
         "Domain"."domain_name",
 				"Domain"."logo",
