@@ -27,7 +27,8 @@ const generateUserAndFollowSeeds = async () => {
     encrypted: 'encrypted',
     allow_anon_dm: true,
     only_received_dm_from_user_following: false,
-    is_backdoor_user: false
+    is_backdoor_user: false,
+    verified_status: 'VERIFIED'
   });
 
   bulks.push({
@@ -49,7 +50,8 @@ const generateUserAndFollowSeeds = async () => {
     encrypted: 'encrypted',
     allow_anon_dm: true,
     only_received_dm_from_user_following: false,
-    is_backdoor_user: false
+    is_backdoor_user: false,
+    verified_status: 'VERIFIED'
   });
 
   for (let i = 2; i < 71; i++) {
