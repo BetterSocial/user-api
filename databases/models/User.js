@@ -84,7 +84,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false
       },
-      verified_status: {type: DataTypes.ENUM('VERIFIED', 'UNVERIFIED'), allowNull: false}
+      verified_status: {
+        type: DataTypes.ENUM('VERIFIED', 'UNVERIFIED'),
+        allowNull: false,
+        defaultValue: 'VERIFIED'
+      }
     },
     {
       sequelize,
