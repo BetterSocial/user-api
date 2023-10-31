@@ -3,10 +3,26 @@ const {checkMoreOrLess} = require('../../helpers/checkMoreOrLess');
 
 module.exports = async (req, res) => {
   try {
+    // check this route is use auth or not
+    let excludeField = [
+      'human_id',
+      'is_backdoor_user',
+      'encrypted',
+      'created_at',
+      'updated_at',
+      'real_name',
+      'last_active_at',
+      'status',
+      'is_banned'
+    ];
+    if (req?.userId) {
+      excludeField = ['human_id', 'is_backdoor_user', 'encrypted'];
+    }
+
     const user = await User.findOne({
       where: {username: req.params.username},
       attributes: {
-        exclude: ['human_id', 'is_backdoor_user', 'encrypted']
+        exclude: excludeField
       }
     });
     if (user === null) {
@@ -32,7 +48,7 @@ module.exports = async (req, res) => {
     });
 
     const isFollowing = await sequelize.query(isFollowingQuery, {
-      replacements: {user_id_follower: req?.userId, user_id_followed: targetUserId}
+      replacements: {user_id_follower: req?.userId || '', user_id_followed: targetUserId}
     });
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;

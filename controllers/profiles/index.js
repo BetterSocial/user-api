@@ -6,7 +6,6 @@ const getMyProfile = require('./getMyProfile');
 const getOtherFeedsInProfile = require('./getOtherFeedsInProfile');
 const getOtherProfile = require('./getOtherProfile');
 const getOtherProfilebyUsername = require('./getOtherProfileByUsername');
-const getOtherProfilePublicByUsername = require('./getOtherProfilePublicByUsername');
 const getProfileByName = require('./getProfileByName');
 const getSelfFeedsInProfile = require('./getSelfFeedsInProfile');
 const getSelfAnonymousFeedsInProfile = require('./getSelfAnonymousFeedsInProfile');
@@ -30,7 +29,6 @@ module.exports = {
   getOtherFeedsInProfile,
   getOtherProfile,
   getOtherProfilebyUsername,
-  getOtherProfilePublicByUsername,
   getProfileByName,
   getSelfFeedsInProfile,
   getSelfAnonymousFeedsInProfile,
