@@ -8,7 +8,6 @@ const GenerateBodyValidationMiddleware = (schema) => {
     try {
       const validate = v.validate(req?.body, schema);
       if (validate.length) {
-        console.log('error validation', validate);
         return res.status(403).json({
           code: 403,
           status: 'error validation',
@@ -69,6 +68,9 @@ const BodyValidationMiddleware = {
   registerV2: GenerateBodyValidationMiddleware(BodyValidationSchema.registerV2),
   registerV2WithoutUpload: GenerateBodyValidationMiddleware(
     BodyValidationSchema.registerV2WithoutUpload
+  ),
+  setSignedChannelAsRead: GenerateBodyValidationMiddleware(
+    BodyValidationSchema.setSignedChannelAsRead
   ),
   unblockUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.unblockUserV2),
   unfollowUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.unfollowUserV2),
