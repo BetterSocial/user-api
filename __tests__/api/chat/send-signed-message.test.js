@@ -63,4 +63,26 @@ describe('POST /chat/send-signed-message', () => {
       })
     );
   });
+
+  test('should return 403 error validation if channelType is not chat or group', async () => {
+    const response = await supertest(app)
+      .post('/api/v1/chat/send-signed-message')
+      .set({Authorization: `Bearer token`})
+      .send({
+        message: 'Hello World',
+        channelType: 3
+      })
+      .expect(403);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        message: 'Error validation',
+        error: expect.arrayContaining([
+          expect.objectContaining({
+            message: expect.any(String)
+          })
+        ])
+      })
+    );
+  });
 });
