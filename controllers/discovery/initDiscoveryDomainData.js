@@ -15,7 +15,7 @@ const InitDiscoveryDomainData = async (req, res) => {
   try {
     let suggestedDomainsQuery = `SELECT 
                 C.domain_name, C.short_description, C.logo, C.credder_score,
-                A.domain_id_followed, 
+                C.domain_page_id AS domain_id_followed, 
                 COUNT(*) as common,
                 A.user_id_follower as user_id_follower
             FROM user_follow_domain A 
