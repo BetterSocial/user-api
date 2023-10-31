@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
         exclude: excludeField
       }
     });
+
     if (user === null) {
       return res.status(404).json({
         code: 404,
@@ -63,10 +64,12 @@ module.exports = async (req, res) => {
     copyUser.following_symbol = checkMoreOrLess(getFollowingCountResult);
     copyUser.follower_symbol = checkMoreOrLess(getFollowerCountResult);
 
-    copyUser.is_following = isFollowingResult;
-    if (copyUser.only_received_dm_from_user_following)
-      copyUser.isSignedMessageEnabled = isFollowingResult;
-    else copyUser.isSignedMessageEnabled = true;
+    if (req?.userId) {
+      copyUser.is_following = isFollowingResult;
+      if (copyUser.only_received_dm_from_user_following)
+        copyUser.isSignedMessageEnabled = isFollowingResult;
+      else copyUser.isSignedMessageEnabled = true;
+    }
 
     copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm && copyUser.isSignedMessageEnabled;
 

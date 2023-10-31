@@ -83,6 +83,11 @@ module.exports = (sequelize, DataTypes) => {
       is_backdoor_user: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+      },
+      verified_status: {
+        type: DataTypes.ENUM('VERIFIED', 'UNVERIFIED'),
+        allowNull: false,
+        defaultValue: 'VERIFIED'
       }
     },
     {
