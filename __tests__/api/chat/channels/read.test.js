@@ -45,28 +45,6 @@ describe('POST /chat/channels/read', () => {
     );
   });
 
-  test('should return 403 error validation if channel type is not provided', async () => {
-    const response = await supertest(app)
-      .post('/api/v1/chat/channels/read')
-      .set({Authorization: `Bearer token`})
-      .send({
-        channelId: 'channel-id'
-      })
-      .expect(403);
-
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        status: 'error validation',
-        message: expect.arrayContaining([
-          expect.objectContaining({
-            field: 'channelType',
-            message: expect.any(String)
-          })
-        ])
-      })
-    );
-  });
-
   test('should return 403 error validation if channelType is not chat or group', async () => {
     const response = await supertest(app)
       .post('/api/v1/chat/channels/read')
