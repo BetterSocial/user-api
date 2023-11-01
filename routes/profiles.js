@@ -11,6 +11,7 @@ router.get(
   Auth.isAuth,
   profileController.getOtherProfilebyUsername
 );
+router.get('/get-profile-public/:username', profileController.getOtherProfilebyUsername);
 router.get('/get-profile/:username', Auth.isAuth, profileController.getProfileByName);
 router.get('/block/', Auth.isAuth, profileController.handleBlock);
 router.post('/set-following', Auth.isAuth, profileController.setFollowing);
