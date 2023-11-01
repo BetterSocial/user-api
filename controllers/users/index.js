@@ -16,6 +16,7 @@ const populate = require('./populateUser');
 const refreshToken = require('./refreshToken');
 const register = require('./register');
 const registerV2 = require('./register_v2');
+const authenticateWeb = require('./authenticate-web');
 const removeFcmTokem = require('./removeFcmToken');
 const removeSingleFcmToken = require('./removeSingleUserToken');
 const renameUser = require('./renameUser');
@@ -46,6 +47,7 @@ module.exports = {
   refreshToken,
   register,
   registerV2,
+  authenticateWeb,
   removeFcmTokem,
   removeSingleFcmToken,
   renameUser,
