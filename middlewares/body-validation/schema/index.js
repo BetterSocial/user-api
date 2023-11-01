@@ -7,6 +7,7 @@ const BodyValidationSchema = {
   checkHumanIdExchangeToken: require('./checkHumanIdExchangeToken'),
   checkPasswordForDemoLogin: require('./checkPasswordForDemoLoginSchema'),
   checkUserFollowStatus: require('./checkUserFollowStatusSchema'),
+  commonLimitOffset: require('./commonLimitOffsetSchema'),
   createAnonymousCommentChildV2: require('./createAnonymousCommentChildV2Schema'),
   createAnonymousCommentV2: require('./createAnonymousCommentV2Schema'),
   createAnonymousPollPostV2: require('./createAnonymousPollPostV2Schema'),

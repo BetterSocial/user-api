@@ -42,6 +42,7 @@ const BodyValidationMiddleware = {
   ),
   changeBio: GenerateBodyValidationMiddleware(BodyValidationSchema.changeBio),
   changeProfileImage: GenerateBodyValidationMiddleware(BodyValidationSchema.changeProfileImage),
+  commonLimitOffset: GenerateBodyValidationMiddleware(BodyValidationSchema.commonLimitOffset),
   createAnonymousCommentChildV2: GenerateBodyValidationMiddleware(
     BodyValidationSchema.createAnonymousCommentChildV2
   ),
