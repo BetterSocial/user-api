@@ -1,6 +1,5 @@
 const {User} = require('../../databases/models');
 const getstreamService = require('../../services/getstream');
-const jwt = require('jsonwebtoken');
 const {createRefreshToken} = require('../../services/jwt');
 const UsersFunction = require('../../databases/functions/users');
 
@@ -25,6 +24,15 @@ module.exports = async (req, res) => {
           message: 'User has banned by admin'
         });
       }
+      if (userData.verified_status !== 'VERIFIED') {
+        return res.status(401).json({
+          code: 401,
+          data: false,
+          is_banned: true,
+          message: 'User is not verified'
+        });
+      }
+
       let user_id = userData.user_id;
       let userId = user_id.toLowerCase();
       const anonUser = await UsersFunction.findAnonymousUserId(User, user_id);
