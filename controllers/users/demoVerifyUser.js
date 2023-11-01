@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
         return res.status(401).json({
           code: 401,
           data: false,
-          is_banned: true,
+          is_verified: true,
           message: 'User is not verified'
         });
       }
@@ -57,12 +57,6 @@ module.exports = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    // const { status, data } = error.response;
-    // return res.json({
-    //   code: status,
-    //   data: 0,
-    //   message: data,
-    // });
     return res.status(200).json({
       code: 500,
       data: false,
