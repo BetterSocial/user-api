@@ -8,6 +8,8 @@ const BodyValidationMiddleware = require('../middlewares/body-validation');
 const RegisterV2UploadPhotoMiddleware = require('../middlewares/upload-photo/registerV2');
 const VerifyUserV2Middleware = require('../middlewares/verify-user');
 const {redisClient} = require('../config/redis');
+const {validate} = require('../middlewares/joi-validation/validate');
+const {UserValidation} = require('../joi-validations/users.validations');
 const RegisterV2WithoutUploadPhotoMiddleware = require('../middlewares/register-user/registerV2WithoutUploadPhoto');
 
 const rateLimiter = expressLimiter(router, redisClient);
@@ -65,7 +67,11 @@ router.post(
   usersHandler.registerV2
 );
 
-router.post('/authenticate-web', usersHandler.authenticateWeb);
+router.post(
+  '/authenticate-web',
+  validate(UserValidation.authenticateWeb),
+  usersHandler.authenticateWeb
+);
 
 router.post(
   '/register-v2-without-upload-photo',
