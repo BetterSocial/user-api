@@ -33,7 +33,7 @@ module.exports.isAuth = async (req, res, next) => {
   try {
     const tokenPayload = await isAuthTokenValid(token, process.env.SECRET);
     const user = await UsersFunction.findUserById(User, tokenPayload.user_id);
-    UsersFunction.updateLastActiveAt(User, user?.user_id);
+    await UsersFunction.updateLastActiveAt(User, user?.user_id);
     req.user = user;
     req.userId = user.user_id;
     req.token = token;

@@ -42,7 +42,10 @@ const GetstreamSingleton = (() => {
      * @returns {StreamChat}
      */
     getChatInstance: () => {
-      chatInstance = createChatInstance();
+      if (!chatInstance) {
+        chatInstance = createChatInstance();
+      }
+
       return chatInstance;
     },
 
@@ -53,6 +56,12 @@ const GetstreamSingleton = (() => {
     getClientInstance: (clientToken) => {
       clientInstance = createClientInstance(clientToken);
       return clientInstance;
+    },
+
+    reset: () => {
+      instance = null;
+      clientInstance = null;
+      chatInstance = null;
     }
   };
 })();

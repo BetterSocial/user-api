@@ -10,7 +10,7 @@ const __queryChannelBuilder = async (userId, limit, offset) => {
     offset: offset,
     state: true
   });
-  await client.disconnectUser();
+
   return channels;
 };
 
@@ -62,7 +62,6 @@ const getSignedChannelList = async (req, res) => {
       queriedChannels.push(...response);
     });
 
-    await client.disconnectUser();
     const channels = queriedChannels.map(__transformChannelData);
     return res.status(200).json(responseSuccess('Success retrieve channels', channels));
   } catch (error) {
