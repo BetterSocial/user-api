@@ -12,7 +12,7 @@ class GetstreamService {
     const query = {
       limit,
       reactions: {own: true, recent: true, counts: true},
-      ranking: GETSTREAM_RANKING_METHOD,
+      // ranking: GETSTREAM_RANKING_METHOD,
       offset
     };
     const res = await this._client.feed('topic', id).get(query);
