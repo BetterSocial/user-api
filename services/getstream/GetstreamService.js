@@ -1,4 +1,3 @@
-const stream = require('getstream');
 const InvariantError = require('../../exceptions/InvariantError');
 const {MAX_FEED_FETCH_LIMIT, GETSTREAM_RANKING_METHOD} = require('../../helpers/constants');
 
@@ -12,7 +11,7 @@ class GetstreamService {
     const query = {
       limit,
       reactions: {own: true, recent: true, counts: true},
-      // ranking: GETSTREAM_RANKING_METHOD,
+      ranking: GETSTREAM_RANKING_METHOD,
       offset
     };
     const res = await this._client.feed('topic', id).get(query);
