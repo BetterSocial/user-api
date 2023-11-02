@@ -12,6 +12,7 @@ const {
   Sequelize
 } = require('../databases/models');
 const {NO_POLL_OPTION_UUID, POST_TYPE_LINK, POST_VERB_POLL} = require('../helpers/constants');
+const deleteActivityFromUserFeed = require('../services/getstream/deleteActivityFromUserFeed');
 
 /**
  *
@@ -309,14 +310,19 @@ function modifyReactionsPost(post, isAnonimous = true) {
   return newPost;
 }
 
-async function filterFeeds(userId, feeds = []) {
+async function filterFeeds(userId, feeds = [], feed_id = null) {
   const newResult = [];
 
   for (const item of feeds || []) {
     const now = moment().valueOf();
     const dateExpired = moment(item?.expired_at).valueOf();
 
-    if (dateExpired < now) continue;
+    if (dateExpired < now) {
+      if (feed_id) {
+        deleteActivityFromUserFeed('topic', feed_id, item.id);
+      }
+      continue;
+    }
     let newItem = {...item};
 
     if (newItem.anonimity) {

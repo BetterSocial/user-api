@@ -18,35 +18,62 @@ class TopicPage {
     this.getTopicPageById = this.getTopicPageById.bind(this);
   }
 
+  async getFeedTopicPages(payload) {
+    const topicPages = await this._getStreamService.getTopicPages(
+      payload.id,
+      payload.limit,
+      payload.offset
+    );
+    let newTopicPagesWithBlock = new BlockServices(
+      payload.listBlockUser,
+      payload.listBlockDomain,
+      payload.listPostAnonymous
+    ).getHasBlock(topicPages);
+    let results = await filterFeeds(payload.userId, newTopicPagesWithBlock, payload.id);
+    return results;
+  }
+
+  async modifiedFeed(userId, post) {
+    if (post.verb === POST_VERB_POLL) {
+      let postPoll = await modifyPollPostObject(userId, post);
+      return postPoll;
+    } else {
+      return post;
+    }
+  }
+
   async getTopicPages(req, res) {
     let {id} = req.params;
     let {limit = MAX_FEED_FETCH_LIMIT, offset = 0} = req.query;
 
     try {
       this._validator.validateGetTopicPages({id});
-      const topicPages = await this._getStreamService.getTopicPages(id, limit, offset);
-
       const listBlockUser = await getListBlockUser(req.userId);
       const listBlockDomain = await getBlockDomain(req.userId);
       const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
-      let newTopicPagesWithBlock = new BlockServices(
+
+      let data = [];
+      let payload = {
         listBlockUser,
         listBlockDomain,
-        listPostAnonymous
-      ).getHasBlock(topicPages);
-      let data = [];
-
-      newTopicPagesWithBlock = await filterFeeds(req.userId, newTopicPagesWithBlock);
-
-      for (let post of newTopicPagesWithBlock) {
-        if (post?.is_hide) continue;
-
-        if (post.verb === POST_VERB_POLL) {
-          let postPoll = await modifyPollPostObject(req.userId, post);
-          data.push(postPoll);
-        } else {
-          data.push(post);
+        listPostAnonymous,
+        id,
+        limit,
+        offset,
+        userId: req.userId
+      };
+      let fetch = 0;
+      while (data.length < limit && fetch < MAX_FEED_FETCH_LIMIT) {
+        if (fetch !== 0) {
+          payload.offset = parseInt(payload.offset) + parseInt(limit);
         }
+        let newTopicPagesWithBlock = await this.getFeedTopicPages(payload);
+
+        for (let post of newTopicPagesWithBlock) {
+          if (post?.is_hide) continue;
+          data.push(await this.modifiedFeed(req.userId, post));
+        }
+        fetch += 1;
       }
 
       res.status(200).json({
@@ -54,7 +81,7 @@ class TopicPage {
         status: 'success',
         message: 'Success get topic pages',
         data: data || [],
-        offset: parseInt(offset) + parseInt(topicPages.length)
+        offset: parseInt(offset)
       });
     } catch (error) {
       console.log(error);

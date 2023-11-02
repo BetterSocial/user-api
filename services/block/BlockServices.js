@@ -11,7 +11,6 @@ class BlockServices {
   getHasBlock(post) {
     try {
       let newArr = this.#privateProcessBlock(post);
-      console.log(newArr);
       return this.#processAnonymousBlock(newArr);
     } catch (err) {
       console.log(err);
