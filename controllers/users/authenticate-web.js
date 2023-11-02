@@ -22,44 +22,67 @@ const authenticateWeb = async (req, res) => {
    * @type {RegisterBody}
    */
   const users = req.body;
-  users.username = 'auth_web_' + moment().format('YYYYMMDDHHmmssSSS');
+
+  const checkUser = await User.findOne({
+    where: {
+      human_id: users.human_id
+    }
+  });
 
   let insertedObject = {};
 
-  /**
-   * Inserting data to Postgres DB
-   */
-  try {
-    insertedObject = await sequelize.transaction(async (t) => {
-      const user = await UsersFunction.register(User, users, t);
-      const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
+  if (checkUser) {
+    insertedObject = {
+      user: checkUser,
+      anonymousUser: await UsersFunction.findAnonymousUserId(User, checkUser.dataValues.user_id, {
+        raw: false
+      })
+    };
+  } else {
+    users.username = 'auth_web_' + moment().format('YYYYMMDDHHmmssSSS');
+    users.verified_status = 'UNVERIFIED';
+    /**
+     * Inserting data to Postgres DB
+     */
+    try {
+      insertedObject = await sequelize.transaction(async (t) => {
+        const user = await UsersFunction.register(User, users, t);
+        const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
 
-      return {
-        user,
-        anonymousUser
-      };
-    });
-  } catch (e) {
-    console.log('error on sql transaction', e);
-    return res.status(500).json({
-      status: 'error on sql transaction',
-      code: 500,
-      message: e
-    });
+        return {
+          user,
+          anonymousUser
+        };
+      });
+    } catch (e) {
+      console.log('error on sql transaction', e);
+      return res.status(500).json({
+        status: 'error on sql transaction',
+        code: 500,
+        message: e
+      });
+    }
+    /**
+     * Inserting data to Postgres DB (END)
+     */
   }
-  /**
-   * Inserting data to Postgres DB (END)
-   */
 
   /**
    * Creating User to Getstream
    */
   try {
-    token = await BetterSocialCore.user.createUser(insertedObject?.user);
-    anonymousToken = Getstream.core.createToken(
-      insertedObject?.anonymousUser?.user_id?.toLowerCase()
-    );
-    await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
+    if (checkUser) {
+      token = Getstream.core.createToken(insertedObject?.user?.user_id);
+      anonymousToken = Getstream.core.createToken(
+        insertedObject?.anonymousUser?.user_id?.toLowerCase()
+      );
+    } else {
+      token = await BetterSocialCore.user.createUser(insertedObject?.user);
+      anonymousToken = Getstream.core.createToken(
+        insertedObject?.anonymousUser?.user_id?.toLowerCase()
+      );
+      await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
+    }
   } catch (e) {
     console.log('error on inserting user to getstream creating', e);
     return res.status(500).json({
