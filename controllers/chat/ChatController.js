@@ -156,7 +156,7 @@ module.exports = {
     }
   },
   getChannels: async (req, res) => {
-    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
+    const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
     try {
       await client.connectUser({id: req.userId}, req.token);
       let channels = await client.queryChannels({members: {$in: [req.userId]}}, [

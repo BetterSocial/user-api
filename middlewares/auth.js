@@ -54,7 +54,7 @@ module.exports.isAuthV2 = async (req, res, next) => {
   try {
     const tokenPayload = await isAuthTokenValid(token, process.env.SECRET);
     const user = await UsersFunction.findUserById(User, tokenPayload.user_id);
-    UsersFunction.updateLastActiveAt(User, user?.user_id);
+    await UsersFunction.updateLastActiveAt(User, user?.user_id);
     // non anon only
     if (!user || user?.is_anonymous) {
       return res.status(403).json(createResponse(403, 'Forbidden access'));

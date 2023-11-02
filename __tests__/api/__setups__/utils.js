@@ -49,6 +49,7 @@ const createUser = async (data) => {
       last_active_at: new Date(),
       status: 'Y',
       is_anonymous: false,
+      verified_status: 'VERIFIED',
       ...data
     });
 
