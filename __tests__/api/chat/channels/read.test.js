@@ -6,8 +6,8 @@ const {
   createReusablePreventAnonymousUserTestSuite
 } = require('../../__authTest__/createReusableAuthTestSuite');
 
-beforeEach(() => {
-  generateUserAndFollowSeeds();
+beforeEach(async () => {
+  await generateUserAndFollowSeeds();
 });
 
 describe('POST /chat/channels/read', () => {
