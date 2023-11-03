@@ -88,6 +88,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM('VERIFIED', 'UNVERIFIED'),
         allowNull: false,
         defaultValue: 'VERIFIED'
+      },
+      updated_at: {
+        type: 'TIMESTAMP',
+        allowNull: false,
+        defaultValue: '2023-01-01 00:00:00'
+      },
+      created_at: {
+        type: 'TIMESTAMP',
+        allowNull: false,
+        defaultValue: '2023-01-01 00:00:00'
       }
     },
     {
