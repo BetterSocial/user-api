@@ -27,7 +27,9 @@ const __queryChannelBuilder = async (client, userId, limit, offset) => {
  * @param {import('stream-chat').Channel} channel
  * @returns
  */
-const __transformChannelData = (channel) => {
+const __filterAndTransformChannelData = (acc, channel) => {
+  console.log('channel');
+  console.log(channel);
   const newChannel = {...channel.data};
   delete newChannel.config;
   delete newChannel.own_capabilities;
@@ -35,19 +37,21 @@ const __transformChannelData = (channel) => {
   const messageLength = channel.state.messages?.length;
   const channelType = newChannel?.channel_type;
 
-  if (messageLength === 0 && channelType === CHANNEL_TYPE.TOPIC) return;
+  if (messageLength === 0 && channelType === CHANNEL_TYPE.TOPIC) return acc;
 
   const members = [];
   Object.keys(channel.state.members).forEach((member) => {
     members.push(channel?.state?.members[member]);
   });
 
-  return {
+  acc.push({
     ...newChannel,
     members,
     unreadCount: channel.state.unreadCount,
     messages: channel.state.messages
-  };
+  });
+
+  return acc;
 };
 
 const getSignedChannelList = async (req, res) => {
@@ -80,7 +84,8 @@ const getSignedChannelList = async (req, res) => {
       queriedChannels.push(...response);
     });
 
-    const channels = queriedChannels.map(__transformChannelData);
+    // const channels = queriedChannels.map(__transformChannelData);
+    const channels = queriedChannels.reduce(__filterAndTransformChannelData, []);
     return res.status(200).json(responseSuccess('Success retrieve channels', channels));
   } catch (error) {
     return res.status(error.statusCode ?? error.status ?? 400).json({
