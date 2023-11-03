@@ -84,7 +84,6 @@ const getSignedChannelList = async (req, res) => {
       queriedChannels.push(...response);
     });
 
-    // const channels = queriedChannels.map(__transformChannelData);
     const channels = queriedChannels.reduce(__filterAndTransformChannelData, []);
     return res.status(200).json(responseSuccess('Success retrieve channels', channels));
   } catch (error) {
