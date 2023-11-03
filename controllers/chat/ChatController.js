@@ -156,13 +156,13 @@ module.exports = {
     }
   },
   getChannels: async (req, res) => {
-    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
+    const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
     try {
       await client.connectUser({id: req.userId}, req.token);
       let channels = await client.queryChannels({members: {$in: [req.userId]}}, [
         {last_message_at: -1}
       ]);
-      await client.disconnectUser();
+
       channels = channels.map((channel) => {
         const newChannel = {...channel.data};
         delete newChannel.config;
@@ -181,12 +181,13 @@ module.exports = {
       });
       return res.status(200).json(responseSuccess('Success retrieve channels', channels));
     } catch (error) {
-      await client.disconnectUser();
       return res.status(error.statusCode ?? error.status ?? 400).json({
         status: 'error',
         code: error.statusCode ?? error.status ?? 400,
         message: error.message
       });
+    } finally {
+      await client.disconnectUser();
     }
   },
   getChannel: async (req, res) => {

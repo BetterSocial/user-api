@@ -1,10 +1,18 @@
+const {StreamChat} = require('stream-chat');
 const {responseSuccess} = require('../../utils/Responses');
-const GetstreamSingleton = require('../../vendor/getstream/singleton');
+const {CHANNEL_TYPE} = require('../../helpers/constants');
 
 const MAX_ITERATIONS = 10;
 
-const __queryChannelBuilder = async (userId, limit, offset) => {
-  const client = GetstreamSingleton.getChatInstance();
+/**
+ *
+ * @param {StreamChat} client
+ * @param {string} userId
+ * @param {number} limit
+ * @param {number} offset
+ * @returns
+ */
+const __queryChannelBuilder = async (client, userId, limit, offset) => {
   const channels = await client.queryChannels({members: {$in: [userId]}}, [{last_message_at: -1}], {
     limit: limit,
     offset: offset,
@@ -14,22 +22,34 @@ const __queryChannelBuilder = async (userId, limit, offset) => {
   return channels;
 };
 
-const __transformChannelData = (channel) => {
+/**
+ *
+ * @param {import('stream-chat').Channel} channel
+ * @returns
+ */
+const __filterAndTransformChannelData = (acc, channel) => {
   const newChannel = {...channel.data};
   delete newChannel.config;
   delete newChannel.own_capabilities;
+
+  const messageLength = channel.state.messages?.length;
+  const channelType = newChannel?.channel_type;
+
+  if (messageLength === 0 && channelType === CHANNEL_TYPE.TOPIC) return acc;
 
   const members = [];
   Object.keys(channel.state.members).forEach((member) => {
     members.push(channel?.state?.members[member]);
   });
 
-  return {
+  acc.push({
     ...newChannel,
     members,
     unreadCount: channel.state.unreadCount,
     messages: channel.state.messages
-  };
+  });
+
+  return acc;
 };
 
 const getSignedChannelList = async (req, res) => {
@@ -40,7 +60,7 @@ const getSignedChannelList = async (req, res) => {
   const queriedChannels = [];
   const promisedChannels = [];
 
-  const client = GetstreamSingleton.getChatInstance();
+  const client = new StreamChat(process.env.API_KEY, process.env.API_SECRET);
   try {
     await client.connectUser({id: req.userId}, req.token);
 
@@ -49,7 +69,7 @@ const getSignedChannelList = async (req, res) => {
 
       const batchSize = Math.min(30, limit - totalFetched);
       promisedChannels.push(
-        __queryChannelBuilder(userId, batchSize, Number(totalFetched) + Number(offset))
+        __queryChannelBuilder(client, userId, batchSize, Number(totalFetched) + Number(offset))
       );
       totalFetched += batchSize;
       if (totalFetched >= limit) {
@@ -62,7 +82,7 @@ const getSignedChannelList = async (req, res) => {
       queriedChannels.push(...response);
     });
 
-    const channels = queriedChannels.map(__transformChannelData);
+    const channels = queriedChannels.reduce(__filterAndTransformChannelData, []);
     return res.status(200).json(responseSuccess('Success retrieve channels', channels));
   } catch (error) {
     return res.status(error.statusCode ?? error.status ?? 400).json({
