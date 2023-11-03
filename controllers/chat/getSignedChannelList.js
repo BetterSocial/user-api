@@ -28,8 +28,6 @@ const __queryChannelBuilder = async (client, userId, limit, offset) => {
  * @returns
  */
 const __filterAndTransformChannelData = (acc, channel) => {
-  console.log('channel');
-  console.log(channel);
   const newChannel = {...channel.data};
   delete newChannel.config;
   delete newChannel.own_capabilities;
