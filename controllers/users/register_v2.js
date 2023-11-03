@@ -28,47 +28,87 @@ const registerV2 = async (req, res) => {
   const {data} = req.body;
   const {users, follows, local_community, topics} = data;
 
+  const checkUser = await User.findOne({
+    where: {
+      human_id: users.human_id
+    }
+  });
+
   let insertedObject = {};
+  let isUnverifiedUser = checkUser && checkUser.verified_status === 'UNVERIFIED';
 
-  /**
-   * Inserting data to Postgres DB
-   */
-  try {
-    insertedObject = await sequelize.transaction(async (t) => {
-      const user = await UsersFunction.register(User, users, t);
-      const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
+  if (isUnverifiedUser) {
+    let updatedUser;
+    try {
+      await checkUser.update(users);
+      updatedUser = await checkUser.save();
+    } catch (e) {
+      return res.status(500).json({
+        status: 'error on sql transaction',
+        code: 500,
+        message: e
+      });
+    }
 
-      const topicRegistered = await TopicFunction.findAllByTopicIds(Topics, topics, t, true);
-      const locations = await LocationFunction.getAllLocationByIds(Locations, local_community, t);
+    const topicRegistered = await TopicFunction.findAllByTopicIds(Topics, topics);
+    const locations = await LocationFunction.getAllLocationByIds(Locations, local_community);
 
-      return {
-        user,
-        anonymousUser,
-        topics: topicRegistered,
-        locations
-      };
-    });
-  } catch (e) {
-    console.log('error on sql transaction', e);
-    return res.status(500).json({
-      status: 'error on sql transaction',
-      code: 500,
-      message: e
-    });
+    insertedObject = {
+      user: updatedUser,
+      anonymousUser: await UsersFunction.findAnonymousUserId(User, updatedUser.user_id, {
+        raw: false
+      }),
+      topics: topicRegistered,
+      locations
+    };
+  } else {
+    /**
+     * Inserting data to Postgres DB
+     */
+    try {
+      insertedObject = await sequelize.transaction(async (t) => {
+        const user = await UsersFunction.register(User, users, t);
+        const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
+
+        const topicRegistered = await TopicFunction.findAllByTopicIds(Topics, topics, t, true);
+        const locations = await LocationFunction.getAllLocationByIds(Locations, local_community, t);
+
+        return {
+          user,
+          anonymousUser,
+          topics: topicRegistered,
+          locations
+        };
+      });
+    } catch (e) {
+      console.log('error on sql transaction', e);
+      return res.status(500).json({
+        status: 'error on sql transaction',
+        code: 500,
+        message: e
+      });
+    }
+    /**
+     * Inserting data to Postgres DB (END)
+     */
   }
-  /**
-   * Inserting data to Postgres DB (END)
-   */
 
   /**
    * Creating User to Getstream
    */
   try {
-    token = await BetterSocialCore.user.createUser(insertedObject?.user);
-    anonymousToken = Getstream.core.createToken(
-      insertedObject?.anonymousUser?.user_id?.toLowerCase()
-    );
-    await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
+    if (isUnverifiedUser) {
+      token = Getstream.core.createToken(insertedObject?.user?.user_id);
+      anonymousToken = Getstream.core.createToken(
+        insertedObject?.anonymousUser?.user_id?.toLowerCase()
+      );
+    } else {
+      token = await BetterSocialCore.user.createUser(insertedObject?.user);
+      anonymousToken = Getstream.core.createToken(
+        insertedObject?.anonymousUser?.user_id?.toLowerCase()
+      );
+      await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
+    }
   } catch (e) {
     console.log('error on inserting user to getstream creating', e);
     return res.status(500).json({
