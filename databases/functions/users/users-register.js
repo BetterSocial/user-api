@@ -21,7 +21,8 @@ module.exports = async (model, users, transaction = null) => {
       created_at: myTs,
       updated_at: myTs,
       last_active_at: myTs,
-      status: 'Y'
+      status: 'Y',
+      verified_status: users?.verified_status
     },
     {transaction, returning: true}
   );
