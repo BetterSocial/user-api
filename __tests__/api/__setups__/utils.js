@@ -1,6 +1,7 @@
 const {exec} = require('child_process');
 const {User} = require('../../../databases/models');
 const TestConstants = require('../__utils__/constant');
+const moment = require('moment');
 
 if (process.env.EXECUTABLE_PHP === undefined) {
   throw new Error('Please set EXECUTABLE_PHP env');
@@ -49,6 +50,8 @@ const createUser = async (data) => {
       last_active_at: new Date(),
       status: 'Y',
       is_anonymous: false,
+      created_at: moment.utc().format('YYYY-MM-DD HH:mm:ss'),
+      updated_at: moment.utc().format('YYYY-MM-DD HH:mm:ss'),
       verified_status: 'VERIFIED',
       ...data
     });

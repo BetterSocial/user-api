@@ -91,8 +91,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       updated_at: {
         type: 'TIMESTAMP',
-        allowNull: false,
-        defaultValue: '2023-01-01 00:00:00'
+        allowNull: false
       },
       created_at: {
         type: 'TIMESTAMP',
@@ -104,6 +103,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'User',
       tableName: 'users',
+      timestamps: false,
       createdAt: 'created_at',
       updatedAt: 'updated_at'
     }

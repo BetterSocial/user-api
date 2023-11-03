@@ -5,7 +5,7 @@ const CryptoUtils = require('../../../utils/crypto');
 
 /**
  *
- * @param {Model} model
+ * @param {import('sequelize').Model} model
  * @param {String} userId
  * @param {Transaction} transaction
  */

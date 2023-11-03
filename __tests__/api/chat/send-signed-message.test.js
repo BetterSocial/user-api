@@ -6,8 +6,8 @@ const {
 } = require('../__authTest__/createReusableAuthTestSuite');
 const generateUserAndFollowSeeds = require('../__utils__/seeds/users_and_follow_seeds');
 
-beforeEach(() => {
-  generateUserAndFollowSeeds();
+beforeEach(async () => {
+  await generateUserAndFollowSeeds();
 });
 
 describe('POST /chat/send-signed-message', () => {
