@@ -7,9 +7,9 @@ const {createUser} = require('../__setups__/utils');
 jest.mock('stream-chat');
 jest.mock('jsonwebtoken');
 
-beforeEach(() => {
+beforeEach(async () => {
   jest.clearAllMocks();
-  createUser();
+  await createUser();
 });
 
 const __generateQueryChannelsParamsCall = (userId, limit, offset) => {

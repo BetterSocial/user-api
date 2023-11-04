@@ -1,7 +1,10 @@
+const {NOTIFICATION_TOPIC_NAME_PREFIX} = require('../helpers/constants');
+
 const emojiUnicode = require('emoji-unicode');
 const _ = require('lodash');
 
 const convertString = (str, from, to) => {
+  if (str === null || str === undefined) return str;
   return str?.split(from)?.join(to);
 };
 
@@ -144,14 +147,27 @@ const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anony
   };
 };
 
+const removePrefixTopic = (topicWithPrefix) => {
+  if (topicWithPrefix === null || topicWithPrefix === undefined) return;
+
+  if (topicWithPrefix.indexOf(NOTIFICATION_TOPIC_NAME_PREFIX) > -1) {
+    const topic = convertString(topicWithPrefix, NOTIFICATION_TOPIC_NAME_PREFIX, '');
+    return topic;
+  }
+
+  return topicWithPrefix;
+};
+
 module.exports = {
+  dateCreted,
+
   capitalizing,
+  convertLocationFromModel,
   convertString,
   convertTopicWithEmoji,
-  convertLocationFromModel,
-  dateCreted,
-  getToken,
-  getFirstStringFromSplit,
   convertingUserFormatForLocation,
-  handleAnonymousData
+  getFirstStringFromSplit,
+  getToken,
+  handleAnonymousData,
+  removePrefixTopic
 };
