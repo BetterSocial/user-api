@@ -16,9 +16,6 @@ class GetstreamService {
     };
     const res = await this._client.feed('topic', id).get(query);
     let data = res.results;
-    if (!data.length) {
-      throw new InvariantError('Topic page not found');
-    }
     return data;
   }
 
