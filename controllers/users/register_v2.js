@@ -40,6 +40,7 @@ const registerV2 = async (req, res) => {
   if (isUnverifiedUser) {
     let updatedUser;
     try {
+      users.verified_status = 'VERIFIED';
       await checkUser.update(users);
       updatedUser = await checkUser.save();
     } catch (e) {
