@@ -13,7 +13,7 @@ const sendNotification = async (
   const payload = {
     notification: {
       title: userNameFollower,
-      body: `${userNameFollower} just started following you. Say 'Hi'!`
+      body: `${userNameFollower} followed you. Say 'Hi'!`
       // click_action: "OPEN_ACTIVITY_1",
     },
     data: {

@@ -6,16 +6,16 @@ const chatController = require('../controllers/chat/ChatController');
 const auth = require('../middlewares/auth');
 const isTargetUserAllowingAnonDMMiddleware = require('../middlewares/chat/isTargetUserAllowingAnonDMMiddleware');
 const SuccessMiddleware = require('../middlewares/success');
-const sendSignedMessage = require('../controllers/chat/sendSignedMessage');
-const setSignedChannelAsRead = require('../controllers/chat/setSignedChannelAsRead');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 const getSignedChannelList = require('../controllers/chat/getSignedChannelList');
+const {setSignedChannelAsRead, sendSignedMessage} = require('../controllers/chat');
 
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
 router.post('/add-members-channel', auth.isAuth, chatController.addMembers);
 router.post('/anonymous', auth.isAuthAnonim, chatController.sendAnonymous);
 router.post('/send-signed-message', auth.isAuthV2, sendSignedMessage);
+
 router.get('/channels', auth.isAuthAnonim, chatController.getChannels);
 router.get(
   '/channels/signed',

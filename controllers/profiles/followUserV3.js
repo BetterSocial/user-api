@@ -12,7 +12,8 @@ const UsersFunction = require('../../databases/functions/users');
 const {sendFollowMainFeedF2} = require('../../services/queue/mainFeedF2');
 
 module.exports = async (req, res) => {
-  const {user_id_followed, follow_source, username_follower, username_followed} = req.body;
+  const {user_id_followed, follow_source} = req.body;
+  const {user} = req;
 
   if (req?.userId === user_id_followed)
     return ErrorResponse.e403(res, 'Only allow following other profiles');
@@ -21,6 +22,11 @@ module.exports = async (req, res) => {
     await UserFollowUserFunction.checkIsUserFollowing(UserFollowUser, req?.userId, user_id_followed)
   )
     return ErrorResponse.e409(res, 'You have followed this user');
+
+  const targetUser = await UsersFunction.findUserById(User, user_id_followed);
+  if (!targetUser) {
+    return ErrorResponse.e404(res, 'User not found');
+  }
 
   try {
     await sequelize.transaction(async (t) => {
@@ -84,9 +90,16 @@ module.exports = async (req, res) => {
   try {
     await BetterSocialCore.fcmToken.sendMultiDeviceNotification(
       req?.userId,
-      username_follower,
+      user?.username,
       user_id_followed,
-      username_followed
+      targetUser?.username
+    );
+
+    Getstream.chat.sendFollowSystemMessage(
+      req?.userId,
+      user?.username,
+      user_id_followed,
+      targetUser?.username
     );
   } catch (e) {
     console.log('Error in follow user v3 fcm');

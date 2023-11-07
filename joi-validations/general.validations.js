@@ -2,6 +2,7 @@ const Joi = require('joi');
 
 /** Joi schema */
 const string = Joi.string().trim();
+const uuid = string.uuid();
 const number = Joi.number();
 const boolean = Joi.boolean();
 const dateIso = Joi.date().iso();
@@ -13,6 +14,7 @@ module.exports = {
   number,
   boolean,
   dateIso,
+  uuid,
   array,
   object
 };
