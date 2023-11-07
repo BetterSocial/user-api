@@ -8,25 +8,14 @@ const isTargetUserAllowingAnonDMMiddleware = require('../middlewares/chat/isTarg
 const SuccessMiddleware = require('../middlewares/success');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 const getSignedChannelList = require('../controllers/chat/getSignedChannelList');
-const {
-  sendFollowSystemMessage,
-  setSignedChannelAsRead,
-  sendSignedMessage
-} = require('../controllers/chat');
-const {ChatValidation} = require('../joi-validations/chat.validation');
-const {validate} = require('../middlewares/joi-validation/validate');
+const {setSignedChannelAsRead, sendSignedMessage} = require('../controllers/chat');
 
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
 router.post('/add-members-channel', auth.isAuth, chatController.addMembers);
 router.post('/anonymous', auth.isAuthAnonim, chatController.sendAnonymous);
 router.post('/send-signed-message', auth.isAuthV2, sendSignedMessage);
-router.post(
-  '/send-follow-system-message',
-  validate(ChatValidation.sendFollowSystemMessage),
-  auth.isAuthV2,
-  sendFollowSystemMessage
-);
+
 router.get('/channels', auth.isAuthAnonim, chatController.getChannels);
 router.get(
   '/channels/signed',
