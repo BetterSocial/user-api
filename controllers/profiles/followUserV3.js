@@ -94,13 +94,14 @@ module.exports = async (req, res) => {
       user_id_followed,
       targetUser?.username
     );
-
-    Getstream.chat.sendFollowSystemMessage(
-      req?.userId,
-      user?.username,
-      user_id_followed,
-      targetUser?.username
-    );
+    if (process.env.FEATURE_FLAG_SEND_FOLLOW_SYSTEM_MESSAGE === 'true') {
+      Getstream.chat.sendFollowSystemMessage(
+        req?.userId,
+        user?.username,
+        user_id_followed,
+        targetUser?.username
+      );
+    }
   } catch (e) {
     console.log('Error in follow user v3 fcm');
     console.log(e);
