@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 // eslint-disable-next-line import/no-unresolved
 const {initializeApp, cert} = require('firebase-admin/app');
@@ -57,6 +58,7 @@ Sentry.init({
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
+app.use(cors());
 app.disable('x-powered-by');
 app.use('/', HomeRouter);
 app.use(logger('dev'));
