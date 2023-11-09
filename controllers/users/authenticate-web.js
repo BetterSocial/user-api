@@ -7,6 +7,7 @@ const {User} = require('../../databases/models');
 const BetterSocialCore = require('../../services/bettersocial');
 const {createRefreshToken} = require('../../services/jwt');
 const Getstream = require('../../vendor/getstream');
+const HumanIdService = require('../../vendor/humanid');
 
 /**
  *
@@ -21,26 +22,44 @@ const authenticateWeb = async (req, res) => {
   /**
    * @type {RegisterBody}
    */
-  const users = req.body;
+  const {exchangeToken} = req.body;
 
-  const checkUser = await User.findOne({
-    where: {
-      human_id: users.human_id
-    }
-  });
+  const verifyTokenResponse = await HumanIdService.verifyExchangeToken(exchangeToken);
+  if (!verifyTokenResponse.success) {
+    return res.status(500).json({
+      status: 'error on verify exchange token',
+      code: 500
+    });
+  }
+
+  const {data} = verifyTokenResponse || {};
+  const {appUserId} = data || {};
+
+  if (!appUserId) {
+    return res.status(500).json({
+      status: 'App user id is required',
+      code: 500
+    });
+  }
+
+  const checkUser = await UsersFunction.findUserByHumanId(User, appUserId);
 
   let insertedObject = {};
 
   if (checkUser) {
     insertedObject = {
       user: checkUser,
-      anonymousUser: await UsersFunction.findAnonymousUserId(User, checkUser.dataValues.user_id, {
+      anonymousUser: await UsersFunction.findAnonymousUserId(User, checkUser.user_id, {
         raw: false
       })
     };
   } else {
-    users.username = 'auth_web_' + moment().format('YYYYMMDDHHmmssSSS');
-    users.verified_status = 'UNVERIFIED';
+    let users = {
+      username: 'auth_web_' + moment().format('YYYYMMDDHHmmssSSS'),
+      verified_status: 'UNVERIFIED',
+      human_id: appUserId,
+      country_code: 'US'
+    };
     /**
      * Inserting data to Postgres DB
      */
