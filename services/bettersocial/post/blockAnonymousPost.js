@@ -11,6 +11,7 @@ const {
 } = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const RedisBlockHelper = require('../../redis/helper/RedisBlockHelper');
+const BetterSocialScoreBlockUser = require('../score/block-user');
 
 /**
  * @typedef {Object} BetterSocialBlockAnonymousPostV2OptionalParams
@@ -41,7 +42,6 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
   }
 
   const authorAnonymousUserId = post?.actor?.id || null;
-
   console.log(`${selfAnonymousUserId?.user_id} vs ${authorAnonymousUserId}`);
   if (selfAnonymousUserId?.user_id === authorAnonymousUserId)
     return {
@@ -86,6 +86,7 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
       message: e?.message || 'Error in block user v2 redis'
     };
   }
+  BetterSocialScoreBlockUser(selfUserId, authorAnonymousUserId, postId);
 
   try {
     await Getstream.feed.unfollowAnonUserByBlockAnonPost(token, selfUserId, authorAnonymousUserId);
