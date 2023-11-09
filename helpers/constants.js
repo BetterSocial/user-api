@@ -38,10 +38,17 @@ const USERS_DEFAULT_IMAGE =
   'https://res.cloudinary.com/hpjivutj2/image/upload/v1680929851/default-profile-picture_vrmmdn.png';
 
 const CHANNEL_TYPE = {
-  CHAT: 1,
-  GROUP: 2,
+  CHAT: 0,
+  GROUP: 1,
+  GROUP_LOCATION: 2,
   TOPIC: 3,
   ANONYMOUS: 4
+};
+
+const CHANNEL_TYPE_STRING = {
+  CHAT: 'messaging',
+  GROUP: 'group',
+  TOPIC: 'topic'
 };
 
 const NOTIFICATION_TOPIC_NAME_PREFIX = 'topic_';
@@ -53,6 +60,7 @@ module.exports = {
   BLOCK_POST_ANONYMOUS,
   BLOCK_POST_ANONYMOUS_AUTHOR,
   CHANNEL_TYPE,
+  CHANNEL_TYPE_STRING,
   CONTENT_TYPE_COMMENT,
   CONTENT_TYPE_POST,
   GETSTREAM_RANKING_METHOD,

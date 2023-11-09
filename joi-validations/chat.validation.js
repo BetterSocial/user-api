@@ -1,4 +1,4 @@
-const {uuid} = require('./general.validations');
+const {uuid, array} = require('./general.validations');
 
 const ChatValidation = {
   sendFollowSystemMessage: {
@@ -6,6 +6,9 @@ const ChatValidation = {
       channel_id: uuid.required(),
       target_follow_user_id: uuid.required()
     }
+  },
+  findOrCreateChannelBySignedSender: {
+    members: array(uuid).min(1)
   }
 };
 
