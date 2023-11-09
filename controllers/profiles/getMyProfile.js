@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
     const getFollowingCountResult = getFollowingCount?.[0]?.[0]?.count_following;
 
-    delete copyUser.following;
+    copyUser.following = parseInt(getFollowingCountResult || 0);
     delete copyUser.follower;
 
     copyUser.following_symbol = checkMoreOrLess(getFollowingCountResult);
