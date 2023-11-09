@@ -89,6 +89,9 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
   }
 
   BetterSocialScoreBlockUser(selfUserId, targetUserId, postId);
+  if (targetAnonymousUserId?.user_id && postId) {
+    BetterSocialScoreBlockUser(selfUserId, targetAnonymousUserId?.user_id, '');
+  }
 
   try {
     await Getstream.feed.unfollowUser(token, selfUserId, targetUserId);
