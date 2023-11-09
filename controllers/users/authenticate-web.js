@@ -1,6 +1,10 @@
+const moment = require('moment');
+
 const UsersFunction = require('../../databases/functions/users');
+const {sequelize} = require('../../databases/models');
 
 const {User} = require('../../databases/models');
+const BetterSocialCore = require('../../services/bettersocial');
 const {createRefreshToken} = require('../../services/jwt');
 const Getstream = require('../../vendor/getstream');
 const HumanIdService = require('../../vendor/humanid');
@@ -50,20 +54,54 @@ const authenticateWeb = async (req, res) => {
       })
     };
   } else {
-    return res.status(500).json({
-      status: 'Human id is not found',
-      code: 500
-    });
+    let users = {
+      username: 'auth_web_' + moment().format('YYYYMMDDHHmmssSSS'),
+      verified_status: 'UNVERIFIED',
+      human_id: appUserId,
+      country_code: 'US'
+    };
+    /**
+     * Inserting data to Postgres DB
+     */
+    try {
+      insertedObject = await sequelize.transaction(async (t) => {
+        const user = await UsersFunction.register(User, users, t);
+        const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
+
+        return {
+          user,
+          anonymousUser
+        };
+      });
+    } catch (e) {
+      console.log('error on sql transaction', e);
+      return res.status(500).json({
+        status: 'error on sql transaction',
+        code: 500,
+        message: e
+      });
+    }
+    /**
+     * Inserting data to Postgres DB (END)
+     */
   }
 
   /**
    * Creating User to Getstream
    */
   try {
-    token = Getstream.core.createToken(insertedObject?.user?.user_id);
-    anonymousToken = Getstream.core.createToken(
-      insertedObject?.anonymousUser?.user_id?.toLowerCase()
-    );
+    if (checkUser) {
+      token = Getstream.core.createToken(insertedObject?.user?.user_id);
+      anonymousToken = Getstream.core.createToken(
+        insertedObject?.anonymousUser?.user_id?.toLowerCase()
+      );
+    } else {
+      token = await BetterSocialCore.user.createUser(insertedObject?.user);
+      anonymousToken = Getstream.core.createToken(
+        insertedObject?.anonymousUser?.user_id?.toLowerCase()
+      );
+      await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
+    }
   } catch (e) {
     console.log('error on inserting user to getstream creating', e);
     return res.status(500).json({
