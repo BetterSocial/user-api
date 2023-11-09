@@ -1,12 +1,9 @@
-const moment = require('moment');
-
 const UsersFunction = require('../../databases/functions/users');
-const {sequelize} = require('../../databases/models');
 
 const {User} = require('../../databases/models');
-const BetterSocialCore = require('../../services/bettersocial');
 const {createRefreshToken} = require('../../services/jwt');
 const Getstream = require('../../vendor/getstream');
+const HumanIdService = require('../../vendor/humanid');
 
 /**
  *
@@ -21,68 +18,52 @@ const authenticateWeb = async (req, res) => {
   /**
    * @type {RegisterBody}
    */
-  const users = req.body;
+  const {exchangeToken} = req.body;
 
-  const checkUser = await User.findOne({
-    where: {
-      human_id: users.human_id
-    }
-  });
+  const verifyTokenResponse = await HumanIdService.verifyExchangeToken(exchangeToken);
+  if (!verifyTokenResponse.success) {
+    return res.status(500).json({
+      status: 'error on verify exchange token',
+      code: 500
+    });
+  }
+
+  const {data} = verifyTokenResponse || {};
+  const {appUserId} = data || {};
+
+  if (!appUserId) {
+    return res.status(500).json({
+      status: 'App user id is required',
+      code: 500
+    });
+  }
+
+  const checkUser = await UsersFunction.findUserByHumanId(User, appUserId);
 
   let insertedObject = {};
 
   if (checkUser) {
     insertedObject = {
       user: checkUser,
-      anonymousUser: await UsersFunction.findAnonymousUserId(User, checkUser.dataValues.user_id, {
+      anonymousUser: await UsersFunction.findAnonymousUserId(User, checkUser.user_id, {
         raw: false
       })
     };
   } else {
-    users.username = 'auth_web_' + moment().format('YYYYMMDDHHmmssSSS');
-    users.verified_status = 'UNVERIFIED';
-    /**
-     * Inserting data to Postgres DB
-     */
-    try {
-      insertedObject = await sequelize.transaction(async (t) => {
-        const user = await UsersFunction.register(User, users, t);
-        const anonymousUser = await UsersFunction.registerAnonymous(User, user?.user_id, t);
-
-        return {
-          user,
-          anonymousUser
-        };
-      });
-    } catch (e) {
-      console.log('error on sql transaction', e);
-      return res.status(500).json({
-        status: 'error on sql transaction',
-        code: 500,
-        message: e
-      });
-    }
-    /**
-     * Inserting data to Postgres DB (END)
-     */
+    return res.status(500).json({
+      status: 'Human id is not found',
+      code: 500
+    });
   }
 
   /**
    * Creating User to Getstream
    */
   try {
-    if (checkUser) {
-      token = Getstream.core.createToken(insertedObject?.user?.user_id);
-      anonymousToken = Getstream.core.createToken(
-        insertedObject?.anonymousUser?.user_id?.toLowerCase()
-      );
-    } else {
-      token = await BetterSocialCore.user.createUser(insertedObject?.user);
-      anonymousToken = Getstream.core.createToken(
-        insertedObject?.anonymousUser?.user_id?.toLowerCase()
-      );
-      await BetterSocialCore.user.createAnonymousUser(insertedObject?.anonymousUser);
-    }
+    token = Getstream.core.createToken(insertedObject?.user?.user_id);
+    anonymousToken = Getstream.core.createToken(
+      insertedObject?.anonymousUser?.user_id?.toLowerCase()
+    );
   } catch (e) {
     console.log('error on inserting user to getstream creating', e);
     return res.status(500).json({
