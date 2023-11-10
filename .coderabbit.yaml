@@ -1,0 +1,22 @@
+language: "id"
+early_access: false
+reviews:
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  path_filters:
+    - "!**/.xml"
+  path_instructions:
+    - path: "**.js"
+      instructions: "Review the JavaScript code for conformity with the Google JavaScript style guide, highlighting any deviations."
+  auto_review:
+    enabled: true
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+    drafts: false
+    base_branches:
+      - "main"
+chat:
+  auto_reply: false
