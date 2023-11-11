@@ -65,7 +65,7 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
           selfUserId,
           targetAnonymousUserId?.user_id,
           source,
-          {transaction: t, message, postId, reason, isAnonymous: true}
+          {transaction: t, message, postId: '', reason, isAnonymous: true}
         );
     });
   } catch (e) {
