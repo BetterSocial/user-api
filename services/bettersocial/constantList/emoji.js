@@ -26,7 +26,7 @@ pushToEmojiList('Sheep', '🐑');
 pushToEmojiList('Goat', '🐐');
 pushToEmojiList('Camel', '🐪');
 pushToEmojiList('Llama', '🦙');
-pushToEmojiList('Girrafe', '🦒');
+pushToEmojiList('Giraffe', '🦒');
 pushToEmojiList('Elephant', '🐘');
 pushToEmojiList('Mammoth', '🦣');
 pushToEmojiList('Rhino', '🦏');
