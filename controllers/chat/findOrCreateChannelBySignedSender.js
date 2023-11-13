@@ -28,13 +28,18 @@ const findOrCreateChannelBySignedSender = async (req, res) => {
 
     const findOrCreateChannel = await channel.create();
     const channelName = findOrCreateChannel.members.map((member) => member.user.name).join(', ');
-    await channel.updatePartial({
-      set: {
-        channelType,
-        channel_type: channelType,
-        name: channelName
-      }
-    });
+
+    try {
+      await channel.updatePartial({
+        set: {
+          channelType,
+          channel_type: channelType,
+          name: channelName
+        }
+      });
+    } catch (e) {
+      console.debug(e);
+    }
 
     await client.disconnectUser();
 
