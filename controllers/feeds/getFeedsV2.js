@@ -19,6 +19,7 @@ const {
 } = require('../../utils/post');
 const {DomainPage, Locations, User} = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
+const {ACTIVITY_THRESHOLD} = require('../../config/constant');
 
 const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
   console.log('Get activity from getstream => ', feed, paramGetFeeds);
@@ -83,6 +84,13 @@ const isValidActivity = async (item, conditions) => {
     return false;
   }
 
+  // filter by threshold
+  const threshold = ACTIVITY_THRESHOLD[feed.toUpperCase()];
+  if ((item.final_score || 0) < threshold) {
+    console.log(`final_score under threshold => `, item.final_score);
+    return false;
+  }
+
   return true;
 };
 
@@ -141,7 +149,7 @@ module.exports = async (req, res) => {
 
         const feeds = await getActivtiesOnFeed(feed, token, paramGetFeeds);
         if (feeds.length === 0) {
-          if (feed === 'main_feed') {
+          if (feed === 'main_feed_broad') {
             break;
           } else {
             offset = 0;
