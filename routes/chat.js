@@ -38,6 +38,12 @@ router.post(
   validate(ChatValidation.moveToAnon),
   chatController.initChatMoveToAnon
 );
+router.post(
+  '/move-to-sign',
+  auth.isAuth,
+  //validate(ChatValidation.moveToAnon),
+  chatController.initChatMoveToSign
+);
 router.post('/users/:targetUserId', auth.isAuth, chatController.getMyAnonProfile);
 router.post(
   '/channels/read',

@@ -555,6 +555,70 @@ module.exports = {
       return ErrorResponse.e400(res, error.message);
     }
   },
+  initChatMoveToSign: async (req, res) => {
+    const {targetUser, message} = req.body;
+
+    let members = [targetUser];
+    if (!members.includes(req.userId)) members.push(req.userId);
+
+    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
+    try {
+      const userModel = await UsersFunction.findUserById(User, req?.userId);
+      const targetUserModel = await UsersFunction.findUserById(User, targetUser);
+      /**
+       * @type {import('stream-chat').OwnUserResponse}
+       */
+      const user = {
+        name: userModel?.username,
+        id: req?.userId,
+        image: userModel?.profile_pic_path,
+        username: userModel?.username
+      };
+
+      await client.connectUser(user, req.token);
+
+      const channel = client.channel('messaging', {members});
+      await channel.create();
+      try {
+        if (!channel?.data?.name) {
+          await channel.updatePartial({
+            set: {
+              channel_type: CHANNEL_TYPE.CHAT,
+              name: [userModel?.username, targetUserModel?.username].join(', ')
+            }
+          });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+
+      const chat = await channel.sendMessage({
+        user_id: req.userId,
+        text: message,
+        ...req.body
+      });
+
+      // get 100 messages
+      const channelFilters = {cid: 'messaging:' + channel.id};
+      const messageFilters = {created_at: {$lte: new Date()}};
+      const messageHistory = await client.search(channelFilters, messageFilters, {
+        sort: [{updated_at: -1}],
+        limit: 100
+      });
+
+      const response = {
+        ...chat,
+        messageHistory: messageHistory.results
+      };
+
+      await client.disconnectUser();
+
+      return res.status(200).json(responseSuccess('sent', response));
+    } catch (error) {
+      await client.disconnectUser();
+      return ErrorResponse.e400(res, error.message);
+    }
+  },
   getMyAnonProfile: async (req, res) => {
     const {targetUserId} = req.params;
 
