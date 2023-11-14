@@ -86,12 +86,16 @@ function getPollPostExpiredAt(pollsDuration, durationFeed) {
 }
 
 async function processPost({userId, isAnonimous, body, data, filteredTopics}) {
+  const expiredAt =
+    body.duration_feed !== 'never'
+      ? moment().utc().add(+body.duration_feed, 'day')
+      : moment().utc().add(100, 'years');
   const [newPost] = await Promise.all([
     Post.create({
       post_id: uuid(),
       author_user_id: userId,
       anonymous: isAnonimous,
-      duration: moment().utc().add(+body.duration_feed, 'day'),
+      duration: expiredAt,
       visibility_location_id: body?.location_id,
       post_content: body.message
     }),
