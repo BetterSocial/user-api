@@ -12,8 +12,7 @@ const isAnonymousUserBlockedFromSignUser = async (selfUserId, anonymousUserId) =
       user_id_blocked: anonymousUserId
     }
   });
-  if (!isBlockedFromSign) return false;
-  return isBlockedFromSign.post_id ? false : true;
+  return isBlockedFromSign && !isBlockedFromSign.post_id;
 };
 /**
  *
