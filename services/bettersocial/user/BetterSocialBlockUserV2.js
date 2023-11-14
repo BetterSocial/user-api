@@ -65,7 +65,7 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
           selfUserId,
           targetAnonymousUserId?.user_id,
           source,
-          {transaction: t, message, postId, reason, isAnonymous: true}
+          {transaction: t, message, postId: '', reason, isAnonymous: true}
         );
     });
   } catch (e) {
@@ -89,6 +89,7 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
   }
 
   BetterSocialScoreBlockUser(selfUserId, targetUserId, postId);
+  BetterSocialScoreBlockUser(selfUserId, targetAnonymousUserId?.user_id, '');
 
   try {
     await Getstream.feed.unfollowUser(token, selfUserId, targetUserId);
