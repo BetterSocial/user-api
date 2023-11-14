@@ -426,7 +426,7 @@ module.exports = {
       return ErrorResponse.e400(res, error.message);
     }
   },
-  initChatSourceAnonymous: async (req, res) => {
+  initChatMoveToAnon: async (req, res) => {
     const {
       targetUser,
       message,

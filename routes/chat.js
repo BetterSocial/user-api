@@ -36,7 +36,7 @@ router.post(
   '/move-to-anon',
   auth.isAuthAnonim,
   validate(ChatValidation.moveToAnon),
-  chatController.initChatSourceAnonymous
+  chatController.initChatMoveToAnon
 );
 router.post('/users/:targetUserId', auth.isAuth, chatController.getMyAnonProfile);
 router.post(
