@@ -11,7 +11,8 @@ const getSignedChannelList = require('../controllers/chat/getSignedChannelList')
 const {
   setSignedChannelAsRead,
   sendSignedMessage,
-  findOrCreateChannelBySignedSender
+  findOrCreateChannelBySignedSender,
+  moveToAnon
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -32,12 +33,7 @@ router.get(
 router.get('/channels/:channelId', auth.isAuthAnonim, chatController.getChannel);
 router.post('/init-chat', auth.isAuth, chatController.initChat);
 router.post('/init-chat-anonymous', auth.isAuthAnonim, chatController.initChatAnonymous);
-router.post(
-  '/move-to-anon',
-  auth.isAuthAnonim,
-  validate(ChatValidation.moveToAnon),
-  chatController.initChatMoveToAnon
-);
+router.post('/move-to-anon', auth.isAuthAnonim, validate(ChatValidation.moveToAnon), moveToAnon);
 router.post(
   '/move-to-sign',
   auth.isAuth,

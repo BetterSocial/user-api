@@ -16,8 +16,7 @@ const ChatValidation = {
       anon_user_info_color_name: string.required(),
       anon_user_info_emoji_code: string.required(),
       anon_user_info_emoji_name: string.required(),
-      targetUser: uuid.required(),
-      message: string.required()
+      targetUser: uuid.required()
     })
   }
 };
