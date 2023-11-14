@@ -6,6 +6,7 @@ const findMultipleUsersById = require('./find-multiple-user-by-id');
 const findSignedUserId = require('./find-signed-user-id');
 const findUserByHumanId = require('./find-user-by-human-id');
 const findUserById = require('./find-user-by-id');
+const findUserByUsername = require('./find-user-by-username');
 const register = require('./users-register');
 const registerAnonymous = require('./users-register-anonymous');
 const updateLastActiveAt = require('./update-last-active-at');
@@ -19,6 +20,7 @@ const UsersFunction = {
   findSignedUserId,
   findUserByHumanId,
   findUserById,
+  findUserByUsername,
   register,
   registerAnonymous,
   updateLastActiveAt
