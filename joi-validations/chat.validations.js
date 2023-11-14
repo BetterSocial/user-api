@@ -18,6 +18,11 @@ const ChatValidation = {
       anon_user_info_emoji_name: string.required(),
       targetUser: uuid.required()
     })
+  },
+  moveToSign: {
+    body: object({
+      targetUser: uuid.required()
+    })
   }
 };
 
