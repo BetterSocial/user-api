@@ -13,6 +13,7 @@ const UsersFunction = require('../../databases/functions/users');
 const moveToAnon = async (req, res) => {
   const {
     targetUser,
+    oldChannelId,
     anon_user_info_color_code,
     anon_user_info_color_name,
     anon_user_info_emoji_code,
@@ -39,49 +40,54 @@ const moveToAnon = async (req, res) => {
       await client.upsertUser({id: req.userId, name: `Anonymous ${anon_user_info_emoji_name}`});
     }
 
-    const channel = client.channel('messaging', {members});
-    const createdChannel = await channel.create();
-
-    try {
-      await channel.updatePartial({
-        set: {
-          channel_type: CHANNEL_TYPE.ANONYMOUS,
-          anon_user_info_color_code,
-          anon_user_info_color_name,
-          anon_user_info_emoji_code,
-          anon_user_info_emoji_name
-        }
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    const newChannel = client.channel('messaging', {members});
+    const createdChannel = await newChannel.create();
 
     const targets = members.filter((member) => member !== req.userId);
     await targets.map(async (target) => {
       const userModel = await UsersFunction.findUserById(User, target);
 
       if (userModel.is_anonymous) {
-        const exist = await ChatAnonUserInfo.count({
+        const checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
           where: {
-            channel_id: channel.id,
+            channel_id: oldChannelId,
             my_anon_user_id: req.userId,
             target_user_id: target
           }
         });
 
-        if (!exist) {
+        if (checkChatAnonUserInfo === null) {
           await ChatAnonUserInfo.create({
-            channel_id: channel.id,
+            channel_id: newChannel.id,
             my_anon_user_id: req.userId,
             target_user_id: target,
-            anon_user_info_color_code,
-            anon_user_info_color_name,
-            anon_user_info_emoji_code,
-            anon_user_info_emoji_name
+            anon_user_info_color_code:
+              checkChatAnonUserInfo?.anon_user_info_color_code || anon_user_info_color_code,
+            anon_user_info_color_name:
+              checkChatAnonUserInfo?.anon_user_info_color_name || anon_user_info_color_name,
+            anon_user_info_emoji_code:
+              checkChatAnonUserInfo?.anon_user_info_emoji_code || anon_user_info_emoji_code,
+            anon_user_info_emoji_name:
+              checkChatAnonUserInfo?.anon_user_info_emoji_name || anon_user_info_emoji_name
           });
         }
       }
     });
+
+    try {
+      await newChannel.updatePartial({
+        set: {
+          channel_type: CHANNEL_TYPE.ANONYMOUS,
+          anon_user_info_color_code,
+          anon_user_info_color_name,
+          anon_user_info_emoji_code,
+          anon_user_info_emoji_name,
+          better_channel_member: newChannel.state.members
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
 
     const targetsUserModel = await UsersFunction.findMultipleUsersById(User, targets);
     targetsUserModel.push({
@@ -95,7 +101,7 @@ const moveToAnon = async (req, res) => {
     });
 
     // get 100 messages
-    const channelFilters = {cid: 'messaging:' + channel.id};
+    const channelFilters = {cid: 'messaging:' + newChannel.id};
     const messageFilters = {created_at: {$lte: new Date()}};
     const messageHistory = await client.search(channelFilters, messageFilters, {
       sort: [{updated_at: -1}],
@@ -105,6 +111,7 @@ const moveToAnon = async (req, res) => {
     await client.disconnectUser();
 
     const response = {
+      channel: createdChannel,
       members: targetsUserModel,
       messageHistory: messageHistory.results
     };
