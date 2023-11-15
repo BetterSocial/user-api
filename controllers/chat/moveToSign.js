@@ -11,16 +11,16 @@ const UsersFunction = require('../../databases/functions/users');
  * @param {import("express").Response} res
  */
 const moveToSign = async (req, res) => {
-  const {targetUser, oldChannelId} = req.body;
+  const {targetUserId, oldChannelId} = req.body;
 
-  let members = [targetUser];
+  let members = [targetUserId];
   if (!members.includes(req.userId)) members.push(req.userId);
 
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
   try {
     const {userModel, targetUserModel} = await Promise.allSettled([
       UsersFunction.findUserById(User, req?.userId),
-      UsersFunction.findUserById(User, targetUser)
+      UsersFunction.findUserById(User, targetUserId)
     ]);
 
     /**
@@ -37,41 +37,60 @@ const moveToSign = async (req, res) => {
 
     const newChannel = client.channel('messaging', {members});
     const createdChannel = await newChannel.create();
+    let newStateMemberWithAnonInfo = newChannel.state.members;
+    let isContainAnonimous = false;
 
-    const targets = members.filter((member) => member !== req.userId);
-    await targets.map(async (target) => {
-      const userModel = await UsersFunction.findUserById(User, target);
+    await Promise.all(
+      members.map(async (member) => {
+        const userModel = await UsersFunction.findUserById(User, member);
 
-      if (userModel.is_anonymous) {
-        const checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
-          where: {
-            channel_id: oldChannelId,
-            my_anon_user_id: req.userId,
-            target_user_id: target
-          }
-        });
+        if (userModel.is_anonymous) {
+          isContainAnonimous = true;
 
-        if (checkChatAnonUserInfo !== null) {
-          await ChatAnonUserInfo.create({
-            channel_id: newChannel.id,
-            my_anon_user_id: req.userId,
-            target_user_id: target,
-            anon_user_info_color_code: checkChatAnonUserInfo?.anon_user_info_color_code,
-            anon_user_info_color_name: checkChatAnonUserInfo?.anon_user_info_color_name,
-            anon_user_info_emoji_code: checkChatAnonUserInfo?.anon_user_info_emoji_code,
-            anon_user_info_emoji_name: checkChatAnonUserInfo?.anon_user_info_emoji_name
+          const checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
+            where: {
+              channel_id: oldChannelId,
+              my_anon_user_id: member,
+              target_user_id: targetUserId
+            }
           });
+
+          if (checkChatAnonUserInfo !== null) {
+            let new_anon_user_info_color_code = checkChatAnonUserInfo?.anon_user_info_color_code;
+            let new_anon_user_info_color_name = checkChatAnonUserInfo?.anon_user_info_color_name;
+            let new_anon_user_info_emoji_code = checkChatAnonUserInfo?.anon_user_info_emoji_code;
+            let new_anon_user_info_emoji_name = checkChatAnonUserInfo?.anon_user_info_emoji_name;
+
+            newStateMemberWithAnonInfo[member].anon_user_info_color_code =
+              new_anon_user_info_color_code;
+            newStateMemberWithAnonInfo[member].anon_user_info_color_name =
+              new_anon_user_info_color_name;
+            newStateMemberWithAnonInfo[member].anon_user_info_emoji_code =
+              new_anon_user_info_emoji_code;
+            newStateMemberWithAnonInfo[member].anon_user_info_emoji_name =
+              new_anon_user_info_emoji_name;
+
+            await ChatAnonUserInfo.create({
+              channel_id: newChannel.id,
+              my_anon_user_id: member,
+              target_user_id: targetUserId,
+              anon_user_info_color_code: new_anon_user_info_color_code,
+              anon_user_info_color_name: new_anon_user_info_color_name,
+              anon_user_info_emoji_code: new_anon_user_info_emoji_code,
+              anon_user_info_emoji_name: new_anon_user_info_emoji_name
+            });
+          }
         }
-      }
-    });
+      })
+    );
 
     try {
       if (!newChannel?.data?.name) {
         await newChannel.updatePartial({
           set: {
-            channel_type: CHANNEL_TYPE.CHAT,
+            channel_type: isContainAnonimous ? CHANNEL_TYPE.ANONYMOUS : CHANNEL_TYPE.CHAT,
             name: [userModel?.username, targetUserModel?.username].join(', '),
-            better_channel_member: newChannel.state.members
+            better_channel_member: newStateMemberWithAnonInfo
           }
         });
       }
@@ -79,7 +98,7 @@ const moveToSign = async (req, res) => {
       console.log(e);
     }
 
-    const targetsUserModel = await UsersFunction.findMultipleUsersById(User, targets);
+    const targetsUserModel = await UsersFunction.findMultipleUsersById(User, members);
 
     // get 100 messages
     const channelFilters = {cid: 'messaging:' + newChannel.id};
