@@ -11,7 +11,7 @@ const UsersFunction = require('../../databases/functions/users');
  * @param {import("express").Response} res
  */
 const moveToSign = async (req, res) => {
-  const {targetUser} = req.body;
+  const {targetUser, oldChannelId} = req.body;
 
   let members = [targetUser];
   if (!members.includes(req.userId)) members.push(req.userId);
@@ -35,14 +35,43 @@ const moveToSign = async (req, res) => {
 
     await client.connectUser(user, req.token);
 
-    const channel = client.channel('messaging', {members});
-    await channel.create();
+    const newChannel = client.channel('messaging', {members});
+    const createdChannel = await newChannel.create();
+
+    const targets = members.filter((member) => member !== req.userId);
+    await targets.map(async (target) => {
+      const userModel = await UsersFunction.findUserById(User, target);
+
+      if (userModel.is_anonymous) {
+        const checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
+          where: {
+            channel_id: oldChannelId,
+            my_anon_user_id: req.userId,
+            target_user_id: target
+          }
+        });
+
+        if (checkChatAnonUserInfo !== null) {
+          await ChatAnonUserInfo.create({
+            channel_id: newChannel.id,
+            my_anon_user_id: req.userId,
+            target_user_id: target,
+            anon_user_info_color_code: checkChatAnonUserInfo?.anon_user_info_color_code,
+            anon_user_info_color_name: checkChatAnonUserInfo?.anon_user_info_color_name,
+            anon_user_info_emoji_code: checkChatAnonUserInfo?.anon_user_info_emoji_code,
+            anon_user_info_emoji_name: checkChatAnonUserInfo?.anon_user_info_emoji_name
+          });
+        }
+      }
+    });
+
     try {
-      if (!channel?.data?.name) {
-        await channel.updatePartial({
+      if (!newChannel?.data?.name) {
+        await newChannel.updatePartial({
           set: {
             channel_type: CHANNEL_TYPE.CHAT,
-            name: [userModel?.username, targetUserModel?.username].join(', ')
+            name: [userModel?.username, targetUserModel?.username].join(', '),
+            better_channel_member: newChannel.state.members
           }
         });
       }
@@ -50,37 +79,10 @@ const moveToSign = async (req, res) => {
       console.log(e);
     }
 
-    const targets = members.filter((member) => member !== req.userId);
-    await targets.map(async (target) => {
-      const userModel = await UsersFunction.findUserById(User, target);
-
-      if (userModel.is_anonymous) {
-        const exist = await ChatAnonUserInfo.count({
-          where: {
-            channel_id: channel.id,
-            my_anon_user_id: req.userId,
-            target_user_id: target
-          }
-        });
-
-        if (!exist) {
-          await ChatAnonUserInfo.create({
-            channel_id: channel.id,
-            my_anon_user_id: req.userId,
-            target_user_id: target
-            /* anon_user_info_color_code,
-            anon_user_info_color_name,
-            anon_user_info_emoji_code,
-            anon_user_info_emoji_name */
-          });
-        }
-      }
-    });
-
     const targetsUserModel = await UsersFunction.findMultipleUsersById(User, targets);
 
     // get 100 messages
-    const channelFilters = {cid: 'messaging:' + channel.id};
+    const channelFilters = {cid: 'messaging:' + newChannel.id};
     const messageFilters = {created_at: {$lte: new Date()}};
     const messageHistory = await client.search(channelFilters, messageFilters, {
       sort: [{updated_at: -1}],
@@ -88,6 +90,7 @@ const moveToSign = async (req, res) => {
     });
 
     const response = {
+      channel: createdChannel,
       members: targetsUserModel,
       messageHistory: messageHistory.results
     };
