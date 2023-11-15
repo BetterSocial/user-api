@@ -42,7 +42,7 @@ const moveToAnon = async (req, res) => {
 
     const newChannel = client.channel('messaging', {members});
     const createdChannel = await newChannel.create();
-    let newStatememberWithAnonInfo = newChannel.state.members;
+    let newStateMemberWithAnonInfo = newChannel.state.members;
 
     await Promise.all(
       members.map(async (member) => {
@@ -57,10 +57,10 @@ const moveToAnon = async (req, res) => {
             }
           });
 
-          newStatememberWithAnonInfo[member].anon_user_info_color_code = anon_user_info_color_code;
-          newStatememberWithAnonInfo[member].anon_user_info_color_name = anon_user_info_color_name;
-          newStatememberWithAnonInfo[member].anon_user_info_emoji_code = anon_user_info_emoji_code;
-          newStatememberWithAnonInfo[member].anon_user_info_emoji_name = anon_user_info_emoji_name;
+          newStateMemberWithAnonInfo[member].anon_user_info_color_code = anon_user_info_color_code;
+          newStateMemberWithAnonInfo[member].anon_user_info_color_name = anon_user_info_color_name;
+          newStateMemberWithAnonInfo[member].anon_user_info_emoji_code = anon_user_info_emoji_code;
+          newStateMemberWithAnonInfo[member].anon_user_info_emoji_name = anon_user_info_emoji_name;
 
           if (checkChatAnonUserInfo !== null) {
             let new_anon_user_info_color_code =
@@ -72,13 +72,13 @@ const moveToAnon = async (req, res) => {
             let new_anon_user_info_emoji_name =
               checkChatAnonUserInfo?.anon_user_info_emoji_name || anon_user_info_emoji_name;
 
-            newStatememberWithAnonInfo[member].anon_user_info_color_code =
+            newStateMemberWithAnonInfo[member].anon_user_info_color_code =
               new_anon_user_info_color_code;
-            newStatememberWithAnonInfo[member].anon_user_info_color_name =
+            newStateMemberWithAnonInfo[member].anon_user_info_color_name =
               new_anon_user_info_color_name;
-            newStatememberWithAnonInfo[member].anon_user_info_emoji_code =
+            newStateMemberWithAnonInfo[member].anon_user_info_emoji_code =
               new_anon_user_info_emoji_code;
-            newStatememberWithAnonInfo[member].anon_user_info_emoji_name =
+            newStateMemberWithAnonInfo[member].anon_user_info_emoji_name =
               new_anon_user_info_emoji_name;
 
             await ChatAnonUserInfo.create({
@@ -103,7 +103,7 @@ const moveToAnon = async (req, res) => {
           anon_user_info_color_name,
           anon_user_info_emoji_code,
           anon_user_info_emoji_name,
-          better_channel_member: newStatememberWithAnonInfo
+          better_channel_member: newStateMemberWithAnonInfo
         }
       });
     } catch (e) {
