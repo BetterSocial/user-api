@@ -56,7 +56,7 @@ const moveToAnon = async (req, res) => {
           }
         });
 
-        if (checkChatAnonUserInfo === null) {
+        if (checkChatAnonUserInfo !== null) {
           await ChatAnonUserInfo.create({
             channel_id: newChannel.id,
             my_anon_user_id: req.userId,
