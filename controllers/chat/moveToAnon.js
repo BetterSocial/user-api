@@ -12,7 +12,7 @@ const UsersFunction = require('../../databases/functions/users');
  */
 const moveToAnon = async (req, res) => {
   const {
-    targetUser,
+    targetUserId,
     oldChannelId,
     anon_user_info_color_code,
     anon_user_info_color_name,
@@ -20,7 +20,7 @@ const moveToAnon = async (req, res) => {
     anon_user_info_emoji_name
   } = req.body;
 
-  let members = [targetUser];
+  let members = [targetUserId];
   if (!members.includes(req.userId)) members.push(req.userId);
 
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
@@ -42,37 +42,58 @@ const moveToAnon = async (req, res) => {
 
     const newChannel = client.channel('messaging', {members});
     const createdChannel = await newChannel.create();
+    let newStatememberWithAnonInfo = newChannel.state.members;
 
-    const targets = members.filter((member) => member !== req.userId);
-    await targets.map(async (target) => {
-      const userModel = await UsersFunction.findUserById(User, target);
+    await Promise.all(
+      members.map(async (member) => {
+        const userModel = await UsersFunction.findUserById(User, member);
 
-      if (userModel.is_anonymous) {
-        const checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
-          where: {
-            channel_id: oldChannelId,
-            my_anon_user_id: req.userId,
-            target_user_id: target
-          }
-        });
-
-        if (checkChatAnonUserInfo !== null) {
-          await ChatAnonUserInfo.create({
-            channel_id: newChannel.id,
-            my_anon_user_id: req.userId,
-            target_user_id: target,
-            anon_user_info_color_code:
-              checkChatAnonUserInfo?.anon_user_info_color_code || anon_user_info_color_code,
-            anon_user_info_color_name:
-              checkChatAnonUserInfo?.anon_user_info_color_name || anon_user_info_color_name,
-            anon_user_info_emoji_code:
-              checkChatAnonUserInfo?.anon_user_info_emoji_code || anon_user_info_emoji_code,
-            anon_user_info_emoji_name:
-              checkChatAnonUserInfo?.anon_user_info_emoji_name || anon_user_info_emoji_name
+        if (userModel.is_anonymous) {
+          const checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
+            where: {
+              channel_id: oldChannelId,
+              my_anon_user_id: member,
+              target_user_id: targetUserId
+            }
           });
+
+          newStatememberWithAnonInfo[member].anon_user_info_color_code = anon_user_info_color_code;
+          newStatememberWithAnonInfo[member].anon_user_info_color_name = anon_user_info_color_name;
+          newStatememberWithAnonInfo[member].anon_user_info_emoji_code = anon_user_info_emoji_code;
+          newStatememberWithAnonInfo[member].anon_user_info_emoji_name = anon_user_info_emoji_name;
+
+          if (checkChatAnonUserInfo !== null) {
+            let new_anon_user_info_color_code =
+              checkChatAnonUserInfo?.anon_user_info_color_code || anon_user_info_color_code;
+            let new_anon_user_info_color_name =
+              checkChatAnonUserInfo?.anon_user_info_color_name || anon_user_info_color_name;
+            let new_anon_user_info_emoji_code =
+              checkChatAnonUserInfo?.anon_user_info_emoji_code || anon_user_info_emoji_code;
+            let new_anon_user_info_emoji_name =
+              checkChatAnonUserInfo?.anon_user_info_emoji_name || anon_user_info_emoji_name;
+
+            newStatememberWithAnonInfo[member].anon_user_info_color_code =
+              new_anon_user_info_color_code;
+            newStatememberWithAnonInfo[member].anon_user_info_color_name =
+              new_anon_user_info_color_name;
+            newStatememberWithAnonInfo[member].anon_user_info_emoji_code =
+              new_anon_user_info_emoji_code;
+            newStatememberWithAnonInfo[member].anon_user_info_emoji_name =
+              new_anon_user_info_emoji_name;
+
+            await ChatAnonUserInfo.create({
+              channel_id: newChannel.id,
+              my_anon_user_id: member,
+              target_user_id: targetUserId,
+              anon_user_info_color_code: new_anon_user_info_color_code,
+              anon_user_info_color_name: new_anon_user_info_color_name,
+              anon_user_info_emoji_code: new_anon_user_info_emoji_code,
+              anon_user_info_emoji_name: new_anon_user_info_emoji_name
+            });
+          }
         }
-      }
-    });
+      })
+    );
 
     try {
       await newChannel.updatePartial({
@@ -82,14 +103,14 @@ const moveToAnon = async (req, res) => {
           anon_user_info_color_name,
           anon_user_info_emoji_code,
           anon_user_info_emoji_name,
-          better_channel_member: newChannel.state.members
+          better_channel_member: newStatememberWithAnonInfo
         }
       });
     } catch (e) {
       console.log(e);
     }
 
-    const targetsUserModel = await UsersFunction.findMultipleUsersById(User, targets);
+    const targetsUserModel = await UsersFunction.findMultipleUsersById(User, members);
     targetsUserModel.push({
       user_id: req.userId,
       username: `Anonymous ${anon_user_info_emoji_name}`,
