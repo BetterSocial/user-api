@@ -1,6 +1,7 @@
 const {QueryTypes} = require('sequelize');
 
 const {sequelize} = require('../../databases/models');
+const {CREDDER_MIN_SCORE} = require('../../helpers/constants');
 
 /**
  *
@@ -35,7 +36,9 @@ const SearchDomain = async (req, res) => {
         ) AS "user_id_follower"
       FROM "domain_page" AS "Domain" 
       LEFT JOIN "user_follow_domain" AS "domainFollower" ON "Domain"."domain_page_id" = "domainFollower"."domain_id_followed" 
-      WHERE "Domain"."domain_name" ILIKE :likeQuery 
+      WHERE 
+        "Domain"."domain_name" ILIKE :likeQuery 
+        AND "Domain"."credder_score" >= ${CREDDER_MIN_SCORE}
       GROUP BY 
         "user_id_follower",
         "Domain"."domain_page_id",
@@ -45,7 +48,8 @@ const SearchDomain = async (req, res) => {
         "Domain"."credder_score"
       ORDER BY
         "user_id_follower" ASC,
-        "followersCount" DESC
+        "followersCount" DESC,
+        "Domain"."credder_score" DESC
       LIMIT :limit`,
       {
         type: QueryTypes.SELECT,

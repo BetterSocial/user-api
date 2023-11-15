@@ -2,15 +2,15 @@ const {getDomain} = require('../../services/getstream');
 const {
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DOMAIN_DATA_RETURN_LENGTH,
-  GETSTREAM_TIME_RANDOM_RANKING_METHOD
+  GETSTREAM_TIME_RANDOM_RANKING_METHOD,
+  CREDDER_MIN_SCORE
 } = require('../../helpers/constants');
 const _ = require('lodash');
 
 const {getBlockDomain} = require('../../services/domain');
-const {DomainPage, NewsLink} = require('../../databases/models/');
+const {DomainPage} = require('../../databases/models/');
 const ElasticNewsLink = require('../../elasticsearch/repo/newsLink/ElasticNewsLink');
 
-const MIN_CREDDER_SCORE = 50;
 const CREDDER_CHECK_ENABLED = true;
 
 const elasticNewsLink = new ElasticNewsLink();
@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
             }
           }
 
-          if (item?.domain?.credderScore >= MIN_CREDDER_SCORE || !CREDDER_CHECK_ENABLED) {
+          if (item?.domain?.credderScore >= CREDDER_MIN_SCORE || !CREDDER_CHECK_ENABLED) {
             data.push(item);
           }
 

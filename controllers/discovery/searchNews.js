@@ -2,6 +2,7 @@ const {Op} = require('sequelize');
 const {NewsLink, DomainPage} = require('../../databases/models');
 
 const {getBlockDomain} = require('../../services/domain');
+const {CREDDER_MIN_SCORE} = require('../../helpers/constants');
 
 /**
  *
@@ -40,7 +41,10 @@ const Search = async (req, res) => {
           {
             model: DomainPage,
             as: 'newsLinkDomain',
-            attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked']
+            attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked'],
+            where: {
+              credder_score: {[Op.gte]: CREDDER_MIN_SCORE}
+            }
           }
         ]
       });
@@ -60,7 +64,10 @@ const Search = async (req, res) => {
           {
             model: DomainPage,
             as: 'newsLinkDomain',
-            attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked']
+            attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked'],
+            where: {
+              credder_score: {[Op.gte]: CREDDER_MIN_SCORE}
+            }
           }
         ]
       });
