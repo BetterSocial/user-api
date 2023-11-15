@@ -17,7 +17,7 @@ const ChatValidation = {
       anon_user_info_emoji_code: string.required(),
       anon_user_info_emoji_name: string.required(),
       oldChannelId: string.required(),
-      targetUser: uuid.required()
+      targetUserId: uuid.required()
     })
   },
   moveToSign: {
