@@ -36,7 +36,7 @@ const moveToSign = async (req, res) => {
     await client.connectUser(user, req.token);
 
     const newChannel = client.channel('messaging', {members});
-    const createdChannel = await newChannel.create();
+    await newChannel.create();
     let newStateMemberWithAnonInfo = newChannel.state.members;
     let isContainAnonimous = false;
 
@@ -98,8 +98,6 @@ const moveToSign = async (req, res) => {
       console.log(e);
     }
 
-    const targetsUserModel = await UsersFunction.findMultipleUsersById(User, members);
-
     // get 100 messages
     const channelFilters = {cid: 'messaging:' + newChannel.id};
     const messageFilters = {created_at: {$lte: new Date()}};
@@ -109,8 +107,7 @@ const moveToSign = async (req, res) => {
     });
 
     const response = {
-      channel: createdChannel,
-      members: targetsUserModel,
+      members: newStateMemberWithAnonInfo,
       messageHistory: messageHistory.results
     };
 
