@@ -132,8 +132,7 @@ const moveToAnon = async (req, res) => {
     await client.disconnectUser();
 
     const response = {
-      channel: createdChannel,
-      members: targetsUserModel,
+      members: newStateMemberWithAnonInfo,
       messageHistory: messageHistory.results
     };
 
