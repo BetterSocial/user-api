@@ -19,6 +19,12 @@ const ChatValidation = {
       oldChannelId: string.required(),
       targetUserId: uuid.required()
     })
+  },
+  moveToSign: {
+    body: object({
+      oldChannelId: string.required(),
+      targetUserId: uuid.required()
+    })
   }
 };
 
