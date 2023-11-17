@@ -13,14 +13,12 @@ module.exports = async (req, res) => {
   const {postId} = req.params;
   const token = req.token;
   const userId = req.userId;
-  const anonymousUserId = await UsersFunction.findAnonymousUserId(User, userId);
-
+  const anonymousUser = await UsersFunction.findAnonymousUserId(User, userId);
   const getstreamQueryResult = await getstreamService.getFeeds(token, 'user_anon', {
     ids: [postId]
   });
-
   const [feed] = getstreamQueryResult?.results || {};
-  if (feed?.actor?.id !== anonymousUserId?.user_id) {
+  if (feed?.actor?.id !== anonymousUser?.user_id) {
     return res.status(200).json({
       success: false,
       message: 'You are not authorized to delete this post'
@@ -28,7 +26,11 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const getstreamDeleteResult = await getstreamService.deleteFeedById(token, 'user_anon', postId);
+    const getstreamDeleteResult = await getstreamService.deleteFeedById(
+      'user_anon',
+      postId,
+      anonymousUser?.user_id
+    );
     const getstreamDeleteNotificationFeed = await Getstream.feed.deleteNotificationFeed(
       userId,
       postId
