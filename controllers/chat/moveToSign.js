@@ -36,7 +36,7 @@ const moveToSign = async (req, res) => {
     await client.connectUser(user, req.token);
 
     const newChannel = client.channel('messaging', {members});
-    await newChannel.create();
+    const createdChannel = await newChannel.create();
     let newStateMemberWithAnonInfo = newChannel.state.members;
     let isContainAnonimous = false;
 
@@ -107,8 +107,10 @@ const moveToSign = async (req, res) => {
     });
 
     const response = {
-      members: newStateMemberWithAnonInfo,
-      messageHistory: messageHistory.results
+      ...createdChannel,
+      better_channel_members_object: newStateMemberWithAnonInfo,
+      better_channel_members: Object.values(newStateMemberWithAnonInfo),
+      messageHistories: messageHistory.results
     };
 
     await client.disconnectUser();
