@@ -2,10 +2,10 @@ const stream = require('getstream');
 const moment = require('moment');
 const GetstreamSingleton = require('../../vendor/getstream/singleton');
 
-module.exports = async (token, feedGroup, activityId) => {
-  const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
+module.exports = async (feedGroup, activityId, anonymousUserId) => {
+  const client = stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);
+  const feed = client.feed(feedGroup, anonymousUserId);
   const serverClient = GetstreamSingleton.getInstance();
-  const user = client.feed(feedGroup, client.userId, token);
   serverClient.activityPartialUpdate({
     id: activityId,
     set: {
@@ -13,6 +13,6 @@ module.exports = async (token, feedGroup, activityId) => {
       is_deleted: true
     }
   });
-
-  return user.removeActivity(activityId);
+  const result = await feed.removeActivity(activityId);
+  return result;
 };
