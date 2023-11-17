@@ -1,6 +1,12 @@
 const {uuid, array, object, string} = require('./general.validations');
 
 const ChatValidation = {
+  getChannelDetail: {
+    query: {
+      channel_id: string.required(),
+      channel_type: string.required()
+    }
+  },
   sendFollowSystemMessage: {
     body: {
       channel_id: uuid.required(),
