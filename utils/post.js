@@ -310,18 +310,17 @@ function modifyReactionsPost(post, isAnonimous = true) {
   return newPost;
 }
 
-const isExpiredPost = (item, feed_id) => {
-  let result = false;
+const isExpiredPost = (item) => {
   const now = moment().valueOf();
   const dateExpired = moment(item?.expired_at).valueOf();
 
-  if (dateExpired < now) {
-    if (feed_id) {
-      deleteActivityFromUserFeed('topic', feed_id, item.id);
-    }
-    result = true;
+  return dateExpired < now;
+};
+
+const deleteExpiredPostFromFeed = (item, feed_id) => {
+  if (feed_id) {
+    deleteActivityFromUserFeed('topic', feed_id, item.id);
   }
-  return result;
 };
 
 const modifyNewItemAnonymity = (newItem) => {
@@ -335,12 +334,16 @@ const modifyNewItemAnonymity = (newItem) => {
 };
 
 async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null) {
-  const newResult = feeds
-    .filter(async (item) => {
-      const expired = await isExpiredPost(item, feed_id);
-      return !(expired || (threshold && (item.final_score || 0) < threshold));
-    })
-    .map(async (item) => {
+  const results = await Promise.allSettled(
+    feeds.map(async (item) => {
+      const expired = isExpiredPost(item);
+      if (expired) {
+        deleteExpiredPostFromFeed(item, feed_id);
+        return null;
+      }
+      if (threshold && (item.final_score || 0) < threshold) {
+        return null;
+      }
       let newItem = {...item};
 
       newItem = modifyNewItemAnonymity(newItem);
@@ -352,8 +355,9 @@ async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null)
       else newItem = await modifyPostLinkPost(DomainPage, newItem);
 
       return newItem;
-    });
-  return Promise.all(newResult);
+    })
+  );
+  return results.filter((item) => item !== null);
 }
 
 module.exports = {
