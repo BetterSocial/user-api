@@ -84,10 +84,10 @@ const moveToSign = async (req, res) => {
       })
     );
 
-    const oldChannelName = createdChannel?.channel?.name?.trim()?.split(',');
+    const oldChannelName = createdChannel?.channel?.name?.trim();
 
     try {
-      if (!oldChannelName) {
+      if (!oldChannelName || oldChannelName === ',') {
         const newChannelName = [userModel?.username, targetUserModel?.username].join(', ');
         createdChannel.channel.name = newChannelName;
         await newChannel.updatePartial({
