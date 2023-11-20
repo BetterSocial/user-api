@@ -310,39 +310,50 @@ function modifyReactionsPost(post, isAnonimous = true) {
   return newPost;
 }
 
-async function filterFeeds(userId, feeds = [], feed_id = null) {
-  const newResult = [];
+const isExpiredPost = (item, feed_id) => {
+  let result = false;
+  const now = moment().valueOf();
+  const dateExpired = moment(item?.expired_at).valueOf();
 
-  for (const item of feeds || []) {
-    const now = moment().valueOf();
-    const dateExpired = moment(item?.expired_at).valueOf();
-
-    if (dateExpired < now) {
-      if (feed_id) {
-        deleteActivityFromUserFeed('topic', feed_id, item.id);
-      }
-      continue;
+  if (dateExpired < now) {
+    if (feed_id) {
+      deleteActivityFromUserFeed('topic', feed_id, item.id);
     }
-    let newItem = {...item};
-
-    if (newItem.anonimity) {
-      newItem.actor = {};
-      newItem.to = [];
-      newItem.origin = null;
-      newItem.object = '';
-    }
-
-    newItem = modifyReactionsPost(newItem, newItem.anonimity);
-
-    const isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0;
-
-    if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem);
-    else newItem = await modifyPostLinkPost(DomainPage, newItem);
-
-    newResult.push(newItem);
+    result = true;
   }
+  return result;
+};
 
-  return newResult;
+const modifyNewItemAnonymity = (newItem) => {
+  if (newItem.anonimity) {
+    newItem.actor = {};
+    newItem.to = [];
+    newItem.origin = null;
+    newItem.object = '';
+  }
+  return newItem;
+};
+
+async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null) {
+  const newResult = feeds
+    .filter(async (item) => {
+      const expired = await isExpiredPost(item, feed_id);
+      return !(expired || (threshold && (item.final_score || 0) < threshold));
+    })
+    .map(async (item) => {
+      let newItem = {...item};
+
+      newItem = modifyNewItemAnonymity(newItem);
+      newItem = modifyReactionsPost(newItem, newItem.anonimity);
+
+      const isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0;
+
+      if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem);
+      else newItem = await modifyPostLinkPost(DomainPage, newItem);
+
+      return newItem;
+    });
+  return Promise.all(newResult);
 }
 
 module.exports = {
