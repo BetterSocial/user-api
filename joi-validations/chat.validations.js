@@ -1,6 +1,13 @@
 const {uuid, array, object, string} = require('./general.validations');
 
 const ChatValidation = {
+  changeChannelDetail: {
+    body: {
+      channel_id: string.required(),
+      channel_name: string.optional(),
+      channel_image: string.optional()
+    }
+  },
   getChannelDetail: {
     query: {
       channel_id: string.required(),

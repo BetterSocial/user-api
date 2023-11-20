@@ -9,11 +9,12 @@ const SuccessMiddleware = require('../middlewares/success');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 const getSignedChannelList = require('../controllers/chat/getSignedChannelList');
 const {
-  setSignedChannelAsRead,
-  sendSignedMessage,
+  changeChannelDetail,
   findOrCreateChannelBySignedSender,
   moveToAnon,
-  moveToSign
+  moveToSign,
+  sendSignedMessage,
+  setSignedChannelAsRead
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -70,6 +71,13 @@ router.post(
   auth.isAuthAnonim,
   isTargetUserAllowingAnonDMMiddleware,
   SuccessMiddleware
+);
+
+router.post(
+  '/channel-detail',
+  auth.isAuthV2,
+  validate(ChatValidation.changeChannelDetail),
+  changeChannelDetail
 );
 
 module.exports = router;
