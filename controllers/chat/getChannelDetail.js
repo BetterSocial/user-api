@@ -32,7 +32,7 @@ const getChannelDetail = async (req, res) => {
   if (!messages) {
     return res.status(400).json({
       success: false,
-      message: `You don't have access to this channel`
+      message: `You do not have permission to access this content, or the content has been deleted`
     });
   }
 
