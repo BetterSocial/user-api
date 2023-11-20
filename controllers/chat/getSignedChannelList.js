@@ -100,7 +100,7 @@ const getSignedChannelList = async (req, res) => {
   const queriedChannels = [];
   const promisedChannels = [];
 
-  const client = new StreamChat(process.env.API_KEY, process.env.API_SECRET);
+  const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
   try {
     await client.connectUser({id: req.userId}, req.token);
 

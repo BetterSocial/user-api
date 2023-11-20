@@ -1,15 +1,17 @@
+const changeChannelDetail = require('./changeChannelDetail');
 const deleteChat = require('./deleteChat');
-const sendSignedMessage = require('./sendSignedMessage');
+const findOrCreateChannelBySignedSender = require('./findOrCreateChannelBySignedSender');
 const moveToAnon = require('./moveToAnon');
 const moveToSign = require('./moveToSign');
+const sendSignedMessage = require('./sendSignedMessage');
 const setSignedChannelAsRead = require('./setSignedChannelAsRead');
-const findOrCreateChannelBySignedSender = require('./findOrCreateChannelBySignedSender');
 
 module.exports = {
+  changeChannelDetail,
   deleteChat,
-  sendSignedMessage,
+  findOrCreateChannelBySignedSender,
   moveToAnon,
   moveToSign,
-  setSignedChannelAsRead,
-  findOrCreateChannelBySignedSender
+  sendSignedMessage,
+  setSignedChannelAsRead
 };
