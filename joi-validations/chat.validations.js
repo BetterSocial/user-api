@@ -8,6 +8,12 @@ const ChatValidation = {
       channel_image: string.optional()
     }
   },
+  getChannelDetail: {
+    query: {
+      channel_id: string.required(),
+      channel_type: string.required()
+    }
+  },
   sendFollowSystemMessage: {
     body: {
       channel_id: uuid.required(),

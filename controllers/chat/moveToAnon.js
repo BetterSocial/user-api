@@ -49,13 +49,23 @@ const moveToAnon = async (req, res) => {
         const userModel = await UsersFunction.findUserById(User, member);
 
         if (userModel.is_anonymous) {
-          const checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
+          let checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
             where: {
               channel_id: oldChannelId,
               my_anon_user_id: member,
               target_user_id: targetUserId
             }
           });
+
+          if (checkChatAnonUserInfo === null) {
+            checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
+              where: {
+                channel_id: createdChannel?.channel?.id,
+                my_anon_user_id: member,
+                target_user_id: targetUserId
+              }
+            });
+          }
 
           newStateMemberWithAnonInfo[member].anon_user_info_color_code = anon_user_info_color_code;
           newStateMemberWithAnonInfo[member].anon_user_info_color_name = anon_user_info_color_name;
@@ -132,8 +142,10 @@ const moveToAnon = async (req, res) => {
     await client.disconnectUser();
 
     const response = {
-      members: newStateMemberWithAnonInfo,
-      messageHistory: messageHistory.results
+      ...createdChannel,
+      better_channel_members: Object.values(newStateMemberWithAnonInfo),
+      better_channel_members_objet: newStateMemberWithAnonInfo,
+      messageHistories: messageHistory.results
     };
 
     if (createdChannel?.channel?.is_channel_blocked) {
