@@ -60,6 +60,8 @@ module.exports = (sequelize, DataTypes) => {
       profile_pic_public_id: {type: DataTypes.STRING, allowNull: true},
       status: {type: DataTypes.BOOLEAN, allowNull: false},
       bio: {type: DataTypes.TEXT, allowNull: true},
+      combined_user_score: {type: DataTypes.NUMBER, allowNull: false},
+      karma_score: {type: DataTypes.NUMBER, allowNull: false},
       is_banned: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
