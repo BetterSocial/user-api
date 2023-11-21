@@ -18,7 +18,7 @@ const moveToSign = async (req, res) => {
 
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
   try {
-    const {userModel, targetUserModel} = await Promise.allSettled([
+    const [userModel, targetUserModel] = await Promise.all([
       UsersFunction.findUserById(User, req?.userId),
       UsersFunction.findUserById(User, targetUserId)
     ]);
@@ -84,12 +84,16 @@ const moveToSign = async (req, res) => {
       })
     );
 
+    const oldChannelName = createdChannel?.channel?.name?.trim();
+
     try {
-      if (!newChannel?.data?.name) {
+      if (!oldChannelName || oldChannelName === ',') {
+        const newChannelName = [userModel?.username, targetUserModel?.username].join(', ');
+        createdChannel.channel.name = newChannelName;
         await newChannel.updatePartial({
           set: {
             channel_type: isContainAnonimous ? CHANNEL_TYPE.ANONYMOUS : CHANNEL_TYPE.CHAT,
-            name: [userModel?.username, targetUserModel?.username].join(', '),
+            name: newChannelName,
             better_channel_member: newStateMemberWithAnonInfo
           }
         });

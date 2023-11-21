@@ -9,14 +9,16 @@ const SuccessMiddleware = require('../middlewares/success');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
 const getSignedChannelList = require('../controllers/chat/getSignedChannelList');
 const {
-  setSignedChannelAsRead,
-  sendSignedMessage,
+  changeChannelDetail,
   findOrCreateChannelBySignedSender,
   moveToAnon,
-  moveToSign
+  moveToSign,
+  sendSignedMessage,
+  setSignedChannelAsRead
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
+const getChannelDetail = require('../controllers/chat/getChannelDetail');
 
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
@@ -30,6 +32,12 @@ router.get(
   BodyValidationMiddleware.commonLimitOffset,
   auth.isAuthV2,
   getSignedChannelList
+);
+router.get(
+  '/channel-detail',
+  validate(ChatValidation.getChannelDetail),
+  auth.isAuth,
+  getChannelDetail
 );
 router.get('/channels/:channelId', auth.isAuthAnonim, chatController.getChannel);
 router.post('/init-chat', auth.isAuth, chatController.initChat);
@@ -63,6 +71,13 @@ router.post(
   auth.isAuthAnonim,
   isTargetUserAllowingAnonDMMiddleware,
   SuccessMiddleware
+);
+
+router.post(
+  '/channel-detail',
+  auth.isAuthV2,
+  validate(ChatValidation.changeChannelDetail),
+  changeChannelDetail
 );
 
 module.exports = router;

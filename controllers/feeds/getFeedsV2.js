@@ -7,7 +7,8 @@ const {
   MAX_FEED_FETCH_LIMIT,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DATA_RETURN_LENGTH,
-  POST_TYPE_LINK
+  POST_TYPE_LINK,
+  GETSTREAM_RANKING_METHOD
 } = require('../../helpers/constants');
 const {getListBlockUser, getListBlockPostAnonymousAuthor} = require('../../services/blockUser');
 const getBlockDomain = require('../../services/domain/getBlockDomain');
@@ -144,6 +145,7 @@ module.exports = async (req, res) => {
         const paramGetFeeds = {
           limit: getstreamLimit,
           reactions: {own: true, recent: true, counts: true},
+          ranking: GETSTREAM_RANKING_METHOD,
           offset
         };
 

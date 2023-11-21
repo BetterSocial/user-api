@@ -336,7 +336,7 @@ const modifyNewItemAnonymity = (newItem) => {
 async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null) {
   const newResult = feeds
     .filter(async (item) => {
-      const expired = await isExpiredPost(item, feed_id);
+      const expired = await isExpiredPost(item);
       if (expired) {
         deleteExpiredPostFromFeed(item, feed_id);
         return false;
