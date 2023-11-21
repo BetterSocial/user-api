@@ -35,8 +35,8 @@ const feedSwitch = async (feed) => {
       return 'main_feed_f2';
     case 'main_feed_f2':
       return 'main_feed_broad';
-    // case 'main_feed_broad':
-    //   return 'main_feed';
+    case 'main_feed_broad':
+      return 'main_feed';
     default:
       return 'main_feed_following';
   }
@@ -151,7 +151,7 @@ module.exports = async (req, res) => {
 
         const feeds = await getActivtiesOnFeed(feed, token, paramGetFeeds);
         if (feeds.length === 0) {
-          if (feed === 'main_feed_broad') {
+          if (feed === 'main_feed') {
             break;
           } else {
             offset = 0;
