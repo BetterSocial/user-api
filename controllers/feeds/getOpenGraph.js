@@ -3,31 +3,24 @@ const {DomainPage} = require('../../databases/models');
 const ogs = require('open-graph-scraper');
 
 const __getOpenGraphInfo = async (url) => {
-  const options = {url: url};
   try {
-    return await ogs(options)
-      .then((data) => {
-        const {error, result} = data;
-        if (error) {
-          return {
-            success: false,
-            error: error
-          };
-        }
+    const {error, result} = await ogs({url});
+    if (error) {
+      return {
+        success: false,
+        error: error
+      };
+    }
 
-        return {
-          success: true,
-          data: result
-        };
-      })
-      .catch((err) => {
-        return {
-          success: true,
-          error: err
-        };
-      });
+    return {
+      success: true,
+      data: result
+    };
   } catch (e) {
-    console.log(e);
+    return {
+      success: false,
+      error: e
+    };
   }
 };
 
