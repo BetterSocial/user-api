@@ -334,30 +334,27 @@ const modifyNewItemAnonymity = (newItem) => {
 };
 
 async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null) {
-  const results = await Promise.allSettled(
-    feeds.map(async (item) => {
-      const expired = isExpiredPost(item);
+  const newResult = feeds
+    .filter(async (item) => {
+      const expired = await isExpiredPost(item, feed_id);
       if (expired) {
         deleteExpiredPostFromFeed(item, feed_id);
-        return null;
+        return false;
       }
-      if (threshold && (item.final_score || 0) < threshold) {
-        return null;
-      }
+      return !(expired || (threshold && (item.final_score || 0) < threshold));
+    })
+    .map(async (item) => {
       let newItem = {...item};
 
       newItem = modifyNewItemAnonymity(newItem);
       newItem = modifyReactionsPost(newItem, newItem.anonimity);
-
       const isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0;
-
       if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem);
       else newItem = await modifyPostLinkPost(DomainPage, newItem);
 
       return newItem;
-    })
-  );
-  return results.filter((item) => item !== null);
+    });
+  return Promise.all(newResult);
 }
 
 module.exports = {
