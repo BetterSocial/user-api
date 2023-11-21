@@ -41,7 +41,8 @@ const SearchUser = async (req, res) => {
                 AND "User"."is_banned" = false) 
             GROUP BY 
                 "User"."user_id"
-            ORDER BY 
+            ORDER BY  
+                "karma_score" DESC,
                 "user_id_follower" ASC,
                 "followersCount" DESC
             LIMIT :limit`,
