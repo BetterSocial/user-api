@@ -1,4 +1,5 @@
 const mainFeedFollowing = require('./feed/mainFeedFollowing');
+const mainFeedFollowingAnon = require('./feed/mainFeedFollowingAnon');
 const createUser = require('./core/createUser');
 const createToken = require('./core/createToken');
 const updateUserRemoveHumanId = require('./core/updateUserRemoveHumanId');
@@ -26,6 +27,7 @@ const unfollowAnonUser = require('./feed/unfollowAnonUser');
 const unfollowAnonUserByBlockAnonPost = require('./feed/unfollowAnonUserByBlockAnonPost');
 const unfollowUser = require('./feed/unfollowUser');
 const unfollowUserExclusive = require('./feed/unfollowUserExclusive');
+const followUserAnon = require('./feed/followUserAnon');
 
 const Getstream = {
   core: {
@@ -59,7 +61,10 @@ const Getstream = {
     unfollowUser,
     unfollowUserExclusive,
     followMainFeedFollowing: mainFeedFollowing.follow,
-    unfollowMainFeedFollowing: mainFeedFollowing.unfollow
+    unfollowMainFeedFollowing: mainFeedFollowing.unfollow,
+    followMainFeedFollowingAnon: mainFeedFollowingAnon.follow,
+    unfollowMainFeedFollowingAnon: mainFeedFollowingAnon.unfollow,
+    followUserAnon
   }
 };
 
