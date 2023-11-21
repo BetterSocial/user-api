@@ -310,39 +310,54 @@ function modifyReactionsPost(post, isAnonimous = true) {
   return newPost;
 }
 
-async function filterFeeds(userId, feeds = [], feed_id = null) {
-  const newResult = [];
+const isExpiredPost = (item) => {
+  const now = moment().valueOf();
+  const dateExpired = moment(item?.expired_at).valueOf();
 
-  for (const item of feeds || []) {
-    const now = moment().valueOf();
-    const dateExpired = moment(item?.expired_at).valueOf();
+  return dateExpired < now;
+};
 
-    if (dateExpired < now) {
-      if (feed_id) {
-        deleteActivityFromUserFeed('topic', feed_id, item.id);
-      }
-      continue;
-    }
-    let newItem = {...item};
-
-    if (newItem.anonimity) {
-      newItem.actor = {};
-      newItem.to = [];
-      newItem.origin = null;
-      newItem.object = '';
-    }
-
-    newItem = modifyReactionsPost(newItem, newItem.anonimity);
-
-    const isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0;
-
-    if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem);
-    else newItem = await modifyPostLinkPost(DomainPage, newItem);
-
-    newResult.push(newItem);
+const deleteExpiredPostFromFeed = (item, feed_id) => {
+  if (feed_id) {
+    deleteActivityFromUserFeed('topic', feed_id, item.id);
   }
+};
 
-  return newResult;
+const modifyNewItemAnonymity = (newItem) => {
+  if (newItem.anonimity) {
+    newItem.actor = {};
+    newItem.to = [];
+    newItem.origin = null;
+    newItem.object = '';
+  }
+  return newItem;
+};
+
+async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null) {
+  const results = await Promise.allSettled(
+    feeds.map(async (item) => {
+      const expired = isExpiredPost(item);
+      if (expired) {
+        deleteExpiredPostFromFeed(item, feed_id);
+        return null;
+      }
+      if (threshold && (item.final_score || 0) < threshold) {
+        return null;
+      }
+      let newItem = {...item};
+
+      newItem = modifyNewItemAnonymity(newItem);
+      newItem = modifyReactionsPost(newItem, newItem.anonimity);
+
+      const isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0;
+
+      if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem);
+      else newItem = await modifyPostLinkPost(DomainPage, newItem);
+
+      return newItem;
+    })
+  );
+  return results.filter((item) => item !== null);
 }
 
 module.exports = {

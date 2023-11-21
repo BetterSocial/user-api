@@ -8,6 +8,7 @@ const GetstreamService = require('../../services/getstream/GetstreamService');
 const {filterFeeds} = require('../../utils/post');
 const {modifyPollPostObject} = require('../../utils/post');
 const TopicPageValidator = require('../../validators/topicPage');
+const {ACTIVITY_THRESHOLD} = require('../../config/constant');
 
 class TopicPage {
   constructor() {
@@ -37,7 +38,8 @@ class TopicPage {
       payload.listBlockDomain,
       payload.listPostAnonymous
     ).getHasBlock(topicPages);
-    results.data = await filterFeeds(payload.userId, newTopicPagesWithBlock, payload.id);
+    const threshold = ACTIVITY_THRESHOLD.TOPIC_FEED;
+    results.data = await filterFeeds(payload.userId, newTopicPagesWithBlock, payload.id, threshold);
     return results;
   }
 
