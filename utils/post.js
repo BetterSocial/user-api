@@ -334,7 +334,7 @@ const modifyNewItemAnonymity = (newItem) => {
 };
 
 async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null) {
-  const results = await Promise.allSettled(
+  const results = await Promise.all(
     feeds.map(async (item) => {
       const expired = isExpiredPost(item);
       if (expired) {
