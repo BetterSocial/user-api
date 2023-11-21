@@ -48,7 +48,7 @@ const InitDiscoveryUserData = async (req, res) => {
         ON A.user_id = B.user_id_followed AND B.user_id_follower = :userId
         WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false
         ORDER BY
-        A.karma_score DESC,
+        COALESCE(A.karma_score, 0) DESC,
         COALESCE(CommonUsers.common, -1) DESC, 
         COALESCE(CommonUsers.user_match, -1) DESC,
         COALESCE(B.user_id_follower, '') DESC
