@@ -1,8 +1,8 @@
 const {StreamChat} = require('stream-chat');
-const ChatAnonUserInfoFunction = require('../../databases/functions/chatAnonUserInfo');
-const {ChatAnonUserInfo, User} = require('../../databases/models');
+const {User} = require('../../databases/models');
 const {ResponseSuccess} = require('../../utils/Responses');
 const UsersFunction = require('../../databases/functions/users');
+const BetterSocialCore = require('../../services/bettersocial');
 
 /**
  *
@@ -36,41 +36,18 @@ const getChannelDetail = async (req, res) => {
     });
   }
 
-  const members = await Promise.all(
-    createdChannel?.members?.map(async (member) => {
-      return await __promiseMapAnonUserInfoHelper(channel_id, member);
-    })
-  );
+  const {betterChannelMember, betterChannelMemberObject} =
+    await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel);
 
   return ResponseSuccess(res, 'Success', 200, {
-    better_channel_members: members,
+    better_channel_members: betterChannelMember,
+    better_channel_member_objects: betterChannelMemberObject,
     ...createdChannel,
     messages: messages?.results?.map((message) => message?.message)
   });
 };
 
 module.exports = getChannelDetail;
-
-const __promiseMapAnonUserInfoHelper = async (channelId, member) => {
-  const isAnonymousUser = member?.user?.name?.toLocaleLowerCase()?.includes('anonymoususer');
-  if (!isAnonymousUser) return member;
-
-  let anonUserInfo;
-  try {
-    anonUserInfo = await ChatAnonUserInfoFunction.findAnonUserInfo(
-      ChatAnonUserInfo,
-      channelId,
-      member?.user_id
-    );
-  } catch (e) {
-    console.debug(e);
-  }
-
-  return {
-    ...member,
-    ...anonUserInfo
-  };
-};
 
 const __queryChannelHelper = async (client, channelId, channelType, userId) => {
   try {

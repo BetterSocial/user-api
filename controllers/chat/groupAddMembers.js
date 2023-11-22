@@ -1,11 +1,10 @@
 const {StreamChat} = require('stream-chat');
 const Environment = require('../../config/environment');
-const {CHANNEL_TYPE_STRING} = require('../../helpers/constants');
+const {CHANNEL_TYPE_STRING, CHANNEL_TYPE} = require('../../helpers/constants');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {ResponseSuccess} = require('../../utils/Responses');
-const UsersFunction = require('../../databases/functions/users');
-const {User} = require('../../databases/models');
 const _ = require('lodash');
+const BetterSocialCore = require('../../services/bettersocial');
 
 /**
  *
@@ -55,40 +54,37 @@ const groupAddMembers = async (req, res) => {
     members: channelMembers
   });
 
-  const queryChannels = await client.queryChannels({
-    type: CHANNEL_TYPE_STRING.GROUP,
-    members: {$in: [userId]},
-    id: channel_id
-  });
-
-  const queriedChannel = await queryChannels[0]?.create();
-
-  const allMembersId = queriedChannel?.members?.map((member) => member?.user_id) || [];
-
-  const membersFromDb = await UsersFunction.findMultipleUsersById(
-    User,
-    _.uniq([...allMembersId, ...filteredMembersId])
-  );
-  const newGroupName = membersFromDb.map((member) => member.username).join(', ');
-
   try {
-    await channelToAdd?.update({
-      name: newGroupName
-    });
-  } catch (e) {
-    console.error('Failed to update group name');
-  }
+    const responseChannel = await channelToAdd?.addMembers(filteredMembersObject);
 
-  try {
-    await channelToAdd?.addMembers(filteredMembersObject);
+    try {
+      const {betterChannelMember, betterChannelMemberObject, newChannelName} =
+        await BetterSocialCore.chat.updateBetterChannelMembers(
+          channelToAdd,
+          responseChannel,
+          true,
+          {
+            channelType: CHANNEL_TYPE.GROUP,
+            channel_type: CHANNEL_TYPE.GROUP
+          }
+        );
 
-    return ResponseSuccess(res, 'New members have been added to the group', 200, {
-      ...queriedChannel,
-      name: newGroupName
-    });
+      responseChannel.channel.better_channel_member = betterChannelMember;
+      responseChannel.channel.name = newChannelName;
+
+      return ResponseSuccess(res, 'New members have been added to the group', 200, {
+        ...responseChannel,
+        better_channel_member: betterChannelMember,
+        better_channel_member_object: betterChannelMemberObject,
+        name: newChannelName
+      });
+    } catch (e) {
+      console.error('Failed to update channel', e);
+      return ErrorResponse.e500(res, e.message);
+    }
   } catch (e) {
     console.log(e);
-    return ErrorResponse.e400(res, e.message);
+    return ErrorResponse.e500(res, e.message);
   }
 };
 

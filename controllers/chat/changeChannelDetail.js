@@ -1,6 +1,7 @@
 const {StreamChat} = require('stream-chat');
 const {CHANNEL_TYPE_STRING} = require('../../helpers/constants');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
+const {ResponseSuccess} = require('../../utils/Responses');
 
 /**
  *
@@ -26,16 +27,15 @@ const changeChannelDetail = async (req, res) => {
   if (channel_name) updateData.name = channel_name;
 
   try {
-    await channel.updatePartial({
+    const response = await channel.updatePartial({
       set: {
-        ...updateData
+        ...updateData,
+        is_name_custom: true,
+        is_image_custom: true
       }
     });
 
-    return res.status(200).json({
-      status: 'success',
-      message: 'Group has been updated'
-    });
+    return ResponseSuccess(res, 'Group has been updated', 200, response);
   } catch (e) {
     return ErrorResponse.e500(res, e.message);
   }

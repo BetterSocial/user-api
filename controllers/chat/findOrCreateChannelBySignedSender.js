@@ -2,6 +2,7 @@ const {StreamChat} = require('stream-chat');
 const {CHANNEL_TYPE_STRING, CHANNEL_TYPE} = require('../../helpers/constants');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {v4: uuid} = require('uuid');
+const BetterSocialCore = require('../../services/bettersocial');
 
 /**
  *
@@ -45,26 +46,23 @@ const findOrCreateChannelBySignedSender = async (req, res) => {
     }
 
     const findOrCreateChannel = await channel.create();
-    const channelName = findOrCreateChannel.members.map((member) => member?.user?.name).join(', ');
-
-    try {
-      await channel.updatePartial({
-        set: {
-          channelType,
-          channel_type: channelType,
-          name: channelName
-        }
+    const {betterChannelMember, newChannelName, betterChannelMemberObject} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(channel, findOrCreateChannel, true, {
+        channelType,
+        channel_type: channelType
       });
-    } catch (e) {
-      console.debug(e);
-    }
 
-    await client.disconnectUser();
+    findOrCreateChannel.channel.name = newChannelName;
 
-    return res.status(200).json(findOrCreateChannel);
+    return res.status(200).json({
+      ...findOrCreateChannel,
+      better_channel_member: betterChannelMember,
+      better_channel_member_object: betterChannelMemberObject
+    });
   } catch (error) {
-    await client.disconnectUser();
     return ErrorResponse.e400(res, error.message);
+  } finally {
+    client.disconnectUser();
   }
 };
 
