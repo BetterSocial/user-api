@@ -19,6 +19,7 @@ const {
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
 const getChannelDetail = require('../controllers/chat/getChannelDetail');
+const groupAddMembers = require('../controllers/chat/groupAddMembers');
 
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
@@ -78,6 +79,13 @@ router.post(
   auth.isAuthV2,
   validate(ChatValidation.changeChannelDetail),
   changeChannelDetail
+);
+
+router.post(
+  '/group/add-members',
+  validate(ChatValidation.addMembers),
+  auth.isAuthV2,
+  groupAddMembers
 );
 
 module.exports = router;

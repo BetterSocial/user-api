@@ -1,6 +1,8 @@
 const {StreamChat} = require('stream-chat');
 const {CHANNEL_TYPE_STRING, CHANNEL_TYPE} = require('../../helpers/constants');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
+const {v4: uuid} = require('uuid');
+const BetterSocialCore = require('../../services/bettersocial');
 
 /**
  *
@@ -22,31 +24,45 @@ const findOrCreateChannelBySignedSender = async (req, res) => {
       members.length > 2 ? CHANNEL_TYPE_STRING.GROUP : CHANNEL_TYPE_STRING.CHAT;
     const channelType = members.length > 2 ? CHANNEL_TYPE.GROUP : CHANNEL_TYPE.CHAT;
 
-    const channel = client.channel(channelTypeString, {
-      members
+    const queriedChannel = await client.queryChannels({
+      type: channelTypeString,
+      members: {$eq: members}
     });
 
-    const findOrCreateChannel = await channel.create();
-    const channelName = findOrCreateChannel.members.map((member) => member.user.name).join(', ');
-
-    try {
-      await channel.updatePartial({
-        set: {
-          channelType,
-          channel_type: channelType,
-          name: channelName
-        }
+    let channel;
+    if (channelTypeString === CHANNEL_TYPE_STRING.GROUP) {
+      // This will always create new group
+      channel = client.channel(channelTypeString, uuid(), {
+        members
       });
-    } catch (e) {
-      console.debug(e);
+    } else if (channelTypeString === CHANNEL_TYPE_STRING.CHAT) {
+      if (queriedChannel?.length > 0) {
+        channel = client.channel(channelTypeString, queriedChannel[0].id);
+      } else {
+        channel = client.channel(channelTypeString, {
+          members
+        });
+      }
     }
 
-    await client.disconnectUser();
+    const findOrCreateChannel = await channel.create();
+    const {betterChannelMember, newChannelName, betterChannelMemberObject} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(channel, findOrCreateChannel, true, {
+        channelType,
+        channel_type: channelType
+      });
 
-    return res.status(200).json(findOrCreateChannel);
+    findOrCreateChannel.channel.name = newChannelName;
+
+    return res.status(200).json({
+      ...findOrCreateChannel,
+      better_channel_member: betterChannelMember,
+      better_channel_member_object: betterChannelMemberObject
+    });
   } catch (error) {
-    await client.disconnectUser();
     return ErrorResponse.e400(res, error.message);
+  } finally {
+    client.disconnectUser();
   }
 };
 
