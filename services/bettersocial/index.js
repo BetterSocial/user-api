@@ -14,7 +14,8 @@ const {BetterSocialCreatePostV3} = require('./post/createPostV3');
 
 const BetterSocialCore = {
   chat: {
-    blockAnonUserFromChat: require('./chat/blockAnonUserFromChat')
+    blockAnonUserFromChat: require('./chat/blockAnonUserFromChat'),
+    updateBetterChannelMembers: require('./chat/updateBetterChannelMembers')
   },
   user: {
     createUser: BetterSocialCreateUser,

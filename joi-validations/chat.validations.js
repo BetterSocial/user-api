@@ -1,6 +1,19 @@
 const {uuid, array, object, string} = require('./general.validations');
 
 const ChatValidation = {
+  addMembers: {
+    body: {
+      channel_id: string.required().messages({
+        'any.required': 'Channel id is required',
+        'string.empty': 'Channel id is required'
+      }),
+      members: array(uuid).min(1).required().messages({
+        'any.required': 'Members is required',
+        'array.min': 'Members must be at least 1',
+        'uuid.base': 'Members must be an array of uuid'
+      })
+    }
+  },
   changeChannelDetail: {
     body: {
       channel_id: string.required(),
