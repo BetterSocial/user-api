@@ -18,7 +18,7 @@ const changeChannelDetail = async (req, res) => {
     members: {$in: [userId]}
   });
 
-  if (queriedChannel?.length < 1) return ErrorResponse.e404(res, 'Channel not found');
+  if (queriedChannel?.length < 1) return ErrorResponse.e404(res, 'Group not found');
 
   const channel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channel_id);
   const updateData = {};
@@ -34,7 +34,7 @@ const changeChannelDetail = async (req, res) => {
 
     return res.status(200).json({
       status: 'success',
-      message: 'Channel updated'
+      message: 'Group has been updated'
     });
   } catch (e) {
     return ErrorResponse.e500(res, e.message);
