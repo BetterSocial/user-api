@@ -48,9 +48,8 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const followUserExclusive = Getstream.feed.followUserExclusive(req?.userId, user_id_followed);
-    const followUser = Getstream.feed.followUser(req?.token, req?.userId, user_id_followed);
-    const followMainFeedFollowing = Getstream.feed.followMainFeedFollowing(
+    const followUser = Getstream.feed.followUserAnon(req?.token, req?.userId, user_id_followed);
+    const followMainFeedFollowing = Getstream.feed.followMainFeedFollowingAnon(
       req?.token,
       req?.userId,
       user_id_followed
@@ -60,7 +59,7 @@ module.exports = async (req, res) => {
     // - exclusive
     // - user
     // - main_feed_following
-    await Promise.all([followUserExclusive, followUser, followMainFeedFollowing, sendJobF2User]);
+    await Promise.all([followUser, followMainFeedFollowing, sendJobF2User]);
   } catch (e) {
     console.log('Error in follow user v3 getstream');
     console.log(e);
@@ -79,10 +78,11 @@ module.exports = async (req, res) => {
   }
 
   try {
+    const signUserId = await UsersFunction.findSignedUserId(User, user_id_followed);
     await BetterSocialCore.fcmToken.sendMultiDeviceNotification(
       req?.userId,
       user?.username,
-      user_id_followed,
+      signUserId,
       targetUser?.username
     );
     if (process.env.FEATURE_FLAG_SEND_FOLLOW_SYSTEM_MESSAGE === 'true') {
