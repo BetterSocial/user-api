@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
   if (!targetUser) {
     return ErrorResponse.e404(res, 'User not found');
   } else if (!targetUser.is_anonymous) {
-    return ErrorResponse.e403(res, 'Should be anonymous user');
+    return ErrorResponse.e403(res, 'Error - requires anonymous userID');
   }
 
   try {
