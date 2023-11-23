@@ -78,10 +78,11 @@ module.exports = async (req, res) => {
   }
 
   try {
+    const signUserId = await UsersFunction.findSignedUserId(User, user_id_followed);
     await BetterSocialCore.fcmToken.sendMultiDeviceNotification(
       req?.userId,
       user?.username,
-      user_id_followed,
+      signUserId,
       targetUser?.username
     );
     if (process.env.FEATURE_FLAG_SEND_FOLLOW_SYSTEM_MESSAGE === 'true') {
