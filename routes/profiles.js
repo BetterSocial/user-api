@@ -4,6 +4,8 @@ const router = express.Router();
 const profileController = require('../controllers/profiles');
 const Auth = require('../middlewares/auth');
 const BodyValidationMiddleware = require('../middlewares/body-validation');
+const {validate} = require('../middlewares/joi-validation/validate');
+const {ProfileValidation} = require('../joi-validations/profiles.validations');
 
 router.get('/get-other-profile/:id', profileController.getOtherProfile);
 router.get(
@@ -100,6 +102,13 @@ router.post(
   Auth.isAuthV2,
   BodyValidationMiddleware.unfollowUserV2,
   profileController.unfollowUserV3
+);
+
+router.post(
+  '/follow-anonymous-user',
+  Auth.isAuthV2,
+  validate(ProfileValidation.followAnonUser),
+  profileController.followAnonUser
 );
 
 module.exports = router;
