@@ -14,7 +14,8 @@ const {
   moveToAnon,
   moveToSign,
   sendSignedMessage,
-  setSignedChannelAsRead
+  setSignedChannelAsRead,
+  searchGif
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -87,5 +88,7 @@ router.post(
   auth.isAuthV2,
   groupAddMembers
 );
+
+router.get('/gif/search', validate(ChatValidation.searchGif), auth.isAuth, searchGif);
 
 module.exports = router;
