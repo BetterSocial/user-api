@@ -1,4 +1,4 @@
-const {uuid, array, object, string} = require('./general.validations');
+const {uuid, array, object, string, number} = require('./general.validations');
 
 const ChatValidation = {
   addMembers: {
@@ -51,6 +51,17 @@ const ChatValidation = {
       oldChannelId: string.required(),
       targetUserId: uuid.required()
     })
+  },
+  searchGif: {
+    query: {
+      q: string.required(),
+      limit: number.optional(),
+      country: string.optional().default('US'),
+      locale: string.optional().default('en_US'),
+      contentFilter: string.optional().default('off'),
+      ar_range: string.optional().default('all'),
+      media_filter: string.optional().default('gif,tinygif')
+    }
   }
 };
 
