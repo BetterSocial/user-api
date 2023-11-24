@@ -37,7 +37,11 @@ module.exports = async (req, res) => {
     const targetUserId = user?.dataValues?.user_id;
 
     const getFollowerCountQuery = `SELECT COUNT(user_follow_user.user_id_follower) as count_follower from user_follow_user WHERE user_id_followed = :user_id`;
-    const getFollowingCountQuery = `SELECT COUNT(user_follow_user.user_id_followed) as count_following from user_follow_user WHERE user_id_follower = :user_id`;
+    const getFollowingCountQuery = `SELECT COUNT(A.user_id_followed) as count_following 
+                                    from user_follow_user A
+                                    INNER JOIN users B ON A.user_id_followed = B.user_id
+                                    WHERE A.user_id_follower = :user_id
+                                    AND B.is_anonymous = false`;
     const isFollowingQuery = `SELECT * FROM user_follow_user WHERE user_id_followed= :user_id_followed AND user_id_follower= :user_id_follower`;
 
     const getFollowerCount = await sequelize.query(getFollowerCountQuery, {
