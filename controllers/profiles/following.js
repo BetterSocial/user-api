@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
       "user"."status" AS "user.status" FROM "user_follow_user" AS "UserFollowUser" 
       LEFT OUTER JOIN 
       "users" AS "user" ON "UserFollowUser"."user_id_followed" = "user"."user_id"
-      WHERE "UserFollowUser"."user_id_follower" = :id AND "UserFollowUser"."user_id_followed" != :id AND "user"."is_anonymous" = 'false';`,
+      WHERE "UserFollowUser"."user_id_follower" = :id AND "UserFollowUser"."user_id_followed" != :id AND "user"."is_anonymous" = false;`,
     {
       nest: true,
       type: QueryTypes.SELECT,
