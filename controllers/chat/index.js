@@ -4,6 +4,7 @@ const findOrCreateChannelBySignedSender = require('./findOrCreateChannelBySigned
 const listFeaturedGif = require('./gif/listFeaturedGif');
 const moveToAnon = require('./moveToAnon');
 const moveToSign = require('./moveToSign');
+const initChatFromPost = require('./initChatFromPost');
 const searchGif = require('./gif/searchGif');
 const registerShareGif = require('./gif/registerShareGif');
 const sendSignedMessage = require('./sendSignedMessage');
@@ -16,6 +17,7 @@ module.exports = {
   listFeaturedGif,
   moveToAnon,
   moveToSign,
+  initChatFromPost,
   registerShareGif,
   searchGif,
   sendSignedMessage,
