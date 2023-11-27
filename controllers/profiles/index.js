@@ -20,6 +20,7 @@ const unfollowUserV2 = require('./unfollowUsersV2');
 const followUserV3 = require('./followUserV3');
 const unfollowUserV3 = require('./unfollowUserV3');
 const followAnonUser = require('./followAnonUser');
+const unfollowAnonnimousUser = require('./unfollowAnonnimousUser');
 
 module.exports = {
   changeImageProfile,
@@ -43,5 +44,6 @@ module.exports = {
   unfollowUserV2,
   followUserV3,
   unfollowUserV3,
-  followAnonUser
+  followAnonUser,
+  unfollowAnonnimousUser
 };
