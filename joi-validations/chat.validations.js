@@ -55,12 +55,30 @@ const ChatValidation = {
   searchGif: {
     query: {
       q: string.required(),
-      limit: number.optional(),
-      country: string.optional().default('US'),
-      locale: string.optional().default('en_US'),
-      contentFilter: string.optional().default('off'),
-      ar_range: string.optional().default('all'),
-      media_filter: string.optional().default('gif,tinygif')
+      limit: number,
+      country: string.default('US'),
+      locale: string.default('en_US'),
+      contentFilter: string.default('off'),
+      ar_range: string.default('all'),
+      media_filter: string.default('gif,tinygif')
+    }
+  },
+  listTrendingGif: {
+    query: {
+      limit: number,
+      country: string.default('US'),
+      locale: string.default('en_US'),
+      contentFilter: string.default('off'),
+      ar_range: string.default('all'),
+      media_filter: string.default('gif,tinygif')
+    }
+  },
+  registerShareGif: {
+    query: {
+      id: string.required(),
+      q: string,
+      country: string.default('US'),
+      locale: string.default('en_US')
     }
   }
 };

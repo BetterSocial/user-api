@@ -1,5 +1,5 @@
-const {ResponseSuccess} = require('../../utils/Responses');
-const {Tenor} = require('../../vendor/tenor');
+const {ResponseSuccess} = require('../../../utils/Responses');
+const {Tenor} = require('../../../vendor/tenor');
 
 /**
  *

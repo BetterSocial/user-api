@@ -15,7 +15,9 @@ const {
   moveToSign,
   sendSignedMessage,
   setSignedChannelAsRead,
-  searchGif
+  searchGif,
+  listFeaturedGif,
+  registerShareGif
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -90,5 +92,12 @@ router.post(
 );
 
 router.get('/gif/search', validate(ChatValidation.searchGif), auth.isAuth, searchGif);
+router.get('/gif/featured', validate(ChatValidation.listTrendingGif), auth.isAuth, listFeaturedGif);
+router.get(
+  '/gif/registershare',
+  validate(ChatValidation.registerShareGif),
+  auth.isAuth,
+  registerShareGif
+);
 
 module.exports = router;
