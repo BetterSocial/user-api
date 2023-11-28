@@ -1,7 +1,7 @@
 const {StreamChat} = require('stream-chat');
-const {CHANNEL_TYPE_STRING} = require('../../helpers/constants');
-const ErrorResponse = require('../../utils/response/ErrorResponse');
-const {ResponseSuccess} = require('../../utils/Responses');
+const {CHANNEL_TYPE_STRING} = require('../../../helpers/constants');
+const ErrorResponse = require('../../../utils/response/ErrorResponse');
+const {ResponseSuccess} = require('../../../utils/Responses');
 
 /**
  *

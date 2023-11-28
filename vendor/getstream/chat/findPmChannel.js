@@ -1,8 +1,8 @@
 /**
  *
  * @param {StreamChat} chatClient
- * @param {*} selfUserId
- * @param {*} targetUserId
+ * @param {string} selfUserId
+ * @param {string} targetUserId
  * @returns
  */
 const findPmChannel = async (chatClient, selfUserId, targetUserId) => {
