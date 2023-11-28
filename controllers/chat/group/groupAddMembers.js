@@ -1,10 +1,10 @@
 const {StreamChat} = require('stream-chat');
-const Environment = require('../../config/environment');
-const {CHANNEL_TYPE_STRING, CHANNEL_TYPE} = require('../../helpers/constants');
-const ErrorResponse = require('../../utils/response/ErrorResponse');
-const {ResponseSuccess} = require('../../utils/Responses');
+const Environment = require('../../../config/environment');
+const {CHANNEL_TYPE_STRING, CHANNEL_TYPE} = require('../../../helpers/constants');
+const ErrorResponse = require('../../../utils/response/ErrorResponse');
+const {ResponseSuccess} = require('../../../utils/Responses');
 const _ = require('lodash');
-const BetterSocialCore = require('../../services/bettersocial');
+const BetterSocialCore = require('../../../services/bettersocial');
 
 /**
  *
