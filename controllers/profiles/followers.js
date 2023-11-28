@@ -60,7 +60,11 @@ module.exports = async (req, res) => {
       ELSE
          false
       END
-      AS "user.following"
+      AS "user.following",
+      ARRAY( select name from topics as tp
+        left join user_topics as utp on tp.topic_id = utp.topic_id
+        where utp.user_id = "user".user_id limit 3
+      ) as "user.community_info"
     FROM "user_follow_user" AS "UserFollowUser" 
     LEFT OUTER JOIN "users" AS "user" ON "UserFollowUser"."user_id_follower" = "user"."user_id" 
     WHERE 

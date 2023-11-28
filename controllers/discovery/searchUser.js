@@ -23,6 +23,10 @@ const SearchUser = async (req, res) => {
                 "User".*,
                 count("follower"."user_id_follower") 
                     AS "followersCount",
+                ARRAY( select name from topics as tp
+                  left join user_topics as utp on tp.topic_id = utp.topic_id
+                  where utp.user_id = "User".user_id limit 3
+                ) as community_info,
                 (SELECT 
                     "f"."user_id_follower" AS "user_id_follower"
                 FROM "user_follow_user" AS f 

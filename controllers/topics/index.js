@@ -197,7 +197,11 @@ const getFollowerList = async (req, res) => {
         CASE COALESCE(is_following_subquery.user_id_follower, '')
             WHEN '' THEN false
             ELSE true
-        END as is_following
+        END as is_following,
+        ARRAY( select name from topics as tp
+          left join user_topics as utp on tp.topic_id = utp.topic_id
+          where utp.user_id = "users".user_id limit 3
+        ) as community_info
     FROM topics A 
     INNER JOIN user_topics B
         ON A.topic_id = B.topic_id
