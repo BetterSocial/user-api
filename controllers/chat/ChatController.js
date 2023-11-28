@@ -86,7 +86,22 @@ module.exports = {
   sendAnonymous: async (req, res) => {
     const schema = {
       channelId: 'string|empty:false',
-      message: 'string|empty:false'
+      message: 'string|empty:false',
+      attachments: {
+        type: 'array',
+        optional: true,
+        nullable: true,
+        empty: true,
+        items: {
+          type: 'object',
+          props: {
+            type: 'string',
+            asset_url: 'string',
+            thumb_url: 'string',
+            myCustomField: 'string'
+          }
+        }
+      }
     };
     const validated = v.validate(req.body, schema);
     if (validated.length)
@@ -95,7 +110,7 @@ module.exports = {
         error: validated
       });
 
-    const {channelId, message} = req.body;
+    const {channelId, message, attachments} = req.body;
 
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
@@ -123,6 +138,7 @@ module.exports = {
       const chat = await channel.sendMessage({
         user_id: req.userId,
         text: message,
+        attachments,
         ...req.body
       });
       const channelMembers = await channel.queryMembers({
