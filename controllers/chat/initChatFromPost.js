@@ -1,5 +1,6 @@
 const {User} = require('../../databases/models');
 const {StreamChat} = require('stream-chat');
+const {v4: uuid} = require('uuid');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
@@ -11,7 +12,10 @@ const UsersFunction = require('../../databases/functions/users');
  * @param {import("express").Response} res
  */
 const initChatFromPost = async (req, res) => {
-  const {postId, targetUserId} = req.body;
+  const {targetUserId} = req.body;
+
+  let members = [targetUserId];
+  if (!members.includes(req.userId)) members.push(req.userId);
 
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
   try {
@@ -31,7 +35,9 @@ const initChatFromPost = async (req, res) => {
 
     await client.connectUser(user, req.token);
 
-    const channel = client.channel('messaging', `fromPost-${postId}`);
+    const channel = client.channel('messaging', uuid(), {
+      members
+    });
     const createdChannel = await channel.create();
 
     try {
@@ -53,7 +59,9 @@ const initChatFromPost = async (req, res) => {
     }
 
     const response = {
-      ...createdChannel
+      ...createdChannel,
+      better_channel_members_object: channel.state.members,
+      better_channel_members: Object.values(channel.state.members)
     };
 
     await client.disconnectUser();

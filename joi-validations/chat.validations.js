@@ -54,7 +54,6 @@ const ChatValidation = {
   },
   initChatFromPost: {
     body: object({
-      postId: string.required(),
       targetUserId: uuid.required()
     })
   },
