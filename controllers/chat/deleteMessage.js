@@ -12,8 +12,7 @@ const deleteMessage = async (req, res) => {
       req.token
     );
 
-    let destroy = await client.deleteMessage(messageID, true);
-    console.log('DELETE destroy', destroy);
+    let destroy = await client.deleteMessage(messageID);
 
     if (!destroy) {
       return res.status(500).json({message: 'Error deleting chat'});
