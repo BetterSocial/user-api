@@ -32,6 +32,10 @@ const InitDiscoveryUserData = async (req, res) => {
             A.is_anonymous,
             A.combined_user_score,
             A.karma_score,
+            ARRAY( select name from topics as tp
+              left join user_topics as utp on tp.topic_id = utp.topic_id
+              where utp.user_id = A.user_id limit 3
+            ) as community_info,
             CommonUsers.common, B.user_id_follower from users A
             LEFT JOIN 
                 (SELECT 
