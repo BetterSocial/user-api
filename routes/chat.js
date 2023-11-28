@@ -17,7 +17,8 @@ const {
   setSignedChannelAsRead,
   searchGif,
   listFeaturedGif,
-  registerShareGif
+  registerShareGif,
+  deleteMessage
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -99,5 +100,7 @@ router.get(
   auth.isAuth,
   registerShareGif
 );
+
+router.delete('/message/:messageID', auth.isAuth, deleteMessage);
 
 module.exports = router;
