@@ -88,9 +88,7 @@ const __helperProcessBetterChannelMember = (members, membersDataFromDbMap) => {
       anon_user_info_emoji_code
     } = memberDataFromDb;
 
-    const updatedUsername = is_anonymous
-      ? `${anon_user_info_color_name} ${anon_user_info_emoji_name}`
-      : username;
+    const updatedUsername = is_anonymous ? `Anonymous ${anon_user_info_emoji_name}` : username;
 
     newChannelName += `${updatedUsername}${SEPARATOR}`;
 
@@ -100,7 +98,8 @@ const __helperProcessBetterChannelMember = (members, membersDataFromDbMap) => {
       user: {
         ...member.user,
         is_anonymous: is_anonymous,
-        username: updatedUsername
+        username: updatedUsername,
+        name: updatedUsername
       }
     };
 
