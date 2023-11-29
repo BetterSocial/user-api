@@ -21,7 +21,8 @@ const {
   initChatFromPost,
   groupAddMembers,
   removeGroupMember,
-  initChatFromProfileAsAnonymousV2
+  initChatFromProfileAsAnonymousV2,
+  initChatFromProfileAsSignedV2
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -54,6 +55,12 @@ router.post(
   auth.isAuthAnonim,
   validate(ChatValidation.initChatFromProfileAsAnonymousV2),
   initChatFromProfileAsAnonymousV2
+);
+router.post(
+  '/init-chat-signed-v2',
+  auth.isAuthV2,
+  validate(ChatValidation.initChatFromProfileAsSignedV2),
+  initChatFromProfileAsSignedV2
 );
 router.post('/move-to-anon', auth.isAuthAnonim, validate(ChatValidation.moveToAnon), moveToAnon);
 router.post('/move-to-sign', auth.isAuthV2, validate(ChatValidation.moveToSign), moveToSign);

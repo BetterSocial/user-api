@@ -3,6 +3,7 @@ const deleteChat = require('./deleteChat');
 const findOrCreateChannelBySignedSender = require('./findOrCreateChannelBySignedSender');
 const groupAddMembers = require('./group/groupAddMembers');
 const initChatFromProfileAsAnonymousV2 = require('./initChatFromProfileAsAnonymousV2');
+const initChatFromProfileAsSignedV2 = require('./initChatFromProfileAsSignedV2');
 const listFeaturedGif = require('./gif/listFeaturedGif');
 const moveToAnon = require('./moveToAnon');
 const moveToSign = require('./moveToSign');
@@ -19,6 +20,7 @@ module.exports = {
   findOrCreateChannelBySignedSender,
   groupAddMembers,
   initChatFromProfileAsAnonymousV2,
+  initChatFromProfileAsSignedV2,
   listFeaturedGif,
   moveToAnon,
   moveToSign,
