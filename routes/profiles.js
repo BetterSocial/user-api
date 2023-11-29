@@ -110,5 +110,11 @@ router.post(
   validate(ProfileValidation.followAnonUser),
   profileController.followAnonUser
 );
+router.post(
+  '/unfollow-anonymous-user',
+  Auth.isAuthV2,
+  validate(ProfileValidation.unfollowAnonUser),
+  profileController.unfollowAnonUser
+);
 
 module.exports = router;
