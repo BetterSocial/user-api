@@ -24,6 +24,8 @@ const deleteMessage = async (req, res) => {
       return res.status(404).json({message: 'Message not found'});
     }
     return res.status(500).json({message: 'Error connecting to chat'});
+  } finally {
+    await client.disconnectUser();
   }
 };
 
