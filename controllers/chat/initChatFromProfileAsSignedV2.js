@@ -19,8 +19,10 @@ const initChatFromProfileAsSignedV2 = async (req, res) => {
 
   const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
   try {
-    const userModel = await UsersFunction.findUserById(User, req?.userId);
-    const targetUserModel = await UsersFunction.findUserById(User, member);
+    const [userModel, targetUserModel] = await Promise.all([
+      UsersFunction.findUserById(User, req.userId),
+      UsersFunction.findUserById(User, member)
+    ]);
     /**
      * @type {import('stream-chat').OwnUserResponse}
      */
