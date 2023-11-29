@@ -18,7 +18,7 @@ const {
   searchGif,
   listFeaturedGif,
   registerShareGif,
-  initChatFromPost
+  initChatFromPost,
   groupAddMembers,
   removeGroupMember
 } = require('../controllers/chat');
