@@ -6,6 +6,7 @@ const initChatFromProfileAsAnonymousV2 = require('./initChatFromProfileAsAnonymo
 const listFeaturedGif = require('./gif/listFeaturedGif');
 const moveToAnon = require('./moveToAnon');
 const moveToSign = require('./moveToSign');
+const initChatFromPost = require('./initChatFromPost');
 const searchGif = require('./gif/searchGif');
 const registerShareGif = require('./gif/registerShareGif');
 const removeGroupMember = require('./group/removeGroupMember');
@@ -21,6 +22,7 @@ module.exports = {
   listFeaturedGif,
   moveToAnon,
   moveToSign,
+  initChatFromPost,
   registerShareGif,
   removeGroupMember,
   searchGif,

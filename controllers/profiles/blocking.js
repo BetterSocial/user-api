@@ -1,19 +1,7 @@
-require('dotenv').config();
-const env = process.env.NODE_ENV || 'development';
-const {User, UserBlockedUser} = require('../../databases/models');
-
-const Sequelize = require('sequelize');
 const {QueryTypes} = require('sequelize');
-const config = require('../../databases/config/database.js')[env];
+const {sequelize} = require('../../databases/models');
 const handleBlock = async (req, res) => {
   try {
-    let sequelize;
-    if (config.use_env_variable) {
-      sequelize = new Sequelize(process.env[config.use_env_variable], config);
-    } else {
-      sequelize = new Sequelize(config.database, config.username, config.password, config);
-    }
-
     const allBlock = await sequelize.query(
       `SELECT 
           "UserBlockedUser"."blocked_action_id", 
@@ -32,7 +20,7 @@ const handleBlock = async (req, res) => {
           "user"."profile_pic_public_id" AS "user.profile_pic_public_id", 
           "user"."status" AS "user.status" FROM "user_blocked_user" AS "UserBlockedUser" 
           INNER JOIN "users" AS "user" ON "UserBlockedUser"."user_id_blocked" = "user"."user_id" 
-          WHERE "UserBlockedUser"."user_id_blocker" = :id AND "UserBlockedUser"."is_anonymous_user" = FALSE;`,
+          WHERE "UserBlockedUser"."user_id_blocker" = :id AND "user"."is_anonymous" = FALSE;`,
       {
         nest: true,
         type: QueryTypes.SELECT,
