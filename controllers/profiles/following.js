@@ -31,7 +31,12 @@ module.exports = async (req, res) => {
       "user"."profile_pic_path" AS "user.profile_pic_path", 
       "user"."profile_pic_asset_id" AS "user.profile_pic_asset_id", 
       "user"."profile_pic_public_id" AS "user.profile_pic_public_id", 
-      "user"."status" AS "user.status" FROM "user_follow_user" AS "UserFollowUser" 
+      "user"."status" AS "user.status",
+      ARRAY( select name from topics as tp
+        left join user_topics as utp on tp.topic_id = utp.topic_id
+        where utp.user_id = "user".user_id limit 3
+      ) as "user.community_info"
+      FROM "user_follow_user" AS "UserFollowUser"
       LEFT OUTER JOIN 
       "users" AS "user" ON "UserFollowUser"."user_id_followed" = "user"."user_id"
       WHERE "UserFollowUser"."user_id_follower" = :id AND "UserFollowUser"."user_id_followed" != :id AND "user"."is_anonymous" = false;`,

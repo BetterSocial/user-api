@@ -85,6 +85,13 @@ const ChatValidation = {
       country: string.default('US'),
       locale: string.default('en_US')
     }
+  },
+
+  removeGroupMember: {
+    body: {
+      channelId: string.required(),
+      targetUserId: uuid.required()
+    }
   }
 };
 

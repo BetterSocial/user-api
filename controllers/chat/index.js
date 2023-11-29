@@ -1,12 +1,14 @@
-const changeChannelDetail = require('./changeChannelDetail');
+const changeChannelDetail = require('./group/changeChannelDetail');
 const deleteChat = require('./deleteChat');
 const findOrCreateChannelBySignedSender = require('./findOrCreateChannelBySignedSender');
+const groupAddMembers = require('./group/groupAddMembers');
 const listFeaturedGif = require('./gif/listFeaturedGif');
 const moveToAnon = require('./moveToAnon');
 const moveToSign = require('./moveToSign');
 const initChatFromPost = require('./initChatFromPost');
 const searchGif = require('./gif/searchGif');
 const registerShareGif = require('./gif/registerShareGif');
+const removeGroupMember = require('./group/removeGroupMember');
 const sendSignedMessage = require('./sendSignedMessage');
 const setSignedChannelAsRead = require('./setSignedChannelAsRead');
 
@@ -14,11 +16,13 @@ module.exports = {
   changeChannelDetail,
   deleteChat,
   findOrCreateChannelBySignedSender,
+  groupAddMembers,
   listFeaturedGif,
   moveToAnon,
   moveToSign,
   initChatFromPost,
   registerShareGif,
+  removeGroupMember,
   searchGif,
   sendSignedMessage,
   setSignedChannelAsRead

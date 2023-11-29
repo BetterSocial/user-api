@@ -1,21 +1,27 @@
 const {Request, Response} = require('express');
 const {DomainPage} = require('../../databases/models');
-const OpenGraph = require('open-graph');
+const ogs = require('open-graph-scraper');
 
-const __getOpenGraphInfo = (url) => {
-  return new Promise((resolve, reject) => {
-    OpenGraph(url, (err, meta) => {
-      if (err)
-        return reject({
-          success: false,
-          error: err
-        });
-      return resolve({
-        success: true,
-        data: meta
-      });
-    });
-  });
+const __getOpenGraphInfo = async (url) => {
+  try {
+    const {error, result} = await ogs({url});
+    if (error) {
+      return {
+        success: false,
+        error: error
+      };
+    }
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (e) {
+    return {
+      success: false,
+      error: e
+    };
+  }
 };
 
 /**
@@ -51,21 +57,20 @@ const getOpenGraph = async (req, res) => {
     });
   }
 
-  const {title, image, url: link, description} = urlOpenGraph?.data || {};
-
+  const {ogTitle, ogImage, ogUrl, ogDescription} = urlOpenGraph?.data || {};
   return res.status(200).json({
     success: true,
     message: 'get open graph success',
     data: {
       domain: {
-        name: singleDomain === null ? openGraphDomain?.title : singleDomain?.domain_name,
-        image: singleDomain === null ? openGraphDomain?.image : singleDomain?.logo
+        name: singleDomain === null ? openGraphDomain?.data?.ogTitle : singleDomain?.domain_name,
+        image: singleDomain === null ? openGraphDomain?.data?.ogImage : singleDomain?.logo
       },
       meta: {
-        title,
-        image: image?.url,
-        url: link,
-        description
+        title: ogTitle,
+        image: ogImage?.[0]?.url,
+        url: ogUrl,
+        description: ogDescription
       }
     }
   });

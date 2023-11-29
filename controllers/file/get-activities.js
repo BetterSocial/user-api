@@ -5,11 +5,9 @@ module.exports = async (req, res) => {
   try {
     const activities = await getUnfilteredActivities(req);
     const csv = await generateCSV(activities);
-    res.set({
-      'Content-Type': 'text/csv',
-      'Content-Disposition': 'attachment; filename=user_activities.csv'
-    });
-    res.download(csv);
+    res.header('Content-Type', 'text/csv');
+    res.attachment(`user_activities.csv`);
+    return res.send(csv);
   } catch (error) {
     console.error(error);
     res.status(403).json({

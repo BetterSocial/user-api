@@ -19,11 +19,12 @@ const {
   listFeaturedGif,
   registerShareGif,
   initChatFromPost
+  groupAddMembers,
+  removeGroupMember
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
 const getChannelDetail = require('../controllers/chat/getChannelDetail');
-const groupAddMembers = require('../controllers/chat/groupAddMembers');
 
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
@@ -105,6 +106,13 @@ router.get(
   validate(ChatValidation.registerShareGif),
   auth.isAuth,
   registerShareGif
+);
+
+router.post(
+  '/group/remove-member',
+  validate(ChatValidation.removeGroupMember),
+  auth.isAuthV2,
+  removeGroupMember
 );
 
 module.exports = router;
