@@ -38,6 +38,12 @@ const ChatValidation = {
       anon_user_info_emoji_name: string.required()
     }
   },
+  initChatFromProfileAsSignedV2: {
+    body: {
+      member: string.required(),
+      message: string.required()
+    }
+  },
   sendFollowSystemMessage: {
     body: {
       channel_id: uuid.required(),
