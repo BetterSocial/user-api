@@ -7,11 +7,12 @@ const {CHANNEL_TYPE, MESSAGE_TYPE} = require('../../helpers/constants');
 const {User} = require('../../databases/models');
 const {responseSuccess} = require('../../utils/Responses');
 const BetterSocialCore = require('../../services/bettersocial');
+const {ErrorMessage} = require('../../helpers/message');
 
 const initChatFromProfileAsSignedV2 = async (req, res) => {
   const {member, message} = req.body;
   if (member === req.userId) {
-    return ErrorResponse.e403(res, 'You cannot chat with yourself');
+    return ErrorResponse.e403(res, ErrorMessage.CANNOT_CHAT_SELF);
   }
 
   const members = [member, req.userId];

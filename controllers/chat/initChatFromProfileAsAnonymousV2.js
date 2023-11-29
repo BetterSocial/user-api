@@ -7,6 +7,7 @@ const {responseError, responseSuccess} = require('../../utils/Responses');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {User, ChatAnonUserInfo} = require('../../databases/models');
 const BetterSocialCore = require('../../services/bettersocial');
+const {ErrorMessage} = require('../../helpers/message');
 
 const initChatFromProfileAsAnonymousV2 = async (req, res) => {
   const {
@@ -18,7 +19,7 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
     anon_user_info_emoji_name
   } = req.body;
   if (member === req.userId) {
-    return ErrorResponse.e403(res, 'You cannot chat with yourself');
+    return ErrorResponse.e403(res, ErrorMessage.CANNOT_CHAT_SELF);
   }
 
   const members = [member, req.userId];
@@ -150,7 +151,7 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
     };
 
     if (createdChannel?.channel?.is_channel_blocked) {
-      return res.status(400).json(responseError('Channel is blocked', response));
+      return res.status(400).json(responseError(ErrorMessage.CHANNEL_BLOCKED, response));
     }
 
     return res.status(200).json(responseSuccess('sent', response));
