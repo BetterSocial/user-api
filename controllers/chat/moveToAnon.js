@@ -86,6 +86,11 @@ const moveToAnon = async (req, res) => {
           newStateMemberWithAnonInfo[member].anon_user_info_emoji_code = anon_user_info_emoji_code;
           newStateMemberWithAnonInfo[member].anon_user_info_emoji_name = anon_user_info_emoji_name;
 
+          newStateMemberWithAnonInfo[member].user.name =
+            anon_user_info_color_name + ' ' + anon_user_info_emoji_name;
+          newStateMemberWithAnonInfo[member].user.username =
+            anon_user_info_color_name + ' ' + anon_user_info_emoji_name;
+
           if (checkChatAnonUserInfo !== null) {
             let new_anon_user_info_color_code =
               checkChatAnonUserInfo?.anon_user_info_color_code || anon_user_info_color_code;
@@ -104,6 +109,11 @@ const moveToAnon = async (req, res) => {
               new_anon_user_info_emoji_code;
             newStateMemberWithAnonInfo[member].anon_user_info_emoji_name =
               new_anon_user_info_emoji_name;
+
+            newStateMemberWithAnonInfo[member].user.name =
+              new_anon_user_info_color_name + ' ' + new_anon_user_info_emoji_name;
+            newStateMemberWithAnonInfo[member].user.username =
+              new_anon_user_info_color_name + ' ' + new_anon_user_info_emoji_name;
 
             /**
              * If the flag is true, insert new anon user info to DB
