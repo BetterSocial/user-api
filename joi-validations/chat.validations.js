@@ -52,6 +52,11 @@ const ChatValidation = {
       targetUserId: uuid.required()
     })
   },
+  initChatFromPost: {
+    body: object({
+      targetUserId: uuid.required()
+    })
+  },
   searchGif: {
     query: {
       q: string.required(),

@@ -18,6 +18,7 @@ const {
   searchGif,
   listFeaturedGif,
   registerShareGif,
+  initChatFromPost
   groupAddMembers,
   removeGroupMember
 } = require('../controllers/chat');
@@ -49,6 +50,12 @@ router.post('/init-chat', auth.isAuth, chatController.initChat);
 router.post('/init-chat-anonymous', auth.isAuthAnonim, chatController.initChatAnonymous);
 router.post('/move-to-anon', auth.isAuthAnonim, validate(ChatValidation.moveToAnon), moveToAnon);
 router.post('/move-to-sign', auth.isAuthV2, validate(ChatValidation.moveToSign), moveToSign);
+router.post(
+  '/init-chat-from-post',
+  auth.isAuth,
+  validate(ChatValidation.initChatFromPost),
+  initChatFromPost
+);
 router.post('/users/:targetUserId', auth.isAuth, chatController.getMyAnonProfile);
 router.post(
   '/channels/read',
