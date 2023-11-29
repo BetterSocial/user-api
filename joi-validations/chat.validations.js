@@ -27,6 +27,17 @@ const ChatValidation = {
       channel_type: string.required()
     }
   },
+
+  initChatFromProfileAsAnonymousV2: {
+    body: {
+      member: string.required(),
+      message: string.required(),
+      anon_user_info_color_code: string.required(),
+      anon_user_info_color_name: string.required(),
+      anon_user_info_emoji_code: string.required(),
+      anon_user_info_emoji_name: string.required()
+    }
+  },
   sendFollowSystemMessage: {
     body: {
       channel_id: uuid.required(),
