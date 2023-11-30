@@ -51,6 +51,14 @@ const CHANNEL_TYPE_STRING = {
   TOPIC: 'topic'
 };
 
+const MESSAGE_TYPE = {
+  REGULAR: 'regular',
+  SYSTEM: 'system',
+  REPLY_PROMPT: 'reply_prompt',
+  REPLY: 'reply',
+  SHARE: 'share'
+};
+
 const NOTIFICATION_TOPIC_NAME_PREFIX = 'topic_';
 
 const CREDDER_MIN_SCORE = 50;
@@ -74,6 +82,7 @@ module.exports = {
   MAX_FEED_FETCH_LIMIT_DOMAIN,
   MAX_FEED_FETCH_LIMIT,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
+  MESSAGE_TYPE,
   NOTIFICATION_TOPIC_NAME_PREFIX,
   NO_POLL_OPTION_UUID,
   POST_TYPE_LINK,

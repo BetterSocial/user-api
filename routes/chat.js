@@ -19,8 +19,11 @@ const {
   listFeaturedGif,
   registerShareGif,
   deleteMessage,
+  initChatFromPost,
   groupAddMembers,
-  removeGroupMember
+  removeGroupMember,
+  initChatFromProfileAsAnonymousV2,
+  initChatFromProfileAsSignedV2
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -48,8 +51,26 @@ router.get(
 router.get('/channels/:channelId', auth.isAuthAnonim, chatController.getChannel);
 router.post('/init-chat', auth.isAuth, chatController.initChat);
 router.post('/init-chat-anonymous', auth.isAuthAnonim, chatController.initChatAnonymous);
+router.post(
+  '/init-chat-anonymous-v2',
+  auth.isAuthAnonim,
+  validate(ChatValidation.initChatFromProfileAsAnonymousV2),
+  initChatFromProfileAsAnonymousV2
+);
+router.post(
+  '/init-chat-signed-v2',
+  auth.isAuthV2,
+  validate(ChatValidation.initChatFromProfileAsSignedV2),
+  initChatFromProfileAsSignedV2
+);
 router.post('/move-to-anon', auth.isAuthAnonim, validate(ChatValidation.moveToAnon), moveToAnon);
 router.post('/move-to-sign', auth.isAuthV2, validate(ChatValidation.moveToSign), moveToSign);
+router.post(
+  '/init-chat-from-post',
+  auth.isAuth,
+  validate(ChatValidation.initChatFromPost),
+  initChatFromPost
+);
 router.post('/users/:targetUserId', auth.isAuth, chatController.getMyAnonProfile);
 router.post(
   '/channels/read',

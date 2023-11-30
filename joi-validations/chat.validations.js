@@ -27,6 +27,23 @@ const ChatValidation = {
       channel_type: string.required()
     }
   },
+
+  initChatFromProfileAsAnonymousV2: {
+    body: {
+      member: string.required(),
+      message: string.required(),
+      anon_user_info_color_code: string.required(),
+      anon_user_info_color_name: string.required(),
+      anon_user_info_emoji_code: string.required(),
+      anon_user_info_emoji_name: string.required()
+    }
+  },
+  initChatFromProfileAsSignedV2: {
+    body: {
+      member: string.required(),
+      message: string.required()
+    }
+  },
   sendFollowSystemMessage: {
     body: {
       channel_id: uuid.required(),
@@ -49,6 +66,11 @@ const ChatValidation = {
   moveToSign: {
     body: object({
       oldChannelId: string.required(),
+      targetUserId: uuid.required()
+    })
+  },
+  initChatFromPost: {
+    body: object({
       targetUserId: uuid.required()
     })
   },

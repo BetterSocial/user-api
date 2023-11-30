@@ -6,6 +6,12 @@ const ProfileValidation = {
       follow_source: string.required(),
       user_id_followed: uuid.required()
     })
+  },
+  unfollowAnonUser: {
+    body: object({
+      follow_source: string.required(),
+      user_id_followed: uuid.required()
+    })
   }
 };
 
