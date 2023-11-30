@@ -1,12 +1,11 @@
-const moment = require('moment');
-const {POST_VERB_POLL, MAX_FEED_FETCH_LIMIT} = require('../../helpers/constants');
-const {DomainPage, User} = require('../../databases/models');
+const {MAX_FEED_FETCH_LIMIT} = require('../../helpers/constants');
+const {User} = require('../../databases/models');
 
 const UsersFunction = require('../../databases/functions/users');
 const Getstream = require('../../vendor/getstream');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const SuccessResponse = require('../../utils/response/SuccessResponse');
-const {modifyPollPostObject, modifyPostLinkPost, filterFeeds} = require('../../utils/post');
+const {filterFeeds} = require('../../utils/post');
 
 module.exports = async (req, res) => {
   try {
@@ -16,7 +15,11 @@ module.exports = async (req, res) => {
     if (!anonymousUserId) return ErrorResponse.e404(res, 'Anonymous user not found');
 
     const result = await Getstream.feed.getAnonymousFeeds(anonymousUserId?.user_id, limit, offset);
-    const newResult = await filterFeeds(req?.userId, result?.results || []);
+    const newResult = await filterFeeds(
+      req?.userId,
+      anonymousUserId?.user_id,
+      result?.results || []
+    );
 
     const responseData = {
       feeds: newResult,

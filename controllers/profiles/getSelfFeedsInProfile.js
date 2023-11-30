@@ -1,20 +1,16 @@
 const getstreamService = require('../../services/getstream');
-const moment = require('moment');
-const {
-  POST_VERB_POLL,
-  MAX_FEED_FETCH_LIMIT,
-  GETSTREAM_TIME_LINEAR_RANKING_METHOD
-} = require('../../helpers/constants');
-const {DomainPage} = require('../../databases/models');
+const {MAX_FEED_FETCH_LIMIT} = require('../../helpers/constants');
+const {User} = require('../../databases/models');
 
 const _ = require('lodash');
-const {modifyPostLinkPost, modifyPollPostObject, filterFeeds} = require('../../utils/post');
+const {filterFeeds} = require('../../utils/post');
+const UsersFunction = require('../../databases/functions/users');
 
 module.exports = async (req, res) => {
   let {limit = MAX_FEED_FETCH_LIMIT, offset = 0} = req.query;
-  let domainPageCache = {};
 
   const token = req.token;
+  const myAnonymousUser = await UsersFunction.findAnonymousUserId(User, req.userId);
 
   getstreamService
     .getFeeds(token, 'user_excl', {
@@ -25,7 +21,7 @@ module.exports = async (req, res) => {
     })
 
     .then(async (result) => {
-      let data = await filterFeeds(req?.userId, result?.results || []);
+      let data = await filterFeeds(req?.userId, myAnonymousUser?.user_id, result?.results || []);
 
       res.status(200).json({
         code: 200,

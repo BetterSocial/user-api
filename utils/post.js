@@ -333,7 +333,13 @@ const modifyNewItemAnonymity = (newItem) => {
   return newItem;
 };
 
-async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null) {
+async function filterFeeds(
+  userId,
+  selfAnonymousUserId,
+  feeds = [],
+  feed_id = null,
+  threshold = null
+) {
   const results = await Promise.all(
     feeds.map(async (item) => {
       const expired = isExpiredPost(item);
@@ -345,6 +351,8 @@ async function filterFeeds(userId, feeds = [], feed_id = null, threshold = null)
         return null;
       }
       let newItem = {...item};
+
+      newItem.is_self = item?.actor?.id === userId || item?.actor?.id === selfAnonymousUserId;
 
       newItem = modifyNewItemAnonymity(newItem);
       newItem = modifyReactionsPost(newItem, newItem.anonimity);

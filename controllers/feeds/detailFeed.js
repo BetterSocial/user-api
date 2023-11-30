@@ -6,6 +6,8 @@ const {NO_POLL_OPTION_UUID, POST_TYPE_POLL} = require('../../helpers/constants')
 const {getDetailFeed} = require('../../services/getstream');
 const {responseSuccess} = require('../../utils/Responses');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
+const UsersFunction = require('../../databases/functions/users');
+const {User} = require('../../databases/models');
 
 module.exports = async (req, res) => {
   const {id} = req.query;
@@ -22,7 +24,11 @@ module.exports = async (req, res) => {
     return ErrorResponse.e404(res, 'This post has expired and has been deleted automatically');
   }
 
+  const myAnonymousUser = await UsersFunction.findAnonymousUserId(User, req.userId, {raw: true});
+
   const newItem = {...feedItem};
+  newItem.is_self =
+    newItem.actor.id === req.userId || newItem.actor.id === myAnonymousUser?.user_id;
   const client = stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);
 
   if (newItem.anonimity) {
