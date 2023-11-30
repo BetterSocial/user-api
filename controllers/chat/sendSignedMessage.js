@@ -18,6 +18,21 @@ const sendSignedMesage = async (req, res) => {
       type: 'enum',
       values: Object.values(CHANNEL_TYPE),
       empty: false
+    },
+    attachments: {
+      type: 'array',
+      optional: true,
+      nullable: true,
+      empty: true,
+      items: {
+        type: 'object',
+        props: {
+          type: 'string',
+          asset_url: 'string',
+          thumb_url: 'string',
+          myCustomField: 'string'
+        }
+      }
     }
   };
   const validated = v.validate(req.body, schema);
@@ -27,7 +42,7 @@ const sendSignedMesage = async (req, res) => {
       error: validated
     });
 
-  const {channelId, message, channelType} = req.body;
+  const {channelId, message, channelType, attachments} = req.body;
 
   let channelTypeDef;
 
@@ -61,6 +76,7 @@ const sendSignedMesage = async (req, res) => {
 
     const chat = await channel.sendMessage({
       user_id: req.userId,
+      attachments,
       text: message
     });
 
