@@ -1,6 +1,5 @@
 const {StreamChat} = require('stream-chat');
 const Validator = require('fastest-validator');
-const {Op} = require('sequelize');
 const {v4: uuidv4} = require('uuid');
 const {responseSuccess, responseError} = require('../../utils/Responses');
 
@@ -82,94 +81,6 @@ module.exports = {
     members.push(req.userId);
     const channel = await AddMembersChannel('messaging', 'morris-heights', members);
     return res.status(200).json(responseSuccess('Success add members channel', channel));
-  },
-  sendAnonymous: async (req, res) => {
-    const schema = {
-      channelId: 'string|empty:false',
-      message: 'string|empty:false',
-      attachments: {
-        type: 'array',
-        optional: true,
-        nullable: true,
-        empty: true,
-        items: {
-          type: 'object',
-          props: {
-            type: 'string',
-            asset_url: 'string',
-            thumb_url: 'string',
-            myCustomField: 'string'
-          }
-        }
-      }
-    };
-    const validated = v.validate(req.body, schema);
-    if (validated.length)
-      return res.status(403).json({
-        message: 'Error validation',
-        error: validated
-      });
-
-    const {channelId, message, attachments} = req.body;
-
-    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
-    try {
-      await client.connectUser({id: req.userId}, req.token);
-
-      const channel = client.channel('messaging', channelId);
-
-      const createdChannel = await channel.create();
-
-      if (
-        req.user.is_anonymous &&
-        createdChannel.channel.anon_user_info_emoji_name &&
-        client.user.name !== `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`
-      ) {
-        await client.upsertUser({
-          id: req.userId,
-          name: `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`,
-          image: createdChannel.channel.anon_user_info_emoji_code,
-          username: `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`
-        });
-      }
-      if (createdChannel?.channel?.is_channel_blocked)
-        return res.status(403).json(responseError('Channel is blocked'));
-
-      const chat = await channel.sendMessage({
-        user_id: req.userId,
-        text: message,
-        attachments,
-        ...req.body
-      });
-      const channelMembers = await channel.queryMembers({
-        id: {$ne: req.userId}
-      });
-      const userIds = channelMembers.members.map((member) => member.user_id);
-
-      const anonReceivers = await ChatAnonUserInfo.findAll({
-        where: {
-          channel_id: channelId,
-          target_user_id: req.userId,
-          my_anon_user_id: {[Op.in]: userIds}
-        }
-      });
-
-      await Promise.all(
-        anonReceivers.map(async () => {
-          // Send Push Notification
-        })
-      );
-
-      await client.disconnectUser();
-      return res.status(200).json(responseSuccess('sent', chat));
-    } catch (error) {
-      await client.disconnectUser();
-      return res.status(error.statusCode ?? error.status ?? 400).json({
-        status: 'error',
-        code: error.statusCode ?? error.status ?? 400,
-        message: error.message
-      });
-    }
   },
   getChannels: async (req, res) => {
     const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
