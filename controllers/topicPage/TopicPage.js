@@ -9,6 +9,8 @@ const {filterFeeds} = require('../../utils/post');
 const {modifyPollPostObject} = require('../../utils/post');
 const TopicPageValidator = require('../../validators/topicPage');
 const {ACTIVITY_THRESHOLD} = require('../../config/constant');
+const UsersFunction = require('../../databases/functions/users');
+const {User} = require('../../databases/models');
 
 class TopicPage {
   constructor() {
@@ -39,7 +41,13 @@ class TopicPage {
       payload.listPostAnonymous
     ).getHasBlock(topicPages);
     const threshold = ACTIVITY_THRESHOLD.TOPIC_FEED;
-    results.data = await filterFeeds(payload.userId, newTopicPagesWithBlock, payload.id, threshold);
+    results.data = await filterFeeds(
+      payload.userId,
+      payload.anonymousUserId,
+      newTopicPagesWithBlock,
+      payload.id,
+      threshold
+    );
     return results;
   }
 
@@ -88,6 +96,9 @@ class TopicPage {
       const listBlockUser = await getListBlockUser(req.userId);
       const listBlockDomain = await getBlockDomain(req.userId);
       const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
+      const myAnonymousUser = await UsersFunction.findAnonymousUserId(User, req.userId, {
+        raw: true
+      });
 
       let payload = {
         listBlockUser,
@@ -96,7 +107,8 @@ class TopicPage {
         id,
         limit,
         offset,
-        userId: req.userId
+        userId: req.userId,
+        anonymousUserId: myAnonymousUser?.user_id
       };
 
       let feeds = await this.getValidActivity(req.userId, payload, limit);
