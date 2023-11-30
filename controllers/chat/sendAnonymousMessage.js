@@ -1,26 +1,14 @@
 const Validator = require('fastest-validator');
 const {StreamChat} = require('stream-chat');
 const {responseError, responseSuccess} = require('../../utils/Responses');
-const {CHANNEL_TYPE, MESSAGE_TYPE} = require('../../helpers/constants');
-const Environment = require('../../config/environment');
+const {MESSAGE_TYPE} = require('../../helpers/constants');
 const {determineMessageType, processReplyMessage} = require('../../utils/chat');
 
 const v = new Validator();
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- */
-const sendSignedMesage = async (req, res) => {
+const sendAnonymousMessage = async (req, res) => {
   const schema = {
     channelId: 'string|empty:false',
     message: 'string|empty:false',
-    channelType: {
-      type: 'enum',
-      values: Object.values(CHANNEL_TYPE),
-      empty: false
-    },
     messageType: {
       type: 'enum',
       values: Object.values(MESSAGE_TYPE),
@@ -52,35 +40,28 @@ const sendSignedMesage = async (req, res) => {
       error: validated
     });
 
-  const {channelId, message, channelType, attachments, messageType, replyMessageId} = req.body;
+  const {channelId, message, attachments, messageType, replyMessageId} = req.body;
 
-  let channelTypeDef;
-
-  switch (channelType) {
-    case CHANNEL_TYPE.CHAT:
-    case CHANNEL_TYPE.ANONYMOUS:
-      channelTypeDef = 'messaging';
-      break;
-
-    case CHANNEL_TYPE.GROUP:
-      channelTypeDef = 'group';
-      break;
-
-    default:
-      return res.status(403).json({
-        message: 'Error validation',
-        error: 'Channel type not found'
-      });
-  }
-
-  const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
+  const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
   try {
     await client.connectUser({id: req.userId}, req.token);
 
-    const channel = client.channel(channelTypeDef, channelId);
+    const channel = client.channel('messaging', channelId);
 
     const createdChannel = await channel.create();
 
+    if (
+      req.user.is_anonymous &&
+      createdChannel.channel.anon_user_info_emoji_name &&
+      client.user.name !== `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`
+    ) {
+      await client.upsertUser({
+        id: req.userId,
+        name: `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`,
+        image: createdChannel.channel.anon_user_info_emoji_code,
+        username: `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`
+      });
+    }
     if (createdChannel?.channel?.is_channel_blocked)
       return res.status(403).json(responseError('Channel is blocked'));
 
@@ -109,12 +90,12 @@ const sendSignedMesage = async (req, res) => {
     return res.status(200).json(responseSuccess('sent', chat));
   } catch (error) {
     await client.disconnectUser();
-    return res.status(error.statusCode ?? error.status ?? 500).json({
+    return res.status(error.statusCode ?? error.status ?? 400).json({
       status: 'error',
-      code: error.statusCode ?? error.status ?? 500,
+      code: error.statusCode ?? error.status ?? 400,
       message: error.message
     });
   }
 };
 
-module.exports = sendSignedMesage;
+module.exports = sendAnonymousMessage;

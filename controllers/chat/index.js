@@ -12,6 +12,7 @@ const searchGif = require('./gif/searchGif');
 const registerShareGif = require('./gif/registerShareGif');
 const removeGroupMember = require('./group/removeGroupMember');
 const sendSignedMessage = require('./sendSignedMessage');
+const sendAnonymousMessage = require('./sendAnonymousMessage');
 const setSignedChannelAsRead = require('./setSignedChannelAsRead');
 const deleteMessage = require('./deleteMessage');
 
@@ -29,6 +30,7 @@ module.exports = {
   registerShareGif,
   removeGroupMember,
   searchGif,
+  sendAnonymousMessage,
   sendSignedMessage,
   setSignedChannelAsRead,
   deleteMessage

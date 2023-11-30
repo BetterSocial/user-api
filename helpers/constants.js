@@ -56,7 +56,13 @@ const MESSAGE_TYPE = {
   SYSTEM: 'system',
   REPLY_PROMPT: 'reply_prompt',
   REPLY: 'reply',
-  SHARE: 'share'
+  SHARE: 'share',
+  MEDIA: 'media',
+  VIDEO: 'video',
+  GIF: 'gif',
+  LOCATION: 'location',
+  SOUND: 'sound',
+  DELETED: 'deleted'
 };
 
 const NOTIFICATION_TOPIC_NAME_PREFIX = 'topic_';

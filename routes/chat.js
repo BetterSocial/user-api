@@ -23,7 +23,8 @@ const {
   groupAddMembers,
   removeGroupMember,
   initChatFromProfileAsAnonymousV2,
-  initChatFromProfileAsSignedV2
+  initChatFromProfileAsSignedV2,
+  sendAnonymousMessage
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -32,7 +33,7 @@ const getChannelDetail = require('../controllers/chat/getChannelDetail');
 router.get('/create-channel', chatController.createChannel);
 router.post('/add-moderator', chatController.addChannelModerator);
 router.post('/add-members-channel', auth.isAuth, chatController.addMembers);
-router.post('/anonymous', auth.isAuthAnonim, chatController.sendAnonymous);
+router.post('/anonymous', auth.isAuthAnonim, sendAnonymousMessage);
 router.post('/send-signed-message', auth.isAuthV2, sendSignedMessage);
 
 router.get('/channels', auth.isAuthAnonim, chatController.getChannels);
