@@ -13,6 +13,7 @@ const registerShareGif = require('./gif/registerShareGif');
 const removeGroupMember = require('./group/removeGroupMember');
 const sendSignedMessage = require('./sendSignedMessage');
 const setSignedChannelAsRead = require('./setSignedChannelAsRead');
+const deleteMessage = require('./deleteMessage');
 
 module.exports = {
   changeChannelDetail,
@@ -29,5 +30,6 @@ module.exports = {
   removeGroupMember,
   searchGif,
   sendSignedMessage,
-  setSignedChannelAsRead
+  setSignedChannelAsRead,
+  deleteMessage
 };

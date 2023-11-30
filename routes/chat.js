@@ -18,6 +18,7 @@ const {
   searchGif,
   listFeaturedGif,
   registerShareGif,
+  deleteMessage,
   initChatFromPost,
   groupAddMembers,
   removeGroupMember,
@@ -121,6 +122,8 @@ router.get(
   auth.isAuth,
   registerShareGif
 );
+
+router.delete('/message/:messageID', auth.isAuth, deleteMessage);
 
 router.post(
   '/group/remove-member',
