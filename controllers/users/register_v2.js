@@ -163,7 +163,7 @@ const registerV2 = async (req, res) => {
     const scoringQueueTopic = insertedObject?.topics?.map((topic) => topic.name);
     const scoringProcessData = {
       user_id: insertedObject?.user?.user_id,
-      register_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+      register_time: moment.utc().format('YYYY-MM-DD HH:mm:ss'),
       emails: [],
       twitter_acc: '',
       topics: scoringQueueTopic,
