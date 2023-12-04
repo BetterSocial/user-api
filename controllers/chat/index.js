@@ -15,6 +15,7 @@ const sendSignedMessage = require('./sendSignedMessage');
 const sendAnonymousMessage = require('./sendAnonymousMessage');
 const setSignedChannelAsRead = require('./setSignedChannelAsRead');
 const deleteMessage = require('./deleteMessage');
+const newChatAnonymous = require('./newChatAnonymous');
 
 module.exports = {
   changeChannelDetail,
@@ -33,5 +34,6 @@ module.exports = {
   sendAnonymousMessage,
   sendSignedMessage,
   setSignedChannelAsRead,
-  deleteMessage
+  deleteMessage,
+  newChatAnonymous
 };

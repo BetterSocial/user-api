@@ -29,6 +29,8 @@ const updateBetterChannelMembers = async (
   if (!channel) throw new Error('Channel is required');
 
   const {members} = channel;
+  console.log('channel', channel);
+  console.log('members', members);
 
   const membersIds = members.map((member) => member.user_id);
 
