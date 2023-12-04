@@ -1,4 +1,5 @@
 const {StreamChat} = require('stream-chat');
+const {MESSAGE_TYPE} = require('../../helpers/constants');
 
 const deleteMessage = async (req, res) => {
   const client = new StreamChat(process.env.API_KEY, process.env.SECRET_KEY);
@@ -11,7 +12,11 @@ const deleteMessage = async (req, res) => {
       },
       req.token
     );
-
+    await client.partialUpdateMessage(messageID, {
+      set: {
+        message_type: MESSAGE_TYPE.DELETED
+      }
+    });
     let destroy = await client.deleteMessage(messageID);
 
     if (!destroy) {
