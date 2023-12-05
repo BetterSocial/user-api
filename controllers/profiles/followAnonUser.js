@@ -12,8 +12,25 @@ const UsersFunction = require('../../databases/functions/users');
 const {sendFollowMainFeedF2} = require('../../services/queue/mainFeedF2');
 
 module.exports = async (req, res) => {
-  const {user_id_followed, follow_source} = req.body;
+  let {user_id_followed, follow_source, post_id, comment_id} = req.body;
   const {user} = req;
+
+  if (follow_source === 'post') {
+    const post = await Getstream.feed.getPlainFeedById(post_id);
+    if (!post) return ErrorResponse.e403(res, 'Post id not found');
+
+    user_id_followed = post?.actor?.id;
+  } else if (follow_source === 'comment') {
+    try {
+      const reaction = await Getstream.feed.getReactionById(comment_id);
+
+      if (!reaction) return ErrorResponse.e403(res, 'Comment id not found');
+
+      user_id_followed = reaction?.user?.id;
+    } catch (error) {
+      return ErrorResponse.e403(res, 'Comment id not found');
+    }
+  }
 
   if (req?.userId === user_id_followed)
     return ErrorResponse.e403(res, 'Only allow following other profiles');
