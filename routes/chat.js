@@ -24,7 +24,8 @@ const {
   removeGroupMember,
   initChatFromProfileAsAnonymousV2,
   initChatFromProfileAsSignedV2,
-  sendAnonymousMessage
+  sendAnonymousMessage,
+  newChatAnonymous
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -72,6 +73,7 @@ router.post(
   validate(ChatValidation.initChatFromPost),
   initChatFromPost
 );
+router.post('/new-chat-anonymous', auth.isAuthAnonim, newChatAnonymous);
 router.post('/users/:targetUserId', auth.isAuth, chatController.getMyAnonProfile);
 router.post(
   '/channels/read',
