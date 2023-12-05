@@ -4,6 +4,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {responseError, responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const UsersFunction = require('../../databases/functions/users');
+const Getstream = require('../../vendor/getstream');
 
 /**
  *
@@ -11,14 +12,23 @@ const UsersFunction = require('../../databases/functions/users');
  * @param {import("express").Response} res
  */
 const moveToAnon = async (req, res) => {
-  const {
+  let {
     targetUserId,
     oldChannelId,
+    source,
+    postId,
+    commentId,
     anon_user_info_color_code,
     anon_user_info_color_name,
     anon_user_info_emoji_code,
     anon_user_info_emoji_name
   } = req.body;
+
+  targetUserId = await Getstream.feed.getUserIdFromSource(res, source, {
+    post_id: postId,
+    comment_id: commentId,
+    user_id: targetUserId
+  });
 
   let members = [targetUserId];
   if (!members.includes(req.userId)) members.push(req.userId);

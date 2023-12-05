@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const {uuid, array, object, string, number} = require('./general.validations');
 
 const ChatValidation = {
@@ -60,18 +61,69 @@ const ChatValidation = {
       anon_user_info_emoji_code: string.required(),
       anon_user_info_emoji_name: string.required(),
       oldChannelId: string.required(),
-      targetUserId: uuid.required()
+      source: string.required(),
+      targetUserId: uuid.when('source', {
+        switch: [
+          {is: 'post', then: Joi.optional()},
+          {is: 'comment', then: Joi.optional()}
+        ],
+        otherwise: Joi.required()
+      }),
+      postId: uuid.when('source', {
+        is: 'post',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      }),
+      commentId: uuid.when('source', {
+        is: 'comment',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      })
     })
   },
   moveToSign: {
     body: object({
       oldChannelId: string.required(),
-      targetUserId: uuid.required()
+      source: string.required(),
+      targetUserId: uuid.when('source', {
+        switch: [
+          {is: 'post', then: Joi.optional()},
+          {is: 'comment', then: Joi.optional()}
+        ],
+        otherwise: Joi.required()
+      }),
+      postId: uuid.when('source', {
+        is: 'post',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      }),
+      commentId: uuid.when('source', {
+        is: 'comment',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      })
     })
   },
   initChatFromPost: {
     body: object({
-      targetUserId: uuid.required()
+      source: string.required(),
+      targetUserId: uuid.when('source', {
+        switch: [
+          {is: 'post', then: Joi.optional()},
+          {is: 'comment', then: Joi.optional()}
+        ],
+        otherwise: Joi.required()
+      }),
+      postId: uuid.when('source', {
+        is: 'post',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      }),
+      commentId: uuid.when('source', {
+        is: 'comment',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      })
     })
   },
   searchGif: {
