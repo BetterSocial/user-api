@@ -29,6 +29,7 @@ const unfollowAnonUserByBlockAnonPost = require('./feed/unfollowAnonUserByBlockA
 const unfollowUser = require('./feed/unfollowUser');
 const unfollowUserExclusive = require('./feed/unfollowUserExclusive');
 const followUserAnon = require('./feed/followUserAnon');
+const getUserIdFromSource = require('./feed/getUserIdFromSource');
 
 const Getstream = {
   core: {
@@ -66,7 +67,8 @@ const Getstream = {
     unfollowMainFeedFollowing: mainFeedFollowing.unfollow,
     followMainFeedFollowingAnon: mainFeedFollowingAnon.follow,
     unfollowMainFeedFollowingAnon: mainFeedFollowingAnon.unfollow,
-    followUserAnon
+    followUserAnon,
+    getUserIdFromSource
   }
 };
 

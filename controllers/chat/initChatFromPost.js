@@ -5,6 +5,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const UsersFunction = require('../../databases/functions/users');
+const Getstream = require('../../vendor/getstream');
 
 /**
  *
@@ -12,7 +13,13 @@ const UsersFunction = require('../../databases/functions/users');
  * @param {import("express").Response} res
  */
 const initChatFromPost = async (req, res) => {
-  const {targetUserId} = req.body;
+  let {targetUserId, source, postId, commentId} = req.body;
+
+  targetUserId = await Getstream.feed.getUserIdFromSource(res, source, {
+    post_id: postId,
+    comment_id: commentId,
+    user_id: targetUserId
+  });
 
   let members = [targetUserId];
   if (!members.includes(req.userId)) members.push(req.userId);
