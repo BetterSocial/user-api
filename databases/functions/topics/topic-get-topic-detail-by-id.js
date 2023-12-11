@@ -25,10 +25,11 @@ const getTopicDetailById = async (sequelize, selfUserId, topicName) => {
       }
     });
 
-    return response[0];
+    return response?.[0];
   } catch (error) {
-    console.log(error);
-    throw new Error(error);
+    console.error('Error on fetching topic detail');
+    console.error(error);
+    return null;
   }
 };
 

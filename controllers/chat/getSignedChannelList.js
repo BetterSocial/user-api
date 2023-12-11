@@ -79,9 +79,6 @@ const __filterAndTransformChannelData = async (channel, userId) => {
       removePrefixTopic(newChannel.id)
     );
 
-    console.log(`topic name ${removePrefixTopic(newChannel.id)}`);
-    console.log(topic);
-
     newChannel.image = topic?.icon_path || null;
     newChannel.channelImage = topic?.icon_path || null;
     newChannel.channel_image = topic?.icon_path || null;
