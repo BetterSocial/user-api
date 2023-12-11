@@ -15,8 +15,7 @@ const deleteMessage = async (req, res) => {
     await client.partialUpdateMessage(messageID, {
       set: {
         message_type: MESSAGE_TYPE.DELETED,
-        text: 'This message has been deleted',
-        html: '<p>This message has been deleted</p>\n'
+        text: 'This message has been deleted'
       }
     });
     let destroy = await client.deleteMessage(messageID);
