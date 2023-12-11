@@ -1,7 +1,7 @@
 const {StreamChat} = require('stream-chat');
 const {responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
-const {Topics} = require('../../databases/models');
+const {sequelize} = require('../../databases/models');
 const TopicFunction = require('../../databases/functions/topics');
 const {removePrefixTopic} = require('../../utils/custom');
 
@@ -62,7 +62,7 @@ const __queryChannelBuilder = async (client, userId, limit, offset) => {
  * @param {import('stream-chat').Channel} channel
  * @returns
  */
-const __filterAndTransformChannelData = async (channel) => {
+const __filterAndTransformChannelData = async (channel, userId) => {
   const newChannel = {...channel.data};
   delete newChannel.config;
   delete newChannel.own_capabilities;
@@ -73,10 +73,18 @@ const __filterAndTransformChannelData = async (channel) => {
   if (messageLength === 0 && channelType === CHANNEL_TYPE.TOPIC) return false;
 
   if (channelType === CHANNEL_TYPE.TOPIC) {
-    const topic = await TopicFunction.findOneByName(Topics, removePrefixTopic(newChannel.id));
-    newChannel.image = topic.icon_path || null;
-    newChannel.channelImage = topic.icon_path || null;
-    newChannel.channel_image = topic.icon_path || null;
+    const topic = await TopicFunction.getTopicDetailByTopicId(
+      sequelize,
+      userId,
+      removePrefixTopic(newChannel.id)
+    );
+
+    newChannel.image = topic?.icon_path || null;
+    newChannel.channelImage = topic?.icon_path || null;
+    newChannel.channel_image = topic?.icon_path || null;
+    newChannel.cover_image = topic?.cover_path || null;
+    newChannel.is_following = topic?.is_following || false;
+    newChannel.topic_follower_count = parseInt(topic?.topic_follower_count || 0);
   }
 
   const members = [];
@@ -128,7 +136,7 @@ const getSignedChannelList = async (req, res) => {
     const channels = [];
     for (let i = 0; i < queriedChannels.length; i++) {
       const _channelItem = queriedChannels[i];
-      const _filteredChannel = await __filterAndTransformChannelData(_channelItem);
+      const _filteredChannel = await __filterAndTransformChannelData(_channelItem, userId);
 
       if (_filteredChannel) channels.push(_filteredChannel);
     }
