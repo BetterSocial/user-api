@@ -2,35 +2,17 @@ const getstreamService = require('../../services/getstream');
 const {
   POST_VERB_POLL,
   MAX_FEED_FETCH_LIMIT,
-  NO_POLL_OPTION_UUID,
-  BLOCK_FEED_KEY,
-  BLOCK_POST_ANONYMOUS,
-  GETSTREAM_RANKING_METHOD,
   MAX_GET_FEED_FROM_GETSTREAM_ITERATION,
   MAX_DATA_RETURN_LENGTH,
   POST_TYPE_LINK,
   GETSTREAM_TIME_LINEAR_RANKING_METHOD
 } = require('../../helpers/constants');
-const {
-  PollingOption,
-  LogPolling,
-  sequelize,
-  UserFollowUser,
-  DomainPage
-} = require('../../databases/models');
-const {Op} = require('sequelize');
-const {getListBlockUser, getListBlockPostAnonymous} = require('../../services/blockUser');
-const getBlockDomain = require('../../services/domain/getBlockDomain');
-const _ = require('lodash');
-const lodash = require('lodash');
-const {setData, getValue, delCache} = require('../../services/redis');
-const {convertString} = require('../../utils/custom');
+const {UserFollowUser, DomainPage} = require('../../databases/models');
 const {modifyPollPostObject} = require('../../utils/post');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 
 module.exports = async (req, res) => {
   let {offset = 0, limit = MAX_FEED_FETCH_LIMIT} = req.query;
-  let domainPageCache = {};
 
   let getFeedFromGetstreamIteration = 0;
   let data = [];
@@ -77,6 +59,8 @@ module.exports = async (req, res) => {
         if (now < dateExpired || item.duration_feed == 'never') {
           let newItem = {...item};
           if (item.anonimity) continue;
+
+          newItem.is_following_target = userFollow ? true : false;
           if (item.verb === POST_VERB_POLL) {
             newItem = await modifyPollPostObject(req.userId, item);
             data.push(newItem);

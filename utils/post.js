@@ -8,6 +8,7 @@ const {
   LogPolling,
   Topics,
   DomainPage,
+  UserFollowUser,
   sequelize,
   Sequelize
 } = require('../databases/models');
@@ -21,6 +22,7 @@ const deleteActivityFromUserFeed = require('../services/getstream/deleteActivity
  */
 
 const RedisDomainHelper = require('../services/redis/helper/RedisDomainHelper');
+const UserFollowUserFunction = require('../databases/functions/userFollowUser');
 
 /**
  *
@@ -333,6 +335,17 @@ const modifyNewItemAnonymity = (newItem) => {
   return newItem;
 };
 
+const modifyFeedIsFollowingTarget = async (newItem, userId) => {
+  const isFollowingTarget = await UserFollowUserFunction.checkIsUserFollowing(
+    UserFollowUser,
+    userId,
+    newItem?.actor?.id
+  );
+
+  newItem.is_following_target = isFollowingTarget;
+  return newItem;
+};
+
 async function filterFeeds(
   userId,
   selfAnonymousUserId,
@@ -353,7 +366,7 @@ async function filterFeeds(
       let newItem = {...item};
 
       newItem.is_self = item?.actor?.id === userId || item?.actor?.id === selfAnonymousUserId;
-
+      newItem = await modifyFeedIsFollowingTarget(newItem, userId);
       newItem = modifyNewItemAnonymity(newItem);
       newItem = modifyReactionsPost(newItem, newItem.anonimity);
 
@@ -376,6 +389,7 @@ module.exports = {
   isPostBlocked,
   modifyAnonimityPost,
   modifyAnonymousAndBlockPost,
+  modifyFeedIsFollowingTarget,
   modifyPollPostObject,
   modifyReactionsPost,
   getFeedDuration,
