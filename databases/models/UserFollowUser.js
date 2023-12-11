@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate(_models) {
       // define association here
     }
   }
@@ -19,7 +19,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true
       },
       user_id_follower: {type: DataTypes.UUID, allowNull: false},
-      user_id_followed: {type: DataTypes.UUID, allowNull: false}
+      user_id_followed: {type: DataTypes.UUID, allowNull: false},
+      is_anonymous: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+      }
     },
     {
       sequelize,
