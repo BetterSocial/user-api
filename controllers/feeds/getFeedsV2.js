@@ -16,7 +16,8 @@ const {
   modifyPollPostObject,
   modifyAnonimityPost,
   isPostBlocked,
-  modifyReactionsPost
+  modifyReactionsPost,
+  modifyFeedIsFollowingTarget
 } = require('../../utils/post');
 const {DomainPage, Locations, User} = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
@@ -180,7 +181,8 @@ module.exports = async (req, res) => {
           } else {
             item.is_self =
               item.actor.id === req.userId || item.actor.id === myAnonymousUser?.user_id;
-            let newItem = await modifyAnonimityPost(item);
+            let newItem = await modifyFeedIsFollowingTarget(item, req.userId);
+            newItem = await modifyAnonimityPost(newItem);
             newItem = modifyReactionsPost(newItem, newItem.anonimity);
             if (item.verb === POST_VERB_POLL) {
               const postPoll = await modifyPollPostObject(req.userId, item);
