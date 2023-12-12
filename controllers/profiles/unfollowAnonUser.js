@@ -11,7 +11,13 @@ const UsersFunction = require('../../databases/functions/users');
 const {sendUnFollowMainFeedF2} = require('../../services/queue/mainFeedF2');
 
 module.exports = async (req, res) => {
-  const {user_id_followed, follow_source} = req.body;
+  let {user_id_followed, follow_source, post_id, comment_id} = req.body;
+
+  user_id_followed = await Getstream.feed.getUserIdFromSource(res, follow_source, {
+    post_id,
+    comment_id,
+    user_id: user_id_followed
+  });
 
   if (req?.userId === user_id_followed)
     return ErrorResponse.e403(res, 'Only allow unfollowing other profiles');
