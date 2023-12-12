@@ -74,6 +74,11 @@ const initChatFromPost = async (req, res) => {
       newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_name =
         postAnonUserInfo?.anon_user_info_emoji_name;
 
+      newStateMemberWithAnonInfo[targetUserModel.user_id].user.name =
+        'Anonymous ' + postAnonUserInfo?.anon_user_info_emoji_name;
+      newStateMemberWithAnonInfo[targetUserModel.user_id].user.username =
+        'Anonymous ' + postAnonUserInfo?.anon_user_info_emoji_name;
+
       await ChatAnonUserInfo.create({
         channel_id: newChannel.id,
         my_anon_user_id: userModel.user_id,
@@ -90,6 +95,9 @@ const initChatFromPost = async (req, res) => {
       newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_color_name = color.color;
       newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_code = emoji.emoji;
       newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_name = emoji.name;
+
+      newStateMemberWithAnonInfo[userModel.user_id].user.name = 'Anonymous ' + emoji.name;
+      newStateMemberWithAnonInfo[userModel.user_id].user.username = 'Anonymous ' + emoji.name;
 
       await ChatAnonUserInfo.create({
         channel_id: newChannel.id,
@@ -109,7 +117,6 @@ const initChatFromPost = async (req, res) => {
         if (userModel.is_anonymous || targetUserModel.is_anonymous) {
           channelType = CHANNEL_TYPE.ANONYMOUS;
         }
-
         await newChannel.updatePartial({
           set: {
             channel_type: channelType,
@@ -130,8 +137,8 @@ const initChatFromPost = async (req, res) => {
 
     const response = {
       ...channelState,
-      better_channel_members: Object.values(newStateMemberWithAnonInfo),
-      better_channel_members_objet: newStateMemberWithAnonInfo,
+      better_channel_members: Object.values(channelState.channel.better_channel_member),
+      better_channel_members_objet: channelState.channel.better_channel_member,
       messageHistories: []
     };
 
