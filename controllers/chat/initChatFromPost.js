@@ -114,17 +114,26 @@ const initChatFromPost = async (req, res) => {
     try {
       if (!newChannel?.data?.name) {
         let channelType = CHANNEL_TYPE.CHAT;
+        let anonDetailInfo = {};
         if (userModel.is_anonymous || targetUserModel.is_anonymous) {
           channelType = CHANNEL_TYPE.ANONYMOUS;
+          anonDetailInfo = {
+            anon_user_info_color_code:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_code || null,
+            anon_user_info_color_name:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_name || null,
+            anon_user_info_emoji_code:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_code || null,
+            anon_user_info_emoji_name:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_name || null
+          };
         }
+
         await newChannel.updatePartial({
           set: {
             channel_type: channelType,
             name: [userModel?.username, targetUserModel?.username].join(', '),
-            anon_user_info_color_code: color.code,
-            anon_user_info_color_name: color.color,
-            anon_user_info_emoji_code: emoji.emoji,
-            anon_user_info_emoji_name: emoji.name,
+            ...anonDetailInfo,
             better_channel_member: newStateMemberWithAnonInfo
           }
         });

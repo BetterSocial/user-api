@@ -27,8 +27,6 @@ module.exports = async (
   let anon_user_id;
   if (!is_anonymous) {
     const anonymousUser = await UsersFunction.findAnonymousUserId(userModel, userId);
-    console.log('anonymousUser');
-    console.log(anonymousUser);
     anon_user_id = anonymousUser?.user_id;
   } else {
     anon_user_id = userId;
