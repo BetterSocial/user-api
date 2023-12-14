@@ -114,9 +114,12 @@ const initChatFromPost = async (req, res) => {
     try {
       if (!newChannel?.data?.name) {
         let channelType = CHANNEL_TYPE.CHAT;
-        let anonDetailInfo = {};
-        if (userModel.is_anonymous || targetUserModel.is_anonymous) {
+        if (userModel.is_anonymous) {
           channelType = CHANNEL_TYPE.ANONYMOUS;
+        }
+
+        let anonDetailInfo = {};
+        if (targetUserModel.is_anonymous) {
           anonDetailInfo = {
             anon_user_info_color_code:
               newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_code || null,
