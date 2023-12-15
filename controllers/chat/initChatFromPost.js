@@ -114,21 +114,18 @@ const initChatFromPost = async (req, res) => {
     try {
       if (!newChannel?.data?.name) {
         let channelType = CHANNEL_TYPE.CHAT;
+        let anonDetailInfo = {};
         if (userModel.is_anonymous) {
           channelType = CHANNEL_TYPE.ANONYMOUS;
-        }
-
-        let anonDetailInfo = {};
-        if (targetUserModel.is_anonymous) {
           anonDetailInfo = {
             anon_user_info_color_code:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_code || null,
+              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_color_code,
             anon_user_info_color_name:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_name || null,
+              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_color_name,
             anon_user_info_emoji_code:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_code || null,
+              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_code,
             anon_user_info_emoji_name:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_name || null
+              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_name
           };
         }
 
