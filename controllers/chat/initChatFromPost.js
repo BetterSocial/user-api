@@ -54,39 +54,57 @@ const initChatFromPost = async (req, res) => {
 
     //Add anon info to channel
     if (targetUserModel.is_anonymous) {
-      const postAnonUserInfo = await PostAnonUserInfoFunction.checkSelfUsernameInPost(
-        PostAnonUserInfo,
-        User,
-        {
-          postId: postId,
-          userId: targetUserModel.user_id
-        },
-        null,
-        true
-      );
+      let anon_user_info = {};
+      if (source === 'post') {
+        const postAnonUserInfo = await PostAnonUserInfoFunction.checkSelfUsernameInPost(
+          PostAnonUserInfo,
+          User,
+          {
+            postId: postId,
+            userId: targetUserModel.user_id
+          },
+          null,
+          true
+        );
+
+        anon_user_info = {
+          anon_user_info_color_code: postAnonUserInfo?.anon_user_info_color_code,
+          anon_user_info_color_name: postAnonUserInfo?.anon_user_info_color_name,
+          anon_user_info_emoji_code: postAnonUserInfo?.anon_user_info_emoji_code,
+          anon_user_info_emoji_name: postAnonUserInfo?.anon_user_info_emoji_name
+        };
+      } else if (source === 'comment') {
+        const reaction = await Getstream.feed.getReactionById(commentId);
+        anon_user_info = {
+          anon_user_info_color_code: reaction?.data.anon_user_info_color_code,
+          anon_user_info_color_name: reaction?.data.anon_user_info_color_name,
+          anon_user_info_emoji_code: reaction?.data.anon_user_info_emoji_code,
+          anon_user_info_emoji_name: reaction?.data.anon_user_info_emoji_name
+        };
+      }
 
       newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_code =
-        postAnonUserInfo?.anon_user_info_color_code;
+        anon_user_info?.anon_user_info_color_code;
       newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_name =
-        postAnonUserInfo?.anon_user_info_color_name;
+        anon_user_info?.anon_user_info_color_name;
       newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_code =
-        postAnonUserInfo?.anon_user_info_emoji_code;
+        anon_user_info?.anon_user_info_emoji_code;
       newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_name =
-        postAnonUserInfo?.anon_user_info_emoji_name;
+        anon_user_info?.anon_user_info_emoji_name;
 
       newStateMemberWithAnonInfo[targetUserModel.user_id].user.name =
-        'Anonymous ' + postAnonUserInfo?.anon_user_info_emoji_name;
+        'Anonymous ' + anon_user_info?.anon_user_info_emoji_name;
       newStateMemberWithAnonInfo[targetUserModel.user_id].user.username =
-        'Anonymous ' + postAnonUserInfo?.anon_user_info_emoji_name;
+        'Anonymous ' + anon_user_info?.anon_user_info_emoji_name;
 
       await ChatAnonUserInfo.create({
         channel_id: newChannel.id,
         my_anon_user_id: userModel.user_id,
         target_user_id: targetUserModel.user_id,
-        anon_user_info_color_code: postAnonUserInfo?.anon_user_info_color_code,
-        anon_user_info_color_name: postAnonUserInfo?.anon_user_info_color_name,
-        anon_user_info_emoji_code: postAnonUserInfo?.anon_user_info_emoji_code,
-        anon_user_info_emoji_name: postAnonUserInfo?.anon_user_info_emoji_name
+        anon_user_info_color_code: anon_user_info?.anon_user_info_color_code,
+        anon_user_info_color_name: anon_user_info?.anon_user_info_color_name,
+        anon_user_info_emoji_code: anon_user_info?.anon_user_info_emoji_code,
+        anon_user_info_emoji_name: anon_user_info?.anon_user_info_emoji_name
       });
     }
 
