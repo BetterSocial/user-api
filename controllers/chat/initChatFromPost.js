@@ -129,6 +129,19 @@ const initChatFromPost = async (req, res) => {
           };
         }
 
+        if (targetUserModel.is_anonymous && !userModel.is_anonymous) {
+          anonDetailInfo = {
+            anon_user_info_color_code:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_code,
+            anon_user_info_color_name:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_name,
+            anon_user_info_emoji_code:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_code,
+            anon_user_info_emoji_name:
+              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_name
+          };
+        }
+
         await newChannel.updatePartial({
           set: {
             channel_type: channelType,
