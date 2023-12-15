@@ -38,7 +38,7 @@ const SearchDomain = async (req, res) => {
       LEFT JOIN "user_follow_domain" AS "domainFollower" ON "Domain"."domain_page_id" = "domainFollower"."domain_id_followed" 
       WHERE 
         "Domain"."domain_name" ILIKE :likeQuery 
-        AND "Domain"."credder_score" >= ${CREDDER_MIN_SCORE}
+        AND "Domain"."credder_score" >= ${CREDDER_MIN_SCORE} AND "Domain"."status" = true
       GROUP BY 
         "user_id_follower",
         "Domain"."domain_page_id",

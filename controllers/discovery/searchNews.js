@@ -43,7 +43,8 @@ const Search = async (req, res) => {
             as: 'newsLinkDomain',
             attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked'],
             where: {
-              credder_score: {[Op.gte]: CREDDER_MIN_SCORE}
+              credder_score: {[Op.gte]: CREDDER_MIN_SCORE},
+              status: true
             }
           }
         ]
@@ -66,7 +67,8 @@ const Search = async (req, res) => {
             as: 'newsLinkDomain',
             attributes: ['domain_name', 'logo', 'credder_score', 'credder_last_checked'],
             where: {
-              credder_score: {[Op.gte]: CREDDER_MIN_SCORE}
+              credder_score: {[Op.gte]: CREDDER_MIN_SCORE},
+              status: true
             }
           }
         ]

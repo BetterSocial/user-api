@@ -7,9 +7,6 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // define association here
-    }
   }
   DomainPage.init(
     {
@@ -30,7 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         field: 'updated_at'
       },
       credder_score: DataTypes.INTEGER,
-      credder_last_checked: DataTypes.DATE
+      credder_last_checked: DataTypes.DATE,
+      status: DataTypes.BOOLEAN
     },
     {
       sequelize,

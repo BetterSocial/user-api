@@ -26,7 +26,7 @@ const InitDiscoveryDomainData = async (req, res) => {
                 AND A.user_id_follower = :userId
             RIGHT JOIN domain_page C 
                 ON C.domain_page_id = A.domain_id_followed
-            WHERE C.credder_score >= ${CREDDER_MIN_SCORE}
+            WHERE C.credder_score >= ${CREDDER_MIN_SCORE} AND C.status = true
             GROUP BY A.domain_id_followed, domain_page_id, A.user_id_follower, C.domain_name, C.logo, C.short_description, C.credder_score
             ORDER BY 
                 common DESC, 
