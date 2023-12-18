@@ -21,20 +21,26 @@ module.exports = async (
   let follows_array = [];
   await Promise.all(
     followedUsers.map(async (val) => {
-      //follow sign user
-      follows_array.push({
-        follow_action_id: uuidv4(),
-        user_id_follower: userId,
-        user_id_followed: val
-      });
-
       const userFollowed = await UsersFunction.findUserById(User, val);
       if (userFollowed.is_anonymous === false) {
+        follows_array.push({
+          follow_action_id: uuidv4(),
+          user_id_follower: userId,
+          user_id_followed: val
+        });
+
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, val);
         follows_array.push({
           follow_action_id: uuidv4(),
           user_id_follower: userId,
           user_id_followed: anonymousUser?.user_id,
+          is_anonymous: true
+        });
+      } else if (userFollowed.is_anonymous === true) {
+        follows_array.push({
+          follow_action_id: uuidv4(),
+          user_id_follower: userId,
+          user_id_followed: val,
           is_anonymous: true
         });
       }
