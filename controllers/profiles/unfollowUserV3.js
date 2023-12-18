@@ -77,7 +77,7 @@ module.exports = async (req, res) => {
   try {
     await addForUnfollowUser({
       user_id: req?.user_id ?? req.userId,
-      followed_user_id: user_id_followed,
+      unfollowed_user_id: user_id_followed,
       activity_time: moment.utc().format('YYYY-MM-DD HH:mm:ss')
     });
   } catch (e) {
