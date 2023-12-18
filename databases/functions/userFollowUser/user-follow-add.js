@@ -30,12 +30,22 @@ module.exports = async (
         });
 
         const anonymousUser = await UsersFunction.findAnonymousUserId(User, val);
-        follows_array.push({
-          follow_action_id: uuidv4(),
-          user_id_follower: userId,
-          user_id_followed: anonymousUser?.user_id,
-          is_anonymous: true
+        let isAlreadyFollowAnonUser = await userFollowUserModel.findOne({
+          where: {
+            user_id_follower: userId,
+            user_id_followed: anonymousUser?.user_id,
+            is_anonymous: true
+          }
         });
+
+        if (!isAlreadyFollowAnonUser) {
+          follows_array.push({
+            follow_action_id: uuidv4(),
+            user_id_follower: userId,
+            user_id_followed: anonymousUser?.user_id,
+            is_anonymous: true
+          });
+        }
       } else if (userFollowed.is_anonymous === true) {
         follows_array.push({
           follow_action_id: uuidv4(),
