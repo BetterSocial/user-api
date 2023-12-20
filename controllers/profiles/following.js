@@ -32,6 +32,7 @@ module.exports = async (req, res) => {
       "user"."profile_pic_asset_id" AS "user.profile_pic_asset_id", 
       "user"."profile_pic_public_id" AS "user.profile_pic_public_id", 
       "user"."status" AS "user.status",
+      "user"."karma_score" AS "user.karma_score",
       ARRAY( select name from topics as tp
         left join user_topics as utp on tp.topic_id = utp.topic_id
         where utp.user_id = "user".user_id limit 3
