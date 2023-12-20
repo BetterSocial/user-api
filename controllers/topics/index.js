@@ -191,6 +191,7 @@ const getFollowerList = async (req, res) => {
         users.username,
         users.bio,
         users.profile_pic_path,
+        users.karma_score,
         users.created_at,
         users.updated_at,
         is_following_subquery.user_id_follower,
