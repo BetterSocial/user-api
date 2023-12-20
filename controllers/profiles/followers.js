@@ -46,6 +46,7 @@ module.exports = async (req, res) => {
       "user"."profile_pic_asset_id" AS "user.profile_pic_asset_id", 
       "user"."profile_pic_public_id" AS "user.profile_pic_public_id", 
       "user"."status" AS "user.status",
+      "user"."karma_score" AS "user.karma_score",
       "user"."is_anonymous" AS "user.is_anonymous",
       CASE WHEN (
         select 
