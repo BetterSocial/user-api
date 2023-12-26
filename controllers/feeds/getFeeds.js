@@ -16,8 +16,9 @@ const {
   isPostBlocked,
   modifyReactionsPost
 } = require('../../utils/post');
-const {DomainPage, Locations, User} = require('../../databases/models');
+const {DomainPage, Locations, User, UserFollowUser} = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
+const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
 
 module.exports = async (req, res) => {
   let {
@@ -25,7 +26,6 @@ module.exports = async (req, res) => {
     limit = MAX_DATA_RETURN_LENGTH,
     getstreamLimit = MAX_FEED_FETCH_LIMIT
   } = req.query;
-  let domainPageCache = {};
   let getFeedFromGetstreamIteration = 0;
   let data = [];
 
@@ -102,7 +102,12 @@ module.exports = async (req, res) => {
 
           // TODO: PLEASE ENABLE THIS CHECKER AFTER SCORING HAS BEEN FIXED
           if (now < dateExpired || item.duration_feed == 'never') {
-            let newItem = await modifyAnonimityPost(item);
+            const isBlurredPost = await UserFollowUserFunction.checkIsBlurredPost(
+              UserFollowUser,
+              User,
+              req.userId
+            );
+            let newItem = await modifyAnonimityPost(item, isBlurredPost);
             newItem = modifyReactionsPost(newItem, newItem.anonimity);
             if (item.verb === POST_VERB_POLL) {
               let postPoll = await modifyPollPostObject(req.userId, item);

@@ -156,7 +156,7 @@ const modifyAnonymousAndBlockPost = async (
   return feedWithAnonymous;
 };
 
-const modifyAnonimityPost = (item) => {
+const modifyAnonimityPost = async (item, isBlurredPost = true) => {
   const newItem = {...item};
 
   if (newItem.anonimity) {
@@ -164,6 +164,7 @@ const modifyAnonimityPost = (item) => {
     newItem.to = [];
     newItem.origin = null;
     newItem.object = '';
+    newItem.isBlurredPost = isBlurredPost;
   }
 
   return newItem;
