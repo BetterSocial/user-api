@@ -1,3 +1,5 @@
+const {MINIMUM_BLUR_USER_FOLLOWING} = require('../../../helpers/constants');
+
 /**
  *
  * @param {Model} userFollowUserModel
@@ -11,10 +13,11 @@ module.exports = async (userFollowUserModel, userIdFollower, _transaction = null
       user_id_follower: userIdFollower,
       is_anonymous: false
     },
+    limit: MINIMUM_BLUR_USER_FOLLOWING,
     raw: true
   });
 
-  if (signUserList.length <= 7) {
+  if (signUserList.length <= MINIMUM_BLUR_USER_FOLLOWING) {
     isBlurredPost = true;
   }
 
