@@ -55,8 +55,8 @@ Sentry.init({
   ],
   environment: process.env.NODE_ENV,
   // Performance Monitoring
-  tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!,
-  profilesSampleRate: 1.0
+  tracesSampleRate: 0.1, // Capture 100% of the transactions, reduce in production!,
+  profilesSampleRate: 0.1
 });
 
 app.use(Sentry.Handlers.requestHandler());
