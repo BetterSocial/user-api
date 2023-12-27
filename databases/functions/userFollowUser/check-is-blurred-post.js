@@ -3,7 +3,7 @@
  * @param {Model} userFollowUserModel
  * @param {RegisterBodyData.Users} users
  */
-module.exports = async (userFollowUserModel, _userModel, userIdFollower, _transaction = null) => {
+module.exports = async (userFollowUserModel, userIdFollower, _transaction = null) => {
   let isBlurredPost = false;
 
   const signUserList = await userFollowUserModel.findAll({

@@ -123,7 +123,7 @@ module.exports = async (req, res) => {
       getListBlockUser(req.userId),
       getBlockDomain(req.userId),
       getListBlockPostAnonymousAuthor(req.userId),
-      UserFollowUserFunction.checkIsBlurredPost(UserFollowUser, User, req.userId)
+      UserFollowUserFunction.checkIsBlurredPost(UserFollowUser, req.userId)
     ]);
 
     const listAnonymousAuthor = listPostAnonymousAuthor.map(

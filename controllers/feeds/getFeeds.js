@@ -104,7 +104,6 @@ module.exports = async (req, res) => {
           if (now < dateExpired || item.duration_feed == 'never') {
             const isBlurredPost = await UserFollowUserFunction.checkIsBlurredPost(
               UserFollowUser,
-              User,
               req.userId
             );
             let newItem = await modifyAnonimityPost(item, isBlurredPost);
