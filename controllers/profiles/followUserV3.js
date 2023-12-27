@@ -28,6 +28,11 @@ module.exports = async (req, res) => {
     return ErrorResponse.e404(res, 'User not found');
   }
 
+  const isBlurredPost = await UserFollowUserFunction.checkIsBlurredPost(
+    UserFollowUser,
+    req?.userId
+  );
+
   try {
     await sequelize.transaction(async (t) => {
       const userFollowUser = await UserFollowUserFunction.registerAddFollowUser(
@@ -109,6 +114,7 @@ module.exports = async (req, res) => {
   }
 
   return SuccessResponse(res, {
-    message: 'User has been followed successfully'
+    message: 'User has been followed successfully',
+    isBlurredPost
   });
 };
