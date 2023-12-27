@@ -1,5 +1,4 @@
 const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
 
 /**
  *
@@ -10,7 +9,8 @@ const upload = async (path) => {
   if (!path) throw new Error('path is required');
   return await cloudinary.uploader.upload(path, {
     overwrite: false,
-    invalidate: true
+    invalidate: true,
+    resource_type: 'auto'
   });
 };
 
