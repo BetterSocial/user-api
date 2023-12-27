@@ -9,6 +9,7 @@ const swaggerUi = require('swagger-ui-express');
 const {initializeApp, cert} = require('firebase-admin/app');
 
 const Sentry = require('@sentry/node');
+const SentryProfiling = require('@sentry/profiling-node');
 
 const serviceAccount = Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString();
 const bodyParser = require('body-parser');
@@ -48,11 +49,14 @@ Sentry.init({
     // enable Express.js middleware tracing
     new Sentry.Integrations.Express({
       app
-    })
+    }),
+    new SentryProfiling.ProfilingIntegration(),
+    new Sentry.Integrations.Postgres()
   ],
   environment: process.env.NODE_ENV,
   // Performance Monitoring
-  tracesSampleRate: 1.0 // Capture 100% of the transactions, reduce in production!,
+  tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!,
+  profilesSampleRate: 1.0
 });
 
 app.use(Sentry.Handlers.requestHandler());
