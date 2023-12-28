@@ -1,6 +1,7 @@
 const moment = require('moment');
+const {Sequelize} = require('sequelize');
 const UsersFunction = require('../../databases/functions/users');
-const {UserBlockedUser, User} = require('../../databases/models');
+const {User, sequelize} = require('../../databases/models');
 const getstreamService = require('../../services/getstream');
 
 const mappingFeed = (req, feeds) => {
@@ -152,16 +153,39 @@ const finalize = (req, id, myReaction, newGroup, activity_id, constantActor) => 
 
 const getFeedGroup = async (groupingFeed) => {
   const feedGroup = [];
-  // eslint-disable-next-line no-restricted-syntax
+  const feedIds = [];
   for (const feed of groupingFeed) {
-    // eslint-disable-next-line no-await-in-loop
-    const blockCount = await UserBlockedUser.count({
-      where: {
-        post_id: feed.activity_id
-      }
-    });
-    feedGroup.push({...feed, block: blockCount});
+    feedIds.push(feed.activity_id);
   }
+
+  let resultBlockCount = [];
+  try {
+    const queryBlockCount = `
+    SELECT post_id, COUNT(post_id) AS COUNT
+    FROM user_blocked_user
+    WHERE post_id IN (:feedIds)
+    GROUP BY post_id`;
+
+    resultBlockCount = await sequelize.query(queryBlockCount, {
+      replacements: {
+        feedIds
+      },
+      type: Sequelize.QueryTypes.SELECT
+    });
+  } catch (e) {
+    console.error('Failed to get count block users', e);
+    throw e;
+  }
+
+  for (const feed2 of groupingFeed) {
+    const filteredFeed = resultBlockCount.filter(
+      (feedDetail) => feed2.activity_id === feedDetail.post_id
+    );
+    const blockCount = filteredFeed[0] ? parseInt(filteredFeed[0].count) : 0;
+
+    feedGroup.push({...feed2, block: blockCount});
+  }
+
   feedGroup.sort(
     (a, b) => moment(b.data.last_message_at).valueOf() - moment(a.data.last_message_at).valueOf()
   );
