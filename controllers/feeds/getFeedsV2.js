@@ -19,10 +19,11 @@ const {
   modifyReactionsPost,
   modifyFeedIsFollowingTarget
 } = require('../../utils/post');
-const {DomainPage, Locations, User} = require('../../databases/models');
+const {DomainPage, Locations, User, UserFollowUser} = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 const {ACTIVITY_THRESHOLD} = require('../../config/constant');
 const UsersFunction = require('../../databases/functions/users');
+const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
 
 const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
   console.log('Get activity from getstream => ', feed, paramGetFeeds);
@@ -110,11 +111,20 @@ module.exports = async (req, res) => {
 
   try {
     const {token} = req;
-    const myAnonymousUser = await UsersFunction.findAnonymousUserId(User, req.userId, {raw: true});
-    // START get excluded post parameter
-    const listBlockUser = await getListBlockUser(req.userId);
-    const listBlockDomain = await getBlockDomain(req.userId);
-    const listPostAnonymousAuthor = await getListBlockPostAnonymousAuthor(req.userId);
+    const [
+      myAnonymousUser,
+      // START get excluded post parameter
+      listBlockUser,
+      listBlockDomain,
+      listPostAnonymousAuthor,
+      isBlurredPost
+    ] = await Promise.all([
+      UsersFunction.findAnonymousUserId(User, req.userId, {raw: true}),
+      getListBlockUser(req.userId),
+      getBlockDomain(req.userId),
+      getListBlockPostAnonymousAuthor(req.userId),
+      UserFollowUserFunction.checkIsBlurredPost(UserFollowUser, req.userId)
+    ]);
 
     const listAnonymousAuthor = listPostAnonymousAuthor.map(
       (value) => value.post_anonymous_author_id
@@ -182,7 +192,7 @@ module.exports = async (req, res) => {
             item.is_self =
               item.actor.id === req.userId || item.actor.id === myAnonymousUser?.user_id;
             let newItem = await modifyFeedIsFollowingTarget(item, req.userId);
-            newItem = await modifyAnonimityPost(newItem);
+            newItem = await modifyAnonimityPost(newItem, isBlurredPost);
             newItem = modifyReactionsPost(newItem, newItem.anonimity);
             if (item.verb === POST_VERB_POLL) {
               const postPoll = await modifyPollPostObject(req.userId, item);
