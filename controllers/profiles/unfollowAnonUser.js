@@ -36,6 +36,11 @@ module.exports = async (req, res) => {
   )
     return ErrorResponse.e409(res, 'You have not followed this user');
 
+  const isBlurredPost = await UserFollowUserFunction.checkIsBlurredPost(
+    UserFollowUser,
+    req?.userId
+  );
+
   try {
     await sequelize.transaction(async (t) => {
       const userFollowUser = await UserFollowUserFunction.userUnfollow(
@@ -81,6 +86,7 @@ module.exports = async (req, res) => {
   }
 
   return SuccessResponse(res, {
-    message: 'User has been unfollowed successfully'
+    message: 'User has been unfollowed successfully',
+    isBlurredPost
   });
 };
