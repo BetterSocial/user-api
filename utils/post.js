@@ -326,12 +326,13 @@ const deleteExpiredPostFromFeed = (item, feed_id) => {
   }
 };
 
-const modifyNewItemAnonymity = (newItem) => {
+const modifyNewItemAnonymity = (newItem, isBlurredPost = false) => {
   if (newItem.anonimity) {
     newItem.actor = {};
     newItem.to = [];
     newItem.origin = null;
     newItem.object = '';
+    newItem.isBlurredPost = isBlurredPost;
   }
   return newItem;
 };
@@ -352,7 +353,8 @@ async function filterFeeds(
   selfAnonymousUserId,
   feeds = [],
   feed_id = null,
-  threshold = null
+  threshold = null,
+  isBlurredPost = false
 ) {
   const results = await Promise.all(
     feeds.map(async (item) => {
@@ -368,7 +370,7 @@ async function filterFeeds(
 
       newItem.is_self = item?.actor?.id === userId || item?.actor?.id === selfAnonymousUserId;
       newItem = await modifyFeedIsFollowingTarget(newItem, userId);
-      newItem = modifyNewItemAnonymity(newItem);
+      newItem = modifyNewItemAnonymity(newItem, isBlurredPost);
       newItem = modifyReactionsPost(newItem, newItem.anonimity);
 
       const isValidPollPost = item.verb === POST_VERB_POLL && item?.polls?.length > 0;

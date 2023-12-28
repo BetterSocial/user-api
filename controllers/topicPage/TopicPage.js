@@ -10,7 +10,8 @@ const {modifyPollPostObject} = require('../../utils/post');
 const TopicPageValidator = require('../../validators/topicPage');
 const {ACTIVITY_THRESHOLD} = require('../../config/constant');
 const UsersFunction = require('../../databases/functions/users');
-const {User} = require('../../databases/models');
+const {User, UserFollowUser} = require('../../databases/models');
+const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
 
 class TopicPage {
   constructor() {
@@ -46,7 +47,8 @@ class TopicPage {
       payload.anonymousUserId,
       newTopicPagesWithBlock,
       payload.id,
-      threshold
+      threshold,
+      payload.isBlurredPost
     );
     return results;
   }
@@ -84,6 +86,7 @@ class TopicPage {
       }
       fetch += 1;
     }
+
     return results;
   }
 
@@ -93,12 +96,17 @@ class TopicPage {
 
     try {
       this._validator.validateGetTopicPages({id});
-      const listBlockUser = await getListBlockUser(req.userId);
-      const listBlockDomain = await getBlockDomain(req.userId);
-      const listPostAnonymous = await getListBlockPostAnonymous(req.userId);
-      const myAnonymousUser = await UsersFunction.findAnonymousUserId(User, req.userId, {
-        raw: true
-      });
+
+      const [listBlockUser, listBlockDomain, listPostAnonymous, myAnonymousUser, isBlurredPost] =
+        await Promise.all([
+          getListBlockUser(req.userId),
+          getBlockDomain(req.userId),
+          getListBlockPostAnonymous(req.userId),
+          UsersFunction.findAnonymousUserId(User, req.userId, {
+            raw: true
+          }),
+          UserFollowUserFunction.checkIsBlurredPost(UserFollowUser, req.userId)
+        ]);
 
       let payload = {
         listBlockUser,
@@ -108,7 +116,8 @@ class TopicPage {
         limit,
         offset,
         userId: req.userId,
-        anonymousUserId: myAnonymousUser?.user_id
+        anonymousUserId: myAnonymousUser?.user_id,
+        isBlurredPost
       };
 
       let feeds = await this.getValidActivity(req.userId, payload, limit);
