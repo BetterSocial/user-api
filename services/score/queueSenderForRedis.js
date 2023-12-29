@@ -1,11 +1,19 @@
 const Bull = require('bull');
 const {v4: uuidv4} = require('uuid');
 const {bullConfig, redisUrl} = require('../../config/redis');
-const {QUEUE_REMOVE_ACTIVITY} = require('./constant');
+const {QUEUE_REMOVE_ACTIVITY, QUEUE_UNFOLLOW_FEED_PROCESS} = require('./constant');
 
 const connectRedis = redisUrl;
 
 const removeActivityQueue = new Bull(QUEUE_REMOVE_ACTIVITY, connectRedis, {
+  redis: {
+    ...bullConfig,
+    maxRetriesPerRequest: 100,
+    connectTimeout: 30000
+  }
+});
+
+const unFollowFeedProcessQueue = new Bull(QUEUE_UNFOLLOW_FEED_PROCESS, connectRedis, {
   redis: {
     ...bullConfig,
     maxRetriesPerRequest: 100,
@@ -42,5 +50,6 @@ const sendQueue = async (event, data) => {
 
 module.exports = {
   sendQueue,
-  removeActivityQueue
+  removeActivityQueue,
+  unFollowFeedProcessQueue
 };

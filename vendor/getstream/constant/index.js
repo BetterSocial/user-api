@@ -7,7 +7,9 @@ const GetstreamConstant = {
   LOCATION_FEED_NAME: 'location',
   TOPIC_FEED_NAME: 'topic',
   MAIN_FEED_FOLLOWING_NAME: 'main_feed_following',
-  MAIN_FEED_TOPIC_NAME: 'main_feed_topic'
+  MAIN_FEED_TOPIC_NAME: 'main_feed_topic',
+  MAIN_FEED_F2_NAME: 'main_feed_f2',
+  MAIN_FEED_BROAD_NAME: 'main_feed_broad'
 };
 
 module.exports = GetstreamConstant;

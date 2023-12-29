@@ -21,5 +21,6 @@ module.exports = {
   EVENT_UNFOLLOW_F2_USER: 'unfollow-f2-users',
   EVENT_SYNC_FEED: 'syncUserFeedQueue',
 
-  QUEUE_REMOVE_ACTIVITY: 'removeActivityQueue'
+  QUEUE_REMOVE_ACTIVITY: 'removeActivityQueue',
+  QUEUE_UNFOLLOW_FEED_PROCESS: 'unFollowFeedProcessQueue'
 };

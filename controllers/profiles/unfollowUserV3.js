@@ -5,10 +5,12 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const SuccessResponse = require('../../utils/response/SuccessResponse');
 
 const {UserFollowUser, UserFollowUserHistory, User, sequelize} = require('../../databases/models');
-const Getstream = require('../../vendor/getstream');
 const {addForUnfollowUser} = require('../../services/score');
 const UsersFunction = require('../../databases/functions/users');
 const {sendUnFollowMainFeedF2} = require('../../services/queue/mainFeedF2');
+
+const {unfollowFeed} = require('../../services/getstream/unfollowFeed');
+const GetstreamConstant = require('../../vendor/getstream/constant');
 
 module.exports = async (req, res) => {
   const {user_id_followed, follow_source} = req.body;
@@ -38,38 +40,80 @@ module.exports = async (req, res) => {
       return userFollowUser;
     });
   } catch (e) {
-    console.log('Error in unfollow user v2 sql transaction');
+    console.log('Error in unfollow user v3 sql transaction');
     return ErrorResponse.e409(res, e.message);
   }
 
   try {
     // unfollow targeted feeds
-    const unfollowUserExcl = Getstream.feed.unfollowUserExclusive(req?.userId, user_id_followed);
-    const unfollowUser = Getstream.feed.unfollowUser(req?.token, req?.userId, user_id_followed);
-    const unfollowMainFeedFollowing = Getstream.feed.unfollowMainFeedFollowing(
-      req?.token,
+    const unfollowUserExclFromMainFeed = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
       req?.userId,
+      GetstreamConstant.USER_EXCLUSIVE_FEED_NAME,
       user_id_followed
     );
-    const sendJobUnfollowF2User = sendUnFollowMainFeedF2(req.userId, user_id_followed);
-    await Promise.all([
-      unfollowUserExcl,
-      unfollowUser,
-      unfollowMainFeedFollowing,
-      sendJobUnfollowF2User
-    ]);
-
+    const unfollowUserFromMainFeed = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
+      req?.userId,
+      GetstreamConstant.USER_FEED_NAME,
+      user_id_followed
+    );
+    const unfollowUserExclFromMainFeedFollowing = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_FOLLOWING_NAME,
+      req?.userId,
+      GetstreamConstant.USER_EXCLUSIVE_FEED_NAME,
+      user_id_followed
+    );
+    const unfollowUserFromMainFeedFollowing = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_FOLLOWING_NAME,
+      req?.userId,
+      GetstreamConstant.USER_FEED_NAME,
+      user_id_followed
+    );
     const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed);
     const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId);
-    await Getstream.feed.unfollowAnonUser(
-      req?.token,
+    const userUnfollowTargetAnonUserFromMainFeed = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
       req?.userId,
-      user_id_followed,
-      selfAnonymousUser?.user_id,
-      anonymousUser?.user_id
+      GetstreamConstant.USER_ANON_FEED_NAME,
+      anonymousUser
     );
+
+    const targetUserUnfollowAnonUserFromMainFeed = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
+      user_id_followed,
+      GetstreamConstant.USER_ANON_FEED_NAME,
+      selfAnonymousUser
+    );
+
+    const userUnfollowTargetAnonUserFromMainFeedFollowing = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
+      req?.userId,
+      GetstreamConstant.USER_ANON_FEED_NAME,
+      anonymousUser
+    );
+
+    const targetUserUnfollowAnonUserFromMainFeedFollowing = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
+      user_id_followed,
+      GetstreamConstant.USER_ANON_FEED_NAME,
+      selfAnonymousUser
+    );
+
+    const sendJobUnfollowF2User = sendUnFollowMainFeedF2(req.userId, user_id_followed);
+    await Promise.all([
+      unfollowUserExclFromMainFeed,
+      unfollowUserFromMainFeed,
+      unfollowUserExclFromMainFeedFollowing,
+      unfollowUserFromMainFeedFollowing,
+      userUnfollowTargetAnonUserFromMainFeed,
+      targetUserUnfollowAnonUserFromMainFeed,
+      userUnfollowTargetAnonUserFromMainFeedFollowing,
+      targetUserUnfollowAnonUserFromMainFeedFollowing,
+      sendJobUnfollowF2User
+    ]);
   } catch (e) {
-    console.log('Error in unfollow user v2 getstream');
+    console.log('Error in unfollow user v3 getstream');
     console.log(e);
     return ErrorResponse.e409(res, e.message);
   }
@@ -81,7 +125,7 @@ module.exports = async (req, res) => {
       activity_time: moment.utc().format('YYYY-MM-DD HH:mm:ss')
     });
   } catch (e) {
-    console.log('Error in unfollow user v2 scoring');
+    console.log('Error in unfollow user v3 scoring');
     return ErrorResponse.e409(res, e.message);
   }
 
