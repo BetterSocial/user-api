@@ -79,7 +79,7 @@ const moveToAnon = async (req, res) => {
 
       await ChatAnonUserInfo.create({
         channel_id: newChannel.id,
-        my_anon_user_id: req.userId,
+        my_anon_user_id: prevTargetUser.user_id,
         target_user_id: prevTargetUser.user_id,
         anon_user_info_color_code: prevTargetUser?.anon_user_info_color_code,
         anon_user_info_color_name: prevTargetUser?.anon_user_info_color_name,
@@ -91,10 +91,12 @@ const moveToAnon = async (req, res) => {
     //set own user detail
     let checkChatAnonUserInfo = await ChatAnonUserInfo.findOne({
       where: {
-        channel_id: createdChannel?.channel?.id,
-        my_anon_user_id: req.userId
+        channel_id: oldChannelId,
+        my_anon_user_id: req.userId,
+        target_user_id: prevTargetUser.user_id
       }
     });
+
     if (checkChatAnonUserInfo) {
       newStateMemberWithAnonInfo[req.userId].anon_user_info_color_code =
         checkChatAnonUserInfo?.anon_user_info_color_code;
@@ -109,16 +111,6 @@ const moveToAnon = async (req, res) => {
         'Anonymous ' + checkChatAnonUserInfo?.anon_user_info_emoji_name;
       newStateMemberWithAnonInfo[req.userId].user.username =
         'Anonymous ' + checkChatAnonUserInfo?.anon_user_info_emoji_name;
-
-      await ChatAnonUserInfo.create({
-        channel_id: newChannel.id,
-        my_anon_user_id: req.userId,
-        target_user_id: prevTargetUser.user_id,
-        anon_user_info_color_code: checkChatAnonUserInfo?.anon_user_info_color_code,
-        anon_user_info_color_name: checkChatAnonUserInfo?.anon_user_info_color_name,
-        anon_user_info_emoji_code: checkChatAnonUserInfo?.anon_user_info_emoji_code,
-        anon_user_info_emoji_name: checkChatAnonUserInfo?.anon_user_info_emoji_name
-      });
     } else {
       newStateMemberWithAnonInfo[req.userId].anon_user_info_color_code = anon_user_info_color_code;
       newStateMemberWithAnonInfo[req.userId].anon_user_info_color_name = anon_user_info_color_name;
