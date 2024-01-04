@@ -99,7 +99,7 @@ const initChatFromPost = async (req, res) => {
 
       await ChatAnonUserInfo.create({
         channel_id: newChannel.id,
-        my_anon_user_id: userModel.user_id,
+        my_anon_user_id: targetUserModel.user_id,
         target_user_id: targetUserModel.user_id,
         anon_user_info_color_code: anon_user_info?.anon_user_info_color_code,
         anon_user_info_color_name: anon_user_info?.anon_user_info_color_name,
