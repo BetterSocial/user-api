@@ -15,6 +15,6 @@ module.exports = async (postId) => {
     withRecentReactions: false
   });
 
-  if (!activity.results.length) Promise.reject(new Error('Post not found'));
+  if (!activity.results.length) return Promise.reject(new Error('Post not found'));
   return Promise.resolve(activity.results[0]);
 };
