@@ -1,12 +1,12 @@
 const {unFollowFeedProcessQueue} = require('../score/queueSenderForRedis');
 
-module.exports = async (feed, userId, targetFeed, unfollowUserId) => {
+module.exports = async (feedName, userId, targetFeed, unfollowUserId) => {
   try {
-    if (!feed || !userId || !targetFeed || !unfollowUserId) {
+    if (!feedName || !userId || !targetFeed || !unfollowUserId) {
       throw new Error('Invalid parameters');
     }
     const result = await unFollowFeedProcessQueue.add({
-      feed,
+      feedName,
       userId,
       targetFeed,
       unfollowUserId

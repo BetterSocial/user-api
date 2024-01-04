@@ -9,7 +9,7 @@ const {addForUnfollowUser} = require('../../services/score');
 const UsersFunction = require('../../databases/functions/users');
 const {sendUnFollowMainFeedF2} = require('../../services/queue/mainFeedF2');
 
-const {unfollowFeed} = require('../../services/getstream/unfollowFeed');
+const unfollowFeed = require('../../services/getstream/unfollowFeed');
 const GetstreamConstant = require('../../vendor/getstream/constant');
 
 module.exports = async (req, res) => {
@@ -45,71 +45,77 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // unfollow targeted feeds
-    const unfollowUserExclFromMainFeed = unfollowFeed(
-      GetstreamConstant.MAIN_FEED_NAME,
-      req?.userId,
-      GetstreamConstant.USER_EXCLUSIVE_FEED_NAME,
-      user_id_followed
-    );
-    const unfollowUserFromMainFeed = unfollowFeed(
-      GetstreamConstant.MAIN_FEED_NAME,
-      req?.userId,
-      GetstreamConstant.USER_FEED_NAME,
-      user_id_followed
-    );
-    const unfollowUserExclFromMainFeedFollowing = unfollowFeed(
-      GetstreamConstant.MAIN_FEED_FOLLOWING_NAME,
-      req?.userId,
-      GetstreamConstant.USER_EXCLUSIVE_FEED_NAME,
-      user_id_followed
-    );
-    const unfollowUserFromMainFeedFollowing = unfollowFeed(
-      GetstreamConstant.MAIN_FEED_FOLLOWING_NAME,
-      req?.userId,
-      GetstreamConstant.USER_FEED_NAME,
-      user_id_followed
-    );
     const anonymousUser = await UsersFunction.findAnonymousUserId(User, user_id_followed);
     const selfAnonymousUser = await UsersFunction.findAnonymousUserId(User, req?.userId);
-    const userUnfollowTargetAnonUserFromMainFeed = unfollowFeed(
+
+    // unfollow_process
+    // 1 main_feed {sign_follower_user_id} user_excl {sign_followed_user_id}
+    // 2 main_feed {sign_follower_user_id} user {sign_followed_user_id}
+    // 3 main_feed_following {sign_follower_user_id} user_excl {sign_followed_user_id}
+    // 4 main_feed_following {sign_follower_user_id} user {sign_followed_user_id}
+    // 5 main_feed_following {sign_follower_user_id} user_anon {anon_followed_user_id}
+    // 6 main_feed {sign_follower_user_id} user_anon {anon_followed_user_id}
+    // 7 main_feed {sign_followed_user_id} user_anon {anon_follower_user_id}
+
+    const unfollow_process_1 = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
+      req?.userId,
+      GetstreamConstant.USER_EXCLUSIVE_FEED_NAME,
+      user_id_followed
+    );
+
+    const unfollow_process_2 = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_NAME,
+      req?.userId,
+      GetstreamConstant.USER_FEED_NAME,
+      user_id_followed
+    );
+
+    const unfollow_process_3 = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_FOLLOWING_NAME,
+      req?.userId,
+      GetstreamConstant.USER_EXCLUSIVE_FEED_NAME,
+      user_id_followed
+    );
+
+    const unfollow_process_4 = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_FOLLOWING_NAME,
+      req?.userId,
+      GetstreamConstant.USER_FEED_NAME,
+      user_id_followed
+    );
+
+    const unfollow_process_5 = unfollowFeed(
+      GetstreamConstant.MAIN_FEED_FOLLOWING_NAME,
+      req?.userId,
+      GetstreamConstant.USER_ANON_FEED_NAME,
+      anonymousUser?.user_id
+    );
+
+    const unfollow_process_6 = unfollowFeed(
       GetstreamConstant.MAIN_FEED_NAME,
       req?.userId,
       GetstreamConstant.USER_ANON_FEED_NAME,
-      anonymousUser
+      anonymousUser?.user_id
     );
 
-    const targetUserUnfollowAnonUserFromMainFeed = unfollowFeed(
+    const unfollow_process_7 = unfollowFeed(
       GetstreamConstant.MAIN_FEED_NAME,
       user_id_followed,
       GetstreamConstant.USER_ANON_FEED_NAME,
-      selfAnonymousUser
-    );
-
-    const userUnfollowTargetAnonUserFromMainFeedFollowing = unfollowFeed(
-      GetstreamConstant.MAIN_FEED_NAME,
-      req?.userId,
-      GetstreamConstant.USER_ANON_FEED_NAME,
-      anonymousUser
-    );
-
-    const targetUserUnfollowAnonUserFromMainFeedFollowing = unfollowFeed(
-      GetstreamConstant.MAIN_FEED_NAME,
-      user_id_followed,
-      GetstreamConstant.USER_ANON_FEED_NAME,
-      selfAnonymousUser
+      selfAnonymousUser?.user_id
     );
 
     const sendJobUnfollowF2User = sendUnFollowMainFeedF2(req.userId, user_id_followed);
+
     await Promise.all([
-      unfollowUserExclFromMainFeed,
-      unfollowUserFromMainFeed,
-      unfollowUserExclFromMainFeedFollowing,
-      unfollowUserFromMainFeedFollowing,
-      userUnfollowTargetAnonUserFromMainFeed,
-      targetUserUnfollowAnonUserFromMainFeed,
-      userUnfollowTargetAnonUserFromMainFeedFollowing,
-      targetUserUnfollowAnonUserFromMainFeedFollowing,
+      unfollow_process_1,
+      unfollow_process_2,
+      unfollow_process_3,
+      unfollow_process_4,
+      unfollow_process_5,
+      unfollow_process_6,
+      unfollow_process_7,
       sendJobUnfollowF2User
     ]);
   } catch (e) {
