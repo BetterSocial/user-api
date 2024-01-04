@@ -8,7 +8,12 @@ const GetUserIdFromSource = async (
   id = {post_id: '', comment_id: '', user_id: ''}
 ) => {
   if (source === 'post') {
-    const post = await getPlainFeedById(id.post_id);
+    let post;
+    try {
+      post = await getPlainFeedById(id.post_id);
+    } catch (error) {
+      ErrorResponse.e403(res, 'Post id not found');
+    }
     if (!post) return ErrorResponse.e403(res, 'Post id not found');
 
     return post?.actor?.id;

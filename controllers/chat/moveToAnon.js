@@ -5,6 +5,7 @@ const {responseError, responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const UsersFunction = require('../../databases/functions/users');
 const Getstream = require('../../vendor/getstream');
+const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
 
 /**
  *
@@ -30,6 +31,11 @@ const moveToAnon = async (req, res) => {
     user_id: targetUserId
   });
 
+  const [emoji, color] = await Promise.all([
+    BetterSocialConstantListUtils.getRandomEmoji(),
+    BetterSocialConstantListUtils.getRandomColor()
+  ]);
+
   let members = [targetUserId];
   if (!members.includes(req.userId)) members.push(req.userId);
 
@@ -40,10 +46,26 @@ const moveToAnon = async (req, res) => {
   const oldChannelDetail = await client.queryChannels(filter, sort);
   //req.userId always anon since the token are using anon token
   const mySignedId = await UsersFunction.findSignedUserId(User, req.userId);
-  const prevTargetUser = Object.values(oldChannelDetail[0].data.better_channel_member).filter(
-    (user) => user.user_id !== mySignedId
-  )[0];
-  const detailPrevTargetUser = await UsersFunction.findUserById(User, prevTargetUser.user_id);
+
+  let prevTargetUser;
+  if (oldChannelDetail[0].data.better_channel_member) {
+    prevTargetUser = Object.values(oldChannelDetail[0].data.better_channel_member).filter(
+      (user) => user.user_id !== mySignedId
+    )[0];
+    targetUserId = prevTargetUser.user_id;
+  }
+
+  if (!prevTargetUser) {
+    prevTargetUser = {
+      user_id: targetUserId,
+      anon_user_info_color_code: color.code,
+      anon_user_info_color_name: color.color,
+      anon_user_info_emoji_code: emoji.emoji,
+      anon_user_info_emoji_name: emoji.name
+    };
+  }
+
+  const detailPrevTargetUser = await UsersFunction.findUserById(User, targetUserId);
 
   try {
     /**
@@ -76,6 +98,13 @@ const moveToAnon = async (req, res) => {
         prevTargetUser?.anon_user_info_emoji_code;
       newStateMemberWithAnonInfo[prevTargetUser.user_id].anon_user_info_emoji_name =
         prevTargetUser?.anon_user_info_emoji_name;
+
+      newStateMemberWithAnonInfo[prevTargetUser.user_id].user = {};
+      newStateMemberWithAnonInfo[prevTargetUser.user_id].user.id = prevTargetUser.user_id;
+      newStateMemberWithAnonInfo[prevTargetUser.user_id].user.name =
+        'Anonymous ' + prevTargetUser?.anon_user_info_emoji_name;
+      newStateMemberWithAnonInfo[prevTargetUser.user_id].user.username =
+        'Anonymous ' + prevTargetUser?.anon_user_info_emoji_name;
 
       await ChatAnonUserInfo.create({
         channel_id: newChannel.id,

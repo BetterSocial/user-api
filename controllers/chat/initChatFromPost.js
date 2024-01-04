@@ -17,11 +17,16 @@ const PostAnonUserInfoFunction = require('../../databases/functions/postAnonUser
 const initChatFromPost = async (req, res) => {
   let {targetUserId, source, postId, commentId} = req.body;
 
-  targetUserId = await Getstream.feed.getUserIdFromSource(res, source, {
-    post_id: postId,
-    comment_id: commentId,
-    user_id: targetUserId
-  });
+  try {
+    targetUserId = await Getstream.feed.getUserIdFromSource(res, source, {
+      post_id: postId,
+      comment_id: commentId,
+      user_id: targetUserId
+    });
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 
   let members = [targetUserId];
   if (!members.includes(req.userId)) members.push(req.userId);
