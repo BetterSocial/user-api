@@ -44,7 +44,6 @@ const moveToAnon = async (req, res) => {
   const filter = {id: oldChannelId};
   const sort = {last_message_at: -1};
   const oldChannelDetail = await client.queryChannels(filter, sort);
-  console.log('::oldChannelDetail', oldChannelDetail);
   //req.userId always anon since the token are using anon token
   const mySignedId = await UsersFunction.findSignedUserId(User, req.userId);
 
@@ -67,7 +66,6 @@ const moveToAnon = async (req, res) => {
   }
 
   const detailPrevTargetUser = await UsersFunction.findUserById(User, targetUserId);
-  console.log('::detailPrevTargetUser', detailPrevTargetUser);
 
   try {
     /**
