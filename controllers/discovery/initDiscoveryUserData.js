@@ -95,14 +95,14 @@ const InitDiscoveryUserData = async (req, res) => {
       },
       raw: true
     });
-    totalData = totalData[0]?.total_data;
+    totalData = totalData?.[0]?.total_data || 0;
 
     return res.status(200).json({
       success: true,
       message: `Fetch discovery data success`,
       suggestedUsers,
       nextPage: page + 1,
-      total_page: Math.ceil(totalData / limit)
+      total_page: totalData > 0 ? Math.ceil(totalData / limit) : 0
     });
   } catch (e) {
     console.log('e');
