@@ -13,6 +13,15 @@ const InitDiscoveryTopicData = async (req, res) => {
   const userId = req.userId;
 
   try {
+    let totalDataQuery = `SELECT 
+                              count(C.topic_id) as total_data
+                          FROM user_topics A 
+                          INNER JOIN user_topics B 
+                              ON A.topic_id = B.topic_id 
+                              AND A.user_id = :userId
+                          RIGHT JOIN topics C 
+                              ON C.topic_id = A.topic_id`;
+
     let suggestedTopicsQuery = `SELECT 
                 C.*, 
                 A.topic_id, 
@@ -42,11 +51,21 @@ const InitDiscoveryTopicData = async (req, res) => {
     });
     let suggestedTopics = topicWithCommonFollowerResult;
 
+    let totalData = await sequelize.query(totalDataQuery, {
+      type: QueryTypes.SELECT,
+      replacements: {
+        userId
+      },
+      raw: true
+    });
+    totalData = totalData[0]?.total_data;
+
     return res.status(200).json({
       success: true,
       message: `Fetch discovery data success`,
       suggestedTopics,
-      page: page + 1
+      page: page + 1,
+      total_page: Math.ceil(totalData / limit)
     });
   } catch (e) {
     console.log('e');
