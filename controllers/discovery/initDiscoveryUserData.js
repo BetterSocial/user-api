@@ -88,8 +88,10 @@ const InitDiscoveryUserData = async (req, res) => {
       success: true,
       message: `Fetch discovery data success`,
       suggestedUsers,
-      nextPage: page + 1,
-      total_page: totalData > 0 && limit > 0 ? Math.ceil(totalData / limit) : 0
+      page: page + 1,
+      total_page: totalData > 0 && limit > 0 ? Math.ceil(totalData / limit) : 0,
+      limit: limit,
+      offset: page * limit
     });
   } catch (e) {
     console.log('e');
