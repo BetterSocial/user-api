@@ -82,7 +82,7 @@ const handleCreatePostTO = (
   return removeDuplicate;
 };
 
-const modifyPollPostObject = async (userId, item) => {
+const modifyPollPostObject = async (userId, item, isBlurredPost = true) => {
   const post = {...item};
   if (!item?.polls) return post;
   const pollOptions = await PollingOption.findAll({
@@ -130,6 +130,10 @@ const modifyPollPostObject = async (userId, item) => {
 
   post.pollOptions = pollOptions;
   post.voteCount = voteCount;
+
+  if (post.anonimity) {
+    post.isBlurredPost = isBlurredPost;
+  }
 
   return post;
 };
