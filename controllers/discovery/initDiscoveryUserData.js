@@ -9,11 +9,17 @@ const {QueryTypes} = require('sequelize');
  * @returns
  */
 const InitDiscoveryUserData = async (req, res) => {
-  const {limit = 50, page = 0} = req.body;
+  const {limit = 50, page = 0} = req.query;
 
   const {userId} = req;
 
   try {
+    let totalDataQuery = `
+    SELECT 
+        count(A.user_id) as total_data
+    FROM users A
+    WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false`;
+
     const usersWithCommonFollowerQuery = `
         SELECT 
             A.user_id,
@@ -69,11 +75,23 @@ const InitDiscoveryUserData = async (req, res) => {
     });
     let suggestedUsers = usersWithCommonFollowerResult;
 
+    let totalData = await sequelize.query(totalDataQuery, {
+      type: QueryTypes.SELECT,
+      replacements: {
+        userId
+      },
+      raw: true
+    });
+    totalData = totalData?.[0]?.total_data || 0;
+
     return res.status(200).json({
       success: true,
       message: `Fetch discovery data success`,
       suggestedUsers,
-      nextPage: page + 1
+      page: page + 1,
+      total_page: totalData > 0 && limit > 0 ? Math.ceil(totalData / limit) : 0,
+      limit: limit,
+      offset: page * limit
     });
   } catch (e) {
     console.log('e');
