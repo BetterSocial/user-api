@@ -14,13 +14,8 @@ const InitDiscoveryTopicData = async (req, res) => {
 
   try {
     let totalDataQuery = `SELECT 
-                              count(C.topic_id) as total_data
-                          FROM user_topics A 
-                          INNER JOIN user_topics B 
-                              ON A.topic_id = B.topic_id 
-                              AND A.user_id = :userId
-                          RIGHT JOIN topics C 
-                              ON C.topic_id = A.topic_id`;
+                              count(A.topic_id) as total_data
+                          FROM topics A`;
 
     let suggestedTopicsQuery = `SELECT 
                 C.*, 
@@ -59,7 +54,6 @@ const InitDiscoveryTopicData = async (req, res) => {
       raw: true
     });
     totalData = totalData?.[0]?.total_data || 0;
-    console.log('totalData', totalData);
 
     return res.status(200).json({
       success: true,

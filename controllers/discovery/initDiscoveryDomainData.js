@@ -15,15 +15,10 @@ const InitDiscoveryDomainData = async (req, res) => {
 
   try {
     let totalDataQuery = `SELECT 
-                      count(C.domain_page_id) as total_data
-                  FROM user_follow_domain A 
-                  INNER JOIN user_follow_domain B 
-                      ON A.domain_id_followed = B.domain_id_followed
-                      AND A.user_id_follower = :userId
-                  RIGHT JOIN domain_page C 
-                      ON C.domain_page_id = A.domain_id_followed
-                  WHERE C.credder_score >= ${CREDDER_MIN_SCORE} AND C.status = true
-                  `;
+                              count(A.domain_page_id) as total_data
+                          FROM domain_page A 
+                          WHERE A.credder_score >= ${CREDDER_MIN_SCORE} AND A.status = true
+                          `;
 
     let suggestedDomainsQuery = `SELECT 
                 C.domain_page_id,

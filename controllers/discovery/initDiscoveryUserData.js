@@ -18,19 +18,6 @@ const InitDiscoveryUserData = async (req, res) => {
     SELECT 
         count(A.user_id) as total_data
     FROM users A
-    LEFT JOIN 
-        (SELECT 
-            common.*,
-            joint.common,
-        CASE WHEN joint.source = :userId THEN 1 ELSE 0 END as user_match
-        FROM users common
-        JOIN 
-            vwm_user_common_follower_count joint
-        ON common.user_id = joint.target
-        WHERE joint.source = :userId AND common.is_anonymous = false) CommonUsers
-    ON CommonUsers.user_id = A.user_id
-    LEFT JOIN user_follow_user B
-    ON A.user_id = B.user_id_followed AND B.user_id_follower = :userId
     WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false`;
 
     const usersWithCommonFollowerQuery = `
