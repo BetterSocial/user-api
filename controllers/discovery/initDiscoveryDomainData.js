@@ -17,7 +17,7 @@ const InitDiscoveryDomainData = async (req, res) => {
     let totalDataQuery = `SELECT 
                               count(A.domain_page_id) as total_data
                           FROM domain_page A 
-                          WHERE A.credder_score >= ${CREDDER_MIN_SCORE} AND A.status = true
+                          WHERE A.credder_score >= :credderMinScore AND A.status = true
                           `;
 
     let suggestedDomainsQuery = `SELECT 
@@ -32,7 +32,7 @@ const InitDiscoveryDomainData = async (req, res) => {
                 AND A.user_id_follower = :userId
             RIGHT JOIN domain_page C 
                 ON C.domain_page_id = A.domain_id_followed
-            WHERE C.credder_score >= ${CREDDER_MIN_SCORE} AND C.status = true
+            WHERE C.credder_score >= :credderMinScore AND C.status = true
             GROUP BY A.domain_id_followed, domain_page_id, A.user_id_follower, C.domain_name, C.logo, C.short_description, C.credder_score
             ORDER BY 
                 common DESC, 
@@ -46,7 +46,8 @@ const InitDiscoveryDomainData = async (req, res) => {
       replacements: {
         userId,
         limit: limit,
-        offset: page * limit
+        offset: page * limit,
+        credderMinScore: CREDDER_MIN_SCORE
       }
     });
     let suggestedDomains = domainWithCommonFollowerResult;
@@ -54,7 +55,8 @@ const InitDiscoveryDomainData = async (req, res) => {
     let totalData = await sequelize.query(totalDataQuery, {
       type: QueryTypes.SELECT,
       replacements: {
-        userId
+        userId,
+        credderMinScore: CREDDER_MIN_SCORE
       },
       raw: true
     });
@@ -65,7 +67,7 @@ const InitDiscoveryDomainData = async (req, res) => {
       message: `Fetch discovery data success`,
       suggestedDomains,
       page: page + 1,
-      total_page: totalData > 0 ? Math.ceil(totalData / limit) : 0
+      total_page: totalData > 0 && limit > 0 ? Math.ceil(totalData / limit) : 0
     });
   } catch (e) {
     console.log('e');

@@ -60,7 +60,7 @@ const InitDiscoveryTopicData = async (req, res) => {
       message: `Fetch discovery data success`,
       suggestedTopics,
       page: page + 1,
-      total_page: totalData > 0 ? Math.ceil(totalData / limit) : 0
+      total_page: totalData > 0 && limit > 0 ? Math.ceil(totalData / limit) : 0
     });
   } catch (e) {
     console.log('e');
