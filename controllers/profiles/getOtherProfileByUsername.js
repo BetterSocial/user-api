@@ -1,5 +1,6 @@
 const {User, sequelize} = require('../../databases/models');
 const {checkMoreOrLess} = require('../../helpers/checkMoreOrLess');
+const ropundingKarmaScore = require('../../helpers/roundingKarmaScore');
 
 module.exports = async (req, res) => {
   try {
@@ -76,6 +77,7 @@ module.exports = async (req, res) => {
     }
 
     copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm && copyUser.isSignedMessageEnabled;
+    copyUser.karma_score = ropundingKarmaScore(copyUser.karma_score);
 
     return res.status(200).json({
       status: 'success',

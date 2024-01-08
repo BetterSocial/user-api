@@ -24,6 +24,7 @@ const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper
 const {ACTIVITY_THRESHOLD} = require('../../config/constant');
 const UsersFunction = require('../../databases/functions/users');
 const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
+const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
 
 const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
   console.log('Get activity from getstream => ', feed, paramGetFeeds);
@@ -256,7 +257,7 @@ module.exports = async (req, res) => {
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, postActors);
     for (let i = 0; i < data.length; i++) {
       const user = karmaScores.find((user) => user.user_id === data[i].actor.id);
-      data[i].karma_score = user?.karma_score || 0;
+      data[i].karma_score = roundingKarmaScore(user?.karma_score || 0);
       data[i] = await modifyAnonimityPost(data[i], isBlurredPost);
     }
 
