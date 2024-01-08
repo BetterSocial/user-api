@@ -91,7 +91,6 @@ const isValidActivity = async (item, conditions) => {
   // filter by threshold
   const threshold = ACTIVITY_THRESHOLD[feed.toUpperCase()];
   if ((item.final_score || 0) < threshold) {
-    console.log(`final_score under threshold => `, item.final_score);
     return false;
   }
 
@@ -257,10 +256,8 @@ module.exports = async (req, res) => {
         });
       }
     }
-    console.log('DEBUG ', postActors);
     // get karma score for each post actor
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, postActors);
-    console.log('DEBUG ', karmaScores);
     for (let i = 0; i < data.length; i++) {
       const user = karmaScores.find((user) => user.user_id === data[i].actor.id);
       data[i].karma_score = user?.karma_score || 0;
