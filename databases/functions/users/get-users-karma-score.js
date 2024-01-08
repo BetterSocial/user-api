@@ -4,7 +4,7 @@
  * @param {String} userId
  */
 const getUsersKarmaScore = async (userModel, userIds = []) => {
-  if (userIds.length === 0) throw new Error('User ids cannot be empty');
+  if (userIds.length === 0) return [];
   const users = await userModel.findAll({
     where: {
       user_id: userIds
