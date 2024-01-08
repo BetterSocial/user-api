@@ -22,9 +22,12 @@ const generateReplyDataFromMessage = (message, userData, isAnonimous = true) => 
       id: message.user_id,
       name: isAnonimous ? anonymousName : userData.username,
       image: isAnonimous ? '' : userData.profile_pic_path,
-      username: isAnonimous ? anonymousName : userData.username
+      username: isAnonimous ? anonymousName : userData.username,
+      anon_user_info_emoji_name: userData?.anon_user_info_emoji_name,
+      anon_user_info_emoji_code: userData?.anon_user_info_emoji_code,
+      anon_user_info_color_name: userData?.anon_user_info_color_name,
+      anon_user_info_color_code: userData?.anon_user_info_color_code
     },
-    message: message.text,
     message_type: message.message_type || MESSAGE_TYPE.REGULAR
   };
 
@@ -36,8 +39,13 @@ const generateReplyDataFromMessage = (message, userData, isAnonimous = true) => 
     };
   }
 
+  const {id, type, created_at, updated_at} = message || {};
+
   return {
-    ...message,
+    id,
+    type,
+    created_at,
+    updated_at,
     ...baseReplyData
   };
 };
@@ -73,6 +81,7 @@ const processReplyMessage = async ({
     );
 
     baseMessage.reply_data = replyData;
+    baseMessage.quoted_message_id = replyMessageId;
 
     return baseMessage;
   }
