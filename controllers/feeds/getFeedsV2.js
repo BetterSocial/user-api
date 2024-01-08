@@ -90,11 +90,7 @@ const isValidActivity = async (item, conditions) => {
 
   // filter by threshold
   const threshold = ACTIVITY_THRESHOLD[feed.toUpperCase()];
-  if ((item.final_score || 0) < threshold) {
-    return false;
-  }
-
-  return true;
+  return (item.final_score || 0) >= threshold;
 };
 
 module.exports = async (req, res) => {
