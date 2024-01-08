@@ -1,4 +1,5 @@
 const {NOTIFICATION_TOPIC_NAME_PREFIX} = require('../helpers/constants');
+const roundingKarmaScore = require('../helpers/roundingKarmaScore');
 
 const emojiUnicode = require('emoji-unicode');
 const _ = require('lodash');
@@ -99,10 +100,18 @@ const convertLocationFromModel = (locationModel, isTO = false) => {
   return '';
 };
 
-const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anonymId) => {
+const handleAnonymousData = async (
+  data,
+  req,
+  postAuthorId,
+  myAnonymousId,
+  anonymId,
+  karmaScores = []
+) => {
   let childComment = data.latest_children?.comment || [];
   childComment = await Promise.all(
     childComment.map(async (child) => {
+      const user = karmaScores.find((user) => user.user_id === child.data.user_id);
       if (child?.data?.anon_user_info_emoji_name) {
         let childCommentLv2 = child?.latest_children?.comment || [];
         childCommentLv2 = childCommentLv2?.map((child2) => {
@@ -115,6 +124,7 @@ const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anony
           ...child,
           latest_children: {comment: childCommentLv2},
           user_id: null,
+          karmaScores: roundingKarmaScore(user?.karma_score || 0),
           user: {},
           target_feeds: [],
           is_you: myAnonymousId === child.user_id,
@@ -123,16 +133,19 @@ const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anony
       }
       return {
         ...child,
+        karmaScores: roundingKarmaScore(user?.karma_score || 0),
         is_you: req.userId === child.user_id,
         is_author: child.user_id === postAuthorId
       };
     })
   );
+  const user = karmaScores.find((user) => user.user_id === data.user_id);
   if (data.data.anon_user_info_emoji_name) {
     return {
       ...data,
       user_id: null,
       user: {},
+      karmaScores: roundingKarmaScore(user?.karma_score || 0),
       target_feeds: [],
       is_you: anonymId === myAnonymousId,
       is_author: postAuthorId === anonymId,
@@ -141,6 +154,7 @@ const handleAnonymousData = async (data, req, postAuthorId, myAnonymousId, anony
   }
   return {
     ...data,
+    karmaScores: roundingKarmaScore(user?.karma_score || 0),
     is_you: req.userId === data.user_id,
     is_author: data.user_id === postAuthorId,
     latest_children: {comment: childComment}

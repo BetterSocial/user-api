@@ -3,6 +3,8 @@ const moment = require('moment');
 const Getstream = require('../../vendor/getstream');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const {handleAnonymousData} = require('../../utils');
+const {User} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
 
 module.exports = async (req, res) => {
   try {
@@ -20,9 +22,29 @@ module.exports = async (req, res) => {
       return {...commentRes, latest_children: {comment: sortComment}};
     });
 
+    // get comment users
+
+    let actors = [];
+    const collectUserIds = (comment) => {
+      if (comment?.user?.id && !actors.includes(comment.user.id)) {
+        actors.push(comment.user.id);
+      }
+      comment?.latest_children?.comment?.forEach(collectUserIds);
+    };
+    sortByDate.forEach(collectUserIds);
+
+    const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
+
     const removeSensitiveData = await Promise.all(
       sortByDate.map(async (data) => {
-        return handleAnonymousData(data, req, post.actor.id, myAnonymousId, data.user_id);
+        return handleAnonymousData(
+          data,
+          req,
+          post.actor.id,
+          myAnonymousId,
+          data.user_id,
+          karmaScores
+        );
       })
     );
     let removeDeletedUser = removeSensitiveData.filter((data) => data.user);
