@@ -17,13 +17,14 @@ const {
   modifyAnonimityPost,
   isPostBlocked,
   modifyReactionsPost,
-  modifyFeedIsFollowingTarget
+  isUserFollowAuthor
 } = require('../../utils/post');
 const {DomainPage, Locations, User, UserFollowUser} = require('../../databases/models');
 const RedisDomainHelper = require('../../services/redis/helper/RedisDomainHelper');
 const {ACTIVITY_THRESHOLD} = require('../../config/constant');
 const UsersFunction = require('../../databases/functions/users');
 const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
+const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
 
 const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
   console.log('Get activity from getstream => ', feed, paramGetFeeds);
@@ -90,12 +91,7 @@ const isValidActivity = async (item, conditions) => {
 
   // filter by threshold
   const threshold = ACTIVITY_THRESHOLD[feed.toUpperCase()];
-  if ((item.final_score || 0) < threshold) {
-    console.log(`final_score under threshold => `, item.final_score);
-    return false;
-  }
-
-  return true;
+  return (item.final_score || 0) >= threshold;
 };
 
 module.exports = async (req, res) => {
@@ -117,14 +113,17 @@ module.exports = async (req, res) => {
       listBlockUser,
       listBlockDomain,
       listPostAnonymousAuthor,
-      isBlurredPost
+      isBlurredPost,
+      allFollowingUser
     ] = await Promise.all([
       UsersFunction.findAnonymousUserId(User, req.userId, {raw: true}),
       getListBlockUser(req.userId),
       getBlockDomain(req.userId),
       getListBlockPostAnonymousAuthor(req.userId),
-      UserFollowUserFunction.checkIsBlurredPost(UserFollowUser, req.userId)
+      UserFollowUserFunction.checkIsBlurredPost(UserFollowUser, req.userId),
+      UserFollowUserFunction.getAllFollowingUser(UserFollowUser, req.userId)
     ]);
+    let postActors = [];
 
     const listAnonymousAuthor = listPostAnonymousAuthor.map(
       (value) => value.post_anonymous_author_id
@@ -175,7 +174,6 @@ module.exports = async (req, res) => {
         // Change to conventional loop because map cannot handle await
         for (let item of feeds) {
           // validation admin hide post
-
           const conditions = {
             listAnonymousAuthor,
             listBlock,
@@ -191,13 +189,19 @@ module.exports = async (req, res) => {
           } else {
             item.is_self =
               item.actor.id === req.userId || item.actor.id === myAnonymousUser?.user_id;
-            let newItem = await modifyFeedIsFollowingTarget(item, req.userId);
-            newItem = await modifyAnonimityPost(newItem, isBlurredPost);
-            newItem = modifyReactionsPost(newItem, newItem.anonimity);
+            // check if actor is already in postActors
+            if (!postActors.includes(item.actor.id)) {
+              // post actor is a list of user id that already in the feed
+              // it will later be used to get their karma score
+              postActors.push(item.actor.id);
+            }
+
             if (item.verb === POST_VERB_POLL) {
               const postPoll = await modifyPollPostObject(req.userId, item, isBlurredPost);
               data.push(postPoll);
             } else {
+              let newItem = await isUserFollowAuthor(item, allFollowingUser);
+              newItem = modifyReactionsPost(newItem, newItem.anonimity);
               if (item.post_type === POST_TYPE_LINK) {
                 const domainPageId = item?.og?.domain_page_id;
                 if (domainPageId) {
@@ -248,6 +252,13 @@ module.exports = async (req, res) => {
           error: err
         });
       }
+    }
+    // get karma score for each post actor
+    const karmaScores = await UsersFunction.getUsersKarmaScore(User, postActors);
+    for (let i = 0; i < data.length; i++) {
+      const user = karmaScores.find((user) => user.user_id === data[i].actor.id);
+      data[i].karma_score = roundingKarmaScore(user?.karma_score || 0);
+      data[i] = await modifyAnonimityPost(data[i], isBlurredPost);
     }
 
     return res.status(200).json({

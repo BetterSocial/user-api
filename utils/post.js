@@ -341,7 +341,17 @@ const modifyNewItemAnonymity = (newItem, isBlurredPost = false) => {
   return newItem;
 };
 
+const isUserFollowAuthor = async (newItem, followingUsers) => {
+  if (newItem?.actor?.id) {
+    newItem.is_following_target = followingUsers.includes(newItem?.actor?.id);
+  }
+
+  return newItem;
+};
+
 const modifyFeedIsFollowingTarget = async (newItem, userId) => {
+  // TODO: Need to modify this function
+  // Get user list of following user, then check if the target user is in the list
   const isFollowingTarget = await UserFollowUserFunction.checkIsUserFollowing(
     UserFollowUser,
     userId,
@@ -400,5 +410,6 @@ module.exports = {
   modifyPollPostObject,
   modifyReactionsPost,
   getFeedDuration,
-  modifyPostLinkPost
+  modifyPostLinkPost,
+  isUserFollowAuthor
 };

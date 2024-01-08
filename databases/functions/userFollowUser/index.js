@@ -5,7 +5,8 @@ const UserFollowUserFunction = {
   checkTargetUserFollowStatus: require('./check-target-user-follow-status'),
   checkTargetUserFollowStatusBatch: require('./check-target-user-follow-status-batch'),
   userBlock: require('./user-block'),
-  userUnfollow: require('./user-unfollow')
+  userUnfollow: require('./user-unfollow'),
+  getAllFollowingUser: require('./get-all-following-user')
 };
 
 module.exports = UserFollowUserFunction;

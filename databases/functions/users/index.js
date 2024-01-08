@@ -11,6 +11,7 @@ const getAllChatAnonimityUserInfo = require('./get-all-chat-anonimity-user-info'
 const register = require('./users-register');
 const registerAnonymous = require('./users-register-anonymous');
 const updateLastActiveAt = require('./update-last-active-at');
+const getUsersKarmaScore = require('./get-users-karma-score');
 
 const UsersFunction = {
   checkIsMe,
@@ -25,7 +26,8 @@ const UsersFunction = {
   getAllChatAnonimityUserInfo,
   register,
   registerAnonymous,
-  updateLastActiveAt
+  updateLastActiveAt,
+  getUsersKarmaScore
 };
 
 module.exports = UsersFunction;
