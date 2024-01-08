@@ -23,17 +23,16 @@ module.exports = async (req, res) => {
     });
 
     // get comment users
+
     let actors = [];
-    sortByDate.map((comment_lvl1) => {
-      if (!actors.includes(comment_lvl1?.user?.id)) {
-        actors.push(comment_lvl1?.user?.id);
+    const collectUserIds = (comment) => {
+      if (comment?.user?.id && !actors.includes(comment.user.id)) {
+        actors.push(comment.user.id);
       }
-      comment_lvl1?.latest_children?.comment?.map((comment_lvl2) => {
-        if (!actors.includes(comment_lvl2?.user?.id)) {
-          actors.push(comment_lvl2?.user?.id);
-        }
-      });
-    });
+      comment?.latest_children?.comment?.forEach(collectUserIds);
+    };
+    sortByDate.forEach(collectUserIds);
+
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
 
     const removeSensitiveData = await Promise.all(
