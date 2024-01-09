@@ -8,6 +8,7 @@ const {responseSuccess} = require('../../utils/Responses');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const {User} = require('../../databases/models');
+const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
 
 module.exports = async (req, res) => {
   const {id} = req.query;
@@ -27,6 +28,36 @@ module.exports = async (req, res) => {
   const myAnonymousUser = await UsersFunction.findAnonymousUserId(User, req.userId, {raw: true});
 
   const newItem = {...feedItem};
+  // add karma score
+  let actors = [newItem.actor.id];
+  let comments = newItem.latest_reactions?.comment;
+  const collectUserIds = (comment) => {
+    if (comment?.user?.id && !actors.includes(comment.user.id)) {
+      actors.push(comment.user.id);
+    }
+    comment?.latest_children?.comment?.forEach(collectUserIds);
+  };
+  comments.forEach(collectUserIds);
+
+  const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
+  // add karma score in feed detail
+  const user = karmaScores.find((user) => user.user_id === newItem.actor.id);
+  newItem.karma_score = roundingKarmaScore(user?.karma_score || 0);
+  // add karma score in comment
+  comments = comments.map((comment) => {
+    const user = karmaScores.find((user) => user.user_id === comment.user_id);
+    comment.karma_score = roundingKarmaScore(user?.karma_score || 0);
+    let sub_comments = comment.latest_children?.comment?.map((sub_comment) => {
+      const user = karmaScores.find((user) => user.user_id === sub_comment.user_id);
+      sub_comment.karma_score = roundingKarmaScore(user?.karma_score || 0);
+      return sub_comment;
+    });
+    comment.latest_children.comment = sub_comments;
+    return comment;
+  });
+
+  newItem.latest_reactions.comment = comments;
+
   newItem.is_self =
     newItem.actor.id === req.userId || newItem.actor.id === myAnonymousUser?.user_id;
   const client = stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);
