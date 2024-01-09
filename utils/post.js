@@ -10,10 +10,13 @@ const {
   DomainPage,
   UserFollowUser,
   sequelize,
-  Sequelize
+  Sequelize,
+  User
 } = require('../databases/models');
 const {NO_POLL_OPTION_UUID, POST_TYPE_LINK, POST_VERB_POLL} = require('../helpers/constants');
 const deleteActivityFromUserFeed = require('../services/getstream/deleteActivityFromUserFeed');
+const UsersFunction = require('../databases/functions/users');
+const roundingKarmaScore = require('../helpers/roundingKarmaScore');
 
 /**
  *
@@ -341,8 +344,12 @@ const modifyNewItemAnonymity = (newItem, isBlurredPost = false) => {
   return newItem;
 };
 
-const isUserFollowAuthor = async (newItem, followingUsers) => {
+const isUserFollowAuthor = async (newItem, followingUsers, karmaScores = []) => {
   if (newItem?.actor?.id) {
+    if (karmaScores.length > 0) {
+      const user = karmaScores.find((user) => user.user_id === newItem?.actor?.id);
+      newItem.karma_score = roundingKarmaScore(user?.karma_score || 0);
+    }
     newItem.is_following_target = followingUsers.includes(newItem?.actor?.id);
   }
 
@@ -368,8 +375,17 @@ async function filterFeeds(
   feeds = [],
   feed_id = null,
   threshold = null,
-  isBlurredPost = false
+  isBlurredPost = false,
+  followingUsers = []
 ) {
+  // get all actor karma score
+  let actors = [];
+  feeds.map((item) => {
+    if (!actors.includes(item.actor.id)) {
+      actors.push(item.actor.id);
+    }
+  });
+  const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
   const results = await Promise.all(
     feeds.map(async (item) => {
       const expired = isExpiredPost(item);
@@ -383,7 +399,7 @@ async function filterFeeds(
       let newItem = {...item};
 
       newItem.is_self = item?.actor?.id === userId || item?.actor?.id === selfAnonymousUserId;
-      newItem = await modifyFeedIsFollowingTarget(newItem, userId);
+      newItem = await isUserFollowAuthor(newItem, followingUsers, karmaScores);
       newItem = modifyNewItemAnonymity(newItem, isBlurredPost);
       newItem = modifyReactionsPost(newItem, newItem.anonimity);
 
@@ -391,7 +407,6 @@ async function filterFeeds(
 
       if (isValidPollPost) newItem = await modifyPollPostObject(userId, newItem);
       else newItem = await modifyPostLinkPost(DomainPage, newItem);
-
       return newItem;
     })
   );

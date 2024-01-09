@@ -41,6 +41,12 @@ class TopicPage {
       payload.listBlockDomain,
       payload.listPostAnonymous
     ).getHasBlock(topicPages);
+
+    let allFollowingUser = await UserFollowUserFunction.getAllFollowingUser(
+      UserFollowUser,
+      payload.userId
+    );
+
     const threshold = ACTIVITY_THRESHOLD.TOPIC_FEED;
     results.data = await filterFeeds(
       payload.userId,
@@ -48,7 +54,8 @@ class TopicPage {
       newTopicPagesWithBlock,
       payload.id,
       threshold,
-      payload.isBlurredPost
+      payload.isBlurredPost,
+      allFollowingUser
     );
     return results;
   }
