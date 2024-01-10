@@ -9,6 +9,7 @@ const {sequelize} = require('../../databases/models');
  */
 const InitDiscoveryTopicData = async (req, res) => {
   let {limit = 10, page = 0} = req.query;
+  page = parseInt(page);
 
   const userId = req.userId;
 
