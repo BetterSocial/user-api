@@ -9,7 +9,8 @@ const {QueryTypes} = require('sequelize');
  * @returns
  */
 const InitDiscoveryUserData = async (req, res) => {
-  const {limit = 50, page = 0} = req.query;
+  let {limit = 50, page = 0} = req.query;
+  page = parseInt(page);
 
   const {userId} = req;
 
