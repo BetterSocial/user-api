@@ -62,7 +62,7 @@ module.exports = (sequelize, DataTypes) => {
       bio: {type: DataTypes.TEXT, allowNull: true},
       combined_user_score: {type: DataTypes.NUMBER, allowNull: true},
       karma_score: {type: DataTypes.NUMBER, allowNull: true},
-      is_karma_unlocked: {type: DataTypes.BOOLEAN, allowNull: false},
+      is_karma_unlocked: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
       is_banned: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
