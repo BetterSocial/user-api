@@ -16,6 +16,7 @@ module.exports = {
   QUEUE_DELETE_USER_POST_COMMENT: 'deleteUserPostComment',
 
   DB_COLLECTION_USER_POST_SCORE: 'user_post_score',
+  DB_COLLECTION_POST_SCORE: 'post_score',
   DB_COLLECTION_USER_SCORE: 'user_score',
   EVENT_FOLLOW_F2_USER: 'follow-f2-users',
   EVENT_UNFOLLOW_F2_USER: 'unfollow-f2-users',
