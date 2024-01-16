@@ -21,6 +21,10 @@ module.exports = async (req, res) => {
     return ErrorResponse.e404(res, 'This post has been deleted');
   }
 
+  if (!feedItem) {
+    return ErrorResponse.e404(res, 'This post not found');
+  }
+
   if (feedExpiredAt.isBefore(moment())) {
     return ErrorResponse.e404(res, 'This post has expired and has been deleted automatically');
   }
@@ -29,8 +33,9 @@ module.exports = async (req, res) => {
 
   const newItem = {...feedItem};
   // add karma score
+
   let actors = [newItem.actor.id];
-  let comments = newItem.latest_reactions?.comment;
+  let comments = newItem.latest_reactions?.comment || [];
   const collectUserIds = (comment) => {
     if (comment?.user?.id && !actors.includes(comment.user.id)) {
       actors.push(comment.user.id);
