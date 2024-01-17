@@ -9,6 +9,7 @@ const getFollowedTopic = require('./getFollowedTopic');
 const {Topics, UserTopic, UserTopicHistory, sequelize} = require('../../databases/models');
 const UserTopicService = require('../../services/postgres/UserTopicService');
 const getSubscribableTopic = require('./getSubscribeableTopic');
+const {getAnonymUser} = require('../../utils/getAnonymUser');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -84,13 +85,32 @@ const putFollowTopic = async (req, res) => {
 
 const getTopics = async (req, res) => {
   const {name} = req.query;
+  const signUserId = req.userId;
+  const anonymousId = await getAnonymUser(req.userId);
 
   try {
     const results = await sequelize.query(
       `SELECT 
             "Topic".*,
             count("topicFollower"."user_id") 
-                AS "followersCount"
+                AS "followersCount",
+            CASE
+              WHEN (SELECT 
+                count(user_id) as user_id_total 
+              FROM user_topics 
+              WHERE 
+                user_id = :signUserId
+                AND topic_id = "Topic".topic_id 
+              LIMIT 1) > 0 THEN 'sign'
+              WHEN (SELECT 
+                count(user_id) as user_id_total 
+              FROM user_topics 
+              WHERE 
+                user_id = :anonymousId
+                AND topic_id = "Topic".topic_id 
+              LIMIT 1) > 0 THEN 'anon'
+              ELSE 'null'
+              END AS is_followed_by
             FROM "topics" 
                 AS "Topic" 
             LEFT OUTER JOIN "user_topics" 
@@ -107,7 +127,9 @@ const getTopics = async (req, res) => {
       {
         type: QueryTypes.SELECT,
         replacements: {
-          likeQuery: `%${name}%`
+          likeQuery: `%${name}%`,
+          signUserId: signUserId,
+          anonymousId: anonymousId
         }
       }
     );
