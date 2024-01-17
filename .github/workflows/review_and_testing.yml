@@ -7,10 +7,9 @@ permissions:
 on:
   pull_request:
     branches: [main]
-    
+
 concurrency:
-  group:
-    ${{ github.repository }}-${{ github.event.number || github.head_ref ||
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref ||
     github.sha }}-${{ github.workflow }}-${{ github.event_name ==
     'pull_request_review_comment' && 'pr_comment' || 'pr' }}
   cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
@@ -109,6 +108,7 @@ jobs:
           DB_PASSWORD: postgres
           DB_NAME: testing
           DB_SSL: false
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/testing
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         env:
