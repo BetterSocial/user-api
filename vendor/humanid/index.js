@@ -1,4 +1,5 @@
 const {default: axios} = require('axios');
+const Sentry = require('@sentry/node');
 
 const verifyExchangeToken = async (exchangeToken) => {
   try {
@@ -27,7 +28,8 @@ const verifyExchangeToken = async (exchangeToken) => {
     };
   } catch (error) {
     console.log('error verifying token to human ID');
-    console.log(error);
+    // send error to sentry
+    Sentry.captureException('error verifying token to human ID');
     return {
       success: false,
       message: error?.message || 'Error on verifying token to human ID'
