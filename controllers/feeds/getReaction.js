@@ -6,6 +6,8 @@ const {handleAnonymousData} = require('../../utils');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const getPlainFeedById = require('../../vendor/getstream/feed/getPlainFeedById');
 const v = new Validator();
+const {User} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
 
 module.exports = async (req, res) => {
   try {
@@ -24,6 +26,7 @@ module.exports = async (req, res) => {
     const token = req.token;
     const detailFeed = await getPlainFeedById(feed_id);
     const myAnonymUser = await getAnonymUser(req.userId);
+    const karmaScores = await UsersFunction.getUsersKarmaScore(User, detailFeed.actor.id);
     getstreamService
       .getReaction(activity_id, token, limit)
       .then(async (result) => {
@@ -34,7 +37,8 @@ module.exports = async (req, res) => {
               req,
               detailFeed.actor.id,
               myAnonymUser,
-              dataUser.user_id
+              dataUser.user_id,
+              karmaScores
             );
           })
         );
