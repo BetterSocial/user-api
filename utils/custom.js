@@ -111,7 +111,7 @@ const handleAnonymousData = async (
   let childComment = data.latest_children?.comment || [];
   childComment = await Promise.all(
     childComment.map(async (child) => {
-      const user = karmaScores.find((user) => user.user_id === child.data.user_id);
+      const user = karmaScores.find((user) => user.user_id === child.user_id);
       if (child?.data?.anon_user_info_emoji_name) {
         let childCommentLv2 = child?.latest_children?.comment || [];
         childCommentLv2 = childCommentLv2?.map((child2) => {
