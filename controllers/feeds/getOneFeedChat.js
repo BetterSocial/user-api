@@ -3,6 +3,7 @@ const {UserBlockedUser, User} = require('../../databases/models');
 const getstreamService = require('../../services/getstream');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
+const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
 
 const constructData = (req, data, datum, constantActor) => {
   datum.isOwningReaction = req.userId === datum.user_id;
@@ -69,7 +70,7 @@ const getOneFeedChatService = async (req, res) => {
     if (moment(data.results[0].expired_at).isBefore(moment().utc())) {
       return ErrorResponse.e400(res, 'Feed alredy expired');
     }
-    const {comments, upvotes, downvotes} = getReaction(
+    let {comments, upvotes, downvotes} = getReaction(
       req,
       data.results[0].latest_reactions,
       data.results[0].actor
@@ -83,6 +84,40 @@ const getOneFeedChatService = async (req, res) => {
     }
 
     const actor = data?.results[0]?.actor;
+
+    let karmaActors = [];
+    if (!karmaActors.includes(actor.id)) {
+      karmaActors.push(actor.id);
+    }
+    for (const comment of comments) {
+      if (!karmaActors.includes(comment?.reaction?.user_id)) {
+        karmaActors.push(comment?.reaction?.user_id);
+      }
+    }
+
+    const karmaScores = await UsersFunction.getUsersKarmaScore(User, karmaActors);
+    comments = comments.map((comment) => {
+      const user = karmaScores.find((user) => user.user_id === comment.reaction.user_id);
+      if (user && comment.reaction.user) {
+        comment.reaction.user.karmaScores = roundingKarmaScore(user?.karma_score || 0);
+      }
+      if (comment.reaction.latest_children.comment) {
+        comment.reaction.latest_children.comment = comment.reaction?.latest_children?.comment?.map(
+          (child) => {
+            const user = karmaScores.find((user) => user.user_id === child.user_id);
+            if (user && child.user) {
+              child.user.karmaScores = roundingKarmaScore(user?.karma_score || 0);
+              return child;
+            }
+          }
+        );
+      }
+      return comment;
+    });
+
+    const user = karmaScores.find((user) => user.user_id === actor.id);
+    actor.karmaScores = roundingKarmaScore(user?.karma_score || 0);
+
     if (data?.results[0]?.anonimity) {
       actor.data.username = `Anonymous ${data?.results[0]?.anon_user_info_emoji_name}`;
       actor.data.anon_user_info_emoji_name = data?.results[0]?.anon_user_info_emoji_name;

@@ -3,6 +3,7 @@ const {Sequelize} = require('sequelize');
 const UsersFunction = require('../../databases/functions/users');
 const {User, sequelize} = require('../../databases/models');
 const getstreamService = require('../../services/getstream');
+const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
 
 const mappingFeed = (req, feeds) => {
   const mapping = [];
@@ -113,7 +114,7 @@ const pushToa = (a, b, newGroup, actor, data) => {
   }
 };
 
-const finalize = (req, id, myReaction, newGroup, activity_id, constantActor) => {
+const finalize = (req, id, myReaction, newGroup, activity_id, constantActor, karmaScores = []) => {
   if (myReaction) {
     myReaction = {
       ...myReaction,
@@ -124,6 +125,8 @@ const finalize = (req, id, myReaction, newGroup, activity_id, constantActor) => 
     }
 
     if (myReaction.kind === 'comment') {
+      const user = karmaScores.find((user) => user.user_id === myReaction.user_id);
+      myReaction.user.karmaScores = roundingKarmaScore(user?.karma_score || 0);
       newGroup[activity_id].comments.push({
         reaction: myReaction,
         actor:
@@ -205,6 +208,17 @@ const getFeedChatService = async (req, res) => {
       newFeed.push(...mapping);
     }
 
+    let actors = [];
+    for (const feed of newFeed) {
+      if (!actors.includes(feed.actor.id)) {
+        actors.push(feed.actor.id);
+      }
+      if (feed.reaction && !actors.includes(feed.reaction.user_id)) {
+        actors.push(feed.reaction.user_id);
+      }
+    }
+    const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
+
     const newGroup = {};
     const groupingFeed = newFeed.reduce((a, b) => {
       const localDate = moment.utc(b.time).local().format();
@@ -222,7 +236,12 @@ const getFeedChatService = async (req, res) => {
         actor,
         showToast = false
       } = getDetail(req, b, myAnonymousId.user_id);
+
+      const user = karmaScores.find((user) => user.user_id === actor.id);
+      actor.karmaScores = roundingKarmaScore(user?.karma_score || 0);
+
       const mapCountLevel2 = countLevel2(childComment);
+
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
 
       const total3 = totalCommentLevel3?.reduce((acc, curr) => acc + curr, 0);
@@ -253,7 +272,15 @@ const getFeedChatService = async (req, res) => {
         });
       }
       const myReaction = b.reaction;
-      finalize(req, myAnonymousId.user_id, myReaction, newGroup, activity_id, constantActor);
+      finalize(
+        req,
+        myAnonymousId.user_id,
+        myReaction,
+        newGroup,
+        activity_id,
+        constantActor,
+        karmaScores
+      );
       return a;
     }, []);
     const feedGroup = await getFeedGroup(groupingFeed);
