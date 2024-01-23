@@ -98,14 +98,20 @@ const getOneFeedChatService = async (req, res) => {
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, karmaActors);
     comments = comments.map((comment) => {
       const user = karmaScores.find((user) => user.user_id === comment.reaction.user_id);
-      comment.reaction.user.karmaScores = roundingKarmaScore(user?.karma_score || 0);
-      comment.reaction.latest_children.comment = comment.reaction?.latest_children?.comment?.map(
-        (child) => {
-          const user = karmaScores.find((user) => user.user_id === child.user_id);
-          child.user.karmaScores = roundingKarmaScore(user?.karma_score || 0);
-          return child;
-        }
-      );
+      if (user && comment.reaction.user) {
+        comment.reaction.user.karmaScores = roundingKarmaScore(user?.karma_score || 0);
+      }
+      if (comment.reaction.latest_children.comment) {
+        comment.reaction.latest_children.comment = comment.reaction?.latest_children?.comment?.map(
+          (child) => {
+            const user = karmaScores.find((user) => user.user_id === child.user_id);
+            if (user && child.user) {
+              child.user.karmaScores = roundingKarmaScore(user?.karma_score || 0);
+              return child;
+            }
+          }
+        );
+      }
       return comment;
     });
 
