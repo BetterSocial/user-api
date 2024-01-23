@@ -17,7 +17,7 @@ module.exports = async (userFollowUserModel, userIdFollower, _transaction = null
     raw: true
   });
 
-  if (signUserList.length <= MINIMUM_BLUR_USER_FOLLOWING) {
+  if (signUserList.length < MINIMUM_BLUR_USER_FOLLOWING) {
     isBlurredPost = true;
   }
 
