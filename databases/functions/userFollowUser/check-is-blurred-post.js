@@ -13,7 +13,7 @@ module.exports = async (userFollowUserModel, userIdFollower, _transaction = null
       user_id_follower: userIdFollower,
       is_anonymous: false
     },
-    limit: MINIMUM_BLUR_USER_FOLLOWING,
+    limit: MINIMUM_BLUR_USER_FOLLOWING + 1,
     raw: true
   });
 
