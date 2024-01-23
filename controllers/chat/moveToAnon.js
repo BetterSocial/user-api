@@ -64,6 +64,15 @@ const moveToAnon = async (req, res) => {
       anon_user_info_emoji_name: emoji.name
     };
   }
+  // prevent if anon user info is null
+  if (!prevTargetUser.anon_user_info_color_code || !prevTargetUser.anon_user_info_color_name) {
+    prevTargetUser.anon_user_info_color_code = color.code;
+    prevTargetUser.anon_user_info_color_name = color.color;
+  }
+  if (!prevTargetUser.anon_user_info_emoji_code || !prevTargetUser.anon_user_info_emoji_name) {
+    prevTargetUser.anon_user_info_emoji_code = emoji.emoji;
+    prevTargetUser.anon_user_info_emoji_name = emoji.name;
+  }
 
   const detailPrevTargetUser = await UsersFunction.findUserById(User, targetUserId);
 
