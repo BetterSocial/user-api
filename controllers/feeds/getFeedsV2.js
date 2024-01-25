@@ -254,10 +254,45 @@ module.exports = async (req, res) => {
       }
     }
     // get karma score for each post actor
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].latest_reactions?.downvotes) {
+        for (let j = 0; j < data[i].latest_reactions?.downvotes.length; j++) {
+          if (!postActors.includes(data[i].latest_reactions.downvotes[j].user_id)) {
+            postActors.push(data[i].latest_reactions.downvotes[j].user_id);
+          }
+        }
+      }
+      if (data[i].own_reactions?.downvotes) {
+        for (let j = 0; j < data[i].own_reactions?.downvotes.length; j++) {
+          if (!postActors.includes(data[i].own_reactions.downvotes[j].user_id)) {
+            postActors.push(data[i].own_reactions.downvotes[j].user_id);
+          }
+        }
+      }
+    }
+
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, postActors);
     for (let i = 0; i < data.length; i++) {
       const user = karmaScores.find((user) => user.user_id === data[i].actor.id);
       data[i].karma_score = roundingKarmaScore(user?.karma_score || 0);
+      if (data[i].latest_reactions?.downvotes) {
+        data[i].latest_reactions.downvotes = data[i].latest_reactions?.downvotes.map((downvote) => {
+          const user = karmaScores.find((user) => user.user_id === downvote.user_id);
+          return {
+            ...downvote,
+            karma_score: roundingKarmaScore(user?.karma_score || 0)
+          };
+        });
+      }
+      if (data[i].own_reactions?.downvotes) {
+        data[i].own_reactions.downvotes = data[i].own_reactions?.downvotes.map((downvote) => {
+          const user = karmaScores.find((user) => user.user_id === downvote.user_id);
+          return {
+            ...downvote,
+            karma_score: roundingKarmaScore(user?.karma_score || 0)
+          };
+        });
+      }
       data[i] = await modifyAnonimityPost(data[i], isBlurredPost);
     }
 
