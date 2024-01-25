@@ -46,15 +46,14 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
     const channel = client.channel('messaging', {members});
     const createdChannel = await channel.create();
 
-    await channel.updatePartial({
-      set: {
+    const {betterChannelMember, betterChannelMemberObject} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true, {
         channel_type: CHANNEL_TYPE.ANONYMOUS,
         anon_user_info_color_code,
         anon_user_info_color_name,
         anon_user_info_emoji_code,
         anon_user_info_emoji_name
-      }
-    });
+      });
 
     // Default mock chat in case of channel is blocked
     let chat = {
@@ -137,9 +136,6 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
       anon_user_info_emoji_code,
       anon_user_info_emoji_name
     });
-
-    const {betterChannelMember, betterChannelMemberObject} =
-      await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true);
 
     await client.disconnectUser();
 

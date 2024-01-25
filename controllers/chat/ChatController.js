@@ -12,6 +12,7 @@ const UsersFunction = require('../../databases/functions/users');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const ChatAnonUserInfoFunction = require('../../databases/functions/chatAnonUserInfo');
+const BetterSocialCore = require('../../services/bettersocial');
 
 const v = new Validator();
 
@@ -266,15 +267,14 @@ module.exports = {
       const channel = client.channel('messaging', {members});
       const createdChannel = await channel.create();
 
-      await channel.updatePartial({
-        set: {
+      const {betterChannelMember, betterChannelMemberObject} =
+        await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true, {
           channel_type: CHANNEL_TYPE.ANONYMOUS,
           anon_user_info_color_code,
           anon_user_info_color_name,
           anon_user_info_emoji_code,
           anon_user_info_emoji_name
-        }
-      });
+        });
 
       // Default mock chat in case of channel is blocked
       let chat = {
@@ -340,7 +340,9 @@ module.exports = {
 
       const response = {
         ...chat,
-        members: targetsUserModel
+        members: targetsUserModel,
+        betterChannelMember,
+        betterChannelMemberObject
       };
 
       if (createdChannel?.channel?.is_channel_blocked) {
