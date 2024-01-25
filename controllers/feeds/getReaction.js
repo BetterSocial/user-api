@@ -26,10 +26,16 @@ module.exports = async (req, res) => {
     const token = req.token;
     const detailFeed = await getPlainFeedById(feed_id);
     const myAnonymUser = await getAnonymUser(req.userId);
-    const karmaScores = await UsersFunction.getUsersKarmaScore(User, detailFeed.actor.id);
     getstreamService
       .getReaction(activity_id, token, limit)
       .then(async (result) => {
+        let actors = [];
+        result.results.map((data) => {
+          if (data.user_id) {
+            actors.push(data.user_id);
+          }
+        });
+        const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
         let mappingNewRes = await Promise.all(
           result.results.map(async (dataUser) => {
             return handleAnonymousData(
