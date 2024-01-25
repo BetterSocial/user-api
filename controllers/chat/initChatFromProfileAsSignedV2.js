@@ -36,8 +36,11 @@ const initChatFromProfileAsSignedV2 = async (req, res) => {
     await client.connectUser(user, req.token);
 
     const channel = client.channel('messaging', {members});
-
     const createdChannel = await channel.create();
+
+    const {betterChannelMember, betterChannelMemberObject} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true);
+
     try {
       if (!channel?.data?.name) {
         await channel.updatePartial({
@@ -67,9 +70,6 @@ const initChatFromProfileAsSignedV2 = async (req, res) => {
         message: targetUserModel.bio
       }
     });
-
-    const {betterChannelMember, betterChannelMemberObject} =
-      await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true);
 
     const response = {
       ...chat,
