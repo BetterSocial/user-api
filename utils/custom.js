@@ -115,10 +115,17 @@ const handleAnonymousData = async (
       if (child?.data?.anon_user_info_emoji_name) {
         let childCommentLv2 = child?.latest_children?.comment || [];
         childCommentLv2 = childCommentLv2?.map((child2) => {
+          const child2_user = karmaScores.find((user) => user.user_id === child2.user_id);
           if (child2.data.anon_user_info_emoji_name) {
-            return {...child2, user_id: null, user: {}, target_feeds: []};
+            return {
+              ...child2,
+              user_id: null,
+              user: {},
+              target_feeds: [],
+              karmaScores: roundingKarmaScore(child2_user?.karma_score || 0)
+            };
           }
-          return {...child2};
+          return {...child2, karmaScores: roundingKarmaScore(child2_user?.karma_score || 0)};
         });
         return {
           ...child,
