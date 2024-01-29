@@ -48,11 +48,18 @@ const moveToAnon = async (req, res) => {
   const mySignedId = await UsersFunction.findSignedUserId(User, req.userId);
 
   let prevTargetUser;
-  if (oldChannelDetail[0].data.better_channel_member) {
+  if (
+    oldChannelDetail &&
+    oldChannelDetail[0] &&
+    oldChannelDetail[0].data &&
+    oldChannelDetail[0].data?.better_channel_member
+  ) {
     prevTargetUser = Object.values(oldChannelDetail[0].data.better_channel_member).filter(
       (user) => user.user_id !== mySignedId
     )[0];
     targetUserId = prevTargetUser.user_id;
+  } else {
+    return res.status(404).json(responseError('Old channel id not found'));
   }
 
   if (!prevTargetUser) {
