@@ -292,7 +292,9 @@ const getFollowerList = async (req, res) => {
     WHERE LOWER(A.name) = LOWER(:name)
         AND users.is_anonymous = false
         ${searchQuery}
-    ORDER BY subquery.follower_count DESC NULLS last
+    ORDER BY 
+      subquery.follower_count DESC NULLS last, 
+      users.karma_score
     LIMIT :limit
     OFFSET :offset`;
 
