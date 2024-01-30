@@ -58,8 +58,6 @@ const moveToAnon = async (req, res) => {
       (user) => user.user_id !== mySignedId
     )[0];
     targetUserId = prevTargetUser.user_id;
-  } else {
-    return res.status(404).json(responseError('Old channel id not found'));
   }
 
   if (!prevTargetUser) {
@@ -102,6 +100,9 @@ const moveToAnon = async (req, res) => {
     const newChannel = client.channel('messaging', {members});
     const createdChannel = await newChannel.create();
     let newStateMemberWithAnonInfo = newChannel.state.members;
+
+    console.log(':::newChannel', newChannel);
+    console.log(':::newStateMemberWithAnonInfo', newStateMemberWithAnonInfo);
 
     //set target user detail
     newStateMemberWithAnonInfo[prevTargetUser.user_id].user = prevTargetUser.user;
