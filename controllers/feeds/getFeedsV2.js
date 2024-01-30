@@ -95,36 +95,12 @@ const isValidActivity = async (item, conditions) => {
 };
 
 const getActorFromLatestReaction = (latestReaction) => {
-  let postActors = [];
-  if (latestReaction?.upvotes?.length > 0) {
-    for (let j = 0; j < latestReaction?.upvotes.length; j++) {
-      if (!postActors.includes(latestReaction.upvotes[j].user_id)) {
-        postActors.push(latestReaction.upvotes[j].user_id);
-      }
-    }
-  }
-  if (latestReaction?.downvotes?.length > 0) {
-    for (let j = 0; j < latestReaction?.downvotes.length; j++) {
-      if (!postActors.includes(latestReaction.downvotes[j].user_id)) {
-        postActors.push(latestReaction.downvotes[j].user_id);
-      }
-    }
-  }
-  if (latestReaction?.comments?.length > 0) {
-    for (let j = 0; j < latestReaction?.comments.length; j++) {
-      if (!postActors.includes(latestReaction.comments[j].user_id)) {
-        postActors.push(latestReaction.comments[j].user_id);
-      }
-    }
-  }
-  if (latestReaction?.comment?.length > 0) {
-    for (let j = 0; j < latestReaction?.comment.length; j++) {
-      if (!postActors.includes(latestReaction.comment[j].user_id)) {
-        postActors.push(latestReaction.comment[j].user_id);
-      }
-    }
-  }
-  return postActors;
+  let postActors = new Set();
+  latestReaction?.upvotes?.forEach((upvote) => postActors.add(upvote.user_id));
+  latestReaction?.downvotes?.forEach((downvote) => postActors.add(downvote.user_id));
+  latestReaction?.comments?.forEach((comments) => postActors.add(comments.user_id));
+  latestReaction?.comment?.forEach((comment) => postActors.add(comment.user_id));
+  return Array.from(postActors);
 };
 
 const setKarmaScore = (latestReaction, karmaScores) => {
@@ -319,8 +295,8 @@ module.exports = async (req, res) => {
       }
     }
     // get karma score for each post actor
-    for (let i = 0; i < data.length; i++) {
-      const actor_from_reaction = getActorFromLatestReaction(data[i].latest_reactions);
+    for (const d of data) {
+      const actor_from_reaction = getActorFromLatestReaction(d.latest_reactions);
       postActors = [...postActors, ...actor_from_reaction];
     }
 
