@@ -108,7 +108,8 @@ const generateUserAndFollowSeeds = async () => {
   return {
     users: bulks,
     followers,
-    followings
+    followings,
+    anonymousUsername
   };
 };
 
