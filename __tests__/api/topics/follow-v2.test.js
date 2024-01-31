@@ -21,10 +21,10 @@ describe('PUT /topics/follow-v2', () => {
       .send({
         name: 'Topic 1'
       });
-
     // Assertion
     expect(response.statusCode).toBe(200);
-    expect(response.body.message).toBe('Success delete topic user v2');
+    expect(response.body.data[0].message).toBe('Success delete topic user v2');
+    expect(response.body.data[0].type).toBe('unfollow');
   });
 
   test('should return 200 OK with add topics', async () => {
@@ -35,10 +35,10 @@ describe('PUT /topics/follow-v2', () => {
       .send({
         name: 'Topic Outer'
       });
-
     // Assertion
     expect(response.statusCode).toBe(200);
-    expect(response.body.message).toBe('Success add topic user v2');
+    expect(response.body.data[0].message).toBe('Success add topic user v2');
+    expect(response.body.data[0].type).toBe('follow');
   });
 
   test('should return 404 with topic not found', async () => {
