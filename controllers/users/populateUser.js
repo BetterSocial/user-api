@@ -20,7 +20,8 @@ module.exports = async (req, res) => {
         profile_pic_public_id,
         bio,
         is_banned,
-        users.is_anonymous 
+        users.is_anonymous,
+        users.allow_anon_dm
         from users INNER JOIN user_follow_user ON users.user_id = user_follow_user.user_id_followed WHERE users.user_id != :userId AND user_follow_user.user_id_follower = :userId AND users.is_anonymous = false
       UNION
       SELECT 
@@ -37,7 +38,8 @@ module.exports = async (req, res) => {
         profile_pic_public_id,
         bio,
         is_banned,
-        users.is_anonymous 
+        users.is_anonymous,
+        users.allow_anon_dm
         from users INNER JOIN user_follow_user ON users.user_id = user_follow_user.user_id_follower WHERE users.user_id != :userId AND user_follow_user.user_id_followed = :userId AND users.is_anonymous = false
       LIMIT :limit
       OFFSET :offset`,
