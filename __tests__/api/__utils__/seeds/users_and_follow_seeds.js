@@ -1,5 +1,6 @@
 const {v4: uuid} = require('uuid');
 const TestConstants = require('../constant');
+const CryptoUtils = require('../../../../utils/crypto');
 
 const {User, UserFollowUser} = require('../../../../databases/models');
 
@@ -7,32 +8,10 @@ const generateUserAndFollowSeeds = async () => {
   const bulks = [];
   const followers = [];
   const followings = [];
+  const signedUserId = TestConstants.MY_USER_ID;
 
   bulks.push({
-    user_id: TestConstants.MY_ANONYMOUS_USER_ID,
-    human_id: `anon_human_id_${0}`,
-    country_code: 'ID',
-    username: `anon_username_${0}`,
-    last_active_at: new Date(),
-    status: 'Y',
-    created_at: new Date(),
-    updated_at: new Date(),
-    real_name: `anon_real_name_${0}`,
-    profile_pic_path: 'profile_pic_path',
-    profile_pic_asset_id: 'profile_pic_asset_id',
-    profile_pic_public_id: 'profile_pic_public_id',
-    bio: 'bio',
-    is_banned: false,
-    is_anonymous: true,
-    encrypted: 'encrypted',
-    allow_anon_dm: true,
-    only_received_dm_from_user_following: false,
-    is_backdoor_user: false,
-    verified_status: 'VERIFIED'
-  });
-
-  bulks.push({
-    user_id: TestConstants.MY_USER_ID,
+    user_id: signedUserId,
     human_id: `human_id_${0}`,
     country_code: 'ID',
     username: `username_${0}`,
@@ -51,7 +30,33 @@ const generateUserAndFollowSeeds = async () => {
     allow_anon_dm: true,
     only_received_dm_from_user_following: false,
     is_backdoor_user: false,
-    verified_status: 'VERIFIED'
+    verified_status: 'VERIFIED',
+    is_karma_unlocked: true
+  });
+
+  const anonymousUsername = CryptoUtils.getAnonymousUsername(signedUserId);
+  bulks.push({
+    user_id: TestConstants.MY_ANONYMOUS_USER_ID,
+    human_id: anonymousUsername,
+    country_code: 'ID',
+    username: anonymousUsername,
+    last_active_at: new Date(),
+    status: 'Y',
+    created_at: new Date(),
+    updated_at: new Date(),
+    real_name: `anon_real_name_${0}`,
+    profile_pic_path: 'profile_pic_path',
+    profile_pic_asset_id: 'profile_pic_asset_id',
+    profile_pic_public_id: 'profile_pic_public_id',
+    bio: 'bio',
+    is_banned: false,
+    is_anonymous: true,
+    encrypted: 'encrypted',
+    allow_anon_dm: true,
+    only_received_dm_from_user_following: false,
+    is_backdoor_user: false,
+    verified_status: 'VERIFIED',
+    is_karma_unlocked: true
   });
 
   for (let i = 2; i < 71; i++) {
@@ -75,7 +80,8 @@ const generateUserAndFollowSeeds = async () => {
       allow_anon_dm: true,
       only_received_dm_from_user_following: false,
       is_backdoor_user: false,
-      verified_status: 'VERIFIED'
+      verified_status: 'VERIFIED',
+      is_karma_unlocked: true
     });
 
     if (i <= 30) {
@@ -102,7 +108,8 @@ const generateUserAndFollowSeeds = async () => {
   return {
     users: bulks,
     followers,
-    followings
+    followings,
+    anonymousUsername
   };
 };
 

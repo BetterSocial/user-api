@@ -2,8 +2,10 @@ const request = require('supertest');
 const app = require('../../../app');
 const generateUserAndFollowSeeds = require('../__utils__/seeds/users_and_follow_seeds');
 
+let anonymousUsername = '';
 beforeEach(async () => {
-  await generateUserAndFollowSeeds();
+  const result = await generateUserAndFollowSeeds();
+  anonymousUsername = result.anonymousUsername;
 });
 
 const arrayOfDetailUser = expect.objectContaining({
@@ -23,7 +25,7 @@ const arrayOfDetailUser = expect.objectContaining({
 describe('GET /profiles/get-profile-public/:username', () => {
   test('should return 200 OK with detail user found', async () => {
     // Execution
-    const response = await request(app).get('/profiles/get-profile-public/anon_username_0');
+    const response = await request(app).get(`/profiles/get-profile-public/${anonymousUsername}`);
     // Assertion
     expect(response.statusCode).toBe(200);
     expect(response.body.data).toEqual(arrayOfDetailUser);

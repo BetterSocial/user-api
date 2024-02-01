@@ -57,7 +57,9 @@ describe('GET /topics/follow', () => {
 
 describe('PUT /topics/follow', () => {
   createReusableAuthTestSuite(request(app).put('/topics/follow/'));
-  test('should return 200 OK with delete topics', async () => {
+
+  //Deprecated Endpoint
+  /* test('should return 200 OK with delete topics', async () => {
     // Execution
     const response = await request(app)
       .put('/topics/follow/')
@@ -69,7 +71,7 @@ describe('PUT /topics/follow', () => {
     // Assertion
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe('Success delete topic user');
-  });
+  }); */
 
   test('should return 200 OK with add topics', async () => {
     // Execution
