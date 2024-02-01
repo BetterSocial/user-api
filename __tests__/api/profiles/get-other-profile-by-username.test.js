@@ -2,8 +2,10 @@ const request = require('supertest');
 const app = require('../../../app');
 const generateUserAndFollowSeeds = require('../__utils__/seeds/users_and_follow_seeds');
 
+let anonymousUsername = '';
 beforeEach(async () => {
-  await generateUserAndFollowSeeds();
+  const result = await generateUserAndFollowSeeds();
+  anonymousUsername = result.anonymousUsername;
 });
 
 const arrayOfDetailUser = expect.objectContaining({
@@ -35,7 +37,7 @@ describe('GET /profiles/get-other-profile-by-username/:username', () => {
   test('should return 200 OK with detail user found', async () => {
     // Execution
     const response = await request(app)
-      .get('/profiles/get-other-profile-by-username/anon_username_0')
+      .get(`/profiles/get-other-profile-by-username/${anonymousUsername}`)
       .set('Authorization', 'Bearer token');
     // Assertion
     expect(response.statusCode).toBe(200);

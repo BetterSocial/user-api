@@ -9,26 +9,40 @@ class UserTopicService {
     this._userTopicHistoryModel = UserTopicHistoryModel;
     this.followTopic = this.followTopic.bind(this);
     this.getUserTopic = this.getUserTopic.bind(this);
+    this.getFollowTopicStatus = this.getFollowTopicStatus.bind(this);
   }
 
-  async getFollowTopic(user_id, topic_id) {
-    try {
-    } catch (error) {}
-  }
-
-  async followTopic(user_id, topic_id) {
+  async getFollowTopicStatus(user_id, topic_id) {
     try {
       let topicUser = await this.getUserTopic(user_id, topic_id);
       if (topicUser) {
-        await this.deleteUserTopic(user_id, topic_id);
         return true;
       } else {
-        await this.addUserTopic(user_id, topic_id);
         return false;
       }
     } catch (error) {
       console.log(error);
+      throw new InvariantError('error get follow topic status');
+    }
+  }
+
+  async followTopic(user_id, topic_id) {
+    try {
+      await this.addUserTopic(user_id, topic_id);
+      return false;
+    } catch (error) {
+      console.log(error);
       throw new InvariantError('error follow topic');
+    }
+  }
+
+  async unfollowTopic(user_id, topic_id) {
+    try {
+      await this.deleteUserTopic(user_id, topic_id);
+      return true;
+    } catch (error) {
+      console.log(error);
+      throw new InvariantError('error unfollow topic');
     }
   }
 
@@ -46,7 +60,7 @@ class UserTopicService {
   async deleteUserTopic(user_id, topic_id) {
     try {
       let date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-      const result = await sequelize.transaction(async (t) => {
+      const result = await sequelize.transaction(async (_t) => {
         await this._userTopicModel.destroy({
           where: {
             user_id,
@@ -71,7 +85,7 @@ class UserTopicService {
   async addUserTopic(user_id, topic_id) {
     try {
       let date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-      await sequelize.transaction(async (t) => {
+      await sequelize.transaction(async (_t) => {
         let userTopic = {
           user_topics_id: uuidv4(),
           user_id: user_id,

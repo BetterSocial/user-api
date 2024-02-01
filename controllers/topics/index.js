@@ -6,10 +6,11 @@ const TopicService = require('../../services/postgres/TopicService');
 const TopicValidator = require('../../validators/topic');
 const topics = require('./topics');
 const getFollowedTopic = require('./getFollowedTopic');
-const {Topics, UserTopic, UserTopicHistory, sequelize} = require('../../databases/models');
+const {Topics, UserTopic, UserTopicHistory, sequelize, User} = require('../../databases/models');
 const UserTopicService = require('../../services/postgres/UserTopicService');
 const getSubscribableTopic = require('./getSubscribeableTopic');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
+const UsersFunction = require('../../databases/functions/users');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -155,21 +156,49 @@ const followTopicV2 = async (req, res) => {
     const {name} = req.body;
     const {token, userId} = req;
 
+    // logic get user sign and anonymous
+    let secondDetailUser;
+    let secondDetailUserId;
+    const detailTokenUser = await UsersFunction.findUserById(User, userId);
+    if (!detailTokenUser.is_anonymous) {
+      secondDetailUser = await UsersFunction.findAnonymousUserId(User, userId);
+    } else {
+      secondDetailUserId = await UsersFunction.findSignedUserId(User, userId);
+      secondDetailUser = await UsersFunction.findUserById(User, secondDetailUserId);
+    }
+
     TopicValidator.validatePutTopicFollow({name});
 
+    //Logic get topic
     const topicService = new TopicService(Topics);
     const topic = await topicService.getTopicByName(name);
     const {topic_id} = topic;
     const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
-    const result = await userTopicService.followTopic(userId, topic_id);
 
-    const message = await _afterPutTopic(result, token, userId, name);
+    //get follow status
+    const [getTokenUserStatus, getSecondUserStatus] = await Promise.all([
+      userTopicService.getFollowTopicStatus(detailTokenUser.user_id, topic_id),
+      userTopicService.getFollowTopicStatus(secondDetailUser.user_id, topic_id)
+    ]);
+
+    let data = [];
+    if (getTokenUserStatus) {
+      await userTopicService.unfollowTopic(detailTokenUser.user_id, topic_id);
+      data.push(await _afterPutTopic(true, token, detailTokenUser.user_id, name));
+    } else {
+      await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
+      data.push(await _afterPutTopic(false, token, detailTokenUser.user_id, name));
+
+      if (getSecondUserStatus) {
+        await userTopicService.unfollowTopic(secondDetailUser.user_id, topic_id);
+        data.push(await _afterPutTopic(true, token, secondDetailUser.user_id, name));
+      }
+    }
 
     return res.status(200).json({
       status: 'success',
       code: 200,
-      data: !result,
-      message
+      data: data
     });
   } catch (error) {
     if (error instanceof ClientError) {
@@ -189,17 +218,30 @@ const followTopicV2 = async (req, res) => {
   }
 };
 
-const _afterPutTopic = async (topic, token, userId, name) => {
+const _afterPutTopic = async (isUnfollow, token, userId, name) => {
   // follow / unfollow main feed topic
-  if (topic) {
+  if (isUnfollow) {
     await unfollowMainFeedTopic(token, userId, name);
   } else {
     await followMainFeedTopic(token, userId, name);
   }
 
-  const message = topic ? 'Success delete topic user v2' : 'Success add topic user v2';
+  let data;
+  if (isUnfollow) {
+    data = {
+      message: 'Success delete topic user v2',
+      type: 'unfollow',
+      userId
+    };
+  } else {
+    data = {
+      message: 'Success add topic user v2',
+      type: 'follow',
+      userId
+    };
+  }
 
-  return message;
+  return data;
 };
 
 const getFollowerList = async (req, res) => {
