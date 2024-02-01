@@ -42,7 +42,8 @@ const SearchUser = async (req, res) => {
                 ("User"."username" ILIKE :likeQuery
                 AND "User"."user_id" != :userId
                 AND "User"."is_anonymous" = false
-                AND "User"."is_banned" = false) 
+                AND "User"."is_banned" = false 
+                AND "User"."verified_status" != 'UNVERIFIED') 
             GROUP BY 
                 "User"."user_id"
             ORDER BY  

@@ -249,6 +249,7 @@ const getFollowerList = async (req, res) => {
         ON is_following_subquery.user_id_followed = users.user_id
     WHERE LOWER(A.name) = LOWER(:name)
         AND users.is_anonymous = false
+        AND users.verified_status != 'UNVERIFIED'
         ${searchQuery}
     ORDER BY subquery.follower_count DESC NULLS last
     LIMIT :limit
