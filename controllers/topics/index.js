@@ -293,7 +293,9 @@ const getFollowerList = async (req, res) => {
         AND users.is_anonymous = false
         AND users.verified_status != 'UNVERIFIED'
         ${searchQuery}
-    ORDER BY subquery.follower_count DESC NULLS last
+    ORDER BY 
+      subquery.follower_count DESC NULLS last, 
+      users.karma_score
     LIMIT :limit
     OFFSET :offset`;
 
