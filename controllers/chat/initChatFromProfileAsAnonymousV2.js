@@ -74,29 +74,6 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
       }
     };
 
-    if (!createdChannel?.channel?.is_channel_blocked) {
-      chat = await channel.sendMessage({
-        user_id: req.userId,
-        text: message,
-        message_type: MESSAGE_TYPE.REPLY_PROMPT,
-        members,
-        message,
-        reply_data: {
-          user: {
-            id: member,
-            name: targetUserData.username,
-            image: targetUserData.profile_pic_path,
-            username: targetUserData.username
-          },
-          message: targetUserData.bio
-        },
-        anon_user_info_color_code,
-        anon_user_info_color_name,
-        anon_user_info_emoji_code,
-        anon_user_info_emoji_name
-      });
-    }
-
     const exist = await ChatAnonUserInfo.count({
       where: {
         channel_id: channel.id,
@@ -138,6 +115,29 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
         anon_user_info_emoji_code,
         anon_user_info_emoji_name
       });
+
+    if (!createdChannel?.channel?.is_channel_blocked) {
+      chat = await channel.sendMessage({
+        user_id: req.userId,
+        text: message,
+        message_type: MESSAGE_TYPE.REPLY_PROMPT,
+        members,
+        message,
+        reply_data: {
+          user: {
+            id: member,
+            name: targetUserData.username,
+            image: targetUserData.profile_pic_path,
+            username: targetUserData.username
+          },
+          message: targetUserData.bio
+        },
+        anon_user_info_color_code,
+        anon_user_info_color_name,
+        anon_user_info_emoji_code,
+        anon_user_info_emoji_name
+      });
+    }
 
     const response = {
       ...chat,
