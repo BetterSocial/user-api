@@ -105,8 +105,6 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
       anon_user_info_emoji_name
     });
 
-    await client.disconnectUser();
-
     const {betterChannelMember, betterChannelMemberObject} =
       await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true, {
         channel_type: CHANNEL_TYPE.ANONYMOUS,
@@ -152,8 +150,10 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
 
     return res.status(200).json(responseSuccess('sent', response));
   } catch (error) {
-    await client.disconnectUser();
+    console.log('Error', error);
     return ErrorResponse.e400(res, error.message);
+  } finally {
+    await client.disconnectUser();
   }
 };
 
