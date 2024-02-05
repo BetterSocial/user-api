@@ -91,6 +91,8 @@ module.exports = {
         {last_message_at: -1}
       ]);
 
+      // const createdChannel = await cha
+
       channels = channels.map((channel) => {
         const newChannel = {...channel.data};
         delete newChannel.config;
@@ -433,6 +435,7 @@ module.exports = {
     }
   },
   findOrCreateChannel: async (req, res) => {
+    console.log('findOrCreateChannel', req.body);
     const schema = {
       members: 'string[]|empty:false'
     };
@@ -509,13 +512,6 @@ module.exports = {
             anonUserInfo
           );
 
-          channel.updatePartial({
-            set: {
-              channel_type: CHANNEL_TYPE.ANONYMOUS,
-              ...anonUserInfo
-            }
-          });
-
           return {
             ...member,
             anon_user_info_color_code: color.code,
@@ -525,9 +521,19 @@ module.exports = {
           };
         })
       );
+
+      const {betterChannelMember, betterChannelMemberObject} =
+        await BetterSocialCore.chat.updateBetterChannelMembers(channel, findOrCreateChannel, true, {
+          channel_type: CHANNEL_TYPE.ANONYMOUS
+        });
+
       await client.disconnectUser();
 
-      return res.status(200).json(findOrCreateChannel);
+      return res.status(200).json({
+        ...findOrCreateChannel,
+        better_channel_member: betterChannelMember,
+        better_channel_member_object: betterChannelMemberObject
+      });
     } catch (error) {
       await client.disconnectUser();
       return ErrorResponse.e400(res, error.message);
