@@ -3,7 +3,7 @@ const Validator = require('fastest-validator');
 const {v4: uuidv4} = require('uuid');
 const {responseSuccess, responseError} = require('../../utils/Responses');
 
-const {User, ChatAnonUserInfo} = require('../../databases/models');
+const {User, ChatAnonUserInfo, Sequelize} = require('../../databases/models');
 
 const {AddMembersChannel} = require('../../services/chat');
 const addModerators = require('./addModerators');
@@ -446,7 +446,7 @@ module.exports = {
         error: validated
       });
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
-    const {members} = req.body;
+    const {members, oldChannelId} = req.body;
 
     /**
      *
@@ -471,14 +471,40 @@ module.exports = {
       const findOrCreateChannel = await channel.create();
       findOrCreateChannel.members = await Promise.all(
         findOrCreateChannel.members.map(async (member) => {
-          if (member.role !== 'owner') return member;
+          if (member.role !== 'owner' && !member.user?.username?.includes('Anonymous'))
+            return member;
 
-          const anonInfo = await ChatAnonUserInfo.findOne({
+          let anonInfo = await ChatAnonUserInfo.findOne({
             where: {
               channel_id: findOrCreateChannel.channel.id,
               my_anon_user_id: member.user_id
             }
           });
+          if (!anonInfo && oldChannelId && member.user_id !== req.userId) {
+            let oldAnonInfo = await ChatAnonUserInfo.findOne({
+              where: {
+                channel_id: oldChannelId,
+                my_anon_user_id: {
+                  [Sequelize.Op.ne]: req.userId
+                }
+              }
+            });
+            if (oldAnonInfo) {
+              anonInfo = oldAnonInfo;
+              await ChatAnonUserInfoFunction.createChatAnonUserInfo(
+                ChatAnonUserInfo,
+                findOrCreateChannel.channel.id,
+                member.user_id,
+                req?.userId,
+                {
+                  anon_user_info_color_code: anonInfo.anon_user_info_color_code,
+                  anon_user_info_color_name: anonInfo.anon_user_info_color_name,
+                  anon_user_info_emoji_code: anonInfo.anon_user_info_emoji_code,
+                  anon_user_info_emoji_name: anonInfo.anon_user_info_emoji_name
+                }
+              );
+            }
+          }
 
           let anonUserInfo = {};
 
