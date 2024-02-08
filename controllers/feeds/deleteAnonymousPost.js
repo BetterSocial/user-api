@@ -26,11 +26,12 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const getstreamDeleteResult = await getstreamService.deleteFeedById(
-      'user_anon',
-      postId,
-      anonymousUser?.user_id
-    );
+    const getstreamDeleteResult = await getstreamService.deleteFeedById({
+      feedGroup: 'user_anon',
+      activityId: postId,
+      userId: anonymousUser?.user_id,
+      token
+    });
     const getstreamDeleteNotificationFeed = await Getstream.feed.deleteNotificationFeed(
       userId,
       postId
