@@ -237,12 +237,14 @@ module.exports = async (req, res) => {
               postActors.push(item.actor.id);
             }
 
+            const actor_from_reaction = getActorFromLatestReaction(item.latest_reactions);
+            postActors = [...postActors, ...actor_from_reaction];
+
             if (item.verb === POST_VERB_POLL) {
               const postPoll = await modifyPollPostObject(req.userId, item, isBlurredPost);
               data.push(postPoll);
             } else {
               let newItem = await isUserFollowAuthor(item, allFollowingUser);
-              newItem = modifyReactionsPost(newItem, newItem.anonimity);
               if (item.post_type === POST_TYPE_LINK) {
                 const domainPageId = item?.og?.domain_page_id;
                 if (domainPageId) {
@@ -294,17 +296,11 @@ module.exports = async (req, res) => {
         });
       }
     }
-    // get karma score for each post actor
-    for (const d of data) {
-      const actor_from_reaction = getActorFromLatestReaction(d.latest_reactions);
-      postActors = [...postActors, ...actor_from_reaction];
-    }
 
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, postActors);
     for (let i = 0; i < data.length; i++) {
       const user = karmaScores.find((user) => user.user_id === data[i].actor.id);
       data[i].karma_score = roundingKarmaScore(user?.karma_score || 0);
-
       if (data[i].latest_reactions) {
         data[i].latest_reactions = addKarmaScoreToLatestReaction(
           data[i].latest_reactions,
@@ -315,7 +311,7 @@ module.exports = async (req, res) => {
       if (data[i].own_reactions) {
         data[i].own_reactions = addKarmaScoreToLatestReaction(data[i].own_reactions, karmaScores);
       }
-
+      data[i] = modifyReactionsPost(data[i], data[i].anonimity);
       data[i] = await modifyAnonimityPost(data[i], isBlurredPost);
     }
 
