@@ -29,4 +29,12 @@ describe('POST /users/populate?limit=50&offset=50', () => {
     expect(response.status).toBe(200);
     expect(response.body.data.length).toBe(10);
   });
+
+  test('Should return 200 OK with rest of the data if limit and offset is seta and filter by allow anon dm field', async () => {
+    const response = await supertest(app)
+      .get('/users/populate?limit=50&offset=50&allow_anon_dm=true')
+      .set('Authorization', 'Bearer token');
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBe(10);
+  });
 });

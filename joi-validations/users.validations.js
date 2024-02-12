@@ -1,4 +1,4 @@
-const {object, string, boolean} = require('./general.validations');
+const {object, string, boolean, number} = require('./general.validations');
 
 const UserValidation = {
   authenticateWeb: {
@@ -8,7 +8,9 @@ const UserValidation = {
   },
   populateUsers: {
     query: {
-      allow_anon_dm: boolean
+      allow_anon_dm: boolean,
+      limit: number,
+      offset: number
     }
   }
 };
