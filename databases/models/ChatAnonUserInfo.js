@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       anon_user_info_color_code: DataTypes.STRING,
       anon_user_info_emoji_name: DataTypes.STRING,
       anon_user_info_emoji_code: DataTypes.STRING,
+      context: DataTypes.STRING,
+      initiator: DataTypes.STRING,
+      source_id: DataTypes.STRING,
       createdAt: {
         type: DataTypes.DATE,
         field: 'created_at'
