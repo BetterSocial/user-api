@@ -51,7 +51,7 @@ router.post('/blockuser', auth.isAuth, usersHandler.blockUser);
 router.post('/block-domain', auth.isAuth, usersHandler.blockDomain);
 router.post('/check-block-status', auth.isAuth, usersHandler.userBlockStatus);
 router.post('/unblock', auth.isAuth, usersHandler.userUnblock);
-router.get('/populate', auth.isAuth, usersHandler.populate);
+router.get('/populate', auth.isAuth, validate(UserValidation.populateUsers), usersHandler.populate);
 router.post('/block-post-anonymous', auth.isAuth, usersHandler.blockPostAnonymous);
 router.post('/delete', auth.isAuth, usersHandler.deleteUser);
 router.post('/rename/:userId', auth.isAuth, usersHandler.renameUser);
