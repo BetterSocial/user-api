@@ -183,7 +183,7 @@ const initChatFromPost = async (req, res) => {
     const response = {
       ...channelState,
       better_channel_members: Object.values(channelState.channel.better_channel_member),
-      better_channel_members_objet: channelState.channel.better_channel_member,
+      better_channel_members_object: channelState.channel.better_channel_member,
       messageHistories: []
     };
 
