@@ -14,7 +14,9 @@ const {
   followTopic,
   followTopics,
   followMainFeedTopic,
-  unfollowMainFeedTopic
+  unfollowMainFeedTopic,
+  addTopicToChatTab,
+  removeTopicFromChatTab
 } = require('./followTopic');
 const {followLocation} = require('./followLocation');
 const deleteFeed = require('./deleteFeed');
@@ -56,6 +58,8 @@ module.exports = {
   followUsers,
   followMainFeedTopic,
   unfollowMainFeedTopic,
+  addTopicToChatTab,
+  removeTopicFromChatTab,
   getDetailDomain,
   getDetailFeed,
   getDomain,
