@@ -3,7 +3,7 @@ const Validator = require('fastest-validator');
 const {v4: uuidv4} = require('uuid');
 const {responseSuccess, responseError} = require('../../utils/Responses');
 
-const {User, ChatAnonUserInfo} = require('../../databases/models');
+const {User, ChatAnonUserInfo, Sequelize} = require('../../databases/models');
 
 const {AddMembersChannel} = require('../../services/chat');
 const addModerators = require('./addModerators');
@@ -13,6 +13,11 @@ const BetterSocialConstantListUtils = require('../../services/bettersocial/const
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const ChatAnonUserInfoFunction = require('../../databases/functions/chatAnonUserInfo');
 const BetterSocialCore = require('../../services/bettersocial');
+const {
+  is_all_anon_user,
+  handle_anon_to_anon_channel_owner,
+  handle_anon_to_anon_channel_member
+} = require('../../services/bettersocial/chat/allAnonChat');
 
 const v = new Validator();
 
@@ -446,7 +451,7 @@ module.exports = {
         error: validated
       });
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
-    const {members} = req.body;
+    const {members, oldChannelId, context = null} = req.body;
 
     /**
      *
@@ -462,23 +467,61 @@ module.exports = {
     };
 
     try {
-      if (!members.includes(req.userId)) members.push(req.userId);
       await client.connectUser({id: req.userId}, req.token);
+      let channel = null;
+      // check if member are both anonymous
+      if (!members.includes(req.userId)) members.push(req.userId);
+      let is_anon_to_anon = await is_all_anon_user(members);
+      if (is_anon_to_anon) {
+        // check if channel already exist
+        let new_channel = await handle_anon_to_anon_channel_owner(req.userId, members[0], context);
+        await handle_anon_to_anon_channel_member(new_channel, members[0], oldChannelId, context);
+        channel = client.channel('messaging', new_channel.channel_id, {
+          members
+        });
+      } else {
+        channel = client.channel('messaging', {
+          members
+        });
+      }
 
-      const channel = client.channel('messaging', {
-        members
-      });
       const findOrCreateChannel = await channel.create();
       findOrCreateChannel.members = await Promise.all(
         findOrCreateChannel.members.map(async (member) => {
-          if (member.role !== 'owner') return member;
+          if (member.role !== 'owner' && !member.user?.username?.includes('Anonymous'))
+            return member;
 
-          const anonInfo = await ChatAnonUserInfo.findOne({
+          let anonInfo = await ChatAnonUserInfo.findOne({
             where: {
               channel_id: findOrCreateChannel.channel.id,
               my_anon_user_id: member.user_id
             }
           });
+          if (!anonInfo && oldChannelId && member.user_id !== req.userId) {
+            let oldAnonInfo = await ChatAnonUserInfo.findOne({
+              where: {
+                channel_id: oldChannelId,
+                my_anon_user_id: {
+                  [Sequelize.Op.ne]: req.userId
+                }
+              }
+            });
+            if (oldAnonInfo) {
+              anonInfo = oldAnonInfo;
+              await ChatAnonUserInfoFunction.createChatAnonUserInfo(
+                ChatAnonUserInfo,
+                findOrCreateChannel.channel.id,
+                member.user_id,
+                req?.userId,
+                {
+                  anon_user_info_color_code: anonInfo.anon_user_info_color_code,
+                  anon_user_info_color_name: anonInfo.anon_user_info_color_name,
+                  anon_user_info_emoji_code: anonInfo.anon_user_info_emoji_code,
+                  anon_user_info_emoji_name: anonInfo.anon_user_info_emoji_name
+                }
+              );
+            }
+          }
 
           let anonUserInfo = {};
 

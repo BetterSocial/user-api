@@ -2,6 +2,7 @@ const _ = require('lodash');
 
 const UsersFunction = require('../../../databases/functions/users');
 const {sequelize} = require('../../../databases/models');
+const BetterSocialConstantListUtils = require('../../../services/bettersocial/constantList/utils');
 
 const SEPARATOR = ', ';
 
@@ -72,21 +73,40 @@ const updateBetterChannelMembers = async (
   };
 };
 
+const __getAnonUserInfoPriority = (memberDataFromDb, member) => {
+  if (memberDataFromDb.anon_user_info_color_code) {
+    return {
+      color_name: memberDataFromDb.anon_user_info_color_name,
+      color_code: memberDataFromDb.anon_user_info_color_code,
+      emoji_name: memberDataFromDb.anon_user_info_emoji_name,
+      emoji_code: memberDataFromDb.anon_user_info_emoji_code
+    };
+  } else if (member.anon_user_info_color_code) {
+    return {
+      color_name: member.anon_user_info_color_name,
+      color_code: member.anon_user_info_color_code,
+      emoji_name: member.anon_user_info_emoji_name,
+      emoji_code: member.anon_user_info_emoji_code
+    };
+  } else {
+    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+    const color = BetterSocialConstantListUtils.getRandomColor();
+    return {
+      color_name: color.color,
+      color_code: color.code,
+      emoji_name: emoji.name,
+      emoji_code: emoji.emoji
+    };
+  }
+};
+
 const __helperProcessBetterChannelMember = (members, membersDataFromDbMap) => {
   let newChannelName = '';
   const better_channel_member = members.map((member) => {
     const memberDataFromDb = membersDataFromDbMap[member.user_id];
 
     if (!memberDataFromDb) return member;
-
-    const {
-      is_anonymous,
-      username,
-      anon_user_info_color_name,
-      anon_user_info_color_code,
-      anon_user_info_emoji_name,
-      anon_user_info_emoji_code
-    } = memberDataFromDb;
+    const {is_anonymous, username, anon_user_info_emoji_name} = memberDataFromDb;
 
     const updatedUsername = is_anonymous ? `Anonymous ${anon_user_info_emoji_name}` : username;
 
@@ -105,10 +125,11 @@ const __helperProcessBetterChannelMember = (members, membersDataFromDbMap) => {
 
     if (is_anonymous) {
       defaultUser.is_anonymous = is_anonymous;
-      defaultUser.anon_user_info_color_name = anon_user_info_color_name;
-      defaultUser.anon_user_info_color_code = anon_user_info_color_code;
-      defaultUser.anon_user_info_emoji_name = anon_user_info_emoji_name;
-      defaultUser.anon_user_info_emoji_code = anon_user_info_emoji_code;
+      let anon_user_info = __getAnonUserInfoPriority(memberDataFromDb, member);
+      defaultUser.anon_user_info_color_name = anon_user_info.color_name;
+      defaultUser.anon_user_info_color_code = anon_user_info.color_code;
+      defaultUser.anon_user_info_emoji_name = anon_user_info.emoji_name;
+      defaultUser.anon_user_info_emoji_code = anon_user_info.emoji_code;
     }
 
     return defaultUser;
