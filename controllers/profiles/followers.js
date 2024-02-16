@@ -8,7 +8,7 @@ const {QueryTypes} = require('sequelize');
 const config = require('../../databases/config/database')[env];
 
 module.exports = async (req, res) => {
-  const id = req.userId;
+  const userId = req.userId;
 
   let filterQuery = '';
   const {q} = req.query;
@@ -29,6 +29,27 @@ module.exports = async (req, res) => {
   } else {
     sequelize = new Sequelize(config.database, config.username, config.password, config);
   }
+
+  let user_topics = await sequelize.query(
+    `select tp.topic_id from topics as tp
+    left join user_topics as utp on tp.topic_id = utp.topic_id
+    where utp.user_id = :userId`,
+    {
+      type: QueryTypes.SELECT,
+      replacements: {
+        userId
+      }
+    }
+  );
+  let topicIds = user_topics.map((topic) => topic.topic_id);
+  const similarTopicQuery =
+    topicIds.length > 0
+      ? `ARRAY( select name from topics as tp
+        left join user_topics as utp on tp.topic_id = utp.topic_id
+        where utp.user_id = "user".user_id and tp.topic_id in (:topicIds) limit 3
+      )`
+      : 'ARRAY[]::text[]';
+
   const followers = await sequelize.query(
     `SELECT 
       "UserFollowUser"."follow_action_id", 
@@ -54,7 +75,7 @@ module.exports = async (req, res) => {
         from
           "user_follow_user" AS "UserFollowUserCheckFollower" 
         where 
-          "UserFollowUserCheckFollower"."user_id_follower" = :id AND
+          "UserFollowUserCheckFollower"."user_id_follower" = :userId AND
           "UserFollowUserCheckFollower"."user_id_followed" = "UserFollowUser"."user_id_follower" LIMIT 1) IS NOT NULL
       THEN
          true
@@ -62,22 +83,19 @@ module.exports = async (req, res) => {
          false
       END
       AS "user.following",
-      ARRAY( select name from topics as tp
-        left join user_topics as utp on tp.topic_id = utp.topic_id
-        where utp.user_id = "user".user_id limit 3
-      ) as "user.community_info"
+      ${similarTopicQuery} as "user.community_info"
     FROM "user_follow_user" AS "UserFollowUser" 
     LEFT OUTER JOIN "users" AS "user" ON "UserFollowUser"."user_id_follower" = "user"."user_id" 
     WHERE 
       "user"."is_anonymous" = false AND 
-      "UserFollowUser"."user_id_followed" = :id AND 
-      "UserFollowUser"."user_id_follower" != :id
+      "UserFollowUser"."user_id_followed" = :userId AND 
+      "UserFollowUser"."user_id_follower" != :userId
       ${filterQuery}
     ORDER BY "UserFollowUser"."followed_at" DESC`,
     {
       nest: true,
       type: QueryTypes.SELECT,
-      replacements: {id, likeQuery: `%${q}%`}
+      replacements: {userId, topicIds, likeQuery: `%${q}%`}
     }
   );
 

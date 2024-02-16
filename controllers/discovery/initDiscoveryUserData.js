@@ -21,6 +21,26 @@ const InitDiscoveryUserData = async (req, res) => {
     FROM users A
     WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false`;
 
+    let user_topics = await sequelize.query(
+      `select tp.topic_id from topics as tp
+      left join user_topics as utp on tp.topic_id = utp.topic_id
+      where utp.user_id = :userId`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          userId
+        }
+      }
+    );
+    let topicIds = user_topics.map((topic) => topic.topic_id);
+    const similarTopicQuery =
+      topicIds.length > 0
+        ? `ARRAY( select name from topics as tp
+          left join user_topics as utp on tp.topic_id = utp.topic_id
+          where utp.user_id = A.user_id and tp.topic_id in (:topicIds) limit 3
+        )`
+        : 'ARRAY[]::text[]';
+
     const usersWithCommonFollowerQuery = `
         SELECT 
             A.user_id,
@@ -39,10 +59,7 @@ const InitDiscoveryUserData = async (req, res) => {
             A.is_anonymous,
             A.combined_user_score,
             A.karma_score,
-            ARRAY( select name from topics as tp
-              left join user_topics as utp on tp.topic_id = utp.topic_id
-              where utp.user_id = A.user_id limit 3
-            ) as community_info,
+            ${similarTopicQuery} as community_info,
             CommonUsers.common, 
             B.user_id_follower 
         from users A
@@ -72,6 +89,7 @@ const InitDiscoveryUserData = async (req, res) => {
       type: QueryTypes.SELECT,
       replacements: {
         userId,
+        topicIds,
         limit: limit,
         offset: page * limit
       }
