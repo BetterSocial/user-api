@@ -1,6 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 const {QueryTypes} = require('sequelize');
-const {followMainFeedTopic, unfollowMainFeedTopic} = require('../../services/getstream');
+const {
+  followMainFeedTopic,
+  unfollowMainFeedTopic,
+  addTopicToChatTab,
+  removeTopicFromChatTab
+} = require('../../services/getstream');
 const ClientError = require('../../exceptions/ClientError');
 const TopicService = require('../../services/postgres/TopicService');
 const TopicValidator = require('../../validators/topic');
@@ -184,14 +189,38 @@ const followTopicV2 = async (req, res) => {
     let data = [];
     if (getTokenUserStatus) {
       await userTopicService.unfollowTopic(detailTokenUser.user_id, topic_id);
-      data.push(await _afterPutTopic(true, token, detailTokenUser.user_id, name));
+      data.push(
+        await _afterPutTopic(
+          true,
+          token,
+          detailTokenUser.user_id,
+          name,
+          detailTokenUser.is_anonymous
+        )
+      );
     } else {
       await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
-      data.push(await _afterPutTopic(false, token, detailTokenUser.user_id, name));
+      data.push(
+        await _afterPutTopic(
+          false,
+          token,
+          detailTokenUser.user_id,
+          name,
+          detailTokenUser.is_anonymous
+        )
+      );
 
       if (getSecondUserStatus) {
         await userTopicService.unfollowTopic(secondDetailUser.user_id, topic_id);
-        data.push(await _afterPutTopic(true, token, secondDetailUser.user_id, name));
+        data.push(
+          await _afterPutTopic(
+            true,
+            token,
+            secondDetailUser.user_id,
+            name,
+            detailTokenUser.is_anonymous
+          )
+        );
       }
     }
 
@@ -218,12 +247,18 @@ const followTopicV2 = async (req, res) => {
   }
 };
 
-const _afterPutTopic = async (isUnfollow, token, userId, name) => {
+const _afterPutTopic = async (isUnfollow, token, userId, name, isAnonymous) => {
   // follow / unfollow main feed topic
-  if (isUnfollow) {
-    await unfollowMainFeedTopic(token, userId, name);
-  } else {
-    await followMainFeedTopic(token, userId, name);
+  try {
+    if (isUnfollow) {
+      await unfollowMainFeedTopic(token, userId, name);
+      await removeTopicFromChatTab(token, name, userId);
+    } else {
+      await followMainFeedTopic(token, userId, name);
+      await addTopicToChatTab(token, name, userId, isAnonymous);
+    }
+  } catch (error) {
+    console.log('After put topic error: ', error);
   }
 
   let data;
