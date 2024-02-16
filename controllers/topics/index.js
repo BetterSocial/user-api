@@ -285,6 +285,19 @@ const getFollowerList = async (req, res) => {
   try {
     const searchQuery = search ? `AND LOWER(users.username) LIKE LOWER(:search)` : '';
 
+    let user_topics = await sequelize.query(
+      `select tp.topic_id from topics as tp
+      left join user_topics as utp on tp.topic_id = utp.topic_id
+      where utp.user_id = :userId`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          userId
+        }
+      }
+    );
+    let topicIds = user_topics.map((topic) => topic.topic_id);
+
     const query = `
     SELECT users.user_id,
         users.username,
@@ -304,7 +317,7 @@ const getFollowerList = async (req, res) => {
         END as is_following,
         ARRAY( select name from topics as tp
           left join user_topics as utp on tp.topic_id = utp.topic_id
-          where utp.user_id = "users".user_id limit 3
+          where utp.user_id = "users".user_id and tp.topic_id in (:topicIds) limit 3
         ) as community_info
     FROM topics A 
     INNER JOIN user_topics B
@@ -338,6 +351,7 @@ const getFollowerList = async (req, res) => {
       type: QueryTypes.SELECT,
       replacements: {
         userId,
+        topicIds,
         name,
         limit,
         offset,

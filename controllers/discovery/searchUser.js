@@ -18,6 +18,19 @@ const SearchUser = async (req, res) => {
     });
 
   try {
+    let user_topics = await sequelize.query(
+      `select tp.topic_id from topics as tp
+      left join user_topics as utp on tp.topic_id = utp.topic_id
+      where utp.user_id = :userId`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: {
+          userId
+        }
+      }
+    );
+    let topicIds = user_topics.map((topic) => topic.topic_id);
+
     const users = await sequelize.query(
       `SELECT 
                 "User".*,
@@ -25,7 +38,7 @@ const SearchUser = async (req, res) => {
                     AS "followersCount",
                 ARRAY( select name from topics as tp
                   left join user_topics as utp on tp.topic_id = utp.topic_id
-                  where utp.user_id = "User".user_id limit 3
+                  where utp.user_id = "User".user_id and tp.topic_id in (:topicIds) limit 3
                 ) as community_info,
                 (SELECT 
                     "f"."user_id_follower" AS "user_id_follower"
@@ -56,6 +69,7 @@ const SearchUser = async (req, res) => {
         replacements: {
           likeQuery: `%${q}%`,
           userId,
+          topicIds,
           limit
         }
       }
