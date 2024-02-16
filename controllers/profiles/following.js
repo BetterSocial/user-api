@@ -29,6 +29,13 @@ module.exports = async (req, res) => {
     }
   );
   let topicIds = user_topics.map((topic) => topic.topic_id);
+  const similarTopicQuery =
+    topicIds.length > 0
+      ? `ARRAY( select name from topics as tp
+        left join user_topics as utp on tp.topic_id = utp.topic_id
+        where utp.user_id = "user".user_id and tp.topic_id in (:topicIds) limit 3
+      )`
+      : 'ARRAY[]::text[]';
 
   const following = await sequelize.query(
     `SELECT 
@@ -47,10 +54,7 @@ module.exports = async (req, res) => {
       "user"."profile_pic_public_id" AS "user.profile_pic_public_id", 
       "user"."status" AS "user.status",
       "user"."karma_score" AS "user.karma_score",
-      ARRAY( select name from topics as tp
-        left join user_topics as utp on tp.topic_id = utp.topic_id
-        where utp.user_id = "user".user_id and tp.topic_id in (:topicIds) limit 3
-      ) as "user.community_info"
+      ${similarTopicQuery} as "user.community_info"
       FROM "user_follow_user" AS "UserFollowUser"
       LEFT OUTER JOIN 
       "users" AS "user" ON "UserFollowUser"."user_id_followed" = "user"."user_id"
