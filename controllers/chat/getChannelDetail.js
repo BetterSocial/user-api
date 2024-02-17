@@ -37,7 +37,7 @@ const getChannelDetail = async (req, res) => {
   }
 
   const {betterChannelMember, betterChannelMemberObject} =
-    await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel);
+    await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true);
 
   return ResponseSuccess(res, 'Success', 200, {
     better_channel_members: betterChannelMember,
