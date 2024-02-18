@@ -8,6 +8,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {User, ChatAnonUserInfo} = require('../../databases/models');
 const BetterSocialCore = require('../../services/bettersocial');
 const {ErrorMessage} = require('../../helpers/message');
+const {isChatToYourself} = require('../../helpers/isChatToYourself');
 
 const initChatFromProfileAsAnonymousV2 = async (req, res) => {
   const {
@@ -18,7 +19,9 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
     anon_user_info_emoji_code,
     anon_user_info_emoji_name
   } = req.body;
-  if (member === req.userId) {
+
+  let allowChat = await isChatToYourself(req.userId, member);
+  if (!allowChat.success) {
     return ErrorResponse.e403(res, ErrorMessage.CANNOT_CHAT_SELF);
   }
 
