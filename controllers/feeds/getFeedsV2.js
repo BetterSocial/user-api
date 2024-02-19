@@ -91,7 +91,7 @@ const isValidActivity = async (item, conditions) => {
 
   // filter by threshold
   const threshold = ACTIVITY_THRESHOLD[feed.toUpperCase()];
-  return (item.final_score || 0) >= threshold;
+  return (item.final_score || 0) >= (threshold || 0);
 };
 
 const getActorFromLatestReaction = (latestReaction) => {
@@ -223,6 +223,12 @@ module.exports = async (req, res) => {
             feed,
             req
           };
+          const threshold = ACTIVITY_THRESHOLD[feed.toUpperCase()];
+          if ((item.final_score || 0) < threshold || 0) {
+            offset = 0;
+            feed = await feedSwitch(feed);
+            continue;
+          }
           const validActivity = await isValidActivity(item, conditions);
           if (!validActivity) {
             offset++;
