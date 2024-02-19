@@ -3,9 +3,11 @@ const {Op} = require('sequelize');
 const crypto = require('crypto');
 const BetterSocialConstantListUtils = require('../constantList/utils');
 
-const generate_channel_id_for_anon_chat = (owner, member) => {
+const generate_channel_id_for_anon_chat = (owner, member, context = null) => {
   const hash = crypto.createHash('sha256');
-  hash.update(owner, member);
+  hash.update(owner);
+  hash.update(member);
+  hash.update(context);
   return hash.digest('hex');
 };
 
@@ -69,7 +71,7 @@ const handle_anon_to_anon_channel_owner = async (owner, member, context = null) 
   } else {
     // handle to create new channel if not exist
     // generate channel id
-    let channel_id = generate_channel_id_for_anon_chat(owner, member);
+    let channel_id = generate_channel_id_for_anon_chat(owner, member, context);
     const emoji = BetterSocialConstantListUtils.getRandomEmoji();
     const color = BetterSocialConstantListUtils.getRandomColor();
     let new_channel = await ChatAnonUserInfo.create({
