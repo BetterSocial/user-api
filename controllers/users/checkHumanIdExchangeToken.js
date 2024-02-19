@@ -40,6 +40,13 @@ const checkHumanIdExchangeToken = async (req, res) => {
       });
 
     if (user?.is_banned) return ErrorResponse.e400(res, 'User has banned by admin');
+    if (user?.verified_status === 'UNVERIFIED') {
+      return SuccessResponse(res, {
+        code: 500,
+        data: false,
+        message: 'User is UNVERIFIED'
+      });
+    }
 
     const anonymousUser = await UsersFunction.findAnonymousUserId(User, user?.user_id);
     const userId = user?.user_id?.toLowerCase();
