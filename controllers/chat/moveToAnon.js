@@ -5,7 +5,7 @@ const {responseError, responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const UsersFunction = require('../../databases/functions/users');
 const Getstream = require('../../vendor/getstream');
-const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
+const BetterSocialCore = require('../../services/bettersocial');
 
 const {
   is_all_anon_user,
@@ -218,11 +218,16 @@ const moveToAnon = async (req, res) => {
       sort: [{updated_at: -1}],
       limit: 100
     });
+    const {betterChannelMember, betterChannelMemberObject} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(newChannel, createdChannel, true, {
+        channel_type: CHANNEL_TYPE.ANONYMOUS
+      });
+
     await client.disconnectUser();
     const response = {
       ...createdChannel,
-      better_channel_members: Object.values(newStateMemberWithAnonInfo),
-      better_channel_members_object: newStateMemberWithAnonInfo,
+      better_channel_members: betterChannelMember,
+      better_channel_members_object: betterChannelMemberObject,
       messageHistories: messageHistory.results
     };
     if (createdChannel?.channel?.is_channel_blocked) {
