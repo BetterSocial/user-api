@@ -60,6 +60,7 @@ const ChatValidation = {
       anon_user_info_color_name: string.required(),
       anon_user_info_emoji_code: string.required(),
       anon_user_info_emoji_name: string.required(),
+      context: Joi.optional(),
       oldChannelId: string.required(),
       source: string.required(),
       targetUserId: uuid.when('source', {
