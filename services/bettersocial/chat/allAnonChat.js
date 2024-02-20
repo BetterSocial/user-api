@@ -7,7 +7,8 @@ const generate_channel_id_for_anon_chat = (owner, member, context = null) => {
   const hash = crypto.createHash('sha256');
   hash.update(owner);
   hash.update(member);
-  hash.update(context);
+  if (context) hash.update(context);
+
   return hash.digest('hex');
 };
 
