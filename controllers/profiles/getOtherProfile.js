@@ -53,15 +53,25 @@ module.exports = async (req, res) => {
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
     const getFollowingCountResult = getFollowingCount?.[0]?.[0]?.count_following;
+    const isFollowingResult = isFollowing?.[0]?.length > 0;
 
     const copyUser = {...user.dataValues};
     delete copyUser.following;
     delete copyUser.follower;
-    copyUser.isSignedMessageEnabled = false;
+
+    if (req?.userId) {
+      copyUser.is_following = isFollowingResult;
+    }
+
+    copyUser.isSignedMessageEnabled = true;
     copyUser.isAnonMessageEnabled = false;
-    if (!copyUser.only_received_dm_from_user_following) {
-      copyUser.isSignedMessageEnabled = true;
-      copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm;
+
+    if (copyUser.allow_anon_dm) {
+      if (copyUser.only_received_dm_from_user_following) {
+        copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm && isFollowingResult;
+      } else {
+        copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm;
+      }
     }
 
     copyUser.following_symbol = checkMoreOrLess(getFollowingCountResult);

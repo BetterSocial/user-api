@@ -71,12 +71,19 @@ module.exports = async (req, res) => {
 
     if (req?.userId) {
       copyUser.is_following = isFollowingResult;
-      if (copyUser.only_received_dm_from_user_following)
-        copyUser.isSignedMessageEnabled = isFollowingResult;
-      else copyUser.isSignedMessageEnabled = true;
     }
 
-    copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm && copyUser.isSignedMessageEnabled;
+    copyUser.isSignedMessageEnabled = true;
+    copyUser.isAnonMessageEnabled = false;
+
+    if (copyUser.allow_anon_dm) {
+      if (copyUser.only_received_dm_from_user_following) {
+        copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm && isFollowingResult;
+      } else {
+        copyUser.isAnonMessageEnabled = copyUser.allow_anon_dm;
+      }
+    }
+
     copyUser.karma_score = ropundingKarmaScore(copyUser.karma_score);
 
     return res.status(200).json({

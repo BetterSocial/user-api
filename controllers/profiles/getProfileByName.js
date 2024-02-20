@@ -63,13 +63,20 @@ module.exports = async (req, res) => {
     clonedUser.following_symbol = checkMoreOrLess(getFollowingCountResult);
     clonedUser.follower_symbol = checkMoreOrLess(getFollowerCountResult);
 
-    clonedUser.isSignedMessageEnabled = false;
+    if (req?.userId) {
+      clonedUser.is_following = isFollowingResult;
+    }
+
+    clonedUser.isSignedMessageEnabled = true;
     clonedUser.isAnonMessageEnabled = false;
 
-    clonedUser.is_following = isFollowingResult;
-    if (clonedUser.only_received_dm_from_user_following)
-      clonedUser.isSignedMessageEnabled = isFollowingResult;
-    else clonedUser.isSignedMessageEnabled = true;
+    if (clonedUser.allow_anon_dm) {
+      if (clonedUser.only_received_dm_from_user_following) {
+        clonedUser.isAnonMessageEnabled = clonedUser.allow_anon_dm && isFollowingResult;
+      } else {
+        clonedUser.isAnonMessageEnabled = clonedUser.allow_anon_dm;
+      }
+    }
 
     clonedUser.isAnonMessageEnabled = clonedUser.allow_anon_dm && clonedUser.isSignedMessageEnabled;
 
