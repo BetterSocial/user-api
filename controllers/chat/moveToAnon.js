@@ -121,7 +121,7 @@ const moveToAnon = async (req, res) => {
     let newStateMemberWithAnonInfo = {};
     if (is_anon_to_anon) {
       // check if channel already exist
-      owner_anon_info = await handle_anon_to_anon_channel_owner(req.userId, members[0]);
+      owner_anon_info = await handle_anon_to_anon_channel_owner(req.userId, members[0], context);
       newStateMemberWithAnonInfo[req.userId] = setNewStateMemberWithAnonInfo(owner_anon_info);
       member_anon_info = await handle_anon_to_anon_channel_member(
         owner_anon_info,
