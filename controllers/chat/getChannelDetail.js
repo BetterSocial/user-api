@@ -36,13 +36,13 @@ const getChannelDetail = async (req, res) => {
     });
   }
 
-  const {betterChannelMember, betterChannelMemberObject} =
+  const {betterChannelMember, betterChannelMemberObject, updatedChannel} =
     await BetterSocialCore.chat.updateBetterChannelMembers(channel, createdChannel, true);
 
   return ResponseSuccess(res, 'Success', 200, {
     better_channel_members: betterChannelMember,
     better_channel_member_objects: betterChannelMemberObject,
-    ...createdChannel,
+    ...updatedChannel,
     messages: messages?.results?.map((message) => message?.message)
   });
 };

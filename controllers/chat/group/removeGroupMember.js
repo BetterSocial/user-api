@@ -11,9 +11,12 @@ const removeGroupMember = async (req, res) => {
     const response = await Getstream.chat.removeGroupMember(channelId, userId, targetUserId);
     const {channel, channelApiResponse} = response.data || {};
 
+    let channelResponse;
     try {
-      const {newChannelName, betterChannelMember, betterChannelMemberObject} =
+      const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
+
+      channelResponse = updatedChannel;
 
       channelApiResponse.channel.name = newChannelName;
       channelApiResponse.channel.better_channel_member = betterChannelMember;
@@ -22,7 +25,7 @@ const removeGroupMember = async (req, res) => {
       console.log(e);
     }
 
-    return ResponseSuccess(res, response?.message, 200, channelApiResponse);
+    return ResponseSuccess(res, response?.message, 200, channelResponse);
   } catch (e) {
     return ErrorResponse.e500(res, e.message);
   }

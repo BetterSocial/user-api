@@ -5,6 +5,7 @@ const {responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const UsersFunction = require('../../databases/functions/users');
 const Getstream = require('../../vendor/getstream');
+const BetterSocialCore = require('../../services/bettersocial');
 
 /**
  *
@@ -25,10 +26,7 @@ const moveToSign = async (req, res) => {
 
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
   try {
-    const [userModel, targetUserModel] = await Promise.all([
-      UsersFunction.findUserById(User, req?.userId),
-      UsersFunction.findUserById(User, targetUserId)
-    ]);
+    const [userModel] = await Promise.all([UsersFunction.findUserById(User, req?.userId)]);
 
     /**
      * @type {import('stream-chat').OwnUserResponse}
@@ -91,24 +89,6 @@ const moveToSign = async (req, res) => {
       })
     );
 
-    const oldChannelName = createdChannel?.channel?.name?.trim();
-
-    try {
-      if (!oldChannelName || oldChannelName === ',') {
-        const newChannelName = [userModel?.username, targetUserModel?.username].join(', ');
-        createdChannel.channel.name = newChannelName;
-        await newChannel.updatePartial({
-          set: {
-            channel_type: isContainAnonimous ? CHANNEL_TYPE.ANONYMOUS : CHANNEL_TYPE.CHAT,
-            name: newChannelName,
-            better_channel_member: newStateMemberWithAnonInfo
-          }
-        });
-      }
-    } catch (e) {
-      console.log(e);
-    }
-
     // get 100 messages
     const channelFilters = {cid: 'messaging:' + newChannel.id};
     const messageFilters = {created_at: {$lte: new Date()}};
@@ -117,10 +97,15 @@ const moveToSign = async (req, res) => {
       limit: 100
     });
 
+    const {betterChannelMember, betterChannelMemberObject, updatedChannel} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(newChannel, createdChannel, true, {
+        channel_type: isContainAnonimous ? CHANNEL_TYPE.ANONYMOUS : CHANNEL_TYPE.CHAT
+      });
+
     const response = {
-      ...createdChannel,
-      better_channel_members_object: newStateMemberWithAnonInfo,
-      better_channel_members: Object.values(newStateMemberWithAnonInfo),
+      ...updatedChannel,
+      better_channel_members_object: betterChannelMemberObject,
+      better_channel_members: betterChannelMember,
       messageHistories: messageHistory.results
     };
 

@@ -218,14 +218,14 @@ const moveToAnon = async (req, res) => {
       sort: [{updated_at: -1}],
       limit: 100
     });
-    const {betterChannelMember, betterChannelMemberObject} =
+    const {betterChannelMember, betterChannelMemberObject, updatedChannel} =
       await BetterSocialCore.chat.updateBetterChannelMembers(newChannel, createdChannel, true, {
         channel_type: CHANNEL_TYPE.ANONYMOUS
       });
 
     await client.disconnectUser();
     const response = {
-      ...createdChannel,
+      ...updatedChannel,
       better_channel_members: betterChannelMember,
       better_channel_members_object: betterChannelMemberObject,
       messageHistories: messageHistory.results
