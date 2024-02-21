@@ -565,7 +565,7 @@ module.exports = {
         })
       );
 
-      const {betterChannelMember, betterChannelMemberObject} =
+      const {betterChannelMember, betterChannelMemberObject, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(channel, findOrCreateChannel, true, {
           channel_type: CHANNEL_TYPE.ANONYMOUS
         });
@@ -573,7 +573,7 @@ module.exports = {
       await client.disconnectUser();
 
       return res.status(200).json({
-        ...findOrCreateChannel,
+        ...updatedChannel,
         better_channel_member: betterChannelMember,
         better_channel_member_object: betterChannelMemberObject
       });

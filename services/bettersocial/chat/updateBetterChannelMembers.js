@@ -11,6 +11,7 @@ const SEPARATOR = ', ';
  * @property {import('stream-chat').ChannelMember[]} betterChannelMember
  * @property {string} newChannelName
  * @property {Object} betterChannelMemberObject
+ * @property {import("stream-chat").ChannelAPIResponse} updatedChannel
  */
 
 /**
@@ -58,7 +59,7 @@ const updateBetterChannelMembers = async (
 
   if (withUpdate) {
     try {
-      await chatChannel.updatePartial({
+      channel = await chatChannel.updatePartial({
         set: defaultUpdateData
       });
     } catch (e) {
@@ -69,7 +70,8 @@ const updateBetterChannelMembers = async (
   return {
     betterChannelMember: better_channel_member,
     newChannelName: checkedChannelName,
-    betterChannelMemberObject: _.keyBy(better_channel_member, 'user_id')
+    betterChannelMemberObject: _.keyBy(better_channel_member, 'user_id'),
+    updatedChannel: channel
   };
 };
 

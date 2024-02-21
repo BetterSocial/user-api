@@ -46,7 +46,7 @@ const findOrCreateChannelBySignedSender = async (req, res) => {
     }
 
     const findOrCreateChannel = await channel.create();
-    const {betterChannelMember, newChannelName, betterChannelMemberObject} =
+    const {betterChannelMember, newChannelName, betterChannelMemberObject, updatedChannel} =
       await BetterSocialCore.chat.updateBetterChannelMembers(channel, findOrCreateChannel, true, {
         channelType,
         channel_type: channelType
@@ -55,7 +55,7 @@ const findOrCreateChannelBySignedSender = async (req, res) => {
     findOrCreateChannel.channel.name = newChannelName;
 
     return res.status(200).json({
-      ...findOrCreateChannel,
+      ...updatedChannel,
       better_channel_member: betterChannelMember,
       better_channel_member_object: betterChannelMemberObject
     });

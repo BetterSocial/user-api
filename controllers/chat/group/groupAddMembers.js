@@ -58,7 +58,7 @@ const groupAddMembers = async (req, res) => {
     const responseChannel = await channelToAdd?.addMembers(filteredMembersObject);
 
     try {
-      const {betterChannelMember, betterChannelMemberObject, newChannelName} =
+      const {betterChannelMember, betterChannelMemberObject, newChannelName, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(
           channelToAdd,
           responseChannel,
@@ -69,11 +69,11 @@ const groupAddMembers = async (req, res) => {
           }
         );
 
-      responseChannel.channel.better_channel_member = betterChannelMember;
-      responseChannel.channel.name = newChannelName;
+      updatedChannel.channel.better_channel_member = betterChannelMember;
+      updatedChannel.channel.name = newChannelName;
 
       return ResponseSuccess(res, 'New members have been added to the group', 200, {
-        ...responseChannel,
+        ...updatedChannel,
         better_channel_member: betterChannelMember,
         better_channel_member_object: betterChannelMemberObject,
         name: newChannelName
