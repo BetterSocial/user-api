@@ -10,10 +10,8 @@ const v = new Validator();
 async function getResult(req, reaction, dbVote, targetFeeds) {
   let result;
   const {reaction_id, vote} = req.body;
+
   if (!dbVote) {
-    if (req.userId !== reaction.user_id) {
-      targetFeeds = [...targetFeeds, `notification:${req.userId}`];
-    }
     await VoteComments.create({comment_id: reaction_id, user_id: req.userId, status: vote});
     if (vote === 'upvote') {
       const count_upvote = reaction.data.count_upvote + 1;
