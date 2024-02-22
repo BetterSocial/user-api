@@ -60,7 +60,9 @@ const getDetail = (req, b, id) => {
         username: `Anonymous ${
           b.object?.anon_user_info_emoji_name ?? b?.anon_user_info_emoji_name
         }`,
+        emoji_name: b.object?.anon_user_info_emoji_name ?? b?.anon_user_info_emoji_name,
         emoji_code: b.object?.anon_user_info_emoji_code ?? b?.anon_user_info_emoji_code,
+        color_name: b.object?.anon_user_info_color_name ?? b?.anon_user_info_color_name,
         color_code: b.object?.anon_user_info_color_code ?? b?.anon_user_info_color_code
       }
     };
