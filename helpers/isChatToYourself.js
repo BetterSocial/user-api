@@ -3,6 +3,7 @@ const UsersFunction = require('../databases/functions/users');
 
 module.exports = {
   isChatToYourself: async (my_user_id, member) => {
+    if (my_user_id === member) return {success: false, message: 'Cannot chat to yourself'};
     let user = await UsersFunction.findUserById(User, member);
     if (!user) {
       return {
