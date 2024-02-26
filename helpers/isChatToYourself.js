@@ -11,16 +11,16 @@ module.exports = {
         message: 'User not found'
       };
     }
-    const user_ids = new Set([user.user_id]);
+    const userIds = new Set([user.user_id]);
     if (!user.is_anonymous) {
       const anon_user = await UsersFunction.findAnonymousUserId(User, user.user_id);
-      user_ids.add(anon_user.user_id);
+      userIds.add(anon_user.user_id);
     } else {
       const sign_user = await UsersFunction.findSignedUserId(User, user.user_id);
-      user_ids.add(sign_user.user_id);
+      userIds.add(sign_user.user_id);
     }
 
-    const isChattingToSelf = user_ids.has(my_user_id);
+    const isChattingToSelf = userIds.has(my_user_id);
     return {
       success: !isChattingToSelf,
       message: isChattingToSelf ? 'Cannot chat to yourself' : 'Success'
