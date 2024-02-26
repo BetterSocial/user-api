@@ -36,10 +36,11 @@ const getAnonymousFeedChatService = async (req, res) => {
         constantActor,
         isAnonym,
         isOwnSignedPost,
+        isOwnAnonymousPost,
         isOwnPost,
         message,
         actor
-      } = getDetail(req, b, mySignedId);
+      } = getDetail(req, b, mySignedId, req?.userId);
       const mapCountLevel2 = countLevel2(childComment);
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
       const total3 = totalCommentLevel3.reduce((a1, b1) => a1 + b1, 0);
@@ -57,6 +58,7 @@ const getAnonymousFeedChatService = async (req, res) => {
           totalComment: totalComment + commentLevel2 + total3,
           isOwnPost,
           isOwnSignedPost,
+          isOwnAnonymousPost,
           totalCommentBadge: 0,
           isRead: b.isRead,
           type: 'post-notif',

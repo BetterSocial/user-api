@@ -39,7 +39,7 @@ const mappingFeed = (req, feeds) => {
   return mapping;
 };
 
-const getDetail = (req, b, id) => {
+const getDetail = (req, b, id, anonymousId) => {
   const activity_id = b.reaction?.activity_id || b.id;
   const expired_at = b?.object?.expired_at || b.expired_at || null;
   const downvote = typeof b.object === 'object' ? b.object.reaction_counts?.downvotes : 0;
@@ -51,7 +51,8 @@ const getDetail = (req, b, id) => {
   let actor = typeof b.object === 'object' ? b.object.actor : b.actor;
   const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity;
   const isOwnSignedPost = actor?.id === id;
-  const isOwnPost = actor?.id === req.userId || actor?.id === id;
+  const isOwnAnonymousPost = actor?.id === anonymousId;
+  const isOwnPost = isOwnAnonymousPost || isOwnSignedPost;
   if (isAnonym) {
     actor = {
       ...actor,
@@ -79,6 +80,7 @@ const getDetail = (req, b, id) => {
     isAnonym,
     isOwnSignedPost,
     isOwnPost,
+    isOwnAnonymousPost,
     actor,
     showToast: b.showToast
   };
@@ -120,7 +122,7 @@ const finalize = (req, id, myReaction, newGroup, activity_id, constantActor, kar
   if (myReaction) {
     myReaction = {
       ...myReaction,
-      isOwningReaction: req.userId === myReaction.user_id || myReaction.user_id === id
+      isOwningReaction: req.userId === myReaction.user_id
     };
     if (myReaction.data.is_anonymous || myReaction.data.anon_user_info_emoji_name) {
       myReaction = {...myReaction, user_id: null, user: {}};
@@ -234,10 +236,12 @@ const getFeedChatService = async (req, res) => {
         constantActor,
         isAnonym,
         isOwnPost,
+        isOwnSignedPost,
+        isOwnAnonymousPost,
         message,
         actor,
         showToast = false
-      } = getDetail(req, b, myAnonymousId.user_id);
+      } = getDetail(req, b, req?.userId, myAnonymousId?.user_id);
 
       const user = karmaScores.find((user) => user.user_id === actor.id);
       actor.karmaScores = roundingKarmaScore(user?.karma_score || 0);
@@ -261,6 +265,8 @@ const getFeedChatService = async (req, res) => {
           isSeen: b.isSeen,
           totalComment: totalComment + commentLevel2 + total3,
           isOwnPost,
+          isOwnAnonymousPost,
+          isOwnSignedPost,
           totalCommentBadge: 0,
           isRead: b.isRead,
           type: 'post-notif',
