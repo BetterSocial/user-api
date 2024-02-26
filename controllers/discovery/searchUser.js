@@ -11,6 +11,7 @@ const {sequelize} = require('../../databases/models');
 const SearchUser = async (req, res) => {
   const {q, limit = 50} = req.query;
   const {userId} = req;
+
   if (q.length < 2)
     return res.status(200).json({
       success: true,
@@ -18,70 +19,84 @@ const SearchUser = async (req, res) => {
     });
 
   try {
-    let user_topics = await sequelize.query(
-      `select tp.topic_id from topics as tp
-      left join user_topics as utp on tp.topic_id = utp.topic_id
-      where utp.user_id = :userId`,
-      {
-        type: QueryTypes.SELECT,
-        replacements: {
-          userId
-        }
-      }
-    );
-    let topicIds = user_topics.map((topic) => topic.topic_id);
-    const similarTopicQuery =
-      topicIds.length > 0
-        ? `ARRAY( select name from topics as tp
-          left join user_topics as utp on tp.topic_id = utp.topic_id
-          where utp.user_id = "User".user_id and tp.topic_id in (:topicIds) limit 3
-        )`
-        : 'ARRAY[]::text[]';
-
     const users = await sequelize.query(
       `SELECT 
-                "User".*,
-                count("follower"."user_id_follower") 
-                    AS "followersCount",
-                ${similarTopicQuery} as community_info,
-                (SELECT 
-                    "f"."user_id_follower" AS "user_id_follower"
-                FROM "user_follow_user" AS f 
-                WHERE "f"."user_id_follower" = :userId
-                    AND "f"."user_id_followed" = "User"."user_id")
-            FROM "users" 
-                AS "User" 
-            LEFT OUTER JOIN "user_follow_user" 
-                AS "follower" 
-            ON "User"."user_id" = 
-                "follower"."user_id_followed" 
-            WHERE 
-                ("User"."username" ILIKE :likeQuery
-                AND "User"."user_id" != :userId
-                AND "User"."is_anonymous" = false
-                AND "User"."is_banned" = false 
-                AND "User"."verified_status" != 'UNVERIFIED') 
-            GROUP BY 
-                "User"."user_id"
-            ORDER BY  
-                "karma_score" DESC,
-                "user_id_follower" ASC,
-                "followersCount" DESC
-            LIMIT :limit`,
+          u.user_id,
+          u.human_id,
+          u.country_code,
+          u.username,
+          u.real_name,
+          u.created_at,
+          u.updated_at,
+          u.last_active_at,
+          u.status,
+          u.profile_pic_path,
+          u.bio,
+          u.is_banned,
+          u.is_anonymous,
+          u.allow_anon_dm,
+          u.only_received_dm_from_user_following,
+          u.is_backdoor_user,
+          u.blocked_by_admin,
+          u.verified_status,
+          u.combined_user_score,
+          u.karma_score,
+          u.is_karma_unlocked,
+          (SELECT COUNT(*) FROM user_follow_user WHERE user_id_followed = u.user_id) AS followersCount,
+          ARRAY(
+              SELECT name
+              FROM (
+                  SELECT name, ROW_NUMBER() OVER (ORDER BY tp.topic_id) AS row_num
+                  FROM topics AS tp
+                  LEFT JOIN user_topics AS utp ON tp.topic_id = utp.topic_id
+                  WHERE utp.user_id = u.user_id AND tp.topic_id IN (
+                      SELECT tp.topic_id 
+                      FROM topics AS tp
+                      LEFT JOIN user_topics AS utp ON tp.topic_id = utp.topic_id
+                      WHERE utp.user_id = :userId
+                  )
+              ) AS subquery
+              WHERE row_num <= 3
+          ) AS community_info,
+          EXISTS (
+              SELECT 1
+              FROM user_follow_user AS f2
+              WHERE f2.user_id_follower = :userId
+              AND f2.user_id_followed = u.user_id
+          ) AS is_followed,
+          (SELECT user_id_follower FROM user_follow_user WHERE user_id_followed = u.user_id AND user_id_follower = :userId) AS user_id_follower
+      FROM 
+          users AS u
+      WHERE 
+          (u.username ILIKE :likeQuery
+          AND u.user_id != :userId
+          AND u.is_anonymous = false
+          AND u.is_banned = false 
+          AND u.verified_status != 'UNVERIFIED') 
+      ORDER BY  
+          u.karma_score DESC,
+          is_followed ASC,
+          followersCount DESC
+      LIMIT :limit`,
       {
         type: QueryTypes.SELECT,
         replacements: {
-          likeQuery: `%${q}%`,
+          likeQuery: '%' + q + '%',
           userId,
-          topicIds,
           limit
         }
       }
     );
 
-    const followedUsers = users.filter((item) => item.user_id_follower !== null);
-
-    const unfollowedUsers = users.filter((item) => item.user_id_follower === null);
+    let followedUsers = [];
+    let unfollowedUsers = [];
+    users.forEach((item) => {
+      if (item.user_id_follower !== null) {
+        followedUsers.push(item);
+      } else {
+        unfollowedUsers.push(item);
+      }
+    });
 
     return res.status(200).json({
       success: true,
