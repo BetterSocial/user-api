@@ -37,23 +37,21 @@ const getReaction = (req, latest_reactions, constantActor) => {
   return {comments, upvotes, downvotes};
 };
 
-async function checkIsOwnPost(tokenUserId, userId) {
-  if (tokenUserId === userId) return true;
-
-  const signedUserId = UsersFunction.findSignedUserId(User, tokenUserId);
-  if (signedUserId === userId) return true;
-
-  try {
-    const anonymousUserId = await UsersFunction.findAnonymousUserId(User, tokenUserId);
-    if (anonymousUserId?.user_id === userId) return true;
-  } catch (e) {
-    return false;
-  }
-
-  return false;
-}
-
 const getOneFeedChatService = async (req, res) => {
+  let oppositeUserId = null;
+  let selfSignedUserId = null;
+  let selfAnonymousUserId = null;
+
+  if (req?.user?.is_anonymous) {
+    oppositeUserId = await UsersFunction.findSignedUserId(User, req.userId);
+    selfAnonymousUserId = req.userId;
+    selfSignedUserId = oppositeUserId;
+  } else {
+    const user = await UsersFunction.findAnonymousUserId(User, req.userId);
+    oppositeUserId = user?.id;
+    selfAnonymousUserId = user?.id;
+    selfSignedUserId = req.userId;
+  }
   try {
     const data = await getstreamService.getFeeds(req.token, 'notification', {
       ids: [req.params.feedId],
@@ -83,7 +81,11 @@ const getOneFeedChatService = async (req, res) => {
       updated_at = last_message_at;
     }
 
-    const actor = data?.results[0]?.actor;
+    const isAnonym = data.results[0].object?.anonimity ?? data.results[0].anonimity;
+    const actor = data?.results?.[0]?.actor;
+    if (isAnonym && actor) {
+      actor.id = null;
+    }
 
     let karmaActors = [];
     if (!karmaActors.includes(actor.id)) {
@@ -119,12 +121,14 @@ const getOneFeedChatService = async (req, res) => {
     actor.karmaScores = roundingKarmaScore(user?.karma_score || 0);
 
     if (data?.results[0]?.anonimity) {
-      actor.data.username = `Anonymous ${data?.results[0]?.anon_user_info_emoji_name}`;
+      actor.data.username = `${data?.results?.[0]?.anon_user_info_color_name} ${data?.results[0]?.anon_user_info_emoji_name}`;
       actor.data.anon_user_info_emoji_name = data?.results[0]?.anon_user_info_emoji_name;
       actor.data.anon_user_info_emoji_code = data?.results[0]?.anon_user_info_emoji_code;
       actor.data.anon_user_info_color_name = data?.results[0]?.anon_user_info_color_name;
       actor.data.anon_user_info_color_code = data?.results[0]?.anon_user_info_color_code;
     }
+
+    const postMakerUserId = data?.results[0]?.actor?.id;
 
     const response = {
       activity_id: data.results[0].id,
@@ -134,14 +138,16 @@ const getOneFeedChatService = async (req, res) => {
       },
       expired_at: data.results[0].expired_at,
       totalComment: data.results[0].reaction_counts?.comment ?? 0,
-      isOwnPost: await checkIsOwnPost(req.userId, data.results[0].actor.id),
+      isOwnPost: req.userId === postMakerUserId,
+      isOwnSignedPost: selfSignedUserId === postMakerUserId,
+      isOwnAnonymousPost: selfAnonymousUserId === postMakerUserId,
       totalCommentBadge: comments.filter((comment) => comment.actor.id !== req.userId).length ?? 0,
       type: 'post-notif',
       titlePost: data.results[0].object?.message ?? data.results[0].message,
       downvote: data.results[0].reaction_counts?.downvotes ?? 0,
       upvote: data.results[0].reaction_counts?.upvotes ?? 0,
       postMaker: actor,
-      isAnonym: data.results[0].object?.anonimity ?? data.results[0].anonimity,
+      isAnonym,
       comments,
       upvotes,
       downvotes
