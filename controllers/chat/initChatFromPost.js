@@ -1,13 +1,142 @@
-const {User, PostAnonUserInfo, ChatAnonUserInfo} = require('../../databases/models');
+const {User, ChatAnonUserInfo} = require('../../databases/models');
 const {StreamChat} = require('stream-chat');
-const {v4: uuid} = require('uuid');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {responseSuccess} = require('../../utils/Responses');
 const {CHANNEL_TYPE} = require('../../helpers/constants');
 const UsersFunction = require('../../databases/functions/users');
 const Getstream = require('../../vendor/getstream');
 const BetterSocialConstantListUtils = require('../../services/bettersocial/constantList/utils');
-const PostAnonUserInfoFunction = require('../../databases/functions/postAnonUserInfo');
+const BetterSocialCore = require('../../services/bettersocial');
+const {generate_channel_id_for_anon_chat} = require('../../services/bettersocial/chat/allAnonChat');
+
+const sign_to_anon_post = async (
+  client,
+  userModel,
+  targetUserModel,
+  source_id,
+  anonUserInfoFromPost
+) => {
+  let channel = await ChatAnonUserInfo.findOne({
+    where: {
+      my_anon_user_id: targetUserModel.user_id,
+      target_user_id: userModel.user_id,
+      context: 'post',
+      initiator: userModel.user_id,
+      source_id: source_id
+    }
+  });
+  if (channel) {
+    return channel;
+  } else {
+    let channel_id = generate_channel_id_for_anon_chat(
+      targetUserModel.user_id,
+      userModel.user_id,
+      'post'
+    );
+    let new_channel = await ChatAnonUserInfo.create({
+      channel_id: channel_id,
+      my_anon_user_id: targetUserModel.user_id,
+      target_user_id: userModel.user_id,
+      anon_user_info_color_code: anonUserInfoFromPost.anon_user_info_color_code,
+      anon_user_info_color_name: anonUserInfoFromPost.anon_user_info_color_name,
+      anon_user_info_emoji_code: anonUserInfoFromPost.anon_user_info_emoji_code,
+      anon_user_info_emoji_name: anonUserInfoFromPost.anon_user_info_emoji_name,
+      context: 'post',
+      source_id: source_id,
+      initiator: userModel.user_id
+    });
+    return new_channel;
+  }
+};
+
+const anon_to_sign_post = async (client, userModel, targetUserModel, source_id) => {
+  let channel = await ChatAnonUserInfo.findOne({
+    where: {
+      my_anon_user_id: userModel.user_id,
+      target_user_id: targetUserModel.user_id,
+      context: 'post',
+      initiator: userModel.user_id
+    }
+  });
+  if (channel) {
+    return channel;
+  } else {
+    let channel_id = generate_channel_id_for_anon_chat(
+      userModel.user_id,
+      targetUserModel.user_id,
+      'post'
+    );
+    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+    const color = BetterSocialConstantListUtils.getRandomColor();
+    let new_channel = await ChatAnonUserInfo.create({
+      channel_id: channel_id,
+      my_anon_user_id: userModel.user_id,
+      target_user_id: targetUserModel.user_id,
+      anon_user_info_color_code: color.code,
+      anon_user_info_color_name: color.color,
+      anon_user_info_emoji_code: emoji.emoji,
+      anon_user_info_emoji_name: emoji.name,
+      context: 'post',
+      source_id: source_id,
+      initiator: userModel.user_id
+    });
+    return new_channel;
+  }
+};
+const anon_to_anon_post = async (
+  client,
+  userModel,
+  targetUserModel,
+  source_id,
+  anonUserInfoFromPost
+) => {
+  let channel = await ChatAnonUserInfo.findOne({
+    where: {
+      my_anon_user_id: userModel.user_id,
+      target_user_id: targetUserModel.user_id,
+      context: 'post',
+      source_id: source_id
+    }
+  });
+  if (channel) {
+    return channel;
+  } else {
+    // create owner anon info
+    let channel_id = generate_channel_id_for_anon_chat(
+      userModel.user_id,
+      targetUserModel.user_id,
+      'post'
+    );
+    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+    const color = BetterSocialConstantListUtils.getRandomColor();
+    let new_channel = await ChatAnonUserInfo.create({
+      channel_id: channel_id,
+      my_anon_user_id: userModel.user_id,
+      target_user_id: targetUserModel.user_id,
+      anon_user_info_color_code: color.code,
+      anon_user_info_color_name: color.color,
+      anon_user_info_emoji_code: emoji.emoji,
+      anon_user_info_emoji_name: emoji.name,
+      context: 'post',
+      source_id: source_id,
+      initiator: userModel.user_id
+    });
+    // // create member anon info
+    await ChatAnonUserInfo.create({
+      channel_id: channel_id,
+      my_anon_user_id: targetUserModel.user_id,
+      target_user_id: userModel.user_id,
+      anon_user_info_color_code: anonUserInfoFromPost.anon_user_info_color_code,
+      anon_user_info_color_name: anonUserInfoFromPost.anon_user_info_color_name,
+      anon_user_info_emoji_code: anonUserInfoFromPost.anon_user_info_emoji_code,
+      anon_user_info_emoji_name: anonUserInfoFromPost.anon_user_info_emoji_name,
+      context: 'post',
+      source_id: source_id,
+      initiator: userModel.user_id
+    });
+    return new_channel;
+  }
+};
 
 /**
  *
@@ -33,11 +162,9 @@ const initChatFromPost = async (req, res) => {
 
   const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
   try {
-    const [userModel, targetUserModel, emoji, color] = await Promise.all([
+    const [userModel, targetUserModel] = await Promise.all([
       UsersFunction.findUserById(User, req?.userId),
-      UsersFunction.findUserById(User, targetUserId),
-      BetterSocialConstantListUtils.getRandomEmoji(),
-      BetterSocialConstantListUtils.getRandomColor()
+      UsersFunction.findUserById(User, targetUserId)
     ]);
     /**
      * @type {import('stream-chat').OwnUserResponse}
@@ -48,147 +175,72 @@ const initChatFromPost = async (req, res) => {
       image: userModel?.profile_pic_path,
       username: userModel?.username
     };
-
     await client.connectUser(user, req.token);
-
-    const newChannel = client.channel('messaging', uuid(), {
-      members
-    });
-    await newChannel.create();
-    let newStateMemberWithAnonInfo = newChannel.state.members;
-
-    //Add anon info to channel
-    if (targetUserModel.is_anonymous) {
-      let anon_user_info = {};
-      if (source === 'post') {
-        const postAnonUserInfo = await PostAnonUserInfoFunction.checkSelfUsernameInPost(
-          PostAnonUserInfo,
-          User,
-          {
-            postId: postId,
-            userId: targetUserModel.user_id
-          },
-          null,
-          true
+    // check if the channel already exists
+    let newChannel;
+    let source_id = source === 'post' ? postId : commentId;
+    let channel_type = CHANNEL_TYPE.CHAT;
+    let channel_info;
+    if (!userModel.is_anonymous && !targetUserModel.is_anonymous) {
+      newChannel = client.channel('messaging', {
+        members
+      });
+    } else {
+      let anonUserInfoFromPost = {};
+      channel_type = CHANNEL_TYPE.ANONYMOUS;
+      if (targetUserModel.is_anonymous) {
+        let anon_post_detail = await Getstream.feed.getPlainFeedById(postId);
+        anonUserInfoFromPost = {
+          anon_user_info_color_code: anon_post_detail.anon_user_info_color_code,
+          anon_user_info_color_name: anon_post_detail.anon_user_info_color_name,
+          anon_user_info_emoji_code: anon_post_detail.anon_user_info_emoji_code,
+          anon_user_info_emoji_name: anon_post_detail.anon_user_info_emoji_name
+        };
+      }
+      if (userModel.is_anonymous && !targetUserModel.is_anonymous) {
+        channel_info = await anon_to_sign_post(client, userModel, targetUserModel, source_id);
+      } else if (!userModel.is_anonymous && targetUserModel.is_anonymous) {
+        channel_info = await sign_to_anon_post(
+          client,
+          userModel,
+          targetUserModel,
+          source_id,
+          anonUserInfoFromPost
         );
-
-        anon_user_info = {
-          anon_user_info_color_code: postAnonUserInfo?.anon_user_info_color_code,
-          anon_user_info_color_name: postAnonUserInfo?.anon_user_info_color_name,
-          anon_user_info_emoji_code: postAnonUserInfo?.anon_user_info_emoji_code,
-          anon_user_info_emoji_name: postAnonUserInfo?.anon_user_info_emoji_name
-        };
-      } else if (source === 'comment') {
-        const reaction = await Getstream.feed.getReactionById(commentId);
-        anon_user_info = {
-          anon_user_info_color_code: reaction?.data.anon_user_info_color_code,
-          anon_user_info_color_name: reaction?.data.anon_user_info_color_name,
-          anon_user_info_emoji_code: reaction?.data.anon_user_info_emoji_code,
-          anon_user_info_emoji_name: reaction?.data.anon_user_info_emoji_name
-        };
+      } else if (userModel.is_anonymous && targetUserModel.is_anonymous) {
+        channel_info = await anon_to_anon_post(
+          client,
+          userModel,
+          targetUserModel,
+          source_id,
+          anonUserInfoFromPost
+        );
       }
-
-      newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_code =
-        anon_user_info?.anon_user_info_color_code;
-      newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_name =
-        anon_user_info?.anon_user_info_color_name;
-      newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_code =
-        anon_user_info?.anon_user_info_emoji_code;
-      newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_name =
-        anon_user_info?.anon_user_info_emoji_name;
-
-      newStateMemberWithAnonInfo[targetUserModel.user_id].user.name =
-        'Anonymous ' + anon_user_info?.anon_user_info_emoji_name;
-      newStateMemberWithAnonInfo[targetUserModel.user_id].user.username =
-        'Anonymous ' + anon_user_info?.anon_user_info_emoji_name;
-
-      await ChatAnonUserInfo.create({
-        channel_id: newChannel.id,
-        my_anon_user_id: targetUserModel.user_id,
-        target_user_id: targetUserModel.user_id,
-        anon_user_info_color_code: anon_user_info?.anon_user_info_color_code,
-        anon_user_info_color_name: anon_user_info?.anon_user_info_color_name,
-        anon_user_info_emoji_code: anon_user_info?.anon_user_info_emoji_code,
-        anon_user_info_emoji_name: anon_user_info?.anon_user_info_emoji_name
+      newChannel = client.channel('messaging', channel_info.channel_id, {
+        members
       });
     }
+    /// START
+    const createdChannel = await newChannel.create();
 
-    if (userModel.is_anonymous) {
-      newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_color_code = color.code;
-      newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_color_name = color.color;
-      newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_code = emoji.emoji;
-      newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_name = emoji.name;
-
-      newStateMemberWithAnonInfo[userModel.user_id].user.name = 'Anonymous ' + emoji.name;
-      newStateMemberWithAnonInfo[userModel.user_id].user.username = 'Anonymous ' + emoji.name;
-
-      await ChatAnonUserInfo.create({
-        channel_id: newChannel.id,
-        my_anon_user_id: userModel.user_id,
-        target_user_id: targetUserModel.user_id,
-        anon_user_info_color_code: color.code,
-        anon_user_info_color_name: color.color,
-        anon_user_info_emoji_code: emoji.emoji,
-        anon_user_info_emoji_name: emoji.name
+    // get 100 messages
+    const channelFilters = {cid: 'messaging:' + newChannel.id};
+    const messageFilters = {created_at: {$lte: new Date()}};
+    const messageHistory = await client.search(channelFilters, messageFilters, {
+      sort: [{updated_at: -1}],
+      limit: 100
+    });
+    const {betterChannelMember, betterChannelMemberObject, updatedChannel} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(newChannel, createdChannel, true, {
+        channel_type: channel_type
       });
-    }
-    //end add anon info to channel
-
-    try {
-      if (!newChannel?.data?.name) {
-        let channelType = CHANNEL_TYPE.CHAT;
-        let anonDetailInfo = {};
-        if (userModel.is_anonymous) {
-          channelType = CHANNEL_TYPE.ANONYMOUS;
-          anonDetailInfo = {
-            anon_user_info_color_code:
-              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_color_code,
-            anon_user_info_color_name:
-              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_color_name,
-            anon_user_info_emoji_code:
-              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_code,
-            anon_user_info_emoji_name:
-              newStateMemberWithAnonInfo[userModel.user_id].anon_user_info_emoji_name
-          };
-        }
-
-        if (targetUserModel.is_anonymous && !userModel.is_anonymous) {
-          anonDetailInfo = {
-            anon_user_info_color_code:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_code,
-            anon_user_info_color_name:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_color_name,
-            anon_user_info_emoji_code:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_code,
-            anon_user_info_emoji_name:
-              newStateMemberWithAnonInfo[targetUserModel.user_id].anon_user_info_emoji_name
-          };
-        }
-
-        await newChannel.updatePartial({
-          set: {
-            channel_type: channelType,
-            name: [userModel?.username, targetUserModel?.username].join(', '),
-            ...anonDetailInfo,
-            better_channel_member: newStateMemberWithAnonInfo
-          }
-        });
-      }
-    } catch (e) {
-      console.log(e);
-    }
-
-    const channelState = await newChannel.watch();
 
     const response = {
-      ...channelState,
-      better_channel_members: Object.values(channelState.channel.better_channel_member),
-      better_channel_members_object: channelState.channel.better_channel_member,
-      messageHistories: []
+      ...updatedChannel,
+      better_channel_members: betterChannelMember,
+      better_channel_members_object: betterChannelMemberObject,
+      messageHistories: messageHistory.results
     };
-
-    await newChannel.stopWatching();
-
     await client.disconnectUser();
 
     return res.status(200).json(responseSuccess('sent', response));
