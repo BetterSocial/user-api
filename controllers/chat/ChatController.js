@@ -18,6 +18,7 @@ const {
   handle_anon_to_anon_channel_owner,
   handle_anon_to_anon_channel_member
 } = require('../../services/bettersocial/chat/allAnonChat');
+const {getOfficialAnonymousUsername} = require('../../utils');
 
 const v = new Validator();
 
@@ -254,21 +255,30 @@ module.exports = {
     } = req.body;
     if (!members.includes(req.userId)) members.push(req.userId);
 
+    const anonUserInfo = {
+      anon_user_info_color_code,
+      anon_user_info_color_name,
+      anon_user_info_emoji_code,
+      anon_user_info_emoji_name
+    };
+
+    const officialAnonUsername = getOfficialAnonymousUsername(anonUserInfo);
+
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
     try {
       /**
        * @type {import('stream-chat').OwnUserResponse}
        */
       const user = {
-        name: `Anonymous ${anon_user_info_emoji_name}`,
+        name: officialAnonUsername,
         id: req.userId,
         image: '',
-        username: `Anonymous ${anon_user_info_emoji_name}`
+        username: officialAnonUsername
       };
       await client.connectUser(user, req.token);
 
-      if (client.user.name !== `Anonymous ${anon_user_info_emoji_name}`) {
-        await client.upsertUser({id: req.userId, name: `Anonymous ${anon_user_info_emoji_name}`});
+      if (client.user.name !== officialAnonUsername) {
+        await client.upsertUser({id: req.userId, name: officialAnonUsername});
       }
 
       const channel = client.channel('messaging', {members});
@@ -292,9 +302,9 @@ module.exports = {
           message,
           user: {
             id: req.userId,
-            name: `Anonymous ${anon_user_info_emoji_name}`,
+            name: officialAnonUsername,
             image: '',
-            username: `Anonymous ${anon_user_info_emoji_name}`
+            username: officialAnonUsername
           },
           created_at: new Date(),
           updated_at: new Date()
@@ -335,7 +345,7 @@ module.exports = {
       const targetsUserModel = await UsersFunction.findMultipleUsersById(User, targets);
       targetsUserModel.push({
         user_id: req.userId,
-        username: `Anonymous ${anon_user_info_emoji_name}`,
+        username: officialAnonUsername,
         profile_pic_path: '',
         anon_user_info_color_code,
         anon_user_info_color_name,

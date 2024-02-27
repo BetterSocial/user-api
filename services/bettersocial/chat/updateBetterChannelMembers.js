@@ -3,6 +3,7 @@ const _ = require('lodash');
 const UsersFunction = require('../../../databases/functions/users');
 const {sequelize} = require('../../../databases/models');
 const BetterSocialConstantListUtils = require('../../../services/bettersocial/constantList/utils');
+const {getOfficialAnonymousUsername} = require('../../../utils');
 
 const SEPARATOR = ', ';
 
@@ -108,9 +109,15 @@ const __helperProcessBetterChannelMember = (members, membersDataFromDbMap) => {
     const memberDataFromDb = membersDataFromDbMap[member.user_id];
 
     if (!memberDataFromDb) return member;
-    const {is_anonymous, username, anon_user_info_emoji_name} = memberDataFromDb;
+    const {is_anonymous, username, anon_user_info_emoji_name, anon_user_info_color_name} =
+      memberDataFromDb;
 
-    const updatedUsername = is_anonymous ? `Anonymous ${anon_user_info_emoji_name}` : username;
+    const updatedUsername = is_anonymous
+      ? getOfficialAnonymousUsername({
+          anon_user_info_emoji_name: anon_user_info_emoji_name,
+          anon_user_info_color_name: anon_user_info_color_name
+        })
+      : username;
 
     newChannelName += `${updatedUsername}${SEPARATOR}`;
 

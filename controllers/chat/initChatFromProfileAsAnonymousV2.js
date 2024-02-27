@@ -8,6 +8,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const {User, ChatAnonUserInfo} = require('../../databases/models');
 const BetterSocialCore = require('../../services/bettersocial');
 const {ErrorMessage} = require('../../helpers/message');
+const {getOfficialAnonymousUsername} = require('../../utils');
 
 const initChatFromProfileAsAnonymousV2 = async (req, res) => {
   const {
@@ -23,22 +24,30 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
   }
 
   const members = [member, req.userId];
+  const anonUserInfo = {
+    anon_user_info_color_code,
+    anon_user_info_color_name,
+    anon_user_info_emoji_code,
+    anon_user_info_emoji_name
+  };
 
-  const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRETƒ);
+  const officialAnonUsername = getOfficialAnonymousUsername(anonUserInfo);
+
+  const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
   try {
     /**
      * @type {import('stream-chat').OwnUserResponse}
      */
     const user = {
-      name: `Anonymous ${anon_user_info_emoji_name}`,
+      name: officialAnonUsername,
       id: req.userId,
       image: '',
-      username: `Anonymous ${anon_user_info_emoji_name}`
+      username: officialAnonUsername
     };
     await client.connectUser(user, req.token);
 
-    if (client.user.name !== `Anonymous ${anon_user_info_emoji_name}`) {
-      await client.upsertUser({id: req.userId, name: `Anonymous ${anon_user_info_emoji_name}`});
+    if (client.user.name !== officialAnonUsername) {
+      await client.upsertUser({id: req.userId, name: officialAnonUsername});
     }
 
     const targetUserData = await UsersFunction.findUserById(User, member);
@@ -56,9 +65,9 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
         message,
         user: {
           id: req.userId,
-          name: `Anonymous ${anon_user_info_emoji_name}`,
+          name: officialAnonUsername,
           image: '',
-          username: `Anonymous ${anon_user_info_emoji_name}`
+          username: officialAnonUsername
         },
         reply_data: {
           user: {
@@ -97,7 +106,7 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
     const targetsUserModel = [targetUserData];
     targetsUserModel.push({
       user_id: req.userId,
-      username: `Anonymous ${anon_user_info_emoji_name}`,
+      username: officialAnonUsername,
       profile_pic_path: '',
       anon_user_info_color_code,
       anon_user_info_color_name,

@@ -178,6 +178,23 @@ const removePrefixTopic = (topicWithPrefix) => {
 
   return topicWithPrefix;
 };
+/**
+ * @typedef {Object} AnonUserInfo
+ * @property {string} anon_user_info_color_code
+ * @property {string} anon_user_info_color_name
+ * @property {string} anon_user_info_emoji_code
+ * @property {string} anon_user_info_emoji_name
+ */
+
+/**
+ * @param {AnonUserInfo} anonUserInfo
+ */
+const getOfficialAnonymousUsername = (anonUserInfo) => {
+  if (!anonUserInfo) return '';
+  const {anon_user_info_emoji_name, anon_user_info_color_name} = anonUserInfo;
+
+  return `${anon_user_info_color_name} ${anon_user_info_emoji_name}`;
+};
 
 module.exports = {
   dateCreted,
@@ -189,6 +206,7 @@ module.exports = {
   convertingUserFormatForLocation,
   getFirstStringFromSplit,
   getToken,
+  getOfficialAnonymousUsername,
   handleAnonymousData,
   removePrefixTopic
 };
