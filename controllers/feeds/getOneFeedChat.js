@@ -38,17 +38,14 @@ const getReaction = (req, latest_reactions, constantActor) => {
 };
 
 const getOneFeedChatService = async (req, res) => {
-  let oppositeUserId = null;
   let selfSignedUserId = null;
   let selfAnonymousUserId = null;
 
   if (req?.user?.is_anonymous) {
-    oppositeUserId = await UsersFunction.findSignedUserId(User, req.userId);
+    selfSignedUserId = await UsersFunction.findSignedUserId(User, req.userId);
     selfAnonymousUserId = req.userId;
-    selfSignedUserId = oppositeUserId;
   } else {
     const user = await UsersFunction.findAnonymousUserId(User, req.userId);
-    oppositeUserId = user?.id;
     selfAnonymousUserId = user?.id;
     selfSignedUserId = req.userId;
   }
@@ -83,9 +80,6 @@ const getOneFeedChatService = async (req, res) => {
 
     const isAnonym = data.results[0].object?.anonimity ?? data.results[0].anonimity;
     const actor = data?.results?.[0]?.actor;
-    if (isAnonym && actor) {
-      actor.id = null;
-    }
 
     let karmaActors = [];
     if (!karmaActors.includes(actor.id)) {
@@ -129,6 +123,10 @@ const getOneFeedChatService = async (req, res) => {
     }
 
     const postMakerUserId = data?.results[0]?.actor?.id;
+
+    if (isAnonym && actor) {
+      actor.id = null;
+    }
 
     const response = {
       activity_id: data.results[0].id,
