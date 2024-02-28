@@ -60,8 +60,8 @@ module.exports = async (req, res) => {
 
   try {
     // unfollow targeted feeds
-    const unfollowUser = Getstream.feed.unfollowUser(req?.token, req?.userId, user_id_followed);
-    const unfollowMainFeedFollowing = Getstream.feed.unfollowMainFeedFollowing(
+    const unfollowUser = Getstream.feed.unfollowAnonUser(req?.token, req?.userId, user_id_followed);
+    const unfollowMainFeedFollowing = Getstream.feed.unfollowMainFeedFollowingAnon(
       req?.token,
       req?.userId,
       user_id_followed
