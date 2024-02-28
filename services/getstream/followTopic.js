@@ -51,15 +51,33 @@ const addTopicToChatTab = async (token, topicName, userId, isAnonymous) => {
       : 'This topic has new followers';
     const defaultImage = isAnonymous ? DEFAULT_TOPIC_PIC_PATH_ANON : DEFAULT_TOPIC_PIC_PATH_SIGN;
 
+    const admin = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
+    const adminChannel = admin.channel('topics', `topic_${topic}`);
+    const adminChannelData = await adminChannel.create();
+
+    const updateData = {};
+    // Update channel image if null to default image
+    if (!adminChannelData?.channel?.image) updateData.image = defaultImage;
+    if (!adminChannelData?.channel?.channelImage) updateData.channelImage = defaultImage;
+    if (!adminChannelData?.channel?.channel_image) updateData.channel_image = defaultImage;
+
+    // Revert back all existing signed channel that has anon topic to correct signed one
+    if (!isAnonymous && adminChannelData?.channel?.image === DEFAULT_TOPIC_PIC_PATH_ANON) {
+      updateData.image = DEFAULT_TOPIC_PIC_PATH_SIGN;
+      updateData.channelImage = DEFAULT_TOPIC_PIC_PATH_SIGN;
+      updateData.channel_image = DEFAULT_TOPIC_PIC_PATH_SIGN;
+    }
+
+    await adminChannel.updatePartial({
+      set: updateData
+    });
+
     const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
     await client.connectUser({id: userId}, token);
     const channel = await client.channel('topics', `topic_${topic}`, {
       name: `#${topic}`,
       members: [userId],
-      channel_type: 3,
-      channel_image: defaultImage,
-      channelImage: defaultImage,
-      image: defaultImage
+      channel_type: 3
     });
 
     console.log('prepare follow channel', topic);
@@ -67,6 +85,7 @@ const addTopicToChatTab = async (token, topicName, userId, isAnonymous) => {
     await channel.addMembers([userId]);
     await channel.sendMessage({text}, {skip_push: true});
     console.log('channel followed');
+    await client.disconnectUser();
   } catch (error) {
     console.log('error add topic to chat tab', error);
     throw new Error('error add topic to chat tab');
