@@ -49,24 +49,37 @@ const addTopicToChatTab = async (token, topicName, userId, isAnonymous) => {
     const text = isAnonymous
       ? 'This topic has new anonymous followers'
       : 'This topic has new followers';
-    const defaultImage = isAnonymous ? DEFAULT_TOPIC_PIC_PATH_ANON : DEFAULT_TOPIC_PIC_PATH_SIGN;
 
     const admin = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
     const adminChannel = admin.channel('topics', `topic_${topic}`);
     const adminChannelData = await adminChannel.create();
 
     const updateData = {};
-    // Update channel image if null to default image
-    if (!adminChannelData?.channel?.image) updateData.image = defaultImage;
-    if (!adminChannelData?.channel?.channelImage) updateData.channelImage = defaultImage;
-    if (!adminChannelData?.channel?.channel_image) updateData.channel_image = defaultImage;
-
     // Revert back all existing signed channel that has anon topic to correct signed one
-    if (!isAnonymous && adminChannelData?.channel?.image === DEFAULT_TOPIC_PIC_PATH_ANON) {
-      updateData.image = DEFAULT_TOPIC_PIC_PATH_SIGN;
-      updateData.channelImage = DEFAULT_TOPIC_PIC_PATH_SIGN;
-      updateData.channel_image = DEFAULT_TOPIC_PIC_PATH_SIGN;
+    if (
+      [DEFAULT_TOPIC_PIC_PATH_ANON, DEFAULT_TOPIC_PIC_PATH_SIGN].includes(
+        adminChannelData?.channel?.image
+      )
+    ) {
+      updateData.image = null;
     }
+
+    if (
+      [DEFAULT_TOPIC_PIC_PATH_ANON, DEFAULT_TOPIC_PIC_PATH_SIGN].includes(
+        adminChannelData?.channel?.channelImage
+      )
+    ) {
+      updateData.channelImage = null;
+    }
+
+    if (
+      [DEFAULT_TOPIC_PIC_PATH_ANON, DEFAULT_TOPIC_PIC_PATH_SIGN].includes(
+        adminChannelData?.channel?.channel_image
+      )
+    ) {
+      updateData.channel_image = null;
+    }
+    // Revert END
 
     await adminChannel.updatePartial({
       set: updateData
