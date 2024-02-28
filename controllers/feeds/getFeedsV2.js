@@ -25,6 +25,7 @@ const {ACTIVITY_THRESHOLD} = require('../../config/constant');
 const UsersFunction = require('../../databases/functions/users');
 const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
 const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
+const {getAnonymUser} = require('../../utils/getAnonymUser');
 
 const getActivtiesOnFeed = async (feed, token, paramGetFeeds) => {
   console.log('Get activity from getstream => ', feed, paramGetFeeds);
@@ -155,14 +156,16 @@ module.exports = async (req, res) => {
       listBlockDomain,
       listPostAnonymousAuthor,
       isBlurredPost,
-      allFollowingUser
+      allFollowingUser,
+      anonymUserId
     ] = await Promise.all([
       UsersFunction.findAnonymousUserId(User, req.userId, {raw: true}),
       getListBlockUser(req.userId),
       getBlockDomain(req.userId),
       getListBlockPostAnonymousAuthor(req.userId),
       UserFollowUserFunction.checkIsBlurredPost(UserFollowUser, req.userId),
-      UserFollowUserFunction.getAllFollowingUser(UserFollowUser, req.userId)
+      UserFollowUserFunction.getAllFollowingUser(UserFollowUser, req.userId),
+      getAnonymUser(req.userId)
     ]);
     let postActors = [];
 
@@ -247,7 +250,12 @@ module.exports = async (req, res) => {
             postActors = [...postActors, ...actor_from_reaction];
 
             if (item.verb === POST_VERB_POLL) {
-              const postPoll = await modifyPollPostObject(req.userId, item, isBlurredPost);
+              const postPoll = await modifyPollPostObject(
+                req.userId,
+                item,
+                isBlurredPost,
+                anonymUserId
+              );
               data.push(postPoll);
             } else {
               let newItem = await isUserFollowAuthor(item, allFollowingUser);
@@ -318,7 +326,7 @@ module.exports = async (req, res) => {
         data[i].own_reactions = addKarmaScoreToLatestReaction(data[i].own_reactions, karmaScores);
       }
       data[i] = modifyReactionsPost(data[i], data[i].anonimity);
-      data[i] = await modifyAnonimityPost(data[i], isBlurredPost);
+      data[i] = await modifyAnonimityPost(data[i], isBlurredPost, anonymUserId);
     }
 
     return res.status(200).json({
