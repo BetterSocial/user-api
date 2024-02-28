@@ -127,6 +127,7 @@ const handle_anon_to_anon_channel_member = async (
 
 module.exports = {
   is_all_anon_user,
+  generate_channel_id_for_anon_chat,
   handle_anon_to_anon_channel_owner,
   handle_anon_to_anon_channel_member
 };
