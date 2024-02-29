@@ -27,6 +27,7 @@ const userUnblock = require('./userUnblock');
 const varifyTokenGetstream = require('./varifyTokenGetstream');
 const verifyUser = require('./verifyUser');
 const veryfyToken = require('./veryfyToken');
+const checkAllowAnonDM = require('./checkAllowAnonDM');
 
 module.exports = {
   blockAnonUserFromChat,
@@ -57,5 +58,6 @@ module.exports = {
   userUnblock,
   varifyTokenGetstream,
   verifyUser,
-  veryfyToken
+  veryfyToken,
+  checkAllowAnonDM
 };
