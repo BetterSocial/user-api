@@ -111,6 +111,6 @@ router.post(
   usersHandler.blockAnonUserFromChat
 );
 
-router.get('/check-allow-dm/:userId', auth.isAuthV2, usersHandler.checkAllowAnonDM);
+router.get('/check-allow-dm/:user_id', auth.isAuth, usersHandler.checkAllowAnonDM);
 
 module.exports = router;

@@ -1,8 +1,8 @@
 const {User} = require('../../databases/models');
 
 module.exports = async (req, res) => {
-  let {userId} = req.params;
-  let user = await User.findOne({where: {user_id: userId, is_anonymous: false}});
+  let {user_id} = req.params;
+  let user = await User.findOne({where: {user_id, is_anonymous: false}});
 
   if (user) {
     return res.status(200).json({
