@@ -1,12 +1,16 @@
 const {User, UserFollowUser} = require('../../databases/models');
 const UsersFunction = require('../../databases/functions/users');
 const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
+const Getstream = require('../../vendor/getstream');
 
 module.exports = async (req, res) => {
   const {userId: self_user_id} = req;
-  let {user_id: target_user_id} = req.params;
+  let {post_id} = req.params;
+
+  const target_user_id = await Getstream.feed.getUserIdFromSource(res, 'post', {post_id});
+
   let user = await User.findOne(
-    {where: {user_id: target_user_id, is_anonymous: false}},
+    {where: {user_id: target_user_id}},
     'user_id allow_anon_dm only_received_dm_from_user_following'
   );
 
