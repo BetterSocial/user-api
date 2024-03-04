@@ -5,9 +5,12 @@ const Getstream = require('../../vendor/getstream');
 
 module.exports = async (req, res) => {
   const {userId: self_user_id} = req;
-  let {post_id} = req.params;
+  let {source, post_id, comment_id} = req.query;
 
-  const target_user_id = await Getstream.feed.getUserIdFromSource(res, 'post', {post_id});
+  const target_user_id = await Getstream.feed.getUserIdFromSource(res, source, {
+    post_id,
+    comment_id
+  });
 
   let user = await User.findOne(
     {where: {user_id: target_user_id}},

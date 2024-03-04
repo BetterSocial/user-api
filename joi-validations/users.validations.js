@@ -1,4 +1,5 @@
-const {object, string, boolean, number} = require('./general.validations');
+const Joi = require('joi');
+const {object, string, boolean, number, uuid} = require('./general.validations');
 
 const UserValidation = {
   authenticateWeb: {
@@ -11,6 +12,21 @@ const UserValidation = {
       allow_anon_dm: boolean,
       limit: number,
       offset: number
+    }
+  },
+  checkAllowDm: {
+    query: {
+      source: string.required(),
+      post_id: uuid.when('source', {
+        is: 'post',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      }),
+      comment_id: uuid.when('source', {
+        is: 'comment',
+        then: Joi.required(),
+        otherwise: Joi.optional()
+      })
     }
   }
 };
