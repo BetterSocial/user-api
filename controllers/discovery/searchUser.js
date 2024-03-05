@@ -80,8 +80,8 @@ const SearchUser = async (req, res) => {
           AND u.is_banned = false 
           AND u.verified_status != 'UNVERIFIED') 
       ORDER BY  
+          is_followed DESC,
           u.karma_score DESC,
-          is_followed ASC,
           followersCount DESC
       LIMIT :limit`,
       {
