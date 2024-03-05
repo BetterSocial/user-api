@@ -143,8 +143,8 @@ const InitDiscoveryUserData = async (req, res) => {
           ${where_anon_dm} 
         ORDER BY
           is_followed DESC,
-          followersCount DESC,
-          COALESCE(A.karma_score, 0) DESC
+          COALESCE(A.karma_score, 0) DESC,
+          followersCount DESC
         LIMIT :limit
         OFFSET :offset`;
 
