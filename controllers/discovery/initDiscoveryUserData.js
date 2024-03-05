@@ -16,6 +16,7 @@ const InitDiscoveryUserData = async (req, res) => {
 
   let where_anon_dm = '';
   if (allow_anon_dm) {
+    allow_anon_dm = allow_anon_dm ? true : false;
     where_anon_dm = 'AND A.allow_anon_dm = :allow_anon_dm';
   }
 
