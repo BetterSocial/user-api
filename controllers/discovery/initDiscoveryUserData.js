@@ -9,17 +9,23 @@ const {QueryTypes} = require('sequelize');
  * @returns
  */
 const InitDiscoveryUserData = async (req, res) => {
-  let {limit = 50, page = 0} = req.query;
+  let {limit = 50, page = 0, allow_anon_dm} = req.query;
   page = parseInt(page);
 
   const {userId} = req;
+
+  let where_anon_dm = '';
+  if (allow_anon_dm) {
+    allow_anon_dm = allow_anon_dm ? true : false;
+    where_anon_dm = 'AND A.allow_anon_dm = :allow_anon_dm';
+  }
 
   try {
     let totalDataQuery = `
     SELECT 
         count(A.user_id) as total_data
     FROM users A
-    WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false`;
+    WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false ${where_anon_dm}`;
 
     let user_topics = await sequelize.query(
       `select tp.topic_id from topics as tp
@@ -59,7 +65,16 @@ const InitDiscoveryUserData = async (req, res) => {
             A.is_anonymous,
             A.combined_user_score,
             A.karma_score,
+            A.allow_anon_dm,
+            A.only_received_dm_from_user_following,
             ${similarTopicQuery} as community_info,
+            (SELECT COUNT(*) FROM user_follow_user WHERE user_id_followed = A.user_id) AS followersCount,
+            EXISTS (
+                SELECT 1
+                FROM user_follow_user AS f2
+                WHERE f2.user_id_follower = :userId
+                AND f2.user_id_followed = A.user_id
+            ) AS is_followed,
             CommonUsers.common, 
             B.user_id_follower 
         from users A
@@ -76,12 +91,15 @@ const InitDiscoveryUserData = async (req, res) => {
         ON CommonUsers.user_id = A.user_id
         LEFT JOIN user_follow_user B
         ON A.user_id = B.user_id_followed AND B.user_id_follower = :userId
-        WHERE A.user_id != :userId AND A.is_anonymous = false AND A.is_banned = false
+        WHERE 
+          A.user_id != :userId 
+          AND A.is_anonymous = false 
+          AND A.is_banned = false
+          ${where_anon_dm} 
         ORDER BY
-        COALESCE(B.user_id_follower, '') DESC,
-        COALESCE(A.karma_score, 0) DESC,
-        COALESCE(CommonUsers.common, -1) DESC, 
-        COALESCE(CommonUsers.user_match, -1) DESC
+          is_followed DESC,
+          COALESCE(A.karma_score, 0) DESC,
+          followersCount DESC
         LIMIT :limit
         OFFSET :offset`;
 
@@ -90,6 +108,7 @@ const InitDiscoveryUserData = async (req, res) => {
       replacements: {
         userId,
         topicIds,
+        allow_anon_dm,
         limit: limit,
         offset: page * limit
       }
@@ -99,7 +118,8 @@ const InitDiscoveryUserData = async (req, res) => {
     let totalData = await sequelize.query(totalDataQuery, {
       type: QueryTypes.SELECT,
       replacements: {
-        userId
+        userId,
+        allow_anon_dm
       },
       raw: true
     });
