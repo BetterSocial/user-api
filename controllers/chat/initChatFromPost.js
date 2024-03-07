@@ -186,16 +186,26 @@ const initChatFromPost = async (req, res) => {
         members
       });
     } else {
-      let anonUserInfoFromPost = {};
+      let anonUserInfoFromSouce = {};
       channel_type = CHANNEL_TYPE.ANONYMOUS;
       if (targetUserModel.is_anonymous) {
-        let anon_post_detail = await Getstream.feed.getPlainFeedById(postId);
-        anonUserInfoFromPost = {
-          anon_user_info_color_code: anon_post_detail.anon_user_info_color_code,
-          anon_user_info_color_name: anon_post_detail.anon_user_info_color_name,
-          anon_user_info_emoji_code: anon_post_detail.anon_user_info_emoji_code,
-          anon_user_info_emoji_name: anon_post_detail.anon_user_info_emoji_name
-        };
+        if (source === 'post') {
+          let anon_post_detail = await Getstream.feed.getPlainFeedById(postId);
+          anonUserInfoFromSouce = {
+            anon_user_info_color_code: anon_post_detail.anon_user_info_color_code,
+            anon_user_info_color_name: anon_post_detail.anon_user_info_color_name,
+            anon_user_info_emoji_code: anon_post_detail.anon_user_info_emoji_code,
+            anon_user_info_emoji_name: anon_post_detail.anon_user_info_emoji_name
+          };
+        } else {
+          let anon_comment_detail = await Getstream.feed.getReactionById(commentId);
+          anonUserInfoFromSouce = {
+            anon_user_info_color_code: anon_comment_detail.data.anon_user_info_color_code,
+            anon_user_info_color_name: anon_comment_detail.data.anon_user_info_color_name,
+            anon_user_info_emoji_code: anon_comment_detail.data.anon_user_info_emoji_code,
+            anon_user_info_emoji_name: anon_comment_detail.data.anon_user_info_emoji_name
+          };
+        }
       }
       if (userModel.is_anonymous && !targetUserModel.is_anonymous) {
         channel_info = await anon_to_sign_post(client, userModel, targetUserModel, source_id);
@@ -205,7 +215,7 @@ const initChatFromPost = async (req, res) => {
           userModel,
           targetUserModel,
           source_id,
-          anonUserInfoFromPost
+          anonUserInfoFromSouce
         );
       } else if (userModel.is_anonymous && targetUserModel.is_anonymous) {
         channel_info = await anon_to_anon_post(
@@ -213,7 +223,7 @@ const initChatFromPost = async (req, res) => {
           userModel,
           targetUserModel,
           source_id,
-          anonUserInfoFromPost
+          anonUserInfoFromSouce
         );
       }
       newChannel = client.channel('messaging', channel_info.channel_id, {
