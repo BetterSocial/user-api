@@ -162,6 +162,12 @@ const ChatValidation = {
       channelId: string.required(),
       targetUserId: uuid.required()
     }
+  },
+
+  leaveGroupMember: {
+    body: {
+      channelId: string.required()
+    }
   }
 };
 

@@ -16,6 +16,7 @@ const sendAnonymousMessage = require('./sendAnonymousMessage');
 const setSignedChannelAsRead = require('./setSignedChannelAsRead');
 const deleteMessage = require('./deleteMessage');
 const newChatAnonymous = require('./newChatAnonymous');
+const leaveGroupMember = require('./group/leaveGroupMember');
 
 module.exports = {
   changeChannelDetail,
@@ -35,5 +36,6 @@ module.exports = {
   sendSignedMessage,
   setSignedChannelAsRead,
   deleteMessage,
-  newChatAnonymous
+  newChatAnonymous,
+  leaveGroupMember
 };
