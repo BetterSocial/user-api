@@ -57,6 +57,13 @@ const groupAddMembers = async (req, res) => {
   try {
     const responseChannel = await channelToAdd?.addMembers(filteredMembersObject);
 
+    await channelToAdd.sendMessage({
+      text: 'Added new members',
+      type: 'system',
+      user_id: userId,
+      members
+    });
+
     try {
       const {betterChannelMember, betterChannelMemberObject, newChannelName, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(

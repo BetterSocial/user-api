@@ -27,6 +27,15 @@ const changeChannelDetail = async (req, res) => {
   if (channel_name) updateData.name = channel_name;
 
   try {
+    await channel.sendMessage({
+      text: 'Update Info group',
+      type: 'system',
+      user_id: userId,
+      updatedInfo: {
+        ...updateData
+      }
+    });
+
     const response = await channel.updatePartial({
       set: {
         ...updateData,

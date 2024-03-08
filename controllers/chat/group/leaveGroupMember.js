@@ -16,6 +16,13 @@ const leaveGroupMember = async (req, res) => {
       const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
 
+      await channel.sendMessage({
+        text: 'Leave group',
+        type: 'system',
+        user_id: userId,
+        userAffectedId: userId
+      });
+
       channelResponse = updatedChannel;
 
       channelApiResponse.channel.name = newChannelName;

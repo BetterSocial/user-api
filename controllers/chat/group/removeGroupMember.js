@@ -16,6 +16,13 @@ const removeGroupMember = async (req, res) => {
       const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
 
+      await channel.sendMessage({
+        text: 'Removed a member',
+        type: 'system',
+        user_id: userId,
+        userAffectedId: targetUserId
+      });
+
       channelResponse = updatedChannel;
 
       channelApiResponse.channel.name = newChannelName;
