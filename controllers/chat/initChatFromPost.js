@@ -9,6 +9,41 @@ const BetterSocialConstantListUtils = require('../../services/bettersocial/const
 const BetterSocialCore = require('../../services/bettersocial');
 const {generate_channel_id_for_anon_chat} = require('../../services/bettersocial/chat/allAnonChat');
 
+const get_anon_info_from_comment_post = async (client, userModel, source_id) => {
+  let comment_data = null;
+  let post_detail = await Getstream.feed.getPlainFeedById(source_id, {
+    withOwnReactions: true
+  });
+  let comments = post_detail?.own_reactions?.comment;
+  // iterate comments
+  for (const element of comments) {
+    let comment = element;
+    if (comment.user_id === userModel.user_id) {
+      comment_data = comment;
+      break;
+    }
+  }
+  if (!comment_data) {
+    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
+    const color = BetterSocialConstantListUtils.getRandomColor();
+    comment_data = {
+      anon_user_info_color_code: color.code,
+      anon_user_info_color_name: color.color,
+      anon_user_info_emoji_code: emoji.emoji,
+      anon_user_info_emoji_name: emoji.name
+    };
+  } else {
+    comment_data = {
+      anon_user_info_color_code: comment_data?.data?.anon_user_info_color_code,
+      anon_user_info_color_name: comment_data?.data?.anon_user_info_color_name,
+      anon_user_info_emoji_code: comment_data?.data?.anon_user_info_emoji_code,
+      anon_user_info_emoji_name: comment_data?.data?.anon_user_info_emoji_name
+    };
+  }
+
+  return comment_data;
+};
+
 const sign_to_anon_post = async (
   client,
   userModel,
@@ -66,16 +101,16 @@ const anon_to_sign_post = async (client, userModel, targetUserModel, source_id) 
       targetUserModel.user_id,
       'post'
     );
-    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
-    const color = BetterSocialConstantListUtils.getRandomColor();
+    let anon_init_data = await get_anon_info_from_comment_post(client, userModel, source_id);
+
     let new_channel = await ChatAnonUserInfo.create({
       channel_id: channel_id,
       my_anon_user_id: userModel.user_id,
       target_user_id: targetUserModel.user_id,
-      anon_user_info_color_code: color.code,
-      anon_user_info_color_name: color.color,
-      anon_user_info_emoji_code: emoji.emoji,
-      anon_user_info_emoji_name: emoji.name,
+      anon_user_info_color_code: anon_init_data.anon_user_info_color_code,
+      anon_user_info_color_name: anon_init_data.anon_user_info_color_name,
+      anon_user_info_emoji_code: anon_init_data.anon_user_info_emoji_code,
+      anon_user_info_emoji_name: anon_init_data.anon_user_info_emoji_name,
       context: 'post',
       source_id: source_id,
       initiator: userModel.user_id
@@ -107,21 +142,21 @@ const anon_to_anon_post = async (
       targetUserModel.user_id,
       'post'
     );
-    const emoji = BetterSocialConstantListUtils.getRandomEmoji();
-    const color = BetterSocialConstantListUtils.getRandomColor();
+    let anon_init_data = await get_anon_info_from_comment_post(client, userModel, source_id);
     let new_channel = await ChatAnonUserInfo.create({
       channel_id: channel_id,
       my_anon_user_id: userModel.user_id,
       target_user_id: targetUserModel.user_id,
-      anon_user_info_color_code: color.code,
-      anon_user_info_color_name: color.color,
-      anon_user_info_emoji_code: emoji.emoji,
-      anon_user_info_emoji_name: emoji.name,
+      anon_user_info_color_code: anon_init_data.anon_user_info_color_code,
+      anon_user_info_color_name: anon_init_data.anon_user_info_color_name,
+      anon_user_info_emoji_code: anon_init_data.anon_user_info_emoji_code,
+      anon_user_info_emoji_name: anon_init_data.anon_user_info_emoji_name,
       context: 'post',
       source_id: source_id,
       initiator: userModel.user_id
     });
-    // // create member anon info
+
+    // create member anon info
     await ChatAnonUserInfo.create({
       channel_id: channel_id,
       my_anon_user_id: targetUserModel.user_id,
@@ -134,6 +169,7 @@ const anon_to_anon_post = async (
       source_id: source_id,
       initiator: userModel.user_id
     });
+
     return new_channel;
   }
 };
@@ -145,7 +181,6 @@ const anon_to_anon_post = async (
  */
 const initChatFromPost = async (req, res) => {
   let {targetUserId, source, postId, commentId} = req.body;
-
   try {
     targetUserId = await Getstream.feed.getUserIdFromSource(res, source, {
       post_id: postId,
@@ -178,7 +213,7 @@ const initChatFromPost = async (req, res) => {
     await client.connectUser(user, req.token);
     // check if the channel already exists
     let newChannel;
-    let source_id = source === 'post' ? postId : commentId;
+    let source_id = postId;
     let channel_type = CHANNEL_TYPE.CHAT;
     let channel_info;
     if (!userModel.is_anonymous && !targetUserModel.is_anonymous) {
@@ -207,6 +242,7 @@ const initChatFromPost = async (req, res) => {
           };
         }
       }
+
       if (userModel.is_anonymous && !targetUserModel.is_anonymous) {
         channel_info = await anon_to_sign_post(client, userModel, targetUserModel, source_id);
       } else if (!userModel.is_anonymous && targetUserModel.is_anonymous) {
