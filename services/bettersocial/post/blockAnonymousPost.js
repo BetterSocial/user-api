@@ -40,7 +40,6 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
       message: e?.message || 'Error in fetching getstream post by post id'
     };
   }
-
   const authorAnonymousUserId = post?.actor?.id || null;
   console.log(`${selfAnonymousUserId?.user_id} vs ${authorAnonymousUserId}`);
   if (selfAnonymousUserId?.user_id === authorAnonymousUserId)
@@ -54,8 +53,8 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
       await UserFollowUserFunction.userBlock(
         UserFollowUser,
         UserFollowUserHistory,
-        selfUserId,
         authorAnonymousUserId,
+        selfUserId,
         {transaction: t, postId}
       );
 
@@ -68,6 +67,7 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
         {transaction: t, message, postId, reason, isAnonymous: true}
       );
     });
+    await Getstream.feed.unfollowMainFeedFollowingAnon(token, selfUserId, authorAnonymousUserId);
   } catch (e) {
     console.log('Error in block user v2 sql transaction');
     return {
@@ -86,6 +86,7 @@ const BetterSocialBlockAnonymousPost = async (token, selfUserId, postId, source,
       message: e?.message || 'Error in block user v2 redis'
     };
   }
+  // send queue to score
   BetterSocialScoreBlockUser(selfUserId, authorAnonymousUserId, postId);
 
   try {
