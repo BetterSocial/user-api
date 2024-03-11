@@ -13,6 +13,91 @@ const Getstream = require('../../../vendor/getstream');
 const RedisBlockHelper = require('../../redis/helper/RedisBlockHelper');
 const BetterSocialScoreBlockUser = require('../score/block-user');
 
+const getstream_unfollow_sequence = async (token, feedOwner, feedTarget, direct = false) => {
+  try {
+    // Main feed following unfollow user anon feed target
+    if (direct) {
+      await Getstream.feed.unfollowMainFeedFollowingDirect(feedOwner, feedTarget);
+    } else {
+      await Getstream.feed.unfollowMainFeedFollowing(token, feedOwner, feedTarget);
+    }
+    // Main feed unfollow user feed target
+    await Getstream.feed.unfollowUser(feedOwner, feedTarget);
+    // Main feed unfollow user exclusive feed target
+    await Getstream.feed.unfollowUserExclusive(feedOwner, feedTarget);
+  } catch (e) {
+    console.log('Error in block user v2 getstream');
+    console.log(e);
+    return {
+      isSuccess: false,
+      message: e?.message || 'Error in block user v2 getstream'
+    };
+  }
+};
+const sign_a_unfollow_sign_b = async (unfollowParams) => {
+  // Destroy follow from sign A to Sign B
+  await UserFollowUserFunction.userBlock(
+    unfollowParams.UserFollowUser,
+    unfollowParams.UserFollowUserHistory,
+    unfollowParams.targetUserId,
+    unfollowParams.selfUserId,
+    {transaction: unfollowParams.t, postId: unfollowParams.postId}
+  );
+  await getstream_unfollow_sequence(
+    unfollowParams.token,
+    unfollowParams.selfUserId,
+    unfollowParams.targetUserId
+  );
+};
+
+const sign_b_unfollow_sign_a = async (unfollowParams) => {
+  // Destroy follow from sign B to sign A
+  try {
+    await UserFollowUserFunction.userBlock(
+      unfollowParams.UserFollowUser,
+      unfollowParams.UserFollowUserHistory,
+      unfollowParams.selfUserId,
+      unfollowParams.targetUserId,
+      {transaction: unfollowParams.t, postId: unfollowParams.postId}
+    );
+    await getstream_unfollow_sequence(
+      unfollowParams.token,
+      unfollowParams.targetUserId,
+      unfollowParams.selfUserId,
+      true
+    );
+  } catch (e) {
+    console.log('Error in block user v2 getstream');
+    console.log(e);
+    return {
+      isSuccess: false,
+      message: e?.message || 'Error in block user v2 getstream'
+    };
+  }
+};
+
+const sign_a_unfollow_anon_b = async (unfollowParams) => {
+  // Destroy follow from sign A to Anon B
+  await UserFollowUserFunction.userBlock(
+    unfollowParams.UserFollowUser,
+    unfollowParams.UserFollowUserHistory,
+    unfollowParams.targetAnonymousUserId.user_id,
+    unfollowParams.selfUserId,
+    {transaction: unfollowParams.t, postId: unfollowParams.postId}
+  );
+};
+
+const sign_b_unfollow_anon_a = async (unfollowParams) => {
+  // Destroy follow from sign B to Anon A
+  await UserFollowUserFunction.userBlock(
+    unfollowParams.UserFollowUser,
+    unfollowParams.UserFollowUserHistory,
+    unfollowParams.selfAnonymousUserId.user_id,
+    unfollowParams.targetUserId,
+    {transaction: unfollowParams.t, postId: unfollowParams.postId}
+  );
+};
+
 /**
  * @typedef {Object} BetterSocialBlockUserV2OptionalParams
  * @property {string} [postId]
@@ -41,14 +126,7 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
 
   try {
     await sequelize.transaction(async (t) => {
-      await UserFollowUserFunction.userBlock(
-        UserFollowUser,
-        UserFollowUserHistory,
-        selfUserId,
-        targetUserId,
-        {transaction: t, postId}
-      );
-
+      // Sign User A block Sign User B
       await UserBlockUserFunction.userBlock(
         UserBlockedUser,
         UserBlockedUserHistory,
@@ -58,15 +136,27 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
         {transaction: t, message, postId, reason}
       );
 
-      if (targetAnonymousUserId?.user_id)
-        await UserBlockUserFunction.userBlock(
-          UserBlockedUser,
-          UserBlockedUserHistory,
+      if (targetAnonymousUserId?.user_id) {
+        let unfollowParams = {
+          token,
+          selfAnonymousUserId,
+          targetAnonymousUserId,
+          UserFollowUser,
+          UserFollowUserHistory,
+          targetUserId,
           selfUserId,
-          targetAnonymousUserId?.user_id,
-          source,
-          {transaction: t, message, postId: '', reason, isAnonymous: true}
-        );
+          t,
+          postId
+        };
+        // Destroy follow from sign A to Sign B
+        await sign_a_unfollow_sign_b(unfollowParams);
+        // Destroy follow from sign B to sign A
+        await sign_b_unfollow_sign_a(unfollowParams);
+        // Destroy follow from sign A to Anon B
+        await sign_a_unfollow_anon_b(unfollowParams);
+        // Destroy follow from sign B to Anon A
+        await sign_b_unfollow_anon_a(unfollowParams);
+      }
     });
   } catch (e) {
     console.log('Error in block user v2 sql transaction');
@@ -88,13 +178,11 @@ const BetterSocialBlockUserV2 = async (token, selfUserId, targetUserId, source, 
     };
   }
 
+  // Send queue to update score
   BetterSocialScoreBlockUser(selfUserId, targetUserId, postId);
   BetterSocialScoreBlockUser(selfUserId, targetAnonymousUserId?.user_id, '');
 
   try {
-    await Getstream.feed.unfollowUser(token, selfUserId, targetUserId);
-    await Getstream.feed.unfollowUserExclusive(selfUserId, targetUserId);
-
     await Getstream.feed.unfollowAnonUser(
       token,
       selfUserId,

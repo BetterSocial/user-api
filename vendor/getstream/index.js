@@ -65,6 +65,7 @@ const Getstream = {
     unfollowUserExclusive,
     followMainFeedFollowing: mainFeedFollowing.follow,
     unfollowMainFeedFollowing: mainFeedFollowing.unfollow,
+    unfollowMainFeedFollowingDirect: mainFeedFollowing.unfollow_direct,
     followMainFeedFollowingAnon: mainFeedFollowingAnon.follow,
     unfollowMainFeedFollowingAnon: mainFeedFollowingAnon.unfollow,
     followUserAnon,
