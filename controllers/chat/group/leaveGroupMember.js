@@ -1,11 +1,18 @@
+const {StreamChat} = require('stream-chat');
+const Environment = require('../../../config/environment');
 const BetterSocialCore = require('../../../services/bettersocial');
 const {ResponseSuccess} = require('../../../utils/Responses');
 const ErrorResponse = require('../../../utils/response/ErrorResponse');
 const Getstream = require('../../../vendor/getstream');
+const UsersFunction = require('../../../databases/functions/users');
+const {User} = require('../../../databases/models');
+const {CHANNEL_TYPE_STRING} = require('../../../helpers/constants');
 
 const leaveGroupMember = async (req, res) => {
   const {userId} = req;
   const {channelId} = req.body;
+
+  const ownUser = await UsersFunction.findUserById(User, userId);
 
   try {
     const response = await Getstream.chat.removeGroupMember(channelId, userId);
@@ -16,11 +23,26 @@ const leaveGroupMember = async (req, res) => {
       const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
 
-      await channel.sendMessage({
-        text: 'Leave group',
+      const client = new StreamChat(
+        Environment.GETSTREAM_API_KEY,
+        Environment.GETSTREAM_API_SECRET
+      );
+      const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
+
+      const textOwnUser = `You leave from this group`;
+      const textTargetUser = `${ownUser.username} has been leave from this group`;
+      const textDefaultUser = `${ownUser.username} has been leave from this group`;
+      const members = betterChannelMember.map((member) => member.user_id);
+
+      await currentChannel.sendMessage({
+        text: textDefaultUser,
+        own_text: textOwnUser,
+        other_text: textTargetUser,
         type: 'system',
         user_id: userId,
-        userAffectedId: userId
+        system_user: userId,
+        isSystem: true,
+        members: members
       });
 
       channelResponse = updatedChannel;

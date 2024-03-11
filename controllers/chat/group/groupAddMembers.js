@@ -4,7 +4,9 @@ const {CHANNEL_TYPE_STRING, CHANNEL_TYPE} = require('../../../helpers/constants'
 const ErrorResponse = require('../../../utils/response/ErrorResponse');
 const {ResponseSuccess} = require('../../../utils/Responses');
 const _ = require('lodash');
+const {User} = require('../../../databases/models');
 const BetterSocialCore = require('../../../services/bettersocial');
+const UsersFunction = require('../../../databases/functions/users');
 
 /**
  *
@@ -14,6 +16,8 @@ const BetterSocialCore = require('../../../services/bettersocial');
 const groupAddMembers = async (req, res) => {
   const {userId} = req;
   const {channel_id, members} = req.body;
+
+  const ownUser = await UsersFunction.findUserById(User, userId);
 
   const filteredMembers = members.reduce(
     (acc, next) => {
@@ -57,11 +61,23 @@ const groupAddMembers = async (req, res) => {
   try {
     const responseChannel = await channelToAdd?.addMembers(filteredMembersObject);
 
-    await channelToAdd.sendMessage({
-      text: 'Added new members',
-      type: 'system',
-      user_id: userId,
-      members
+    channelMembers.map(async (member) => {
+      const targetUserModel = await UsersFunction.findUserById(User, member);
+
+      const textOwnUser = `You added ${targetUserModel.username} to this group`;
+      const textTargetUser = `${ownUser.username} added you to this group`;
+      const textDefaultUser = `${ownUser.username} added ${targetUserModel.username} to this group`;
+
+      await channelToAdd.sendMessage({
+        text: textDefaultUser,
+        own_text: textOwnUser,
+        other_text: textTargetUser,
+        type: 'system',
+        user_id: userId,
+        system_user: userId,
+        isSystem: true,
+        members: [member]
+      });
     });
 
     try {
