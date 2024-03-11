@@ -12,6 +12,7 @@ const register = require('./users-register');
 const registerAnonymous = require('./users-register-anonymous');
 const updateLastActiveAt = require('./update-last-active-at');
 const getUsersKarmaScore = require('./get-users-karma-score');
+const getBlockedAndBlockerUserId = require('./get-blocked-and-blocker-user-id');
 
 const UsersFunction = {
   checkIsMe,
@@ -27,7 +28,8 @@ const UsersFunction = {
   register,
   registerAnonymous,
   updateLastActiveAt,
-  getUsersKarmaScore
+  getUsersKarmaScore,
+  getBlockedAndBlockerUserId
 };
 
 module.exports = UsersFunction;
