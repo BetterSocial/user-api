@@ -1,6 +1,7 @@
-const {sequelize} = require('../../databases/models');
+const {sequelize, UserBlockedUser} = require('../../databases/models');
 const _ = require('lodash');
 const {QueryTypes} = require('sequelize');
+const UsersFunction = require('../../databases/functions/users');
 
 /**
  *
@@ -18,6 +19,14 @@ const InitDiscoveryUserData = async (req, res) => {
   if (allow_anon_dm) {
     allow_anon_dm = allow_anon_dm ? true : false;
     where_anon_dm = 'AND A.allow_anon_dm = :allow_anon_dm';
+  }
+
+  const blockedIds = await UsersFunction.getBlockedAndBlockerUserId(UserBlockedUser, req.userId);
+  let filterBlockedUser = '';
+  if (blockedIds.length > 0) {
+    filterBlockedUser += `AND A.user_id NOT IN (${blockedIds
+      .map((item) => `'${item}'`)
+      .join(',')})`;
   }
 
   try {
@@ -96,6 +105,7 @@ const InitDiscoveryUserData = async (req, res) => {
           AND A.is_anonymous = false 
           AND A.is_banned = false
           ${where_anon_dm} 
+          ${filterBlockedUser}
         ORDER BY
           is_followed DESC,
           COALESCE(A.karma_score, 0) DESC,

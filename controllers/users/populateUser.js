@@ -1,5 +1,6 @@
 const {responseError, responseSuccess} = require('../../utils/Responses');
-const {sequelize} = require('../../databases/models');
+const {sequelize, UserBlockedUser} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
 
 module.exports = async (req, res) => {
   try {
@@ -8,6 +9,14 @@ module.exports = async (req, res) => {
     let filterAllowDm = '';
     if (allow_anon_dm !== '') {
       filterAllowDm = `AND users.allow_anon_dm = ${allow_anon_dm}`;
+    }
+
+    const blockedIds = await UsersFunction.getBlockedAndBlockerUserId(UserBlockedUser, req.userId);
+    let filterBlockedUser = '';
+    if (blockedIds.length > 0) {
+      filterBlockedUser += `AND users.user_id NOT IN (${blockedIds
+        .map((item) => `'${item}'`)
+        .join(',')})`;
     }
 
     let queryResults = await sequelize.query(
@@ -33,6 +42,7 @@ module.exports = async (req, res) => {
           AND user_follow_user.user_id_follower = :userId 
           AND users.is_anonymous = false
           ${filterAllowDm}
+          ${filterBlockedUser}
       UNION
       SELECT 
         user_id,
@@ -56,6 +66,7 @@ module.exports = async (req, res) => {
           AND user_follow_user.user_id_followed = :userId 
           AND users.is_anonymous = false
           ${filterAllowDm}
+          ${filterBlockedUser}
       LIMIT :limit
       OFFSET :offset`,
       {

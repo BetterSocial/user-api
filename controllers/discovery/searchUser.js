@@ -1,6 +1,6 @@
 const {QueryTypes} = require('sequelize');
-
-const {sequelize} = require('../../databases/models');
+const {sequelize, UserBlockedUser} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
 
 /**
  *
@@ -21,6 +21,14 @@ const SearchUser = async (req, res) => {
   let where_anon_dm = '';
   if (allow_anon_dm) {
     where_anon_dm = 'AND u.allow_anon_dm = :allow_anon_dm';
+  }
+
+  const blockedIds = await UsersFunction.getBlockedAndBlockerUserId(UserBlockedUser, req.userId);
+  let filterBlockedUser = '';
+  if (blockedIds.length > 0) {
+    filterBlockedUser += `AND u.user_id NOT IN (${blockedIds
+      .map((item) => `'${item}'`)
+      .join(',')})`;
   }
 
   try {
@@ -75,6 +83,7 @@ const SearchUser = async (req, res) => {
       WHERE 
           (u.username ILIKE :likeQuery
           ${where_anon_dm}
+          ${filterBlockedUser}
           AND u.user_id != :userId
           AND u.is_anonymous = false
           AND u.is_banned = false 
