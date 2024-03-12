@@ -94,15 +94,22 @@ const sendSignedMesage = async (req, res) => {
         req.userId
       );
       let better_channel_member = createdChannel?.channel?.better_channel_member;
-      if (blockedIds.length > 0) {
-        for (const member of better_channel_member) {
-          if (member.user_id !== req.userId && blockedIds.includes(member.user_id)) {
-            return res
-              .status(403)
-              .json(responseError('This user does not want to receive messages'));
-          }
-        }
+      const blockedIdsSet = new Set(blockedIds);
+      const isBlocked = better_channel_member.some(
+        (member) => member.user_id !== req.userId && blockedIdsSet.has(member.user_id)
+      );
+      if (isBlocked) {
+        return res.status(403).json(responseError('This user does not want to receive messages'));
       }
+      // if (blockedIds.length > 0) {
+      //   for (const member of better_channel_member) {
+      //     if (member.user_id !== req.userId && blockedIds.includes(member.user_id)) {
+      //       return res
+      //         .status(403)
+      //         .json(responseError('This user does not want to receive messages'));
+      //     }
+      //   }
+      // }
     }
 
     const currentMessageType = determineMessageType(messageType, attachments);
