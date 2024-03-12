@@ -43,12 +43,15 @@ const unfollowMainFeedTopic = async (token, userId, name) => {
   return feed.unfollow(TOPIC_FEED_NAME, name);
 };
 
-const addTopicToChatTab = async (token, topicName, userId, isAnonymous) => {
+const addTopicToChatTab = async (
+  token,
+  topicName,
+  userId,
+  isAnonymous,
+  withSystemMessage = false
+) => {
   try {
     const topic = topicName.toLowerCase();
-    const text = isAnonymous
-      ? 'This topic has new anonymous followers'
-      : 'This topic has new followers';
 
     const admin = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
     const adminChannel = admin.channel('topics', `topic_${topic}`);
@@ -86,7 +89,6 @@ const addTopicToChatTab = async (token, topicName, userId, isAnonymous) => {
     });
 
     const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
-    await client.connectUser({id: userId}, token);
     const channel = await client.channel('topics', `topic_${topic}`, {
       name: `#${topic}`,
       members: [userId],
@@ -94,11 +96,30 @@ const addTopicToChatTab = async (token, topicName, userId, isAnonymous) => {
     });
 
     console.log('prepare follow channel', topic);
+    let textOwnUser = 'You joined this community';
+    if (isAnonymous) textOwnUser += ' incognito';
+
     await channel.create();
     await channel.addMembers([userId]);
-    await channel.sendMessage({text}, {skip_push: true});
+    if (withSystemMessage) {
+      console.log('system message sent');
+      await channel.sendMessage(
+        {
+          user_id: userId,
+          text: textOwnUser,
+          other_text: '',
+          own_text: textOwnUser,
+          system_user: userId,
+          isSystem: true,
+          type: 'system',
+          only_show_to_system_user: true
+        },
+        {
+          skip_push: true
+        }
+      );
+    }
     console.log('channel followed');
-    await client.disconnectUser();
   } catch (error) {
     console.log('error add topic to chat tab', error);
     throw new Error('error add topic to chat tab');
@@ -109,7 +130,6 @@ const removeTopicFromChatTab = async (token, topicName, userId) => {
   try {
     const name = topicName.toLowerCase();
     const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
-    await client.connectUser({id: userId}, token);
     const channel = await client.channel('topics', `topic_${name}`);
 
     await channel.removeMembers([userId]);

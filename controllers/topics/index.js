@@ -158,7 +158,7 @@ const getTopics = async (req, res) => {
 
 const followTopicV2 = async (req, res) => {
   try {
-    const {name} = req.body;
+    const {name, with_system_message = false} = req.body;
     const {token, userId} = req;
 
     // logic get user sign and anonymous
@@ -195,7 +195,8 @@ const followTopicV2 = async (req, res) => {
           token,
           detailTokenUser.user_id,
           name,
-          detailTokenUser.is_anonymous
+          detailTokenUser.is_anonymous,
+          with_system_message
         )
       );
     } else {
@@ -206,7 +207,8 @@ const followTopicV2 = async (req, res) => {
           token,
           detailTokenUser.user_id,
           name,
-          detailTokenUser.is_anonymous
+          detailTokenUser.is_anonymous,
+          with_system_message
         )
       );
 
@@ -218,7 +220,8 @@ const followTopicV2 = async (req, res) => {
             token,
             secondDetailUser.user_id,
             name,
-            detailTokenUser.is_anonymous
+            detailTokenUser.is_anonymous,
+            with_system_message
           )
         );
       }
@@ -247,7 +250,14 @@ const followTopicV2 = async (req, res) => {
   }
 };
 
-const _afterPutTopic = async (isUnfollow, token, userId, name, isAnonymous) => {
+const _afterPutTopic = async (
+  isUnfollow,
+  token,
+  userId,
+  name,
+  isAnonymous,
+  withSystemMessage = false
+) => {
   // follow / unfollow main feed topic
   try {
     if (isUnfollow) {
@@ -255,7 +265,7 @@ const _afterPutTopic = async (isUnfollow, token, userId, name, isAnonymous) => {
       await removeTopicFromChatTab(token, name, userId);
     } else {
       await followMainFeedTopic(token, userId, name);
-      await addTopicToChatTab(token, name, userId, isAnonymous);
+      await addTopicToChatTab(token, name, userId, isAnonymous, withSystemMessage);
     }
   } catch (error) {
     console.log('After put topic error: ', error);
