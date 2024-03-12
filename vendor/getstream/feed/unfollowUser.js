@@ -3,7 +3,7 @@ const GetstreamSingleton = require('../singleton');
 
 const unfollowUser = async (token, userIdFollower, userIdFollowed) => {
   const client = GetstreamSingleton.getInstance();
-  const user = client.feed(GetstreamConstant.MAIN_FEED_NAME, userIdFollower, token);
+  const user = client.feed(GetstreamConstant.MAIN_FEED_NAME, userIdFollower);
   return user.unfollow(GetstreamConstant.USER_FEED_NAME, userIdFollowed);
 };
 
