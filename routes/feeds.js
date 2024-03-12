@@ -66,7 +66,7 @@ router.post('/comment-child-v2', isAuth, CreateCommentChildMiddleware, feed.comm
 router.post('/comment-domain-v2', isAuth, CreateCommentMiddleware, feed.commentDomainV2);
 router.post(
   '/block-anonymous-post-v2',
-  isAuth,
+  isAuthV2,
   BodyValidationMiddleware.blockAnonymousPostV2,
   feed.blockAnonymousPostV2
 );

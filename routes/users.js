@@ -81,7 +81,7 @@ router.post(
 );
 router.post(
   '/blockuser-v2',
-  auth.isAuth,
+  auth.isAuthV2,
   BodyValidationMiddleware.blockUserV2,
   usersHandler.blockUserV2
 );
@@ -106,7 +106,7 @@ router.post(
 
 router.post(
   '/block-anon-user-from-chat',
-  auth.isAuth,
+  auth.isAuthV2,
   BodyValidationMiddleware.blockUserV2,
   usersHandler.blockAnonUserFromChat
 );
