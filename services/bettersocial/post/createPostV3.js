@@ -33,6 +33,8 @@ const PostAnonUserInfoFunction = require('../../../databases/functions/postAnonU
 const {convertLocationFromModel} = require('../../../utils');
 const sendMultiDeviceTaggedNotification = require('../fcmToken/sendMultiDeviceTaggedNotification');
 const PostFunction = require('../../../databases/functions/post');
+const {StreamChat} = require('stream-chat');
+const Environment = require('../../../config/environment');
 
 const isEmptyMessageAllowed = (body) => {
   const isPollPost = body?.verb === POST_VERB_POLL;
@@ -183,6 +185,50 @@ function processAnonymous(isAnonimous, body, data) {
   return data;
 }
 
+async function processSendSystemMessage(
+  filteredTopics,
+  selfUserId,
+  username,
+  with_system_message = false,
+  isAnonimous = false
+) {
+  if (!with_system_message) return;
+  if (!filteredTopics) return;
+  if (filteredTopics?.length == 0) return;
+  if (!selfUserId || !username) throw new Error('Missing params');
+
+  console.log('send system message');
+
+  const adminClient = new StreamChat(
+    Environment.GETSTREAM_API_KEY,
+    Environment.GETSTREAM_API_SECRET
+  );
+
+  adminClient.connectUser({id: selfUserId});
+  const promises = filteredTopics?.map((topic) => {
+    return new Promise((resolve, reject) => {
+      const channel = adminClient.channel('topics', `topic_${topic}`);
+
+      channel
+        .create()
+        .then(() => {
+          Getstream.chat
+            .sendCreatePostTopicSystemMessage(channel, selfUserId, username, {isAnonimous})
+            .then(() => {
+              resolve();
+            })
+            .catch((e) => {
+              reject(e);
+            });
+        })
+        .catch((e) => reject(e));
+    });
+  });
+
+  await Promise.all(promises);
+  adminClient.disconnectUser();
+}
+
 /**
  *
  * @param {import('express').Request} req
@@ -262,16 +308,17 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
     };
   }
 
+  const user = isAnonimous
+    ? {
+        username: `${body?.anon_user_info_color_name} ${body?.anon_user_info?.emoji_name}`
+      }
+    : userDetail;
+
   try {
     if (isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
     else post = await Getstream.feed.createPost(req?.token, data);
     body.tagUsers?.forEach(async (user_id) => {
-      await sendMultiDeviceTaggedNotification(
-        isAnonimous ? {username: `Anonymous ${body?.anon_user_info?.emoji_name}`} : userDetail,
-        user_id,
-        post.message,
-        post.id
-      );
+      await sendMultiDeviceTaggedNotification(user, user_id, post.message, post.id);
     });
     if (isAnonimous) {
       await PostAnonUserInfoFunction.createAnonUserInfoInPost(PostAnonUserInfo, {
@@ -283,6 +330,14 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
         anonUserInfoEmojiName: body?.anon_user_info?.emoji_name
       });
     }
+
+    await processSendSystemMessage(
+      filteredTopics,
+      req?.userId,
+      user?.username,
+      body?.with_system_message,
+      isAnonimous
+    );
 
     await PostFunction.updateGetstreamActivityId(Post, data?.foreign_id, post?.id);
 

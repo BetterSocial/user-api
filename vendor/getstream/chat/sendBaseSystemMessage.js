@@ -7,6 +7,8 @@ const {Channel} = require('stream-chat');
  * @property {string} [other_text='']
  * @property {boolean} [only_show_to_system_user=false]
  * @property {boolean} [skip_push=true]
+ * @property {string} [type = 'system']
+ * @property {boolean} [isSystem = true]
  *
  */
 
@@ -16,7 +18,7 @@ const {Channel} = require('stream-chat');
  * @param {string} systemMessageTriggerActorUserId
  * @param {string} text
  * @param {SendSystemMessageOptionalParams} otherParams
- * @returns {Channel | null}
+ * @returns {Promise<Channel | null>}
  */
 async function sendBaseSystemMessage(
   channel,
@@ -28,7 +30,9 @@ async function sendBaseSystemMessage(
     only_show_to_system_user = false,
     other_text = '',
     own_text = '',
-    skip_push = true
+    skip_push = true,
+    isSystem = true,
+    type = 'system'
   } = otherParams;
   try {
     const response = await channel.sendMessage(
@@ -38,8 +42,8 @@ async function sendBaseSystemMessage(
         other_text: other_text,
         own_text: own_text,
         system_user: systemMessageTriggerActorUserId,
-        isSystem: true,
-        type: 'system',
+        isSystem,
+        type,
         only_show_to_system_user
       },
       {
