@@ -4,7 +4,8 @@ const {
   followMainFeedTopic,
   unfollowMainFeedTopic,
   addTopicToChatTab,
-  removeTopicFromChatTab
+  removeTopicFromChatTab,
+  createToken
 } = require('../../services/getstream');
 const ClientError = require('../../exceptions/ClientError');
 const TopicService = require('../../services/postgres/TopicService');
@@ -172,6 +173,7 @@ const followTopicV2 = async (req, res) => {
       secondDetailUser = await UsersFunction.findUserById(User, secondDetailUserId);
     }
 
+    let prevUserToken = await createToken(secondDetailUser.user_id);
     TopicValidator.validatePutTopicFollow({name});
 
     //Logic get topic
@@ -196,7 +198,8 @@ const followTopicV2 = async (req, res) => {
           detailTokenUser.user_id,
           name,
           detailTokenUser.is_anonymous,
-          with_system_message
+          with_system_message,
+          prevUserToken
         )
       );
     } else {
@@ -208,7 +211,8 @@ const followTopicV2 = async (req, res) => {
           detailTokenUser.user_id,
           name,
           detailTokenUser.is_anonymous,
-          with_system_message
+          with_system_message,
+          prevUserToken
         )
       );
 
@@ -221,7 +225,8 @@ const followTopicV2 = async (req, res) => {
             secondDetailUser.user_id,
             name,
             detailTokenUser.is_anonymous,
-            with_system_message
+            with_system_message,
+            prevUserToken
           )
         );
       }
@@ -256,12 +261,13 @@ const _afterPutTopic = async (
   userId,
   name,
   isAnonymous,
-  withSystemMessage = false
+  withSystemMessage = false,
+  prevUserToken
 ) => {
   // follow / unfollow main feed topic
   try {
     if (isUnfollow) {
-      await unfollowMainFeedTopic(token, userId, name);
+      await unfollowMainFeedTopic(prevUserToken, userId, name);
       await removeTopicFromChatTab(token, name, userId);
     } else {
       await followMainFeedTopic(token, userId, name);
