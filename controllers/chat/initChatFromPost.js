@@ -16,13 +16,16 @@ const get_anon_info_from_comment_post = async (client, userModel, source_id) => 
   });
   let comments = post_detail?.own_reactions?.comment;
   // iterate comments
-  for (const element of comments) {
-    let comment = element;
-    if (comment.user_id === userModel.user_id) {
-      comment_data = comment;
-      break;
+  if (comments) {
+    for (const element of comments) {
+      let comment = element;
+      if (comment.user_id === userModel.user_id) {
+        comment_data = comment;
+        break;
+      }
     }
   }
+
   if (!comment_data) {
     const emoji = BetterSocialConstantListUtils.getRandomEmoji();
     const color = BetterSocialConstantListUtils.getRandomColor();
