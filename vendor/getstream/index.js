@@ -8,6 +8,8 @@ const createTokenChat = require('./chat/createTokenChat');
 const findPmChannel = require('./chat/findPmChannel');
 const removeGroupMember = require('./chat/removeGroupMember');
 const sendSystemMessageForTokenHolder = require('./chat/sendSystemMessageForTokenHolder');
+const sendFollowTopicSystemMessage = require('./chat/sendFollowTopicSystemMessage');
+const sendFollowSignedUserSystemMessage = require('./chat/sendFollowSignedUserSystemMessage');
 const sendFollowSystemMessage = require('./chat/sendFollowSystemMessage');
 const syncUser = require('./chat/syncUser');
 
@@ -41,7 +43,9 @@ const Getstream = {
     createTokenChat,
     findPmChannel,
     removeGroupMember,
+    sendFollowTopicSystemMessage,
     sendFollowSystemMessage,
+    sendFollowSignedUserSystemMessage,
     sendSystemMessageForTokenHolder,
     syncUser
   },
