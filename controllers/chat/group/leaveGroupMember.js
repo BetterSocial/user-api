@@ -29,9 +29,9 @@ const leaveGroupMember = async (req, res) => {
       );
       const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
 
-      const textOwnUser = `You leave from this group`;
-      const textTargetUser = `${ownUser.username} has been leave from this group`;
-      const textDefaultUser = `${ownUser.username} has been leave from this group`;
+      const textOwnUser = `You left this group`;
+      const textTargetUser = `${ownUser.username} left this group`;
+      const textDefaultUser = `${ownUser.username} left this group`;
       const members = betterChannelMember.map((member) => member.user_id);
 
       await currentChannel.sendMessage({
