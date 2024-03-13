@@ -3,6 +3,8 @@ const {StreamChat} = require('stream-chat');
 const {responseError, responseSuccess} = require('../../utils/Responses');
 const {MESSAGE_TYPE} = require('../../helpers/constants');
 const {determineMessageType, processReplyMessage} = require('../../utils/chat');
+const UsersFunction = require('../../databases/functions/users');
+const {User, UserBlockedUser} = require('../../databases/models');
 
 const v = new Validator();
 const sendAnonymousMessage = async (req, res) => {
@@ -64,6 +66,21 @@ const sendAnonymousMessage = async (req, res) => {
     }
     if (createdChannel?.channel?.is_channel_blocked)
       return res.status(403).json(responseError('Channel is blocked'));
+
+    // Prevent if user try to chat with blocked user
+    let channelType = createdChannel?.channel?.channel_type;
+    if (channelType === 4 || channelType === 0) {
+      let signUser = await UsersFunction.findSignedUserId(User, req.userId);
+      const blockedIds = await UsersFunction.getBlockedAndBlockerUserId(UserBlockedUser, signUser);
+      let better_channel_member = createdChannel?.channel?.better_channel_member;
+      const blockedIdsSet = new Set(blockedIds);
+      const isBlocked = better_channel_member.some(
+        (member) => member.user_id !== req.userId && blockedIdsSet.has(member.user_id)
+      );
+      if (isBlocked) {
+        return res.status(403).json(responseError('This user does not want to receive messages'));
+      }
+    }
 
     const currentMessageType = determineMessageType(messageType, attachments);
     let baseMessage = {
