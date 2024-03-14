@@ -28,7 +28,9 @@ async function sendFollowTopicSystemMessage(
 
   return sendBaseSystemMessage(channel, systemMessageTriggerActorUserId, own_text, {
     only_show_to_system_user: true,
-    own_text
+    own_text,
+    ignore_update_timestamp: true,
+    better_type: 'follow_topic'
   });
 }
 

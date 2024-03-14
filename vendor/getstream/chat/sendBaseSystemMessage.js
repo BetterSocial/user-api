@@ -3,12 +3,16 @@ const {Channel} = require('stream-chat');
 
 /**
  * @typedef {Object} SendSystemMessageOptionalParams
- * @property {string} [own_text='']
- * @property {string} [other_text='']
+ * @property {string} [other_system_user]
+ * @property {'follow_user' | 'follow_topic' | 'new_topic_post' | 'add_member_to_group' | 'remove_member_from_group' | 'change_channel_detail' | 'leave_group'}  [better_type]
+ * @property {boolean} [ignore_update_timestamp=false]
+ * @property {boolean} [ignore_unread_count=false]
+ * @property {boolean} [isSystem = true]
  * @property {boolean} [only_show_to_system_user=false]
  * @property {boolean} [skip_push=true]
- * @property {string} [type = 'system']
- * @property {boolean} [isSystem = true]
+ * @property {string} [other_text='']
+ * @property {string} [own_text='']
+ * @property {string} [type='system']
  *
  */
 
@@ -27,11 +31,15 @@ async function sendBaseSystemMessage(
   otherParams = {}
 ) {
   const {
+    better_type = null,
+    ignore_unread_count = false,
+    ignore_update_timestamp = false,
+    isSystem = true,
     only_show_to_system_user = false,
+    other_system_user = null,
     other_text = '',
     own_text = '',
     skip_push = true,
-    isSystem = true,
     type = 'system'
   } = otherParams;
   try {
@@ -44,7 +52,11 @@ async function sendBaseSystemMessage(
         system_user: systemMessageTriggerActorUserId,
         isSystem,
         type,
-        only_show_to_system_user
+        only_show_to_system_user,
+        other_system_user,
+        better_type,
+        ignore_unread_count,
+        ignore_update_timestamp
       },
       {
         skip_push

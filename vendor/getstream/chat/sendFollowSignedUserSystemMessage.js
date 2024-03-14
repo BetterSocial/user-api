@@ -22,11 +22,10 @@ async function SendFollowSignedUserSystemMessage(
   const own_text = `You started following ${followedUsername}.\nSend them a message now`;
   const target_text = `${systemMessageTriggerActorUsername} started following you.\nSend them a message now`;
 
-  console.log(own_text, target_text);
-
-  return sendBaseSystemMessage(channel, systemMessageTriggerActorUserId, own_text, {
+  return sendBaseSystemMessage(channel, systemMessageTriggerActorUserId, target_text, {
     own_text,
-    other_text: target_text
+    other_text: target_text,
+    better_type: 'follow_user'
   });
 }
 
