@@ -29,11 +29,10 @@ async function sendCreatePostTopicSystemMessage(
     ? 'There are new incognito posts'
     : `There are new posts from ${systemMesssageTriggerActorUsername} & others`;
 
-  console.log('send topic', text);
-
   return await sendBaseSystemMessage(channel, systemMessageTriggerActorUserId, text, {
     isSystem: false,
-    type: 'regular'
+    type: 'regular',
+    better_type: 'new_topic_post'
   });
 }
 
