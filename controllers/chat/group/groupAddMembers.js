@@ -72,6 +72,8 @@ const groupAddMembers = async (req, res) => {
         text: textDefaultUser,
         own_text: textOwnUser,
         other_text: textTargetUser,
+        other_system_user: member,
+        better_type: 'add_member_to_group',
         type: 'system',
         user_id: userId,
         only_to_user_show: userId,
