@@ -31,7 +31,7 @@ const removeGroupMember = async (req, res) => {
       const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
 
       const textOwnUser = `You removed ${targetUserModel.username} from this group`;
-      const textTargetUser = `You has been removed from this group`;
+      const textTargetUser = `${ownUser.username} removed you from this group`;
       const textDefaultUser = `${ownUser.username} removed ${targetUserModel.username} from this group`;
       const members = betterChannelMember.map((member) => member.user_id);
 
@@ -41,6 +41,9 @@ const removeGroupMember = async (req, res) => {
         other_text: textTargetUser,
         type: 'system',
         user_id: userId,
+        only_to_user_show: userId,
+        disable_to_user: false,
+        is_from_prepopulated: true,
         system_user: userId,
         isSystem: true,
         members: members

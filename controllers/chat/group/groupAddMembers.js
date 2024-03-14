@@ -61,7 +61,7 @@ const groupAddMembers = async (req, res) => {
   try {
     const responseChannel = await channelToAdd?.addMembers(filteredMembersObject);
 
-    channelMembers.map(async (member) => {
+    filteredMembersId.map(async (member) => {
       const targetUserModel = await UsersFunction.findUserById(User, member);
 
       const textOwnUser = `You added ${targetUserModel.username} to this group`;
@@ -74,6 +74,9 @@ const groupAddMembers = async (req, res) => {
         other_text: textTargetUser,
         type: 'system',
         user_id: userId,
+        only_to_user_show: userId,
+        disable_to_user: false,
+        is_from_prepopulated: true,
         system_user: userId,
         isSystem: true,
         members: [member]
