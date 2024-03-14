@@ -39,6 +39,8 @@ const removeGroupMember = async (req, res) => {
         text: textDefaultUser,
         own_text: textOwnUser,
         other_text: textTargetUser,
+        other_system_user: userId,
+        better_type: 'remove_member_from_group',
         type: 'system',
         user_id: userId,
         only_to_user_show: userId,

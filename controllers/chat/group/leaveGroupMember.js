@@ -38,6 +38,7 @@ const leaveGroupMember = async (req, res) => {
         text: textDefaultUser,
         own_text: textOwnUser,
         other_text: textTargetUser,
+        better_type: 'leave_group',
         type: 'system',
         user_id: userId,
         only_to_user_show: userId,
