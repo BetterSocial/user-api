@@ -3,11 +3,12 @@ const {Op} = require('sequelize');
 const crypto = require('crypto');
 const BetterSocialConstantListUtils = require('../constantList/utils');
 
-const generate_channel_id_for_anon_chat = (owner, member, context = null) => {
+const generate_channel_id_for_anon_chat = (owner, member, context = null, source_id = null) => {
   const hash = crypto.createHash('sha256');
   hash.update(owner);
   hash.update(member);
   if (context) hash.update(context);
+  if (source_id) hash.update(source_id);
 
   return hash.digest('hex');
 };

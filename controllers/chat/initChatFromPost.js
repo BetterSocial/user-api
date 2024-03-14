@@ -69,7 +69,8 @@ const sign_to_anon_post = async (
     let channel_id = generate_channel_id_for_anon_chat(
       targetUserModel.user_id,
       userModel.user_id,
-      'post'
+      'post',
+      source_id
     );
     let new_channel = await ChatAnonUserInfo.create({
       channel_id: channel_id,
@@ -102,7 +103,8 @@ const anon_to_sign_post = async (client, userModel, targetUserModel, source_id) 
     let channel_id = generate_channel_id_for_anon_chat(
       userModel.user_id,
       targetUserModel.user_id,
-      'post'
+      'post',
+      source_id
     );
     let anon_init_data = await get_anon_info_from_comment_post(client, userModel, source_id);
 
@@ -143,7 +145,8 @@ const anon_to_anon_post = async (
     let channel_id = generate_channel_id_for_anon_chat(
       userModel.user_id,
       targetUserModel.user_id,
-      'post'
+      'post',
+      source_id
     );
     let anon_init_data = await get_anon_info_from_comment_post(client, userModel, source_id);
     let new_channel = await ChatAnonUserInfo.create({
