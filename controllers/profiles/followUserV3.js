@@ -10,9 +10,11 @@ const {addForFollowUser} = require('../../services/score');
 const BetterSocialCore = require('../../services/bettersocial');
 const UsersFunction = require('../../databases/functions/users');
 const {sendFollowMainFeedF2} = require('../../services/queue/mainFeedF2');
+const {StreamChat} = require('stream-chat');
+const Environment = require('../../config/environment');
 
 module.exports = async (req, res) => {
-  const {user_id_followed, follow_source} = req.body;
+  const {user_id_followed, follow_source, with_system_message} = req.body;
   const {user} = req;
 
   if (req?.userId === user_id_followed)
@@ -92,6 +94,32 @@ module.exports = async (req, res) => {
     return ErrorResponse.e409(res, e.message);
   }
 
+  if (with_system_message) {
+    try {
+      const adminClient = new StreamChat(
+        Environment.GETSTREAM_API_KEY,
+        Environment.GETSTREAM_API_SECRET
+      );
+
+      const channel = await adminClient.channel('messaging', {
+        members: [req?.userId, user_id_followed],
+        created_by_id: req?.userId
+      });
+
+      await channel?.create();
+
+      await Getstream.chat.sendFollowSignedUserSystemMessage(
+        channel,
+        req?.userId,
+        req?.user?.username,
+        targetUser?.username
+      );
+    } catch (e) {
+      console.error('Error in sending system message', e);
+      return ErrorResponse.e409(res, e.message);
+    }
+  }
+
   try {
     await BetterSocialCore.fcmToken.sendMultiDeviceNotification(
       req?.userId,
@@ -99,14 +127,6 @@ module.exports = async (req, res) => {
       user_id_followed,
       targetUser?.username
     );
-    if (process.env.FEATURE_FLAG_SEND_FOLLOW_SYSTEM_MESSAGE === 'true') {
-      Getstream.chat.sendFollowSystemMessage(
-        req?.userId,
-        user?.username,
-        user_id_followed,
-        targetUser?.username
-      );
-    }
   } catch (e) {
     console.log('Error in follow user v3 fcm');
     console.log(e);

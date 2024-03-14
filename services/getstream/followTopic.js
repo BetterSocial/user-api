@@ -7,6 +7,7 @@ const {
   DEFAULT_TOPIC_PIC_PATH_SIGN,
   DEFAULT_TOPIC_PIC_PATH_ANON
 } = require('../../vendor/getstream/constant');
+const Getstream = require('../../vendor/getstream');
 const followTopic = async (token, userId) => {
   let id = userId.toLowerCase();
   const client = stream.connect(process.env.API_KEY, token, process.env.APP_ID);
@@ -96,28 +97,14 @@ const addTopicToChatTab = async (
     });
 
     console.log('prepare follow channel', topic);
-    let textOwnUser = 'You joined this community';
-    if (isAnonymous) textOwnUser += ' incognito';
 
     await channel.create();
     await channel.addMembers([userId]);
     if (withSystemMessage) {
       console.log('system message sent');
-      await channel.sendMessage(
-        {
-          user_id: userId,
-          text: textOwnUser,
-          other_text: '',
-          own_text: textOwnUser,
-          system_user: userId,
-          isSystem: true,
-          type: 'system',
-          only_show_to_system_user: true
-        },
-        {
-          skip_push: true
-        }
-      );
+      await Getstream.chat.sendFollowTopicSystemMessage(channel, userId, {
+        isJoinedAnonymous: isAnonymous
+      });
     }
     console.log('channel followed');
   } catch (error) {
