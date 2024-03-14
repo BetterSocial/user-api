@@ -14,8 +14,7 @@ module.exports = {
     define: {
       timestamps: true,
       freezeTableName: true
-    },
-    logging: false
+    }
   },
   staging: {
     username: process.env.DB_USERNAME,
