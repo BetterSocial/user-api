@@ -1,6 +1,6 @@
 const {QueryTypes} = require('sequelize');
-
-const {sequelize} = require('../../databases/models');
+const {User, sequelize} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
 
 /**
  *
@@ -10,7 +10,10 @@ const {sequelize} = require('../../databases/models');
  */
 const Search = async (req, res) => {
   const {q} = req.query;
+
   const {userId} = req;
+  const anonymousUser = await UsersFunction.findAnonymousUserId(User, userId, {raw: true});
+
   if (q.length < 2)
     return res.status(200).json({
       success: true,
@@ -23,7 +26,12 @@ const Search = async (req, res) => {
             "Topic".*,
             count("topicFollower"."user_id") 
                 AS "followersCount",
-            (SELECT "f"."user_id" AS "user_id_follower" FROM "user_topics" AS f WHERE "f"."user_id" = :userId AND "f"."topic_id" = "Topic"."topic_id")
+            (SELECT "f"."user_id" AS "user_id_follower" 
+              FROM "user_topics" AS f 
+              WHERE 
+                ("f"."user_id" = :userId 
+                OR "f"."user_id" = :anonymousUserId)
+                AND "f"."topic_id" = "Topic"."topic_id")
         FROM "topics" 
             AS "Topic" 
         LEFT OUTER JOIN "user_topics" 
@@ -42,6 +50,7 @@ const Search = async (req, res) => {
         type: QueryTypes.SELECT,
         replacements: {
           userId,
+          anonymousUserId: anonymousUser?.user_id,
           likeQuery: `%${q}%`,
           limit: 50
         }

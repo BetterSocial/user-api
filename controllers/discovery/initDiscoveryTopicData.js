@@ -1,5 +1,6 @@
 const {QueryTypes} = require('sequelize');
-const {sequelize} = require('../../databases/models');
+const {User, sequelize} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
 
 /**
  *
@@ -12,6 +13,7 @@ const InitDiscoveryTopicData = async (req, res) => {
   page = parseInt(page);
 
   const userId = req.userId;
+  const anonymousUser = await UsersFunction.findAnonymousUserId(User, userId, {raw: true});
 
   try {
     let totalDataQuery = `SELECT 
@@ -19,14 +21,14 @@ const InitDiscoveryTopicData = async (req, res) => {
                           FROM topics A`;
 
     let suggestedTopicsQuery = `SELECT 
-                C.*, 
+                C.*,
                 A.topic_id, 
                 COUNT(*) as common,
                 A.user_id as user_id_follower
             FROM user_topics A 
             INNER JOIN user_topics B 
                 ON A.topic_id = B.topic_id 
-                AND A.user_id = :userId
+                AND (A.user_id = :userId OR A.user_id = :anonymousUserId)
             RIGHT JOIN topics C 
                 ON C.topic_id = A.topic_id
             GROUP BY A.topic_id, C.topic_id, A.user_id
@@ -41,10 +43,12 @@ const InitDiscoveryTopicData = async (req, res) => {
       type: QueryTypes.SELECT,
       replacements: {
         userId,
+        anonymousUserId: anonymousUser?.user_id,
         limit: limit,
         offset: page * limit
       }
     });
+
     let suggestedTopics = topicWithCommonFollowerResult;
 
     let totalData = await sequelize.query(totalDataQuery, {
