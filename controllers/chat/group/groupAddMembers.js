@@ -61,29 +61,34 @@ const groupAddMembers = async (req, res) => {
   try {
     const responseChannel = await channelToAdd?.addMembers(filteredMembersObject);
 
-    filteredMembersId.map(async (member) => {
-      const targetUserModel = await UsersFunction.findUserById(User, member);
+    filteredMembersId.map(
+      async (member) => {
+        const targetUserModel = await UsersFunction.findUserById(User, member);
 
-      const textOwnUser = `You added ${targetUserModel.username} to this group`;
-      const textTargetUser = `${ownUser.username} added you to this group`;
-      const textDefaultUser = `${ownUser.username} added ${targetUserModel.username} to this group`;
+        const textOwnUser = `You added ${targetUserModel.username} to this group`;
+        const textTargetUser = `${ownUser.username} added you to this group`;
+        const textDefaultUser = `${ownUser.username} added ${targetUserModel.username} to this group`;
 
-      await channelToAdd.sendMessage({
-        text: textDefaultUser,
-        own_text: textOwnUser,
-        other_text: textTargetUser,
-        other_system_user: member,
-        better_type: 'add_member_to_group',
-        type: 'system',
-        user_id: userId,
-        only_to_user_show: userId,
-        disable_to_user: false,
-        is_from_prepopulated: true,
-        system_user: userId,
-        isSystem: true,
-        members: [member]
-      });
-    });
+        await channelToAdd.sendMessage({
+          text: textDefaultUser,
+          own_text: textOwnUser,
+          other_text: textTargetUser,
+          other_system_user: member,
+          better_type: 'add_member_to_group',
+          type: 'system',
+          user_id: userId,
+          only_to_user_show: userId,
+          disable_to_user: false,
+          is_from_prepopulated: true,
+          system_user: userId,
+          isSystem: true,
+          members: [member]
+        });
+      },
+      {
+        skip_push: true
+      }
+    );
 
     try {
       const {betterChannelMember, betterChannelMemberObject, newChannelName, updatedChannel} =

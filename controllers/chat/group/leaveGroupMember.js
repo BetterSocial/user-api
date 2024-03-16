@@ -34,20 +34,25 @@ const leaveGroupMember = async (req, res) => {
       const textDefaultUser = `${ownUser.username} left this group`;
       const members = betterChannelMember.map((member) => member.user_id);
 
-      await currentChannel.sendMessage({
-        text: textDefaultUser,
-        own_text: textOwnUser,
-        other_text: textTargetUser,
-        better_type: 'leave_group',
-        type: 'system',
-        user_id: userId,
-        only_to_user_show: userId,
-        disable_to_user: false,
-        is_from_prepopulated: true,
-        system_user: userId,
-        isSystem: true,
-        members: members
-      });
+      await currentChannel.sendMessage(
+        {
+          text: textDefaultUser,
+          own_text: textOwnUser,
+          other_text: textTargetUser,
+          better_type: 'leave_group',
+          type: 'system',
+          user_id: userId,
+          only_to_user_show: userId,
+          disable_to_user: false,
+          is_from_prepopulated: true,
+          system_user: userId,
+          isSystem: true,
+          members: members
+        },
+        {
+          skip_push: true
+        }
+      );
 
       channelResponse = updatedChannel;
 

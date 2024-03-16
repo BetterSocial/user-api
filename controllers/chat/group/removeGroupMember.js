@@ -35,21 +35,26 @@ const removeGroupMember = async (req, res) => {
       const textDefaultUser = `${ownUser.username} removed ${targetUserModel.username} from this group`;
       const members = betterChannelMember.map((member) => member.user_id);
 
-      await currentChannel.sendMessage({
-        text: textDefaultUser,
-        own_text: textOwnUser,
-        other_text: textTargetUser,
-        other_system_user: userId,
-        better_type: 'remove_member_from_group',
-        type: 'system',
-        user_id: userId,
-        only_to_user_show: userId,
-        disable_to_user: false,
-        is_from_prepopulated: true,
-        system_user: userId,
-        isSystem: true,
-        members: members
-      });
+      await currentChannel.sendMessage(
+        {
+          text: textDefaultUser,
+          own_text: textOwnUser,
+          other_text: textTargetUser,
+          other_system_user: userId,
+          better_type: 'remove_member_from_group',
+          type: 'system',
+          user_id: userId,
+          only_to_user_show: userId,
+          disable_to_user: false,
+          is_from_prepopulated: true,
+          system_user: userId,
+          isSystem: true,
+          members: members
+        },
+        {
+          skip_push: true
+        }
+      );
 
       channelResponse = updatedChannel;
 
