@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
     });
 
     const isFollowing = await sequelize.query(isFollowingQuery, {
-      replacements: {user_id_followed: other_user_id, user_id_follower: req.userId}
+      replacements: {user_id_follower: other_user_id, user_id_followed: req.userId}
     });
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
