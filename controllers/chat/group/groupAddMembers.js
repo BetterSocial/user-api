@@ -45,13 +45,14 @@ const groupAddMembers = async (req, res) => {
 
   const channel = await client.queryChannels({
     id: channel_id,
-    type: CHANNEL_TYPE_STRING.GROUP,
-    members: {$in: [userId]}
+    type: CHANNEL_TYPE_STRING.GROUP /* ,
+    members: {$in: [userId]} */
   });
-
   if (channel?.length < 1) {
     return ErrorResponse.e404(res, 'Group not found');
   }
+
+  let all_members = channel[0].data.better_channel_member.map((member) => member.user.id);
 
   const channelMembers = [userId, ...filteredMembersId];
   const channelToAdd = await client.channel(CHANNEL_TYPE_STRING.GROUP, channel_id, {
@@ -61,15 +62,15 @@ const groupAddMembers = async (req, res) => {
   try {
     const responseChannel = await channelToAdd?.addMembers(filteredMembersObject);
 
-    filteredMembersId.map(
-      async (member) => {
-        const targetUserModel = await UsersFunction.findUserById(User, member);
+    filteredMembersId.map(async (member) => {
+      const targetUserModel = await UsersFunction.findUserById(User, member);
 
-        const textOwnUser = `You added ${targetUserModel.username} to this group`;
-        const textTargetUser = `${ownUser.username} added you to this group`;
-        const textDefaultUser = `${ownUser.username} added ${targetUserModel.username} to this group`;
+      const textOwnUser = `You added ${targetUserModel.username} to this group`;
+      const textTargetUser = `${ownUser.username} added you to this group`;
+      const textDefaultUser = `${ownUser.username} added ${targetUserModel.username} to this group`;
 
-        await channelToAdd.sendMessage({
+      await channelToAdd.sendMessage(
+        {
           text: textDefaultUser,
           own_text: textOwnUser,
           other_text: textTargetUser,
@@ -83,12 +84,25 @@ const groupAddMembers = async (req, res) => {
           system_user: userId,
           isSystem: true,
           members: [member]
-        });
-      },
-      {
-        skip_push: true
+        },
+        {
+          skip_push: true
+        }
+      );
+
+      const other_members = all_members.filter((m) => m !== member && m !== userId);
+      try {
+        await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
+      } catch (error) {
+        console.error('Failed to send group chat notification to user', error);
       }
-    );
+      await BetterSocialCore.fcmToken.sendGroupChatNotification(member, textTargetUser);
+      await Promise.all(
+        other_members.map(async (m) => {
+          await BetterSocialCore.fcmToken.sendGroupChatNotification(m, textDefaultUser);
+        })
+      );
+    });
 
     try {
       const {betterChannelMember, betterChannelMemberObject, newChannelName, updatedChannel} =
