@@ -16,6 +16,16 @@ const removeGroupMember = async (req, res) => {
   const targetUserModel = await UsersFunction.findUserById(User, targetUserId);
 
   try {
+    const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
+    const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
+    const queriedChannel = await client.queryChannels({
+      type: CHANNEL_TYPE_STRING.GROUP,
+      id: channelId,
+      members: {$in: [userId]}
+    });
+
+    let all_members = queriedChannel[0].data.better_channel_member.map((member) => member.user.id);
+
     const response = await Getstream.chat.removeGroupMember(channelId, userId, targetUserId);
     const {channel, channelApiResponse} = response.data || {};
 
@@ -24,23 +34,16 @@ const removeGroupMember = async (req, res) => {
       const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
         await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
 
-      const client = new StreamChat(
-        Environment.GETSTREAM_API_KEY,
-        Environment.GETSTREAM_API_SECRET
-      );
-      const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
-
       const textOwnUser = `You removed ${targetUserModel.username} from this group`;
       const textTargetUser = `${ownUser.username} removed you from this group`;
       const textDefaultUser = `${ownUser.username} removed ${targetUserModel.username} from this group`;
-      const members = betterChannelMember.map((member) => member.user_id);
 
       await currentChannel.sendMessage(
         {
           text: textDefaultUser,
           own_text: textOwnUser,
           other_text: textTargetUser,
-          other_system_user: userId,
+          other_system_user: targetUserModel.user_id,
           better_type: 'remove_member_from_group',
           type: 'system',
           user_id: userId,
@@ -49,11 +52,25 @@ const removeGroupMember = async (req, res) => {
           is_from_prepopulated: true,
           system_user: userId,
           isSystem: true,
-          members: members
+          members: all_members
         },
         {
           skip_push: true
         }
+      );
+
+      const other_members = all_members.filter(
+        (m) => m !== targetUserModel.user_id && m !== userId
+      );
+      await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
+      await BetterSocialCore.fcmToken.sendGroupChatNotification(
+        targetUserModel.user_id,
+        textTargetUser
+      );
+      await Promise.all(
+        other_members.map(async (m) => {
+          await BetterSocialCore.fcmToken.sendGroupChatNotification(m, textDefaultUser);
+        })
       );
 
       channelResponse = updatedChannel;

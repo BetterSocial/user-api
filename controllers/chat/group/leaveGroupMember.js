@@ -15,53 +15,60 @@ const leaveGroupMember = async (req, res) => {
   const ownUser = await UsersFunction.findUserById(User, userId);
 
   try {
+    let channelResponse;
+
+    const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
+    const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
+    const queriedChannel = await client.queryChannels({
+      type: CHANNEL_TYPE_STRING.GROUP,
+      id: channelId
+    });
+    console.log(':::queriedChannel', queriedChannel);
+    let all_members = queriedChannel[0].data.better_channel_member.map((member) => member.user.id);
+
     const response = await Getstream.chat.removeGroupMember(channelId, userId);
     const {channel, channelApiResponse} = response.data || {};
 
-    let channelResponse;
-    try {
-      const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
-        await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
+    const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
 
-      const client = new StreamChat(
-        Environment.GETSTREAM_API_KEY,
-        Environment.GETSTREAM_API_SECRET
-      );
-      const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
+    const textOwnUser = `You left this group`;
+    const textTargetUser = `${ownUser.username} left this group`;
+    const textDefaultUser = `${ownUser.username} left this group`;
 
-      const textOwnUser = `You left this group`;
-      const textTargetUser = `${ownUser.username} left this group`;
-      const textDefaultUser = `${ownUser.username} left this group`;
-      const members = betterChannelMember.map((member) => member.user_id);
+    await currentChannel.sendMessage(
+      {
+        text: textDefaultUser,
+        own_text: textOwnUser,
+        other_text: textTargetUser,
+        better_type: 'leave_group',
+        type: 'system',
+        user_id: userId,
+        only_to_user_show: userId,
+        disable_to_user: false,
+        is_from_prepopulated: true,
+        system_user: userId,
+        isSystem: true,
+        members: all_members
+      },
+      {
+        skip_push: true
+      }
+    );
 
-      await currentChannel.sendMessage(
-        {
-          text: textDefaultUser,
-          own_text: textOwnUser,
-          other_text: textTargetUser,
-          better_type: 'leave_group',
-          type: 'system',
-          user_id: userId,
-          only_to_user_show: userId,
-          disable_to_user: false,
-          is_from_prepopulated: true,
-          system_user: userId,
-          isSystem: true,
-          members: members
-        },
-        {
-          skip_push: true
-        }
-      );
+    const other_members = all_members.filter((m) => m !== userId);
+    await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
+    await Promise.all(
+      other_members.map(async (m) => {
+        await BetterSocialCore.fcmToken.sendGroupChatNotification(m, textDefaultUser);
+      })
+    );
 
-      channelResponse = updatedChannel;
+    channelResponse = updatedChannel;
 
-      channelApiResponse.channel.name = newChannelName;
-      channelApiResponse.channel.better_channel_member = betterChannelMember;
-      channelApiResponse.channel.better_channel_member_object = betterChannelMemberObject;
-    } catch (e) {
-      console.log(e);
-    }
+    channelApiResponse.channel.name = newChannelName;
+    channelApiResponse.channel.better_channel_member = betterChannelMember;
+    channelApiResponse.channel.better_channel_member_object = betterChannelMemberObject;
 
     return ResponseSuccess(res, response?.message, 200, channelResponse);
   } catch (e) {

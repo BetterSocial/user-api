@@ -4,6 +4,7 @@ const ErrorResponse = require('../../../utils/response/ErrorResponse');
 const {ResponseSuccess} = require('../../../utils/Responses');
 const UsersFunction = require('../../../databases/functions/users');
 const {User} = require('../../../databases/models');
+const BetterSocialCore = require('../../../services/bettersocial');
 
 /**
  *
@@ -24,6 +25,8 @@ const changeChannelDetail = async (req, res) => {
   });
 
   if (queriedChannel?.length < 1) return ErrorResponse.e404(res, 'Group not found');
+
+  let all_members = queriedChannel[0].data.better_channel_member.map((member) => member.user.id);
 
   const channel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channel_id);
   const updateData = {};
@@ -57,16 +60,24 @@ const changeChannelDetail = async (req, res) => {
           skip_push: true
         }
       );
+
+      const other_members = all_members.filter((m) => m !== userId);
+      await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
+      await Promise.all(
+        other_members.map(async (m) => {
+          await BetterSocialCore.fcmToken.sendGroupChatNotification(m, textDefaultUser);
+        })
+      );
     }
 
     if (channel_image) {
       const textOwnUser = `You changed the group image`;
       const textTargetUser = `${ownUser.username} changed the group image`;
-      const textOtherUser = `${ownUser.username} changed the group image`;
+      const textDefaultUser = `${ownUser.username} changed the group image`;
 
       await channel.sendMessage(
         {
-          text: textOtherUser,
+          text: textDefaultUser,
           own_text: textOwnUser,
           other_text: textTargetUser,
           better_type: 'change_channel_detail',
@@ -79,6 +90,14 @@ const changeChannelDetail = async (req, res) => {
         {
           skip_push: true
         }
+      );
+
+      const other_members = all_members.filter((m) => m !== userId);
+      await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
+      await Promise.all(
+        other_members.map(async (m) => {
+          await BetterSocialCore.fcmToken.sendGroupChatNotification(m, textDefaultUser);
+        })
       );
     }
 

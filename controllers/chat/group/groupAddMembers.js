@@ -45,8 +45,8 @@ const groupAddMembers = async (req, res) => {
 
   const channel = await client.queryChannels({
     id: channel_id,
-    type: CHANNEL_TYPE_STRING.GROUP /* ,
-    members: {$in: [userId]} */
+    type: CHANNEL_TYPE_STRING.GROUP,
+    members: {$in: [userId]}
   });
   if (channel?.length < 1) {
     return ErrorResponse.e404(res, 'Group not found');
@@ -91,11 +91,7 @@ const groupAddMembers = async (req, res) => {
       );
 
       const other_members = all_members.filter((m) => m !== member && m !== userId);
-      try {
-        await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
-      } catch (error) {
-        console.error('Failed to send group chat notification to user', error);
-      }
+      await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
       await BetterSocialCore.fcmToken.sendGroupChatNotification(member, textTargetUser);
       await Promise.all(
         other_members.map(async (m) => {
