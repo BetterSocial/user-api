@@ -91,10 +91,15 @@ module.exports = {
   getChannels: async (req, res) => {
     const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
     try {
+      let {last_fetch_date = null} = req.query;
+      let filter = {members: {$in: [req.userId]}};
+      if (last_fetch_date) {
+        last_fetch_date = new Date(last_fetch_date);
+        last_fetch_date = last_fetch_date.toISOString();
+        filter = {members: {$in: [req.userId]}, last_message_at: {$gte: last_fetch_date}};
+      }
       await client.connectUser({id: req.userId}, req.token);
-      let channels = await client.queryChannels({members: {$in: [req.userId]}}, [
-        {last_message_at: -1}
-      ]);
+      let channels = await client.queryChannels(filter, [{last_message_at: -1}]);
 
       // const createdChannel = await cha
 

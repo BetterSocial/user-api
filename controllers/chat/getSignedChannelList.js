@@ -15,8 +15,15 @@ const MAX_ITERATIONS = 10;
  * @param {number} offset
  * @returns
  */
-const __queryChannelBuilder = async (client, userId, limit, offset) => {
-  const channels = await client.queryChannels({members: {$in: [userId]}}, [{last_message_at: -1}], {
+const __queryChannelBuilder = async (client, userId, limit, offset, last_message_at = null) => {
+  let filter = {members: {$in: [userId]}};
+  if (last_message_at) {
+    last_message_at = new Date(last_message_at);
+    last_message_at = last_message_at.toISOString();
+    filter = {members: {$in: [userId]}, last_message_at: {$gte: last_message_at}};
+  }
+
+  const channels = await client.queryChannels(filter, [{last_message_at: -1}], {
     limit: limit,
     offset: offset,
     state: true
@@ -102,7 +109,7 @@ const __filterAndTransformChannelData = async (channel, userId) => {
 
 const getSignedChannelList = async (req, res) => {
   const {userId} = req;
-  const {limit = 100, offset = 0} = req.query;
+  const {limit = 100, offset = 0, last_fetch_date = null} = req.query;
 
   let totalFetched = 0;
   const queriedChannels = [];
@@ -117,7 +124,13 @@ const getSignedChannelList = async (req, res) => {
 
       const batchSize = Math.min(30, limit - totalFetched);
       promisedChannels.push(
-        __queryChannelBuilder(client, userId, batchSize, Number(totalFetched) + Number(offset))
+        __queryChannelBuilder(
+          client,
+          userId,
+          batchSize,
+          Number(totalFetched) + Number(offset),
+          last_fetch_date
+        )
       );
       totalFetched += batchSize;
       if (totalFetched >= limit) {
