@@ -59,18 +59,9 @@ const removeGroupMember = async (req, res) => {
         }
       );
 
-      const other_members = all_members.filter(
-        (m) => m !== targetUserModel.user_id && m !== userId
-      );
-      await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
       await BetterSocialCore.fcmToken.sendGroupChatNotification(
         targetUserModel.user_id,
         textTargetUser
-      );
-      await Promise.all(
-        other_members.map(async (m) => {
-          await BetterSocialCore.fcmToken.sendGroupChatNotification(m, textDefaultUser);
-        })
       );
 
       channelResponse = updatedChannel;

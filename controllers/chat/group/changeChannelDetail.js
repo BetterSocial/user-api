@@ -62,7 +62,6 @@ const changeChannelDetail = async (req, res) => {
       );
 
       const other_members = all_members.filter((m) => m !== userId);
-      await BetterSocialCore.fcmToken.sendGroupChatNotification(userId, textOwnUser);
       await Promise.all(
         other_members.map(async (m) => {
           await BetterSocialCore.fcmToken.sendGroupChatNotification(m, textDefaultUser);
