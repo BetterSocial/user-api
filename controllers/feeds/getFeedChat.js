@@ -212,8 +212,15 @@ const getFeedChatService = async (req, res) => {
     const data = await getstreamService.notificationGetNewFeed(req.userId, req.token);
     const newFeed = [];
 
-    // eslint-disable-next-line no-restricted-syntax
+    let {last_fetch_date = null} = req.query;
+    if (last_fetch_date) {
+      last_fetch_date = new Date(last_fetch_date);
+      last_fetch_date = last_fetch_date.toISOString();
+    }
     for (const feeds of data.results) {
+      if (last_fetch_date && feeds.updated_at < last_fetch_date) {
+        continue;
+      }
       const mapping = mappingFeed(req, feeds);
       newFeed.push(...mapping);
     }
