@@ -25,7 +25,8 @@ const ChatValidation = {
   getChannelDetail: {
     query: {
       channel_id: string.required(),
-      channel_type: string.required()
+      channel_type: string.required(),
+      last_fetch_date: string.optional()
     }
   },
 

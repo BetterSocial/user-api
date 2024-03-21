@@ -14,15 +14,24 @@ const {
 
 const getAnonymousFeedChatService = async (req, res) => {
   try {
+    let {last_fetch_date = null} = req.query;
+    if (last_fetch_date) {
+      last_fetch_date = new Date(last_fetch_date);
+      last_fetch_date = last_fetch_date.toISOString();
+    }
     const mySignedId = await UsersFunction.findSignedUserId(User, req.userId);
     const data = await getstreamService.notificationGetNewFeed(req.userId, req.token);
     const newFeed = [];
 
     // eslint-disable-next-line no-restricted-syntax
     for (const feeds of data.results) {
+      if (last_fetch_date && feeds.updated_at < last_fetch_date) {
+        continue;
+      }
       const mapping = mappingFeed(req, feeds);
       newFeed.push(...mapping);
     }
+
     const newGroup = {};
     const groupingFeed = newFeed.reduce((a, b) => {
       const localDate = moment.utc(b.time).local().format();

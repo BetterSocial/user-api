@@ -17,16 +17,32 @@ const getChannelDetail = async (req, res) => {
       message: 'Bad request'
     });
   }
-
+  let {last_fetch_date = null} = req.query;
+  if (last_fetch_date) {
+    last_fetch_date = new Date(last_fetch_date);
+    last_fetch_date = last_fetch_date.toISOString();
+  }
   const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
   const channel = await client.channel(channel_type, channel_id);
   const createdChannel = await channel.create();
 
   const anonymousUser = await UsersFunction.findAnonymousUserId(User, req.userId, {raw: true});
 
-  let messages = await __queryChannelHelper(client, channel_id, channel_type, req.userId);
+  let messages = await __queryChannelHelper(
+    client,
+    channel_id,
+    channel_type,
+    req.userId,
+    last_fetch_date
+  );
   if (!messages) {
-    messages = await __queryChannelHelper(client, channel_id, channel_type, anonymousUser?.user_id);
+    messages = await __queryChannelHelper(
+      client,
+      channel_id,
+      channel_type,
+      anonymousUser?.user_id,
+      last_fetch_date
+    );
   }
 
   if (!messages) {
@@ -49,7 +65,21 @@ const getChannelDetail = async (req, res) => {
 
 module.exports = getChannelDetail;
 
-const __queryChannelHelper = async (client, channelId, channelType, userId) => {
+const __queryChannelHelper = async (
+  client,
+  channelId,
+  channelType,
+  userId,
+  last_fetch_date = null
+) => {
+  let date_filter = {
+    $lte: new Date()
+  };
+  if (last_fetch_date) {
+    date_filter = {
+      $gte: last_fetch_date
+    };
+  }
   try {
     let messages = await client.search(
       {
@@ -60,11 +90,10 @@ const __queryChannelHelper = async (client, channelId, channelType, userId) => {
         }
       },
       {
-        created_at: {$lte: new Date()}
+        created_at: date_filter
       },
       {
-        sort: [{updated_at: -1}],
-        limit: 10
+        sort: [{updated_at: -1}]
       }
     );
 
