@@ -34,9 +34,11 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const topicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id IN (:topics) AND topic_follower_rank <= 10 order BY topic_follower_rank ASC`;
+    const topicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id IN (:topics) AND topic_follower_rank <= 10 ORDER BY topic_follower_rank ASC, CASE WHEN profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END`;
 
-    const locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (:locations) AND follower_rank <= 10 order BY follower_rank ASC`;
+    const locationQuery = `SELECT * FROM vwm_user_location_follower_count WHERE location_id IN (:locations) AND follower_rank <= 10 ORDER BY follower_rank ASC, CASE WHEN profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END`;
+
+    const otherTopicsQuery = `SELECT * FROM vwm_user_topic_follower_count_rank WHERE topic_id NOT IN (:topics) AND topic_follower_rank <= 10 ORDER BY follower_count DESC, CASE WHEN profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END LIMIT 35`;
 
     const userTopicFollowerQueryResult = await sequelize.query(topicsQuery, {
       type: sequelize.QueryTypes.SELECT,
@@ -53,6 +55,14 @@ module.exports = async (req, res) => {
       }
     });
     const userLocationFollower = userLocationFollowerQueryResult;
+
+    const userOtherTopicFollowerQueryResult = await sequelize.query(otherTopicsQuery, {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: {
+        topics
+      }
+    });
+    const userOtherTopicFollower = userOtherTopicFollowerQueryResult;
 
     const TopicsData = await Topics.findAll({
       where: {
@@ -83,7 +93,6 @@ module.exports = async (req, res) => {
       for (const indexUserTopic in userTopicFollower) {
         const userTopic = userTopicFollower[indexUserTopic];
         delete userTopic.human_id;
-        if (tempUsers?.length >= 10) break;
         if (
           userTopic.topic_id === topic.topic_id &&
           userTopic.user_id !== process.env.BETTER_ADMIN_ID
@@ -99,12 +108,12 @@ module.exports = async (req, res) => {
         result.push({
           viewtype: 'labeltopic',
           name: topic.name,
-          id: topic.topic_id
+          id: topic.topic_id,
+          users: tempUsers
         });
-
-        result.push(...tempUsers);
       }
     }
+
     for (const indexLocation in LocationsData) {
       const tempUsers = [];
       const location = LocationsData[indexLocation];
@@ -112,7 +121,7 @@ module.exports = async (req, res) => {
       for (const indexUserLocation in userLocationFollower) {
         const userLocation = userLocationFollower[indexUserLocation];
         delete userLocation.human_id;
-        if (userLocation.location_id === location.location_id && tempUsers?.length < 10)
+        if (userLocation.location_id === location.location_id)
           tempUsers.push({
             ...userLocation,
             viewtype: 'user'
@@ -122,12 +131,33 @@ module.exports = async (req, res) => {
       if (tempUsers.length > 0) {
         result.push({
           ...location,
-          viewtype: 'labellocation'
+          viewtype: 'labellocation',
+          users: tempUsers
         });
-
-        result.push(...tempUsers);
       }
     }
+
+    //Other topics
+    const tempUsers = [];
+    for (const indexUserOtherTopic in userOtherTopicFollower) {
+      const userOtherTopic = userOtherTopicFollower[indexUserOtherTopic];
+      delete userOtherTopic.human_id;
+      if (userOtherTopic.user_id !== process.env.BETTER_ADMIN_ID) {
+        tempUsers.push({
+          ...userOtherTopic,
+          viewtype: 'user'
+        });
+      }
+    }
+
+    if (tempUsers.length > 0) {
+      result.push({
+        viewtype: 'labelothers',
+        name: 'Other popular members',
+        users: tempUsers
+      });
+    }
+    //ENN other topics
 
     return res.status(200).json({
       status: 'success',
