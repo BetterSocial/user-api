@@ -48,7 +48,6 @@ const groupAddMembers = async (req, res) => {
     type: CHANNEL_TYPE_STRING.GROUP,
     members: {$in: [userId]}
   });
-
   if (channel?.length < 1) {
     return ErrorResponse.e404(res, 'Group not found');
   }
@@ -68,21 +67,28 @@ const groupAddMembers = async (req, res) => {
       const textTargetUser = `${ownUser.username} added you to this group`;
       const textDefaultUser = `${ownUser.username} added ${targetUserModel.username} to this group`;
 
-      await channelToAdd.sendMessage({
-        text: textDefaultUser,
-        own_text: textOwnUser,
-        other_text: textTargetUser,
-        other_system_user: member,
-        better_type: 'add_member_to_group',
-        type: 'system',
-        user_id: userId,
-        only_to_user_show: userId,
-        disable_to_user: false,
-        is_from_prepopulated: true,
-        system_user: userId,
-        isSystem: true,
-        members: [member]
-      });
+      await channelToAdd.sendMessage(
+        {
+          text: textDefaultUser,
+          own_text: textOwnUser,
+          other_text: textTargetUser,
+          other_system_user: member,
+          better_type: 'add_member_to_group',
+          type: 'system',
+          user_id: userId,
+          only_to_user_show: userId,
+          disable_to_user: false,
+          is_from_prepopulated: true,
+          system_user: userId,
+          isSystem: true,
+          members: [member]
+        },
+        {
+          skip_push: true
+        }
+      );
+
+      await BetterSocialCore.fcmToken.sendGroupChatNotification(member, textTargetUser);
     });
 
     try {

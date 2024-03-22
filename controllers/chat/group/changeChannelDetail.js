@@ -38,38 +38,48 @@ const changeChannelDetail = async (req, res) => {
       const textTargetUser = `${ownUser.username} changed the group name to "${channel_name}"`;
       const textDefaultUser = `${ownUser.username} changed the group name to "${channel_name}"`;
 
-      await channel.sendMessage({
-        text: textDefaultUser,
-        own_text: textOwnUser,
-        other_text: textTargetUser,
-        better_type: 'change_channel_detail',
-        type: 'system',
-        user_id: userId,
-        only_to_user_show: userId,
-        disable_to_user: false,
-        is_from_prepopulated: true,
-        system_user: userId,
-        isSystem: true,
-        members: members
-      });
+      await channel.sendMessage(
+        {
+          text: textDefaultUser,
+          own_text: textOwnUser,
+          other_text: textTargetUser,
+          better_type: 'change_channel_detail',
+          type: 'system',
+          user_id: userId,
+          only_to_user_show: userId,
+          disable_to_user: false,
+          is_from_prepopulated: true,
+          system_user: userId,
+          isSystem: true,
+          members: members
+        },
+        {
+          skip_push: true
+        }
+      );
     }
 
     if (channel_image) {
       const textOwnUser = `You changed the group image`;
       const textTargetUser = `${ownUser.username} changed the group image`;
-      const textOtherUser = `${ownUser.username} changed the group image`;
+      const textDefaultUser = `${ownUser.username} changed the group image`;
 
-      await channel.sendMessage({
-        text: textOtherUser,
-        own_text: textOwnUser,
-        other_text: textTargetUser,
-        better_type: 'change_channel_detail',
-        type: 'system',
-        user_id: userId,
-        system_user: userId,
-        isSystem: true,
-        members: members
-      });
+      await channel.sendMessage(
+        {
+          text: textDefaultUser,
+          own_text: textOwnUser,
+          other_text: textTargetUser,
+          better_type: 'change_channel_detail',
+          type: 'system',
+          user_id: userId,
+          system_user: userId,
+          isSystem: true,
+          members: members
+        },
+        {
+          skip_push: true
+        }
+      );
     }
 
     const response = await channel.updatePartial({
