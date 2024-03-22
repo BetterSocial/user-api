@@ -23,14 +23,8 @@ const leaveGroupMember = async (req, res) => {
       type: CHANNEL_TYPE_STRING.GROUP,
       id: channelId
     });
-    console.log(':::queriedChannel', queriedChannel);
+
     let all_members = queriedChannel[0].data.better_channel_member.map((member) => member.user.id);
-
-    const response = await Getstream.chat.removeGroupMember(channelId, userId);
-    const {channel, channelApiResponse} = response.data || {};
-
-    const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
-      await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
 
     const textOwnUser = `You left this group`;
     const textTargetUser = `${ownUser.username} left this group`;
@@ -55,6 +49,12 @@ const leaveGroupMember = async (req, res) => {
         skip_push: true
       }
     );
+
+    const response = await Getstream.chat.removeGroupMember(channelId, userId);
+    const {channel, channelApiResponse} = response.data || {};
+
+    const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
+      await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
 
     channelResponse = updatedChannel;
 
