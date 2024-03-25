@@ -214,8 +214,7 @@ const getFeedChatService = async (req, res) => {
 
     let {last_fetch_date = null} = req.query;
     if (last_fetch_date) {
-      last_fetch_date = new Date(last_fetch_date);
-      last_fetch_date = last_fetch_date.toISOString();
+      last_fetch_date = moment.utc(last_fetch_date).format('YYYY-MM-DDTHH:mm:ss');
     }
     for (const feeds of data.results) {
       if (last_fetch_date && feeds.updated_at < last_fetch_date) {
@@ -223,6 +222,14 @@ const getFeedChatService = async (req, res) => {
       }
       const mapping = mappingFeed(req, feeds);
       newFeed.push(...mapping);
+    }
+
+    if (newFeed.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: 'Success get data'
+      });
     }
 
     let actors = [];

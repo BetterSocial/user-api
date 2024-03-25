@@ -1,3 +1,4 @@
+const moment = require('moment');
 const {StreamChat} = require('stream-chat');
 const Validator = require('fastest-validator');
 const {v4: uuidv4} = require('uuid');
@@ -94,8 +95,7 @@ module.exports = {
       let {last_fetch_date = null} = req.query;
       let filter = {members: {$in: [req.userId]}};
       if (last_fetch_date) {
-        last_fetch_date = new Date(last_fetch_date);
-        last_fetch_date = last_fetch_date.toISOString();
+        last_fetch_date = moment.utc(last_fetch_date).toDate().toISOString();
         filter = {members: {$in: [req.userId]}, last_message_at: {$gte: last_fetch_date}};
       }
       await client.connectUser({id: req.userId}, req.token);
