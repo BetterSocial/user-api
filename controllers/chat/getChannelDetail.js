@@ -1,3 +1,4 @@
+const moment = require('moment');
 const {StreamChat} = require('stream-chat');
 const {User} = require('../../databases/models');
 const {ResponseSuccess} = require('../../utils/Responses');
@@ -19,8 +20,7 @@ const getChannelDetail = async (req, res) => {
   }
   let {last_fetch_date = null} = req.query;
   if (last_fetch_date) {
-    last_fetch_date = new Date(last_fetch_date);
-    last_fetch_date = last_fetch_date.toISOString();
+    last_fetch_date = moment.utc(last_fetch_date).toDate().toISOString();
   }
   const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
   const channel = await client.channel(channel_type, channel_id);
