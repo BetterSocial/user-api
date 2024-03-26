@@ -83,7 +83,9 @@ module.exports = async (req, res) => {
             viewtype: 'user'
           });
 
-          allUserIds.push(userTopic.user_id);
+          if (!allUserIds.includes(userTopic.user_id)) {
+            allUserIds.push(userTopic.user_id);
+          }
         }
 
         if (tempUsers.length > 0) {
@@ -171,7 +173,9 @@ module.exports = async (req, res) => {
             viewtype: 'user'
           });
 
-          allUserIds.push(userLocation.user_id);
+          if (!allUserIds.includes(userLocation.user_id)) {
+            allUserIds.push(userLocation.user_id);
+          }
         }
 
         if (tempUsers.length > 0) {
@@ -188,6 +192,7 @@ module.exports = async (req, res) => {
 
     //OTHER USERS
     if (page == 1 && topics) {
+      allUserIds.push(process.env.BETTER_ADMIN_ID);
       const otherTopicsQuery = `SELECT 
                             a.user_id,
                             a.country_code,
@@ -216,7 +221,6 @@ module.exports = async (req, res) => {
                             AND a.is_banned = false
                             AND a.blocked_by_admin = false
                             AND a.karma_score > 30
-                            AND a.user_id != :admin_user_id
                             AND b.topic_id NOT IN (:topics)
                             AND a.user_id NOT IN (:allUserIds)
                           GROUP BY a.user_id
@@ -231,7 +235,6 @@ module.exports = async (req, res) => {
         replacements: {
           topics,
           allUserIds,
-          admin_user_id: process.env.BETTER_ADMIN_ID,
           limit
         }
       });
