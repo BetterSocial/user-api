@@ -8,6 +8,7 @@ module.exports = async (req, res) => {
 
   const limit = 7;
   const offset = (page - 1) * limit;
+  const allUserIds = [];
 
   try {
     //TOPICS
@@ -81,6 +82,8 @@ module.exports = async (req, res) => {
             ...userTopic,
             viewtype: 'user'
           });
+
+          allUserIds.push(userTopic.user_id);
         }
 
         if (tempUsers.length > 0) {
@@ -167,6 +170,8 @@ module.exports = async (req, res) => {
             ...userLocation,
             viewtype: 'user'
           });
+
+          allUserIds.push(userLocation.user_id);
         }
 
         if (tempUsers.length > 0) {
@@ -183,6 +188,7 @@ module.exports = async (req, res) => {
 
     //OTHER USERS
     if (page == 1 && topics) {
+      console.log(':::allUserIds', allUserIds);
       const otherTopicsQuery = `SELECT 
                             a.user_id,
                             a.country_code,
@@ -203,8 +209,7 @@ module.exports = async (req, res) => {
                             a.only_received_dm_from_user_following,
                             a.is_backdoor_user,
                             a.followers_count,
-                            a.karma_score,
-                            b.topic_id
+                            a.karma_score
                           FROM users a
                           INNER JOIN user_topics b ON a.user_id = b.user_id
                           WHERE 
@@ -214,6 +219,8 @@ module.exports = async (req, res) => {
                             AND a.karma_score > 30
                             AND a.user_id != :admin_user_id
                             AND b.topic_id NOT IN (:topics)
+                            AND a.user_id NOT IN (:allUserIds)
+                          GROUP BY a.user_id
                           ORDER BY 
                             a.last_active_at DESC,
                             CASE WHEN a.profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END,
@@ -224,6 +231,7 @@ module.exports = async (req, res) => {
         type: sequelize.QueryTypes.SELECT,
         replacements: {
           topics,
+          allUserIds,
           admin_user_id: process.env.BETTER_ADMIN_ID,
           limit
         }
