@@ -188,7 +188,6 @@ module.exports = async (req, res) => {
 
     //OTHER USERS
     if (page == 1 && topics) {
-      console.log(':::allUserIds', allUserIds);
       const otherTopicsQuery = `SELECT 
                             a.user_id,
                             a.country_code,
