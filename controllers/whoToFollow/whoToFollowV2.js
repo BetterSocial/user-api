@@ -58,8 +58,8 @@ module.exports = async (req, res) => {
                             AND a.user_id != :admin_user_id
                             AND b.topic_id = :topic_id
                           ORDER BY 
-                            a.last_active_at DESC,
-                            CASE WHEN a.profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END,
+                            CASE WHEN a.last_active_at > now() - interval '7' day THEN 0 ELSE 1 END,
+                            CASE WHEN a.profile_pic_path NOT LIKE '%default-profile-picture%' THEN 0 ELSE 1 END,
                             a.followers_count DESC
                           LIMIT :limit OFFSET :offset`;
 
@@ -148,8 +148,8 @@ module.exports = async (req, res) => {
                                 AND a.karma_score > 45
                                 AND b.location_id = :location_id
                               ORDER BY 
-                                a.last_active_at DESC,
-                                CASE WHEN a.profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END,
+                                CASE WHEN a.last_active_at > now() - interval '7' day THEN 0 ELSE 1 END,
+                                CASE WHEN a.profile_pic_path NOT LIKE '%default-profile-picture%' THEN 0 ELSE 1 END,
                                 a.followers_count DESC
                               LIMIT :limit OFFSET :offset`;
 
@@ -225,8 +225,8 @@ module.exports = async (req, res) => {
                             AND a.user_id NOT IN (:allUserIds)
                           GROUP BY a.user_id
                           ORDER BY 
-                            a.last_active_at DESC,
-                            CASE WHEN a.profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END,
+                            CASE WHEN a.last_active_at > now() - interval '7' day THEN 0 ELSE 1 END,
+                            CASE WHEN a.profile_pic_path NOT LIKE '%default-profile-picture%' THEN 0 ELSE 1 END,
                             a.followers_count DESC
                           LIMIT :limit OFFSET :offset`;
 
