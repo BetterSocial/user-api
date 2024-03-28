@@ -54,12 +54,12 @@ module.exports = async (req, res) => {
                             a.is_anonymous = false
                             AND a.is_banned = false
                             AND a.blocked_by_admin = false
-                            AND a.karma_score > 30
+                            AND a.karma_score > 45
                             AND a.user_id != :admin_user_id
                             AND b.topic_id = :topic_id
                           ORDER BY 
-                            a.last_active_at DESC,
-                            CASE WHEN a.profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END,
+                            CASE WHEN a.last_active_at > now() - interval '7' day THEN 0 ELSE 1 END,
+                            CASE WHEN a.profile_pic_path NOT LIKE '%default-profile-picture%' THEN 0 ELSE 1 END,
                             a.followers_count DESC
                           LIMIT :limit OFFSET :offset`;
 
@@ -145,11 +145,11 @@ module.exports = async (req, res) => {
                                 a.is_anonymous = false
                                 AND a.is_banned = false
                                 AND a.blocked_by_admin = false
-                                AND a.karma_score > 30
+                                AND a.karma_score > 45
                                 AND b.location_id = :location_id
                               ORDER BY 
-                                a.last_active_at DESC,
-                                CASE WHEN a.profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END,
+                                CASE WHEN a.last_active_at > now() - interval '7' day THEN 0 ELSE 1 END,
+                                CASE WHEN a.profile_pic_path NOT LIKE '%default-profile-picture%' THEN 0 ELSE 1 END,
                                 a.followers_count DESC
                               LIMIT :limit OFFSET :offset`;
 
@@ -191,7 +191,7 @@ module.exports = async (req, res) => {
     //END LOCATIONS
 
     //OTHER USERS
-    if (page == 1 && topics) {
+    if (topics) {
       allUserIds.push(process.env.BETTER_ADMIN_ID);
       const otherTopicsQuery = `SELECT 
                             a.user_id,
@@ -220,22 +220,23 @@ module.exports = async (req, res) => {
                             a.is_anonymous = false
                             AND a.is_banned = false
                             AND a.blocked_by_admin = false
-                            AND a.karma_score > 30
+                            AND a.karma_score > 45
                             AND b.topic_id NOT IN (:topics)
                             AND a.user_id NOT IN (:allUserIds)
                           GROUP BY a.user_id
                           ORDER BY 
-                            a.last_active_at DESC,
-                            CASE WHEN a.profile_pic_path != '%default-profile-picture%' THEN 0 ELSE 1 END,
+                            CASE WHEN a.last_active_at > now() - interval '7' day THEN 0 ELSE 1 END,
+                            CASE WHEN a.profile_pic_path NOT LIKE '%default-profile-picture%' THEN 0 ELSE 1 END,
                             a.followers_count DESC
-                          LIMIT :limit`;
+                          LIMIT :limit OFFSET :offset`;
 
       const userOtherTopicFollowerQueryResult = await sequelize.query(otherTopicsQuery, {
         type: sequelize.QueryTypes.SELECT,
         replacements: {
           topics,
           allUserIds,
-          limit
+          limit,
+          offset
         }
       });
       const userOtherTopicFollower = userOtherTopicFollowerQueryResult;
