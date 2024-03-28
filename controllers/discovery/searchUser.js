@@ -77,7 +77,8 @@ const SearchUser = async (req, res) => {
               WHERE f2.user_id_follower = :userId
               AND f2.user_id_followed = u.user_id
           ) AS is_followed,
-          (SELECT user_id_follower FROM user_follow_user WHERE user_id_followed = u.user_id AND user_id_follower = :userId) AS user_id_follower
+          (SELECT user_id_follower FROM user_follow_user WHERE user_id_followed = u.user_id AND user_id_follower = :userId) AS user_id_follower,
+					(u.last_active_at > NOW() - INTERVAL '7 days') AS recently_active
       FROM 
           users AS u
       WHERE 
@@ -89,7 +90,8 @@ const SearchUser = async (req, res) => {
           AND u.is_banned = false 
           AND u.verified_status != 'UNVERIFIED') 
       ORDER BY  
-          is_followed DESC,
+          recently_active DESC,
+          community_info DESC,
           u.karma_score DESC,
           followersCount DESC
       LIMIT :limit`,
