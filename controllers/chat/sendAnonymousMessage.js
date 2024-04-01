@@ -5,6 +5,7 @@ const {MESSAGE_TYPE} = require('../../helpers/constants');
 const {determineMessageType, processReplyMessage} = require('../../utils/chat');
 const UsersFunction = require('../../databases/functions/users');
 const {User, UserBlockedUser} = require('../../databases/models');
+const BetterSocialCore = require('../../services/bettersocial');
 
 const v = new Validator();
 const sendAnonymousMessage = async (req, res) => {
@@ -67,6 +68,8 @@ const sendAnonymousMessage = async (req, res) => {
     if (createdChannel?.channel?.is_channel_blocked)
       return res.status(403).json(responseError('Channel is blocked'));
 
+    let channelMember = [];
+    let senderInfo = [];
     // Prevent if user try to chat with blocked user
     let channelType = createdChannel?.channel?.channel_type;
     if (channelType === 4 || channelType === 0) {
@@ -80,6 +83,11 @@ const sendAnonymousMessage = async (req, res) => {
       if (isBlocked) {
         return res.status(403).json(responseError('This user does not want to receive messages'));
       }
+      channelMember = better_channel_member.filter(
+        (element) => element.user_id !== req.userId && !blockedIdsSet.has(element.user_id)
+      );
+
+      senderInfo = better_channel_member.find((element) => element.user_id === req.userId);
     }
 
     const currentMessageType = determineMessageType(messageType, attachments);
@@ -101,7 +109,42 @@ const sendAnonymousMessage = async (req, res) => {
       });
     }
 
-    const chat = await channel.sendMessage(baseMessage);
+    const chat = await channel.sendMessage(baseMessage, {skip_push: true});
+    let notificationPayload = {
+      title: `New Message from ${senderInfo?.user?.username}`,
+      body: `${message.substring(0, 100)}`
+    };
+    let dataPayload = {
+      channel_id: channelId,
+      user_id: req.userId,
+      message_id: chat.message.id,
+      message,
+      message_schema: currentMessageType,
+      type: 'message.new',
+      status: 'sent',
+      is_big_message: 'false',
+      attachment: JSON.stringify(attachments) ?? '',
+      created_at: chat.message.created_at,
+      is_annoymous: 'false'
+    };
+    const dataSizeInBytes = Buffer.byteLength(JSON.stringify(dataPayload), 'utf8');
+    const dataSizeInKilobytes = dataSizeInBytes / 1024;
+    if (dataSizeInKilobytes > 4) {
+      dataPayload.is_big_message = 'true';
+      dataPayload.attachment = '';
+    }
+    channelMember.forEach((member) => {
+      let payload = {
+        notification: notificationPayload,
+        // priority: 'high',
+        // content_available: true,
+        data: {
+          ...dataPayload,
+          is_annoymous: member.is_anonymous.toString()
+        }
+      };
+      BetterSocialCore.fcmToken.sendChatNotification(member.user_id, payload);
+    });
 
     await client.disconnectUser();
     return res.status(200).json(responseSuccess('sent', chat));

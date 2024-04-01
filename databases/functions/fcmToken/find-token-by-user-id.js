@@ -10,6 +10,7 @@ module.exports = async (fcmTokenModel, userId) => {
     where: {
       user_id: userId
     },
+    order: [['updated_at', 'DESC']],
     raw: true
   });
 
