@@ -117,7 +117,7 @@ const sendAnonymousMessage = async (req, res) => {
     let dataPayload = {
       channel_id: channelId,
       user_id: req.userId,
-      message_id: chat.message.id,
+      messages_id: chat.message.id,
       message,
       message_schema: currentMessageType,
       type: 'message.new',
@@ -136,14 +136,15 @@ const sendAnonymousMessage = async (req, res) => {
     channelMember.forEach((member) => {
       let payload = {
         notification: notificationPayload,
-        // priority: 'high',
-        // content_available: true,
         data: {
           ...dataPayload,
           is_annoymous: member.is_anonymous.toString()
         }
       };
-      BetterSocialCore.fcmToken.sendChatNotification(member.user_id, payload);
+      BetterSocialCore.fcmToken.sendChatNotification(member.user_id, payload, {
+        priority: 'high',
+        content_available: true
+      });
     });
 
     await client.disconnectUser();
