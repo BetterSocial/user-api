@@ -5,12 +5,14 @@ const UsersFunction = require('../../../databases/functions/users');
 
 const sendChatNotification = async (userTargetId, payload, options = {}) => {
   const signedUser = await UsersFunction.findSignedUserId(User, userTargetId);
-  const userTargetToken = await FcmTokenFunction.findTokenByUserId(FcmToken, signedUser);
+  const userTargetToken = await FcmTokenFunction.findAllTokenByUserId(FcmToken, signedUser);
   if (userTargetToken) {
     try {
-      messaging()
-        .sendToDevice(userTargetToken?.token, payload, options)
-        .then(() => {});
+      userTargetToken.forEach((user) => {
+        messaging()
+          .sendToDevice(user?.token, payload, options)
+          .then(() => {});
+      });
     } catch (error) {
       console.log('error send chat notifications', error);
     }

@@ -134,7 +134,7 @@ const sendSignedMesage = async (req, res) => {
 
     const chat = await channel.sendMessage(baseMessage, {skip_push: true});
     let notificationPayload = {
-      title: `New Message from ${senderInfo?.user?.username}`,
+      title: `${senderInfo?.user?.username}`,
       body: `${message.substring(0, 100)}`
     };
     let dataPayload = {
