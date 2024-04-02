@@ -68,7 +68,11 @@ module.exports = async (req, res) => {
             }
           }
 
-          if (item?.domain?.credderScore >= CREDDER_MIN_SCORE || !CREDDER_CHECK_ENABLED) {
+          const isNewsExist = data.find((news) => news.content.news_url === item.content.news_url);
+          if (
+            (item?.domain?.credderScore >= CREDDER_MIN_SCORE || !CREDDER_CHECK_ENABLED) &&
+            !isNewsExist
+          ) {
             data.push(item);
           }
 
