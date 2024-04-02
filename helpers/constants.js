@@ -62,7 +62,8 @@ const MESSAGE_TYPE = {
   GIF: 'gif',
   LOCATION: 'location',
   SOUND: 'sound',
-  DELETED: 'deleted'
+  DELETED: 'deleted',
+  TEXT: 'text'
 };
 
 const NOTIFICATION_TOPIC_NAME_PREFIX = 'topic_';

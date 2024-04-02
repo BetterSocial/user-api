@@ -34,7 +34,8 @@ const BetterSocialCore = {
     sendMultiDeviceNotification: require('./fcmToken/sendMultiDeviceNotification'),
     sendMultiDeviceCommentNotification: require('./fcmToken/sendMultiDeviceCommentNotification'),
     sendMultiDeviceReplyCommentNotification: require('./fcmToken/sendMultiDeviceReplyCommentNotification'),
-    sendGroupChatNotification: require('./fcmToken/sendGroupChatNotification')
+    sendGroupChatNotification: require('./fcmToken/sendGroupChatNotification'),
+    sendChatNotification: require('./fcmToken/sendChatNotification')
   },
   post: {
     blockAnonymousPost: require('./post/blockAnonymousPost'),
