@@ -1,22 +1,16 @@
 const {QueryTypes} = require('sequelize');
-const {sequelize} = require('../../databases/models');
+const {sequelize, Topics} = require('../../databases/models');
 
 module.exports = async (req, res) => {
   const {name} = req.query;
   try {
-    let topics = await sequelize.query(
-      `SELECT topic_id FROM topics
-      WHERE name = :name`,
-      {
-        type: QueryTypes.SELECT,
-        replacements: {
-          name
-        }
+    let topics = await Topics.findOne({
+      where: {
+        name: name
       }
-    );
-    let topicIds = topics.map((topic) => topic.topic_id);
+    });
 
-    if (topicIds.length === 0) {
+    if (!topics) {
       res.status(400).json({
         code: 400,
         message: 'Topic not found'
@@ -31,14 +25,14 @@ module.exports = async (req, res) => {
         INNER JOIN post_topics pt 
         ON p.post_id = pt.post_id
       WHERE 
-        pt.topic_id IN (:topicIds)
+        pt.topic_id = :topic_id
         AND p.duration >= now()
       ORDER BY created_at DESC
       LIMIT 1`,
       {
         type: QueryTypes.SELECT,
         replacements: {
-          topicIds
+          topic_id: topics.topic_id
         }
       }
     );
