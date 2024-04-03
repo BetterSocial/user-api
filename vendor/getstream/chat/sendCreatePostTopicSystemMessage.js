@@ -24,7 +24,7 @@ async function sendCreatePostTopicSystemMessage(
     throw new Error('Missing params');
   }
 
-  const {isAnonimous} = otherParams;
+  const {isAnonimous, post_expired_at} = otherParams;
   let text = isAnonimous
     ? 'There are new incognito posts'
     : `There are new posts from ${systemMesssageTriggerActorUsername} & others`;
@@ -32,7 +32,8 @@ async function sendCreatePostTopicSystemMessage(
   return await sendBaseSystemMessage(channel, systemMessageTriggerActorUserId, text, {
     isSystem: false,
     type: 'regular',
-    better_type: 'new_topic_post'
+    better_type: 'new_topic_post',
+    post_expired_at
   });
 }
 
