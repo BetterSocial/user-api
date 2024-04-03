@@ -8,7 +8,7 @@ const {
   getFeedDuration
 } = require('../../../utils/post');
 const CloudinaryService = require('../../../vendor/cloudinary');
-const {User, Locations, PostAnonUserInfo, sequelize} = require('../../../databases/models');
+const {User, Locations, PostAnonUserInfo} = require('../../../databases/models');
 const Getstream = require('../../../vendor/getstream');
 const LocationFunction = require('../../../databases/functions/location');
 const {POST_TYPE_STANDARD, POST_VERSION} = require('../../../helpers/constants');
@@ -99,7 +99,9 @@ const BetterSocialCreatePost = async (req, isAnonimous = true) => {
 
     body.tagUsers?.forEach(async (user_id) => {
       await sendMultiDeviceTaggedNotification(
-        isAnonimous ? {username: `Anonymous ${body?.anon_user_info?.emoji_name}`} : userDetail,
+        isAnonimous
+          ? {username: `${body?.anon_user_info?.color_name} ${body?.anon_user_info?.emoji_name}`}
+          : userDetail,
         user_id,
         data.message,
         feed.id

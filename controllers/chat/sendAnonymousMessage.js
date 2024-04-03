@@ -56,13 +56,14 @@ const sendAnonymousMessage = async (req, res) => {
     if (
       req.user.is_anonymous &&
       createdChannel.channel.anon_user_info_emoji_name &&
-      client.user.name !== `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`
+      client.user.name !==
+        `${createdChannel.channel.anon_user_info_color_name} ${createdChannel.channel.anon_user_info_emoji_name}`
     ) {
       await client.upsertUser({
         id: req.userId,
-        name: `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`,
+        name: `${createdChannel.channel.anon_user_info_color_name} ${createdChannel.channel.anon_user_info_emoji_name}`,
         image: createdChannel.channel.anon_user_info_emoji_code,
-        username: `Anonymous ${createdChannel.channel.anon_user_info_emoji_name}`
+        username: `${createdChannel.channel.anon_user_info_color_name} ${createdChannel.channel.anon_user_info_emoji_name}`
       });
     }
     if (createdChannel?.channel?.is_channel_blocked)

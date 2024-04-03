@@ -24,7 +24,7 @@ module.exports = async (
   if (!userAnon.data.username) {
     await clientUser
       .user(anonymousUserId)
-      .update({username: `Anonymous ${anonUserInfo?.emoji_name}`});
+      .update({username: `${anonUserInfo?.color_name} ${anonUserInfo?.emoji_name}`});
   }
 
   const handleResponse = await clientUser.reactions.add(

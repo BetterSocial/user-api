@@ -33,15 +33,18 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
      * @type {import('stream-chat').OwnUserResponse}
      */
     const user = {
-      name: `Anonymous ${anon_user_info_emoji_name}`,
+      name: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`,
       id: req.userId,
       image: '',
-      username: `Anonymous ${anon_user_info_emoji_name}`
+      username: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`
     };
     await client.connectUser(user, req.token);
 
-    if (client.user.name !== `Anonymous ${anon_user_info_emoji_name}`) {
-      await client.upsertUser({id: req.userId, name: `Anonymous ${anon_user_info_emoji_name}`});
+    if (client.user.name !== `${anon_user_info_color_name} ${anon_user_info_emoji_name}`) {
+      await client.upsertUser({
+        id: req.userId,
+        name: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`
+      });
     }
 
     const targetUserData = await UsersFunction.findUserById(User, member);
@@ -59,9 +62,9 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
         message,
         user: {
           id: req.userId,
-          name: `Anonymous ${anon_user_info_emoji_name}`,
+          name: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`,
           image: '',
-          username: `Anonymous ${anon_user_info_emoji_name}`
+          username: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`
         },
         reply_data: {
           user: {
@@ -100,7 +103,7 @@ const initChatFromProfileAsAnonymousV2 = async (req, res) => {
     const targetsUserModel = [targetUserData];
     targetsUserModel.push({
       user_id: req.userId,
-      username: `Anonymous ${anon_user_info_emoji_name}`,
+      username: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`,
       profile_pic_path: '',
       anon_user_info_color_code,
       anon_user_info_color_name,

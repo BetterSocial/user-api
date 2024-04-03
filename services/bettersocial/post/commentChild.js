@@ -27,7 +27,7 @@ const BetterSocialCreateCommentChild = async (req, isAnonimous) => {
     let result = {};
 
     let commentAuthor = {
-      username: `Anonymous ${anon_user_info?.emoji_name}`,
+      username: `${anon_user_info?.color_name} ${anon_user_info?.emoji_name}`,
       profile_pic_path: USERS_DEFAULT_IMAGE,
       anon_user_info
     };
@@ -214,7 +214,7 @@ const BetterSocialCreateCommentChildV3Anonymous = async (req) => {
     });
 
     const commentAuthor = {
-      username: `Anonymous ${anonInfo?.anon_user_info_emoji_name}`,
+      username: `${anonInfo?.anon_user_info_color_name} ${anonInfo?.anon_user_info_emoji_name}`,
       profile_pic_path: USERS_DEFAULT_IMAGE,
       anon_user_info
     };
