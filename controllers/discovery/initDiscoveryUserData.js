@@ -85,7 +85,8 @@ const InitDiscoveryUserData = async (req, res) => {
                 AND f2.user_id_followed = A.user_id
             ) AS is_followed,
             CommonUsers.common, 
-            B.user_id_follower 
+            B.user_id_follower,
+		        (A.last_active_at > NOW() - INTERVAL '7 days') AS recently_active
         from users A
         LEFT JOIN 
                 (SELECT 
@@ -107,8 +108,9 @@ const InitDiscoveryUserData = async (req, res) => {
           ${where_anon_dm} 
           ${filterBlockedUser}
         ORDER BY
-          is_followed DESC,
-          COALESCE(A.karma_score, 0) DESC,
+          recently_active DESC,
+          community_info DESC,
+          A.karma_score DESC,
           followersCount DESC
         LIMIT :limit
         OFFSET :offset`;
