@@ -26,7 +26,8 @@ const {
   initChatFromProfileAsSignedV2,
   sendAnonymousMessage,
   newChatAnonymous,
-  leaveGroupMember
+  leaveGroupMember,
+  getMessageDetail
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -142,5 +143,7 @@ router.post(
   auth.isAuthV2,
   leaveGroupMember
 );
+
+router.get('/message/:messageID', auth.isAuth, getMessageDetail);
 
 module.exports = router;
