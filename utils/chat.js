@@ -14,7 +14,7 @@ const determineMessageType = (messageType, attachments) => {
  * @param {import('stream-chat').MessageResponse} message
  */
 const generateReplyDataFromMessage = (message, userData, isAnonimous = true) => {
-  const anonymousName = `Anonymous ${userData?.anon_user_info_emoji_name}`;
+  const anonymousName = `${userData?.anon_user_info_color_name} ${userData?.anon_user_info_emoji_name}`;
 
   const baseReplyData = {
     user: {

@@ -15,8 +15,8 @@ const {
 
 const setNewStateMemberWithAnonInfo = (anon_user_info) => {
   let user = {
-    name: `Anonymous ${anon_user_info.anon_user_info_emoji_name}`,
-    username: `Anonymous ${anon_user_info.anon_user_info_emoji_name}`
+    name: `${anon_user_info.anon_user_info_color_name} ${anon_user_info.anon_user_info_emoji_name}`,
+    username: `${anon_user_info.anon_user_info_color_name} ${anon_user_info.anon_user_info_emoji_name}`
   };
   return {
     anon_user_info_color_code: anon_user_info.anon_user_info_color_code,
@@ -107,10 +107,10 @@ const moveToAnon = async (req, res) => {
      * @type {import('stream-chat').OwnUserResponse}
      */
     const user = {
-      name: `Anonymous ${anon_user_info_emoji_name}`,
+      name: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`,
       id: req.userId,
       image: '',
-      username: `Anonymous ${anon_user_info_emoji_name}`
+      username: `${anon_user_info_color_name} ${anon_user_info_emoji_name}`
     };
     await client.connectUser(user, req.token);
     let is_anon_to_anon = await is_all_anon_user(members);

@@ -46,9 +46,10 @@ const BetterSocialCreateComment = async (req, isAnonimous = true) => {
     let detailUser = {};
     let result = {};
     const commentAuthorEmojiName = anon_user_info?.emoji_name;
+    const commentAuthorColorName = anon_user_info?.color_name;
 
     let commentAuthor = {
-      username: `Anonymous ${capitalize(commentAuthorEmojiName)}`,
+      username: `${capitalize(commentAuthorColorName)} ${capitalize(commentAuthorEmojiName)}`,
       profile_pic_path: USERS_DEFAULT_IMAGE,
       anon_user_info
     };
@@ -215,7 +216,11 @@ const BetterSocialCreateCommentV3Anonymous = async (req) => {
     if (!(await UsersFunction.checkIsMe(User, actor?.id, userId)))
       await sendMultiDeviceCommentNotification(
         signedFeedOwnerId,
-        {username: `Anonymous ${capitalize(anonInfo.anon_user_info_emoji_name)}`},
+        {
+          username: `${capitalize(anonInfo.anon_user_info_color_name)} ${capitalize(
+            anonInfo.anon_user_info_emoji_name
+          )}`
+        },
         message,
         activity_id
       );
