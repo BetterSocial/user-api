@@ -1,6 +1,7 @@
 const {QueryTypes} = require('sequelize');
 const {sequelize, UserBlockedUser} = require('../../databases/models');
 const UsersFunction = require('../../databases/functions/users');
+const {MINIMUM_KARMA_SCORE} = require('../../helpers/constants');
 
 /**
  *
@@ -56,8 +57,8 @@ const SearchUser = async (req, res) => {
           u.karma_score,
           u.is_karma_unlocked,
           (SELECT COUNT(*) FROM user_follow_user WHERE user_id_followed = u.user_id) AS followersCount,
-          ARRAY(
-              SELECT name
+          (
+              SELECT count(name) > 1
               FROM (
                   SELECT name, ROW_NUMBER() OVER (ORDER BY tp.topic_id) AS row_num
                   FROM topics AS tp
@@ -68,9 +69,9 @@ const SearchUser = async (req, res) => {
                       LEFT JOIN user_topics AS utp ON tp.topic_id = utp.topic_id
                       WHERE utp.user_id = :userId
                   )
+                  LIMIT 2
               ) AS subquery
-              WHERE row_num <= 3
-          ) AS community_info,
+          ) AS community_info_result,
           EXISTS (
               SELECT 1
               FROM user_follow_user AS f2
@@ -88,10 +89,11 @@ const SearchUser = async (req, res) => {
           AND u.user_id != :userId
           AND u.is_anonymous = false
           AND u.is_banned = false 
+          AND u.karma_score > :minimumKarmaScore
           AND u.verified_status != 'UNVERIFIED') 
       ORDER BY  
           recently_active DESC,
-          community_info DESC,
+          community_info_result DESC,
           u.karma_score DESC,
           followersCount DESC
       LIMIT :limit`,
@@ -101,6 +103,7 @@ const SearchUser = async (req, res) => {
           likeQuery: '%' + q + '%',
           allow_anon_dm,
           userId,
+          minimumKarmaScore: MINIMUM_KARMA_SCORE,
           limit
         }
       }
