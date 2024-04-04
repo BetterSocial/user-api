@@ -3,7 +3,10 @@ const {
   POST_CHECK_FEED_EXPIRED,
   POST_CHECK_AUTHOR_BLOCKED,
   POST_CHECK_AUTHOR_NOT_FOLLOWING,
-  POST_CHECK_FEED_NOT_FOUND
+  POST_CHECK_FEED_NOT_FOUND,
+  POST_PRIVACY_PUBLIC,
+  POST_CHECK_PUBLIC,
+  POST_CHECK_ANONYMOUS
 } = require('../../helpers/constants');
 const {getDetailFeed} = require('../../services/getstream');
 const {isDateExpired} = require('../../utils/date');
@@ -52,6 +55,21 @@ module.exports = async (req, res) => {
       code: POST_CHECK_AUTHOR_BLOCKED,
       message: 'Author has blocked you'
     });
+
+  if (feed?.privacy === POST_PRIVACY_PUBLIC)
+    return res.status(200).json({
+      success: true,
+      code: POST_CHECK_PUBLIC,
+      message: 'Public post'
+    });
+
+  if (feed?.anonimity) {
+    return res.status(200).json({
+      success: true,
+      code: POST_CHECK_ANONYMOUS,
+      message: 'Anonymous post'
+    });
+  }
 
   let isAuthorFollowMe = await UserFollowUser?.findOne({
     where: {
