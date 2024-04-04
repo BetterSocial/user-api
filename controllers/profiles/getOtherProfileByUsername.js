@@ -57,9 +57,14 @@ module.exports = async (req, res) => {
       replacements: {user_id_followed: req?.userId || '', user_id_follower: targetUserId}
     });
 
+    const isMeFollowingTarget = await sequelize.query(isFollowingQuery, {
+      replacements: {user_id_followed: targetUserId || '', user_id_follower: req?.userId}
+    });
+
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
     const getFollowingCountResult = getFollowingCount?.[0]?.[0]?.count_following;
     const isFollowingResult = isFollowing?.[0]?.length > 0;
+    const isMeFollowingTargetResult = isMeFollowingTarget?.[0]?.length > 0;
 
     const copyUser = {...user.dataValues};
 
@@ -75,6 +80,7 @@ module.exports = async (req, res) => {
 
     copyUser.isSignedMessageEnabled = true;
     copyUser.isAnonMessageEnabled = false;
+    copyUser.is_me_following_target = isMeFollowingTargetResult;
 
     if (copyUser.allow_anon_dm) {
       if (copyUser.only_received_dm_from_user_following) {
