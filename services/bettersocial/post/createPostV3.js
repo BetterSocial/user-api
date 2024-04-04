@@ -190,7 +190,8 @@ async function processSendSystemMessage(
   selfUserId,
   username,
   with_system_message = false,
-  isAnonimous = false
+  isAnonimous = false,
+  processSendSystemMessage = 'never'
 ) {
   if (!with_system_message) return;
   if (!filteredTopics) return;
@@ -198,6 +199,10 @@ async function processSendSystemMessage(
   if (!selfUserId || !username) throw new Error('Missing params');
 
   console.log('send system message');
+  const post_expired_at =
+    processSendSystemMessage !== 'never'
+      ? moment().utc().add(+processSendSystemMessage, 'day')
+      : moment().utc().add(100, 'years');
 
   const adminClient = new StreamChat(
     Environment.GETSTREAM_API_KEY,
@@ -213,7 +218,10 @@ async function processSendSystemMessage(
         .create()
         .then(() => {
           Getstream.chat
-            .sendCreatePostTopicSystemMessage(channel, selfUserId, username, {isAnonimous})
+            .sendCreatePostTopicSystemMessage(channel, selfUserId, username, {
+              isAnonimous,
+              post_expired_at
+            })
             .then(() => {
               resolve();
             })
@@ -330,13 +338,13 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
         anonUserInfoEmojiName: body?.anon_user_info?.emoji_name
       });
     }
-
     await processSendSystemMessage(
       filteredTopics,
       req?.userId,
       user?.username,
       body?.with_system_message,
-      isAnonimous
+      isAnonimous,
+      body?.duration_feed
     );
 
     await PostFunction.updateGetstreamActivityId(Post, data?.foreign_id, post?.id);

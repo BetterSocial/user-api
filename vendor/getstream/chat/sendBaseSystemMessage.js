@@ -13,6 +13,7 @@ const {Channel} = require('stream-chat');
  * @property {string} [other_text='']
  * @property {string} [own_text='']
  * @property {string} [type='system']
+ * @property {string} [post_expired_at]
  *
  */
 
@@ -40,7 +41,8 @@ async function sendBaseSystemMessage(
     other_text = '',
     own_text = '',
     skip_push = true,
-    type = 'system'
+    type = 'system',
+    post_expired_at = null
   } = otherParams;
   try {
     const response = await channel.sendMessage(
@@ -56,7 +58,8 @@ async function sendBaseSystemMessage(
         other_system_user,
         better_type,
         ignore_unread_count,
-        ignore_update_timestamp
+        ignore_update_timestamp,
+        post_expired_at
       },
       {
         skip_push
