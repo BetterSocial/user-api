@@ -51,7 +51,8 @@ const changeChannelDetail = async (req, res) => {
           is_from_prepopulated: true,
           system_user: userId,
           isSystem: true,
-          members: members
+          members: members,
+          channel_name
         },
         {
           skip_push: true
@@ -74,7 +75,8 @@ const changeChannelDetail = async (req, res) => {
           user_id: userId,
           system_user: userId,
           isSystem: true,
-          members: members
+          members: members,
+          channel_image
         },
         {
           skip_push: true
