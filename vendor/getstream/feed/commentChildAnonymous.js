@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const GetstreamSingleton = require('../singleton');
-const {createToken} = require('../../../services/getstream');
+const createToken = require('../../../vendor/getstream/core/createToken');
 
 module.exports = async (
   anonymousUserId,
