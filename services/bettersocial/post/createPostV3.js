@@ -318,7 +318,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
 
   const user = isAnonimous
     ? {
-        username: `${body?.anon_user_info_color_name} ${body?.anon_user_info?.emoji_name}`
+        username: `${body?.anon_user_info?.color_name} ${body?.anon_user_info?.emoji_name}`
       }
     : userDetail;
 
