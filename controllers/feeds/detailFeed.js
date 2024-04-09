@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
   }
 
   if (!feedItem) {
-    return ErrorResponse.e404(res, 'This post not found');
+    return ErrorResponse.e404(res, 'Post not found');
   }
 
   if (feedExpiredAt.isBefore(moment())) {
