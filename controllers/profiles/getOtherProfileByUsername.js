@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
     });
 
     const isMeFollowingTarget = await sequelize.query(isFollowingQuery, {
-      replacements: {user_id_followed: targetUserId || '', user_id_follower: req?.userId}
+      replacements: {user_id_followed: targetUserId || '', user_id_follower: req?.userId || ''}
     });
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
@@ -98,11 +98,11 @@ module.exports = async (req, res) => {
       data: copyUser
     });
   } catch (error) {
-    const {status, data} = error.response;
+    console.log('error', error);
     return res.status(500).json({
-      code: status,
+      code: error?.response?.status,
       status: 'error',
-      message: data
+      message: error?.response?.data
     });
   }
 };
