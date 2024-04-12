@@ -88,8 +88,7 @@ const SearchUser = async (req, res) => {
           ${filterBlockedUser}
           AND u.user_id != :userId
           AND u.is_anonymous = false
-          AND u.is_banned = false 
-          AND u.karma_score > :minimumKarmaScore
+          AND u.is_banned = false
           AND u.verified_status != 'UNVERIFIED') 
       ORDER BY  
           recently_active DESC,
