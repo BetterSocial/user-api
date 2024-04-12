@@ -31,7 +31,17 @@ const Search = async (req, res) => {
               WHERE 
                 ("f"."user_id" = :userId 
                 OR "f"."user_id" = :anonymousUserId)
-                AND "f"."topic_id" = "Topic"."topic_id")
+                AND "f"."topic_id" = "Topic"."topic_id"),
+            (1 + COUNT("topicFollower"."user_id")*(0.2 + (SELECT 
+              count("D"."post_id") 
+              FROM "posts" as "D" 
+              INNER JOIN "post_topics" as "E" 
+              ON "D"."post_id" = "E"."post_id" 
+              INNER JOIN "topics" as "F" 
+              ON "E"."topic_id" = "F"."topic_id" 
+              WHERE "F"."topic_id" = "Topic"."topic_id" 
+              AND "D"."created_at" > current_date - interval '7 days'
+            ) ^ 0.5)) AS ordering_score
         FROM "topics" 
             AS "Topic" 
         LEFT OUTER JOIN "user_topics" 
@@ -43,8 +53,7 @@ const Search = async (req, res) => {
         GROUP BY 
             "Topic"."topic_id"
         ORDER BY
-            "user_id_follower" ASC,
-            "followersCount" DESC
+            "ordering_score" DESC
             LIMIT :limit`,
       {
         type: QueryTypes.SELECT,
