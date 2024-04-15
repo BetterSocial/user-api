@@ -25,7 +25,15 @@ const InitDiscoveryTopicData = async (req, res) => {
                 A.topic_id, 
                 COUNT(*) as common,
                 A.user_id as user_id_follower,
-                (1 + COUNT(A.user_id)*(0.2 + (SELECT 
+                ((1 + 
+									CASE
+											when COUNT(A.user_id) < 20 then COUNT(A.user_id)
+									ELSE 
+											20
+									END
+								)
+									*
+									(0.2 + (SELECT 
                   count(D.post_id) 
                   FROM posts D 
                   INNER JOIN post_topics E 

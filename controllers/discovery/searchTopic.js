@@ -32,15 +32,23 @@ const Search = async (req, res) => {
                 ("f"."user_id" = :userId 
                 OR "f"."user_id" = :anonymousUserId)
                 AND "f"."topic_id" = "Topic"."topic_id"),
-            (1 + COUNT("topicFollower"."user_id")*(0.2 + (SELECT 
-              count("D"."post_id") 
-              FROM "posts" as "D" 
-              INNER JOIN "post_topics" as "E" 
-              ON "D"."post_id" = "E"."post_id" 
-              INNER JOIN "topics" as "F" 
-              ON "E"."topic_id" = "F"."topic_id" 
-              WHERE "F"."topic_id" = "Topic"."topic_id" 
-              AND "D"."created_at" > current_date - interval '7 days'
+            ((1 + 
+              CASE
+                  when COUNT(topicFollower.user_id) < 20 then COUNT(topicFollower.user_id)
+              ELSE 
+                  20
+              END
+            )
+              *
+              (0.2 + (SELECT 
+              count(D.post_id) 
+              FROM posts D 
+              INNER JOIN post_topics E 
+              ON D.post_id = E.post_id 
+              INNER JOIN topics F 
+              ON E.topic_id = F.topic_id 
+              WHERE F.topic_id = topicFollower.topic_id 
+              AND D.created_at > current_date - interval '7 days'
             ) ^ 0.5)) AS ordering_score
         FROM "topics" 
             AS "Topic" 
