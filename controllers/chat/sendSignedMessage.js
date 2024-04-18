@@ -112,6 +112,13 @@ const sendSignedMesage = async (req, res) => {
       senderInfo = better_channel_member.find((element) => element.user_id === req.userId);
     }
 
+    // Send PN to all members in group chat except sender
+    if (channelType === 1) {
+      let better_channel_member = createdChannel?.channel?.better_channel_member;
+      channelMember = better_channel_member.filter((element) => element.user_id !== req.userId);
+      senderInfo = better_channel_member.find((element) => element.user_id === req.userId);
+    }
+
     const currentMessageType = determineMessageType(messageType, attachments);
 
     let baseMessage = {
@@ -165,6 +172,7 @@ const sendSignedMesage = async (req, res) => {
           is_annoymous: member.is_anonymous.toString()
         }
       };
+
       BetterSocialCore.fcmToken.sendChatNotification(member.user_id, payload, {
         priority: 'high',
         content_available: true
