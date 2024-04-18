@@ -23,46 +23,39 @@ const Search = async (req, res) => {
   try {
     const topics = await sequelize.query(
       `SELECT 
-            "Topic".*,
-            count("topicFollower"."user_id") 
-                AS "followersCount",
-            (SELECT "f"."user_id" AS "user_id_follower" 
-              FROM "user_topics" AS f 
-              WHERE 
-                ("f"."user_id" = :userId 
-                OR "f"."user_id" = :anonymousUserId)
-                AND "f"."topic_id" = "Topic"."topic_id"),
-            ((1 + 
-              CASE
-                  when COUNT(topicFollower.user_id) < 20 then COUNT(topicFollower.user_id)
-              ELSE 
-                  20
-              END
+        C.*,
+        COUNT(*) as followersCount,
+        A.user_id as user_id_follower,
+        (
+          (1 + 
+                  CASE
+                      when COUNT(A.user_id) < 20 then COUNT(A.user_id)
+                  ELSE 
+                      20
+                  END
             )
-              *
-              (0.2 + (SELECT 
-              count(D.post_id) 
-              FROM posts D 
-              INNER JOIN post_topics E 
-              ON D.post_id = E.post_id 
-              INNER JOIN topics F 
-              ON E.topic_id = F.topic_id 
-              WHERE F.topic_id = topicFollower.topic_id 
-              AND D.created_at > current_date - interval '7 days'
-            ) ^ 0.5)) AS ordering_score
-        FROM "topics" 
-            AS "Topic" 
-        LEFT OUTER JOIN "user_topics" 
-            AS "topicFollower" 
-        ON "Topic"."topic_id" = 
-            "topicFollower"."topic_id" 
+            *
+            (0.2 + (SELECT 
+                    count(D.post_id) 
+                    FROM posts D 
+                    INNER JOIN post_topics E 
+                    ON D.post_id = E.post_id 
+                    INNER JOIN topics F 
+                    ON E.topic_id = F.topic_id 
+                    WHERE F.topic_id = A.topic_id 
+                    AND D.created_at > current_date - interval '7 days'
+            ) ^ 0.5)
+        ) AS ordering_score
+        FROM topics C
+        LEFT JOIN  user_topics A
+            ON C.topic_id = A.topic_id
+            AND A.user_id in (:userId, :anonymousUserId)
         WHERE 
-            "Topic"."name" ILIKE :likeQuery
-        GROUP BY 
-            "Topic"."topic_id"
-        ORDER BY
-            "ordering_score" DESC
-            LIMIT :limit`,
+            C.name LIKE :likeQuery
+        GROUP BY A.topic_id, C.topic_id, A.user_id
+        ORDER BY 
+              ordering_score DESC
+        LIMIT :limit`,
       {
         type: QueryTypes.SELECT,
         replacements: {
