@@ -24,7 +24,25 @@ const InitDiscoveryTopicData = async (req, res) => {
                 C.*,
                 A.topic_id, 
                 COUNT(*) as common,
-                A.user_id as user_id_follower
+                A.user_id as user_id_follower,
+                ((1 + 
+									CASE
+											when COUNT(A.user_id) < 20 then COUNT(A.user_id)
+									ELSE 
+											20
+									END
+								)
+									*
+									(0.2 + (SELECT 
+                  count(D.post_id) 
+                  FROM posts D 
+                  INNER JOIN post_topics E 
+                  ON D.post_id = E.post_id 
+                  INNER JOIN topics F 
+                  ON E.topic_id = F.topic_id 
+                  WHERE F.topic_id = A.topic_id 
+                  AND D.created_at > current_date - interval '7 days'
+                ) ^ 0.5)) AS ordering_score
             FROM user_topics A 
             INNER JOIN user_topics B 
                 ON A.topic_id = B.topic_id 
@@ -33,9 +51,7 @@ const InitDiscoveryTopicData = async (req, res) => {
                 ON C.topic_id = A.topic_id
             GROUP BY A.topic_id, C.topic_id, A.user_id
             ORDER BY 
-                common DESC, 
-                A.topic_id ASC,
-                COALESCE(A.user_id, '') ASC
+              ordering_score DESC
             LIMIT :limit
             OFFSET :offset`;
 
