@@ -131,7 +131,7 @@ const getTopics = async (req, res) => {
                 "Topic"."topic_id"
             ORDER BY
                 "followersCount" DESC
-            LIMIT 5`,
+            LIMIT 50`,
       {
         type: QueryTypes.SELECT,
         replacements: {
