@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
     const schema = {
       fcm_token: 'string|empty:false'
     };
-    const validate = v.validate(req.body, schema);
+    const validate = v.validate(req.query, schema);
     if (validate.length) {
       return res.status(403).json({
         code: 403,
@@ -17,14 +17,14 @@ module.exports = async (req, res) => {
         message: validate
       });
     }
-    const exist = await findFcmToken(FcmToken, req.userId, req.body.fcm_token);
+    const exist = await findFcmToken(FcmToken, req.userId, req?.query?.fcm_token);
     if (!exist) {
       return ErrorResponse.e404(res, 'Token not found');
     }
     await FcmToken.destroy({
       where: {
         user_id: req.userId,
-        token: req.body.fcm_token
+        token: req?.query?.fcm_token
       }
     });
 
