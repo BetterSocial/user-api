@@ -101,7 +101,8 @@ const convertLocationFromModel = (locationModel, isTO = false) => {
 };
 
 const setChildCommentLv2 = (childCommentLv2 = [], karmaScores, mySignUserId, myAnonymousId) => {
-  const new_child_comment_lv2 = childCommentLv2?.map((child2) => {
+  let new_child_comment_lv2 = childCommentLv2;
+  return new_child_comment_lv2.map((child2) => {
     const child2_user = karmaScores.find((user) => user.user_id === child2.user_id);
     if (child2.data.anon_user_info_emoji_name) {
       return {
@@ -119,8 +120,6 @@ const setChildCommentLv2 = (childCommentLv2 = [], karmaScores, mySignUserId, myA
       karmaScores: roundingKarmaScore(child2_user?.karma_score || 0)
     };
   });
-
-  return new_child_comment_lv2;
 };
 
 const handleAnonymousData = async (
