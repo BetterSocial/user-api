@@ -100,8 +100,8 @@ const convertLocationFromModel = (locationModel, isTO = false) => {
   return '';
 };
 
-const setChildCommentLv2 = (childCommentLv2 = [], karmaScores, mySignUserId, myAnonymousId) => {
-  let new_child_comment_lv2 = childCommentLv2;
+const setChildCommentLv2 = (childCommentLv2, karmaScores, mySignUserId, myAnonymousId) => {
+  let new_child_comment_lv2 = childCommentLv2 || [];
   return new_child_comment_lv2.map((child2) => {
     const child2_user = karmaScores.find((user) => user.user_id === child2.user_id);
     if (child2.data.anon_user_info_emoji_name) {
