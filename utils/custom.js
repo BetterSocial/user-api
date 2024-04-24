@@ -100,6 +100,28 @@ const convertLocationFromModel = (locationModel, isTO = false) => {
   return '';
 };
 
+const setChildCommentLv2 = (childCommentLv2, karmaScores, mySignUserId, myAnonymousId) => {
+  let new_child_comment_lv2 = childCommentLv2 || [];
+  return new_child_comment_lv2.map((child2) => {
+    const child2_user = karmaScores.find((user) => user.user_id === child2.user_id);
+    if (child2.data.anon_user_info_emoji_name) {
+      return {
+        ...child2,
+        user_id: null,
+        user: {},
+        target_feeds: [],
+        is_you: myAnonymousId === child2.user_id,
+        karmaScores: roundingKarmaScore(child2_user?.karma_score || 0)
+      };
+    }
+    return {
+      ...child2,
+      is_you: mySignUserId === child2.user_id,
+      karmaScores: roundingKarmaScore(child2_user?.karma_score || 0)
+    };
+  });
+};
+
 const handleAnonymousData = async (
   data,
   req,
@@ -113,23 +135,15 @@ const handleAnonymousData = async (
     childComment.map(async (child) => {
       const user = karmaScores.find((user) => user.user_id === child.user_id);
       if (child?.data?.anon_user_info_emoji_name) {
-        let childCommentLv2 = child?.latest_children?.comment || [];
-        childCommentLv2 = childCommentLv2?.map((child2) => {
-          const child2_user = karmaScores.find((user) => user.user_id === child2.user_id);
-          if (child2.data.anon_user_info_emoji_name) {
-            return {
-              ...child2,
-              user_id: null,
-              user: {},
-              target_feeds: [],
-              karmaScores: roundingKarmaScore(child2_user?.karma_score || 0)
-            };
-          }
-          return {...child2, karmaScores: roundingKarmaScore(child2_user?.karma_score || 0)};
-        });
+        let childCommentLv2Anon = setChildCommentLv2(
+          child?.latest_children?.comment,
+          karmaScores,
+          req.userId,
+          myAnonymousId
+        );
         return {
           ...child,
-          latest_children: {comment: childCommentLv2},
+          latest_children: {comment: childCommentLv2Anon},
           user_id: null,
           karmaScores: roundingKarmaScore(user?.karma_score || 0),
           user: {},
@@ -138,8 +152,16 @@ const handleAnonymousData = async (
           is_author: postAuthorId === child.user_id
         };
       }
+
+      let childCommentLv2 = setChildCommentLv2(
+        child?.latest_children?.comment,
+        karmaScores,
+        req.userId,
+        myAnonymousId
+      );
       return {
         ...child,
+        latest_children: {comment: childCommentLv2},
         karmaScores: roundingKarmaScore(user?.karma_score || 0),
         is_you: req.userId === child.user_id,
         is_author: child.user_id === postAuthorId
