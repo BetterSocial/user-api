@@ -90,7 +90,7 @@ const sendSignedMesage = async (req, res) => {
     let channelMember = [];
     let senderInfo = [];
     // Prevent if user try to chat with blocked user
-    let channelType = createdChannel?.channel?.channel_type;
+    let channelType = createdChannel?.channel?.channel_type || req.body.channelType || 0;
     if (channelType === 4 || channelType === 0) {
       const blockedIds = await UsersFunction.getBlockedAndBlockerUserId(
         UserBlockedUser,
