@@ -28,7 +28,6 @@ const verifyUserRateLimiter = rateLimiter({
 
 router.post('/check-username', usersHandler.checkUsername);
 router.post('/register', usersHandler.register);
-router.post('/demo-verify-user', usersHandler.demoVerifyUser);
 router.post(
   '/demo-verify-user-v2',
   verifyUserRateLimiter,
@@ -42,7 +41,6 @@ router.post(
   BodyValidationMiddleware.checkPasswordForDemoLogin,
   usersHandler.checkPasswordForDemoLogin
 );
-router.post('/verify-user', usersHandler.verifyUser);
 router.get('/veryfy-token', usersHandler.veryfyToken);
 router.get('/refresh-token', auth.isRefreshToken, usersHandler.refreshToken);
 router.get('/veryfy-token-getstream', auth.isAuth, usersHandler.varifyTokenGetstream);
