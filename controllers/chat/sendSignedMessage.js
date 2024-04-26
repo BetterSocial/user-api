@@ -55,7 +55,7 @@ const sendSignedMesage = async (req, res) => {
       error: validated
     });
 
-  const {channelId, message, channelType, attachments, messageType, replyMessageId} = req.body;
+  let {channelId, message, channelType, attachments, messageType, replyMessageId} = req.body;
 
   let channelTypeDef;
 
@@ -139,11 +139,17 @@ const sendSignedMesage = async (req, res) => {
       });
     }
 
-    const chat = await channel.sendMessage(baseMessage, {skip_push: true});
+    let chat = await channel.sendMessage(baseMessage, {skip_push: true});
     let notificationPayload = {
       title: `${senderInfo?.user?.username}`,
       body: `${message.substring(0, 100)}`
     };
+
+    if (chat && chat.message?.message_type === MESSAGE_TYPE.TEXT) {
+      chat.message.attachments = [];
+      attachments = [];
+    }
+
     let dataPayload = {
       channel_id: channelId,
       user_id: req.userId,
