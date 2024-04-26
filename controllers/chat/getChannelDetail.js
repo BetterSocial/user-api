@@ -4,6 +4,7 @@ const {User} = require('../../databases/models');
 const {ResponseSuccess} = require('../../utils/Responses');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialCore = require('../../services/bettersocial');
+const {MESSAGE_TYPE} = require('../../helpers/constants');
 
 /**
  *
@@ -59,7 +60,15 @@ const getChannelDetail = async (req, res) => {
     better_channel_members: betterChannelMember,
     better_channel_member_objects: betterChannelMemberObject,
     ...updatedChannel,
-    messages: messages?.results?.map((message) => message?.message)
+    messages: messages?.results?.map((message) => {
+      let detail_message = message?.message;
+
+      if (detail_message.message_type === MESSAGE_TYPE.TEXT) {
+        detail_message.attachments = [];
+      }
+
+      return detail_message;
+    })
   });
 };
 
