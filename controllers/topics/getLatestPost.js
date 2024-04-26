@@ -1,8 +1,10 @@
 const {QueryTypes} = require('sequelize');
 const {sequelize, Topics} = require('../../databases/models');
+const {StreamChat} = require('stream-chat');
 
 module.exports = async (req, res) => {
   const {name} = req.query;
+  const {userId, token} = req;
   try {
     let topics = await Topics.findOne({
       where: {
@@ -64,12 +66,32 @@ module.exports = async (req, res) => {
 
     let message = `There are new posts from ${authorUsername}`;
 
+    const getstreamClient = new StreamChat(process.env.API_KEY, process.env.SECRET);
+    let unreadCount = 0;
+    try {
+      await getstreamClient.connectUser({id: userId}, token);
+
+      const userChannel = getstreamClient.channel('topics', `topic_${name}`);
+      const createdChannel = await userChannel.watch();
+      const readUsers = createdChannel?.read;
+      const selfUserReadStatus = readUsers?.find((readStatus) => {
+        return readStatus?.user?.id === userId;
+      });
+
+      unreadCount = selfUserReadStatus?.unread_messages || 0;
+    } catch (e) {
+      console.error('Error getting unread count', e);
+    } finally {
+      getstreamClient.disconnectUser();
+    }
+
     res.status(200).json({
       status: 'success',
       code: 200,
       data: {
         ...post,
-        message
+        message,
+        unread_count: unreadCount
       }
     });
   } catch (error) {
