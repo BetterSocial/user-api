@@ -1,6 +1,6 @@
-const {QueryTypes} = require('sequelize');
-const {sequelize, Topics} = require('../../databases/models');
+const {Topics} = require('../../databases/models');
 const {StreamChat} = require('stream-chat');
+const stream = require('getstream');
 
 module.exports = async (req, res) => {
   const {name} = req.query;
@@ -19,50 +19,31 @@ module.exports = async (req, res) => {
       });
     }
 
-    let post_topics = await sequelize.query(
-      `SELECT
-        pt.topic_id,
-        p.*,
-        pAnonUserInfo.anon_user_info_color_code,
-        pAnonUserInfo.anon_user_info_color_name,
-        pAnonUserInfo.anon_user_info_emoji_code,
-        pAnonUserInfo.anon_user_info_emoji_name,
-        u.username,
-        u.is_anonymous,
-        u.profile_pic_path
-      FROM posts p 
-      INNER JOIN post_topics pt 
-        ON p.post_id = pt.post_id
-      INNER JOIN post_anon_user_info pAnonUserInfo
-        ON pAnonUserInfo.post_id = p.getstream_activity_id
-      INNER JOIN users u
-        ON u.user_id = p.author_user_id
-      WHERE 
-        pt.topic_id = :topic_id
-        AND p.duration >= now()
-      ORDER BY created_at DESC
-      LIMIT 1`,
-      {
-        type: QueryTypes.SELECT,
-        replacements: {
-          topic_id: topics.topic_id
-        },
-        raw: true
-      }
-    );
+    const feedClient = stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);
+    let feed = undefined;
 
-    if (post_topics?.length < 1) {
-      res.status(400).json({
-        success: false,
-        message: 'This topic has no active post'
+    try {
+      const clientFeed = feedClient.feed('topic', name, token);
+      const topicFeed = await clientFeed.get({
+        limit: 1,
+        enrich: true
       });
+
+      if (topicFeed?.results?.length < 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'This topic has no active post'
+        });
+      }
+
+      feed = topicFeed?.results?.at(0);
+    } catch (e) {
+      console.error('Error getting feed', e);
     }
 
-    let post = post_topics?.at(0);
-
-    let authorUsername = post?.is_anonymous
-      ? `${post?.anon_user_info_color_name} ${post?.anon_user_info_emoji_name}`
-      : post?.username;
+    let authorUsername = feed?.anonimity
+      ? `${feed?.anon_user_info_color_name} ${feed?.anon_user_info_emoji_name}`
+      : feed?.actor?.data?.username;
 
     let message = `There are new posts from ${authorUsername}`;
 
@@ -70,7 +51,6 @@ module.exports = async (req, res) => {
     let unreadCount = 0;
     try {
       await getstreamClient.connectUser({id: userId}, token);
-
       const userChannel = getstreamClient.channel('topics', `topic_${name}`);
       const createdChannel = await userChannel.watch();
       const readUsers = createdChannel?.read;
@@ -85,11 +65,15 @@ module.exports = async (req, res) => {
       getstreamClient.disconnectUser();
     }
 
+    if (feed?.anonimity) {
+      feed.actor = {};
+    }
+
     res.status(200).json({
       status: 'success',
       code: 200,
       data: {
-        ...post,
+        ...feed,
         message,
         unread_count: unreadCount
       }
