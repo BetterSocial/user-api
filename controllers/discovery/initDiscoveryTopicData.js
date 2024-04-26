@@ -41,7 +41,7 @@ const InitDiscoveryTopicData = async (req, res) => {
                               FROM posts D 
                               INNER JOIN post_topics E 
                               ON D.post_id = E.post_id 
-                              WHERE E.topic_id = A.topic_id 
+                              WHERE E.topic_id = C.topic_id 
                               AND D.created_at > current_date - interval '7 days'
                                 ) ^ 0.5)) AS ordering_score
                             FROM user_topics A 
