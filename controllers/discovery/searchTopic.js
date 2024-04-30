@@ -22,41 +22,60 @@ const Search = async (req, res) => {
 
   try {
     const topics = await sequelize.query(
-      `SELECT 
-            C.*,
-            A.topic_id, 
-            COUNT(*) as followersCount,
-            A.user_id as user_id_follower,
-            ((1 + 
-              CASE
-                  when COUNT(A.user_id) < 20 then COUNT(A.user_id)
-              ELSE 
-                  20
-              END
-            )
-              *
-              (0.2 + (SELECT 
-              count(D.post_id) 
-              FROM posts D 
-              INNER JOIN post_topics E 
-              ON D.post_id = E.post_id 
-              INNER JOIN topics F 
-              ON E.topic_id = F.topic_id 
-              WHERE F.topic_id = A.topic_id 
-              AND D.created_at > current_date - interval '7 days'
-            ) ^ 0.5)) AS ordering_score
-        FROM user_topics A 
-        INNER JOIN user_topics B 
-            ON A.topic_id = B.topic_id
-            AND A.user_id in (:userId, :anonymousUserId)
-        RIGHT JOIN topics C 
-            ON C.topic_id = A.topic_id
-        WHERE 
-            C.name ILIKE :likeQuery
-        GROUP BY A.topic_id, C.topic_id, A.user_id
-        ORDER BY 
-          ordering_score DESC
-        LIMIT :limit`,
+      `
+    WITH post_counts AS (
+        SELECT 
+            E.topic_id,
+            count(D.post_id) AS post_count
+        FROM posts D 
+        INNER JOIN post_topics E 
+        ON D.post_id = E.post_id 
+        WHERE D.created_at > current_date - interval '7 days'
+        GROUP BY E.topic_id
+    ), user_follow_counts AS (
+        SELECT 
+            ut.topic_id,
+            count(ufu.user_id_followed) AS friend_count
+        FROM user_follow_user ufu
+        INNER JOIN user_topics ut ON ufu.user_id_followed = ut.user_id
+        WHERE ufu.user_id_follower = :userId
+        GROUP BY ut.topic_id
+    ), topic_followers AS (
+        SELECT 
+            topic_id,
+            count(*) AS followers_count
+        FROM user_topics
+        GROUP BY topic_id
+    ), user_topic_follow_counts AS (
+        SELECT 
+            ut.topic_id,
+            count(*) AS user_follow_count
+        FROM user_topics ut
+        WHERE ut.user_id IN (:userId, :anonymousUserId)
+        GROUP BY ut.topic_id
+    )
+    SELECT 
+        C.*,
+        C.topic_id,
+        COALESCE(tf.followers_count, 0) AS followersCount,
+        utfc.user_follow_count AS user_id_follower,
+        ((1 + 
+            CASE
+                WHEN COALESCE(ufc.friend_count, 0) > 20 THEN 20
+                ELSE COALESCE(ufc.friend_count, 0)
+            END)
+            *
+            (0.2 + POW(COALESCE(pc.post_count, 0), 0.5))
+        ) AS ordering_score
+    FROM topics C 
+    LEFT JOIN post_counts pc ON C.topic_id = pc.topic_id
+    LEFT JOIN user_follow_counts ufc ON C.topic_id = ufc.topic_id
+    LEFT JOIN topic_followers tf ON C.topic_id = tf.topic_id
+    LEFT JOIN user_topic_follow_counts utfc ON C.topic_id = utfc.topic_id
+    WHERE C.name ILIKE :likeQuery
+    GROUP BY C.name, C.topic_id, pc.post_count, ufc.friend_count, tf.followers_count, utfc.user_follow_count
+    ORDER BY ordering_score DESC
+    LIMIT :limit;`,
       {
         type: QueryTypes.SELECT,
         replacements: {
