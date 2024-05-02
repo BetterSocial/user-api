@@ -70,6 +70,10 @@ const InitDiscoveryUserData = async (req, res) => {
             A.karma_score,
             A.allow_anon_dm,
             A.only_received_dm_from_user_following,
+            ARRAY( select name from topics as tp
+              left join user_topics as utp on tp.topic_id = utp.topic_id
+              where utp.user_id = A.user_id limit 3
+            ) as community_info,
             ( select count(name) > 1 from topics as tp
 							left join user_topics as utp on tp.topic_id = utp.topic_id
 							where utp.user_id = A.user_id and tp.topic_id in (:topicIds) LIMIT 2

@@ -56,6 +56,10 @@ const SearchUser = async (req, res) => {
           u.combined_user_score,
           u.karma_score,
           u.is_karma_unlocked,
+          ARRAY( select name from topics as tp
+            left join user_topics as utp on tp.topic_id = utp.topic_id
+            where utp.user_id = u.user_id limit 3
+          ) as community_info,
           (SELECT COUNT(*) FROM user_follow_user WHERE user_id_followed = u.user_id) AS followersCount,
           (
               SELECT count(name) > 1
