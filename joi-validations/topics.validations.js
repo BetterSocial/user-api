@@ -10,6 +10,11 @@ const TopicValidation = {
     body: {
       name: string.required()
     }
+  },
+  create: {
+    body: {
+      name: string.required()
+    }
   }
 };
 
