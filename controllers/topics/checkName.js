@@ -2,7 +2,7 @@ const {Topics} = require('../../databases/models');
 
 module.exports = async (req, res) => {
   try {
-    let {name} = req.body;
+    let {name} = req.query;
     name = name.toLowerCase();
     let topics = await Topics.findOne({
       where: {
@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
       available: false
     };
 
-    if (topics) {
+    if (!topics) {
       response = {
         success: true,
         message: 'Community name available',

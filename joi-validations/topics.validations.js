@@ -7,7 +7,7 @@ const TopicValidation = {
     }
   },
   checkName: {
-    body: {
+    query: {
       name: string.required()
     }
   },
