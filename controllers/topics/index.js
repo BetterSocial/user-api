@@ -12,6 +12,7 @@ const TopicService = require('../../services/postgres/TopicService');
 const TopicValidator = require('../../validators/topic');
 const topics = require('./topics');
 const checkName = require('./checkName');
+const create = require('./create');
 const getFollowedTopic = require('./getFollowedTopic');
 const getLatestPost = require('./getLatestPost');
 const {Topics, UserTopic, UserTopicHistory, sequelize, User} = require('../../databases/models');
@@ -398,6 +399,7 @@ const getFollowerList = async (req, res) => {
 module.exports = {
   topics,
   checkName,
+  create,
   putFollowTopic,
   getFollowTopic,
   getFollowedTopic,
