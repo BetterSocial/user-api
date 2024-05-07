@@ -11,6 +11,7 @@ const {redisClient} = require('../config/redis');
 const {validate} = require('../middlewares/joi-validation/validate');
 const {UserValidation} = require('../joi-validations/users.validations');
 const RegisterV2WithoutUploadPhotoMiddleware = require('../middlewares/register-user/registerV2WithoutUploadPhoto');
+const getTargetUserIdByPMChannelIdMiddleware = require('../middlewares/user/getTargetUserIdByPMChannelId');
 
 const rateLimiter = expressLimiter(router, redisClient);
 
@@ -90,6 +91,12 @@ router.post(
   usersHandler.unblockUserV2
 );
 router.get('/check-follow', auth.isAuth, usersHandler.checkFollow);
+router.get(
+  '/check-follow-by-channelId',
+  auth.isAuth,
+  getTargetUserIdByPMChannelIdMiddleware,
+  usersHandler.checkFollow
+);
 router.post(
   '/check-follow-batch',
   auth.isAuth,
