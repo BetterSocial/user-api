@@ -34,7 +34,7 @@ const getTargetUserIdByPMChannelIdMiddleware = async (req, res, next) => {
     });
   }
 
-  if (channelMembers && channelMembers?.length !== 1)
+  if (!channelMembers || channelMembers?.length !== 1)
     return res.status(400).json({
       code: 400,
       success: false,
