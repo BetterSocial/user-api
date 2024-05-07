@@ -6,6 +6,7 @@ const updateUserRemoveHumanId = require('./core/updateUserRemoveHumanId');
 
 const createTokenChat = require('./chat/createTokenChat');
 const findPmChannel = require('./chat/findPmChannel');
+const getTargetUserIdByChannelId = require('./chat/getTargetUserIdByChannelId');
 const removeGroupMember = require('./chat/removeGroupMember');
 const sendCreatePostTopicSystemMessage = require('./chat/sendCreatePostTopicSystemMessage');
 const sendSystemMessageForTokenHolder = require('./chat/sendSystemMessageForTokenHolder');
@@ -43,6 +44,7 @@ const Getstream = {
   chat: {
     createTokenChat,
     findPmChannel,
+    getTargetUserIdByChannelId,
     removeGroupMember,
     sendCreatePostTopicSystemMessage,
     sendFollowTopicSystemMessage,
