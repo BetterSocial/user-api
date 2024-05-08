@@ -5,6 +5,16 @@ const TopicValidation = {
     query: {
       name: string.required()
     }
+  },
+  checkName: {
+    query: {
+      name: string.min(3).required()
+    }
+  },
+  create: {
+    body: {
+      name: string.min(3).required()
+    }
   }
 };
 
