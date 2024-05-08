@@ -8,12 +8,12 @@ const TopicValidation = {
   },
   checkName: {
     query: {
-      name: string.required()
+      name: string.min(3).required()
     }
   },
   create: {
     body: {
-      name: string.required()
+      name: string.min(3).required()
     }
   }
 };
