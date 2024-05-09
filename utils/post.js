@@ -40,8 +40,13 @@ const filterAllTopics = (text, topics = []) => {
     return acc;
   }, []);
 
-  return [...new Set([...topicsFromTextWithoutHashtag, ...topics])];
-  // return topics;
+  let unique_topics = [
+    ...new Set([
+      ...topicsFromTextWithoutHashtag.map((topic) => topic.toLowerCase()),
+      ...topics.map((topic) => topic.toLowerCase())
+    ])
+  ];
+  return unique_topics;
 };
 
 const handleCreatePostTO = (
