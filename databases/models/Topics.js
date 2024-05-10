@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: DataTypes.STRING,
       icon_path: DataTypes.STRING,
+      cover_path: DataTypes.STRING,
       categories: DataTypes.TEXT,
       created_at: DataTypes.DATE,
       deleted_at: DataTypes.DATE,
