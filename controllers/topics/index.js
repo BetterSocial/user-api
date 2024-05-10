@@ -12,6 +12,7 @@ const TopicService = require('../../services/postgres/TopicService');
 const TopicValidator = require('../../validators/topic');
 const topics = require('./topics');
 const checkName = require('./checkName');
+const updateTopic = require('./updateTopic');
 const create = require('./create');
 const getFollowedTopic = require('./getFollowedTopic');
 const getLatestPost = require('./getLatestPost');
@@ -400,6 +401,7 @@ module.exports = {
   topics,
   checkName,
   create,
+  updateTopic,
   putFollowTopic,
   getFollowTopic,
   getFollowedTopic,

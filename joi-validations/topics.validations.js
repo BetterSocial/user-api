@@ -1,9 +1,15 @@
-const {string} = require('./general.validations');
+const {string, url} = require('./general.validations');
 
 const TopicValidation = {
   latestPost: {
     query: {
       name: string.required()
+    }
+  },
+  updateTopic: {
+    body: {
+      icon: url,
+      cover: url
     }
   },
   checkName: {
