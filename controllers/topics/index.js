@@ -132,6 +132,7 @@ const getTopics = async (req, res) => {
                 "Topic"."name" ILIKE :likeQuery
             GROUP BY 
                 "Topic"."topic_id"
+            HAVING count("topicFollower"."user_id") >= 5
             ORDER BY
                 "followersCount" DESC
             LIMIT 50`,
