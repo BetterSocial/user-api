@@ -12,11 +12,6 @@ const {CREDDER_MIN_SCORE} = require('../../helpers/constants');
  */
 const Search = async (req, res) => {
   const {q} = req.query;
-  if (q.length < 2)
-    return res.status(200).json({
-      success: true,
-      message: 'Your search characters is too few, please input 3 or more characters for search'
-    });
 
   try {
     const blockDomain = await getBlockDomain(req.userId);

@@ -13,12 +13,6 @@ const SearchUser = async (req, res) => {
   const {q, limit = 50, allow_anon_dm} = req.query;
   const {userId} = req;
 
-  if (q.length < 2)
-    return res.status(200).json({
-      success: true,
-      message: 'Your search characters is too few, please input 3 or more characters for search'
-    });
-
   let where_anon_dm = '';
   if (allow_anon_dm) {
     where_anon_dm = 'AND u.allow_anon_dm = :allow_anon_dm';
