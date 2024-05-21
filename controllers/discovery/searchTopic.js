@@ -14,12 +14,6 @@ const Search = async (req, res) => {
   const {userId} = req;
   const anonymousUser = await UsersFunction.findAnonymousUserId(User, userId, {raw: true});
 
-  if (q.length < 2)
-    return res.status(200).json({
-      success: true,
-      message: 'Your search characters is too few, please input 3 or more characters for search'
-    });
-
   try {
     const topics = await sequelize.query(
       `

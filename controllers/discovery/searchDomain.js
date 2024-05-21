@@ -12,11 +12,6 @@ const {CREDDER_MIN_SCORE} = require('../../helpers/constants');
 const SearchDomain = async (req, res) => {
   const {q} = req.query;
   const {userId} = req;
-  if (!q || q?.length < 2)
-    return res.status(200).json({
-      success: true,
-      message: 'Your search characters is too few, please input 3 or more characters for search'
-    });
 
   try {
     const domains = await sequelize.query(
