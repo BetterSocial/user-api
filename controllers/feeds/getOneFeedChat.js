@@ -5,17 +5,30 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
 
-const constructData = (req, data, datum, constantActor) => {
-  datum.isOwningReaction = req.userId === datum.user_id;
+const constructData = ({selfUserId, data, datum, constantActor, shouldIncludeActorData = true}) => {
+  datum.isOwningReaction = selfUserId === datum.user_id;
   if (datum.data.is_anonymous || datum.data.anon_user_info_emoji_name) {
     datum.user_id = null;
     datum.user = {};
   }
+
+  if (!shouldIncludeActorData) {
+    datum.user = {};
+  }
+
+  const getActorData = () => {
+    if (datum?.user_id && shouldIncludeActorData) {
+      return constantActor;
+    }
+
+    return {};
+  };
+
   data.push({
     reaction: {
       ...datum
     },
-    actor: datum.user_id ? constantActor : {}
+    actor: getActorData()
   });
 };
 
@@ -24,14 +37,30 @@ const getReaction = (req, latest_reactions, constantActor) => {
   const upvotes = [];
   const downvotes = [];
   if (Array.isArray(latest_reactions.comment)) {
-    latest_reactions.comment.map((comment) => constructData(req, comments, comment, constantActor));
+    latest_reactions.comment.map((comment) =>
+      constructData({selfUserId: req?.userId, data: comments, datum: comment, constantActor})
+    );
   }
   if (Array.isArray(latest_reactions.upvotes)) {
-    latest_reactions.upvotes.map((upvote) => constructData(req, upvotes, upvote, constantActor));
+    latest_reactions.upvotes.map((upvote) =>
+      constructData({
+        selfUserId: req?.userId,
+        data: upvotes,
+        datum: upvote,
+        constantActor,
+        shouldIncludeActorData: false
+      })
+    );
   }
   if (Array.isArray(latest_reactions.downvotes)) {
     latest_reactions.downvotes.map((downvote) =>
-      constructData(req, downvotes, downvote, constantActor)
+      constructData({
+        selfUserId: req?.userId,
+        data: downvotes,
+        datum: downvote,
+        constantActor,
+        shouldIncludeActorData: false
+      })
     );
   }
   return {comments, upvotes, downvotes};

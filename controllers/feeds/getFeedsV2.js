@@ -325,7 +325,7 @@ module.exports = async (req, res) => {
       if (data[i].own_reactions) {
         data[i].own_reactions = addKarmaScoreToLatestReaction(data[i].own_reactions, karmaScores);
       }
-      data[i] = modifyReactionsPost(data[i], data[i].anonimity);
+      data[i] = modifyReactionsPost(data[i]);
       data[i] = await modifyAnonimityPost(data[i], isBlurredPost, anonymUserId);
     }
 

@@ -107,7 +107,7 @@ module.exports = async (req, res) => {
               req.userId
             );
             let newItem = await modifyAnonimityPost(item, isBlurredPost);
-            newItem = modifyReactionsPost(newItem, newItem.anonimity);
+            newItem = modifyReactionsPost(newItem);
             if (item.verb === POST_VERB_POLL) {
               let postPoll = await modifyPollPostObject(req.userId, item);
               data.push(postPoll);
