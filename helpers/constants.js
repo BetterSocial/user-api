@@ -46,13 +46,15 @@ const CHANNEL_TYPE = {
   GROUP: 1,
   GROUP_LOCATION: 2,
   TOPIC: 3,
-  ANONYMOUS: 4
+  ANONYMOUS: 4,
+  TOPIC_INVITATION: 5
 };
 
 const CHANNEL_TYPE_STRING = {
   CHAT: 'messaging',
   GROUP: 'group',
-  TOPIC: 'topic'
+  TOPIC: 'topic',
+  TOPIC_INVITATION: 'topicinvitation'
 };
 
 const MESSAGE_TYPE = {

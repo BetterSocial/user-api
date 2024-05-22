@@ -204,8 +204,9 @@ const followTopicV2 = async (req, res) => {
           detailTokenUser.user_id,
           name,
           detailTokenUser.is_anonymous,
-          with_system_message,
-          prevUserToken
+          detailTokenUser,
+          prevUserToken,
+          with_system_message
         )
       );
     } else {
@@ -217,8 +218,9 @@ const followTopicV2 = async (req, res) => {
           detailTokenUser.user_id,
           name,
           detailTokenUser.is_anonymous,
-          with_system_message,
-          prevUserToken
+          detailTokenUser,
+          prevUserToken,
+          with_system_message
         )
       );
 
@@ -231,8 +233,9 @@ const followTopicV2 = async (req, res) => {
             secondDetailUser.user_id,
             name,
             detailTokenUser.is_anonymous,
-            with_system_message,
-            prevUserToken
+            detailTokenUser,
+            prevUserToken,
+            with_system_message
           )
         );
       }
@@ -267,8 +270,9 @@ const _afterPutTopic = async (
   userId,
   name,
   isAnonymous,
-  withSystemMessage = false,
-  prevUserToken
+  detailTokenUser,
+  prevUserToken,
+  withSystemMessage = false
 ) => {
   // follow / unfollow main feed topic
   try {
@@ -277,7 +281,7 @@ const _afterPutTopic = async (
       await removeTopicFromChatTab(token, name, userId);
     } else {
       await followMainFeedTopic(token, userId, name);
-      await addTopicToChatTab(token, name, userId, isAnonymous, withSystemMessage);
+      await addTopicToChatTab(token, name, userId, isAnonymous, detailTokenUser, withSystemMessage);
     }
   } catch (error) {
     console.log('After put topic error: ', error);

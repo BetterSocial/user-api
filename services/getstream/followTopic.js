@@ -1,6 +1,7 @@
 const stream = require('getstream');
 const {StreamChat} = require('stream-chat');
 const Environment = require('../../config/environment');
+const {CHANNEL_TYPE_STRING} = require('../../helpers/constants');
 const {
   TOPIC_FEED_NAME,
   MAIN_FEED_FOLLOWING_NAME,
@@ -49,6 +50,7 @@ const addTopicToChatTab = async (
   topicName,
   userId,
   isAnonymous,
+  detailTokenUser,
   withSystemMessage = false
 ) => {
   try {
@@ -95,6 +97,17 @@ const addTopicToChatTab = async (
       members: [userId],
       channel_type: 3
     });
+
+    try {
+      const topicInvitationChannel = client.channel(
+        CHANNEL_TYPE_STRING.TOPIC_INVITATION,
+        `${detailTokenUser.username}_${topic}`
+      );
+      await topicInvitationChannel.delete();
+    } catch (error) {
+      console.log('error remove invitations topic channel', error);
+      throw new Error('error remove invitations topic channel');
+    }
 
     console.log('prepare follow channel', topic);
 
