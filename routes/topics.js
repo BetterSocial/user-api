@@ -23,6 +23,12 @@ router.put(
   topicsController.updateTopic
 );
 router.get('/is-exist', validate(TopicValidation.checkName), isAuth, topicsController.checkName);
+router.post(
+  '/invite-members',
+  validate(TopicValidation.inviteMembers),
+  isAuth,
+  topicsController.inviteMembers
+);
 router.post('/create', validate(TopicValidation.create), isAuth, topicsController.create);
 router.get('/', isAuth, topicsController.getTopics);
 router.get(

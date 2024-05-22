@@ -1,4 +1,4 @@
-const {string, url} = require('./general.validations');
+const {string, url, array} = require('./general.validations');
 
 const TopicValidation = {
   latestPost: {
@@ -20,6 +20,12 @@ const TopicValidation = {
   create: {
     body: {
       name: string.min(3).required()
+    }
+  },
+  inviteMembers: {
+    body: {
+      member_ids: array(string.required()),
+      topic_id: string.required()
     }
   }
 };
