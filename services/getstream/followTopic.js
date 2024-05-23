@@ -50,7 +50,7 @@ const addTopicToChatTab = async (
   topicName,
   userId,
   isAnonymous,
-  detailTokenUser,
+  topicInvitationIds = [],
   withSystemMessage = false
 ) => {
   try {
@@ -98,15 +98,20 @@ const addTopicToChatTab = async (
       channel_type: 3
     });
 
-    try {
-      const topicInvitationChannel = client.channel(
-        CHANNEL_TYPE_STRING.TOPIC_INVITATION,
-        `${detailTokenUser.username}_${topic}`
-      );
-      await topicInvitationChannel.delete();
-    } catch (error) {
-      console.log('error remove invitations topic channel', error);
-      throw new Error('error remove invitations topic channel');
+    //remove topic invitations channel
+    if (topicInvitationIds.length > 0) {
+      try {
+        topicInvitationIds.forEach(async (topicInvitationsId) => {
+          const topicInvitationChannel = client.channel(
+            CHANNEL_TYPE_STRING.TOPIC_INVITATION,
+            topicInvitationsId
+          );
+          await topicInvitationChannel.delete();
+        });
+      } catch (error) {
+        console.log('error remove invitations topic channel', error);
+        throw new Error('error remove invitations topic channel');
+      }
     }
 
     console.log('prepare follow channel', topic);

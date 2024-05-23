@@ -1,7 +1,8 @@
 const {StreamChat} = require('stream-chat');
 const {CHANNEL_TYPE_STRING} = require('../../helpers/constants');
-const {Topics, User, FcmToken} = require('../../databases/models');
+const {Topics, User, FcmToken, TopicInvitations} = require('../../databases/models');
 const {messaging} = require('firebase-admin');
+const {v4: uuid} = require('uuid');
 
 module.exports = async (req, res) => {
   try {
@@ -59,11 +60,19 @@ module.exports = async (req, res) => {
         const invitations_msg = `${inviter.username} invited you to join ${topics.name} community`;
 
         //topic invitation message primary chat
+        const topic_invitations_id = await uuid();
+        await TopicInvitations.create({
+          topic_invitations_id: topic_invitations_id,
+          user_id_inviter: req?.userId,
+          user_id_invited: user_id,
+          topic_id
+        });
+
         const client = new StreamChat(process.env.API_KEY, process.env.SECRET);
 
         const channel = await client.channel(
           CHANNEL_TYPE_STRING.TOPIC_INVITATION,
-          `${user.username}_${topics.name}`,
+          topic_invitations_id,
           {
             name: `#${topics.name}`,
             created_by_id: req?.userId,
