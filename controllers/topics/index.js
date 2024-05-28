@@ -17,7 +17,14 @@ const updateTopic = require('./updateTopic');
 const create = require('./create');
 const getFollowedTopic = require('./getFollowedTopic');
 const getLatestPost = require('./getLatestPost');
-const {Topics, UserTopic, UserTopicHistory, sequelize, User} = require('../../databases/models');
+const {
+  Topics,
+  UserTopic,
+  UserTopicHistory,
+  sequelize,
+  User,
+  TopicInvitations
+} = require('../../databases/models');
 const UserTopicService = require('../../services/postgres/UserTopicService');
 const getSubscribableTopic = require('./getSubscribeableTopic');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
@@ -194,6 +201,7 @@ const followTopicV2 = async (req, res) => {
       userTopicService.getFollowTopicStatus(secondDetailUser.user_id, topic_id)
     ]);
 
+    let topicInvitationIds = [];
     let data = [];
     if (getTokenUserStatus) {
       await userTopicService.unfollowTopic(detailTokenUser.user_id, topic_id);
@@ -204,11 +212,31 @@ const followTopicV2 = async (req, res) => {
           detailTokenUser.user_id,
           name,
           detailTokenUser.is_anonymous,
-          with_system_message,
-          prevUserToken
+          topicInvitationIds,
+          prevUserToken,
+          with_system_message
         )
       );
     } else {
+      //get invitations topic detail
+      const topicInvitations = await TopicInvitations.findAll({
+        where: {
+          user_id_invited: userId,
+          topic_id
+        }
+      });
+
+      if (topicInvitations.length > 0) {
+        topicInvitationIds = topicInvitations.map(
+          (topicInvitation) => topicInvitation.topic_invitations_id
+        );
+        await TopicInvitations.destroy({
+          where: {
+            topic_invitations_id: topicInvitationIds
+          }
+        });
+      }
+
       await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
       data.push(
         await _afterPutTopic(
@@ -217,12 +245,14 @@ const followTopicV2 = async (req, res) => {
           detailTokenUser.user_id,
           name,
           detailTokenUser.is_anonymous,
-          with_system_message,
-          prevUserToken
+          topicInvitationIds,
+          prevUserToken,
+          with_system_message
         )
       );
 
       if (getSecondUserStatus) {
+        topicInvitationIds = [];
         await userTopicService.unfollowTopic(secondDetailUser.user_id, topic_id);
         data.push(
           await _afterPutTopic(
@@ -231,8 +261,9 @@ const followTopicV2 = async (req, res) => {
             secondDetailUser.user_id,
             name,
             detailTokenUser.is_anonymous,
-            with_system_message,
-            prevUserToken
+            topicInvitationIds,
+            prevUserToken,
+            with_system_message
           )
         );
       }
@@ -267,8 +298,9 @@ const _afterPutTopic = async (
   userId,
   name,
   isAnonymous,
-  withSystemMessage = false,
-  prevUserToken
+  topicInvitationsId,
+  prevUserToken,
+  withSystemMessage = false
 ) => {
   // follow / unfollow main feed topic
   try {
@@ -277,7 +309,14 @@ const _afterPutTopic = async (
       await removeTopicFromChatTab(token, name, userId);
     } else {
       await followMainFeedTopic(token, userId, name);
-      await addTopicToChatTab(token, name, userId, isAnonymous, withSystemMessage);
+      await addTopicToChatTab(
+        token,
+        name,
+        userId,
+        isAnonymous,
+        topicInvitationsId,
+        withSystemMessage
+      );
     }
   } catch (error) {
     console.log('After put topic error: ', error);

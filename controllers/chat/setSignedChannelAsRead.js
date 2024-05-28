@@ -19,6 +19,10 @@ const setSignedChannelAsRead = async (req, res) => {
       channelTypeDef = 'topics';
       break;
 
+    case CHANNEL_TYPE.TOPIC_INVITATION:
+      channelTypeDef = 'topicinvitation';
+      break;
+
     default:
       return res.status(403).json({
         message: 'Error validation',
