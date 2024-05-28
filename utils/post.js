@@ -280,17 +280,19 @@ async function modifyPostLinkPost(domainPageModel, post) {
  * @param {Boolean} [isAnonimous = true]
  * @returns {Object}
  */
-function modifyReactionsPost(post, isAnonimous = true) {
-  if (!isAnonimous) return post;
-
+function modifyReactionsPost(post) {
   const newPost = {...post};
 
-  const itemReducer = (acc, next) => {
+  const itemReducer = (acc, next, isUserDataIncluded = true) => {
     if (next.data.anon_user_info_color_name) {
       next.user = {};
       next.user_id = '';
       next.target_feeds = [];
       next.data.target_feeds = [];
+    }
+
+    if (!isUserDataIncluded) {
+      next.user.data = {};
     }
 
     acc.push(next);
@@ -302,9 +304,9 @@ function modifyReactionsPost(post, isAnonimous = true) {
     const downvotes = newPost?.latest_reactions?.downvotes || [];
     const comments = newPost?.latest_reactions?.comment || [];
 
-    const newUpvotes = upvotes.reduce(itemReducer, []);
-    const newDownvotes = downvotes.reduce(itemReducer, []);
-    const newComments = comments.reduce(itemReducer, []);
+    const newUpvotes = upvotes.reduce((acc, next) => itemReducer(acc, next, false), []);
+    const newDownvotes = downvotes.reduce((acc, next) => itemReducer(acc, next, false), []);
+    const newComments = comments.reduce((acc, next) => itemReducer(acc, next, true), []);
 
     newPost.latest_reactions.upvotes = newUpvotes;
     newPost.latest_reactions.downvotes = newDownvotes;
@@ -316,9 +318,9 @@ function modifyReactionsPost(post, isAnonimous = true) {
     const downvotes = newPost?.own_reactions?.downvotes || [];
     const comments = newPost?.own_reactions?.comment || [];
 
-    const newUpvotes = upvotes.reduce(itemReducer, []);
-    const newDownvotes = downvotes.reduce(itemReducer, []);
-    const newComments = comments.reduce(itemReducer, []);
+    const newUpvotes = upvotes.reduce((acc, next) => itemReducer(acc, next, false), []);
+    const newDownvotes = downvotes.reduce((acc, next) => itemReducer(acc, next, false), []);
+    const newComments = comments.reduce((acc, next) => itemReducer(acc, next, true), []);
 
     newPost.own_reactions.upvotes = newUpvotes;
     newPost.own_reactions.downvotes = newDownvotes;

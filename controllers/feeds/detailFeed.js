@@ -63,6 +63,26 @@ module.exports = async (req, res) => {
 
   newItem.latest_reactions.comment = comments;
 
+  if (Array.isArray(newItem?.latest_reactions?.upvotes)) {
+    const modifiedUpvotes = newItem?.latest_reactions?.upvotes?.reduce((acc, current) => {
+      current.user.data = {};
+      acc.push(current);
+      return acc;
+    }, []);
+
+    newItem.latest_reactions.upvotes = modifiedUpvotes;
+  }
+
+  if (Array.isArray(newItem?.latest_reactions?.downvotes)) {
+    const modifiedDownvotes = newItem?.latest_reactions?.downvotes?.reduce((acc, current) => {
+      current.user.data = {};
+      acc.push(current);
+      return acc;
+    }, []);
+
+    newItem.latest_reactions.downvotes = modifiedDownvotes;
+  }
+
   newItem.is_self =
     newItem.actor.id === req.userId || newItem.actor.id === myAnonymousUser?.user_id;
   const client = stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);

@@ -80,7 +80,7 @@ const activityFormatter = async (item, feedGroup, userId, excludedPostParameter)
   }
 
   let newItem = item;
-  newItem = modifyReactionsPost(newItem, newItem.anonimity);
+  newItem = modifyReactionsPost(newItem);
   if (item.verb === POST_VERB_POLL) {
     const postPoll = await modifyPollPostObject(userId, item);
     return postPoll;
