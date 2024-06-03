@@ -102,107 +102,6 @@ const putFollowTopic = async (req, res) => {
   }
 };
 
-const followTopicV2Func = async (req) => {
-  const {name, with_system_message = false} = req.body;
-  const {token, userId} = req;
-
-  // logic get user sign and anonymous
-  let secondDetailUser;
-  let secondDetailUserId;
-  const detailTokenUser = await UsersFunction.findUserById(User, userId);
-  if (!detailTokenUser.is_anonymous) {
-    secondDetailUser = await UsersFunction.findAnonymousUserId(User, userId);
-  } else {
-    secondDetailUserId = await UsersFunction.findSignedUserId(User, userId);
-    secondDetailUser = await UsersFunction.findUserById(User, secondDetailUserId);
-  }
-
-  let prevUserToken = await createToken(secondDetailUser.user_id);
-  TopicValidator.validatePutTopicFollow({name});
-
-  //Logic get topic
-  const topicService = new TopicService(Topics);
-  const topic = await topicService.getTopicByName(name);
-  const {topic_id} = topic;
-  const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
-
-  //get follow status
-  const [getTokenUserStatus, getSecondUserStatus] = await Promise.all([
-    userTopicService.getFollowTopicStatus(detailTokenUser.user_id, topic_id),
-    userTopicService.getFollowTopicStatus(secondDetailUser.user_id, topic_id)
-  ]);
-
-  let topicInvitationIds = [];
-  let data = [];
-  if (getTokenUserStatus) {
-    await userTopicService.unfollowTopic(detailTokenUser.user_id, topic_id);
-    data.push(
-      await _afterPutTopic(
-        true,
-        token,
-        detailTokenUser.user_id,
-        name,
-        detailTokenUser.is_anonymous,
-        topicInvitationIds,
-        prevUserToken,
-        with_system_message
-      )
-    );
-  } else {
-    //get invitations topic detail
-    const topicInvitations = await TopicInvitations.findAll({
-      where: {
-        user_id_invited: userId,
-        topic_id
-      }
-    });
-
-    if (topicInvitations.length > 0) {
-      topicInvitationIds = topicInvitations.map(
-        (topicInvitation) => topicInvitation.topic_invitations_id
-      );
-      await TopicInvitations.destroy({
-        where: {
-          topic_invitations_id: topicInvitationIds
-        }
-      });
-    }
-
-    await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
-    data.push(
-      await _afterPutTopic(
-        false,
-        token,
-        detailTokenUser.user_id,
-        name,
-        detailTokenUser.is_anonymous,
-        topicInvitationIds,
-        prevUserToken,
-        with_system_message
-      )
-    );
-
-    if (getSecondUserStatus) {
-      topicInvitationIds = [];
-      await userTopicService.unfollowTopic(secondDetailUser.user_id, topic_id);
-      data.push(
-        await _afterPutTopic(
-          true,
-          token,
-          secondDetailUser.user_id,
-          name,
-          detailTokenUser.is_anonymous,
-          topicInvitationIds,
-          prevUserToken,
-          with_system_message
-        )
-      );
-    }
-  }
-
-  return data;
-};
-
 const getTopics = async (req, res) => {
   const {name} = req.query;
   const signUserId = req.userId;
@@ -276,6 +175,8 @@ const createTopic = async (req, res) => {
     let {name} = req.body;
     name = name.toLowerCase();
 
+    const {token, userId} = req;
+
     let topics = await Topics.findOne({
       where: {
         name,
@@ -291,13 +192,13 @@ const createTopic = async (req, res) => {
       });
     }
 
-    const topicId = await insertTopics([name]);
-    await followTopicV2Func(req, res);
+    const topic_id = await insertTopics([name]);
+    await followTopicViaCreateTopic({token, name, topic_id, userId});
 
     return res.status(200).json({
       success: true,
       message: 'Success',
-      topicId
+      topic_id
     });
   } catch (error) {
     return res.json({
@@ -309,9 +210,111 @@ const createTopic = async (req, res) => {
   }
 };
 
+const followTopicViaCreateTopic = async ({token, name, topic_id, userId}) => {
+  const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
+  await userTopicService.followTopic(userId, topic_id);
+  await _afterPutTopic(false, token, userId, name, false, [], null, false);
+};
+
 const followTopicV2 = async (req, res) => {
   try {
-    const data = await followTopicV2Func(req);
+    const {name, with_system_message = false} = req.body;
+    const {token, userId} = req;
+
+    // logic get user sign and anonymous
+    let secondDetailUser;
+    let secondDetailUserId;
+    const detailTokenUser = await UsersFunction.findUserById(User, userId);
+    if (!detailTokenUser.is_anonymous) {
+      secondDetailUser = await UsersFunction.findAnonymousUserId(User, userId);
+    } else {
+      secondDetailUserId = await UsersFunction.findSignedUserId(User, userId);
+      secondDetailUser = await UsersFunction.findUserById(User, secondDetailUserId);
+    }
+
+    let prevUserToken = await createToken(secondDetailUser.user_id);
+    TopicValidator.validatePutTopicFollow({name});
+
+    //Logic get topic
+    const topicService = new TopicService(Topics);
+    const topic = await topicService.getTopicByName(name);
+    const {topic_id} = topic;
+    const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
+
+    //get follow status
+    const [getTokenUserStatus, getSecondUserStatus] = await Promise.all([
+      userTopicService.getFollowTopicStatus(detailTokenUser.user_id, topic_id),
+      userTopicService.getFollowTopicStatus(secondDetailUser.user_id, topic_id)
+    ]);
+
+    let topicInvitationIds = [];
+    let data = [];
+    if (getTokenUserStatus) {
+      await userTopicService.unfollowTopic(detailTokenUser.user_id, topic_id);
+      data.push(
+        await _afterPutTopic(
+          true,
+          token,
+          detailTokenUser.user_id,
+          name,
+          detailTokenUser.is_anonymous,
+          topicInvitationIds,
+          prevUserToken,
+          with_system_message
+        )
+      );
+    } else {
+      //get invitations topic detail
+      const topicInvitations = await TopicInvitations.findAll({
+        where: {
+          user_id_invited: userId,
+          topic_id
+        }
+      });
+
+      if (topicInvitations.length > 0) {
+        topicInvitationIds = topicInvitations.map(
+          (topicInvitation) => topicInvitation.topic_invitations_id
+        );
+        await TopicInvitations.destroy({
+          where: {
+            topic_invitations_id: topicInvitationIds
+          }
+        });
+      }
+
+      await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
+      data.push(
+        await _afterPutTopic(
+          false,
+          token,
+          detailTokenUser.user_id,
+          name,
+          detailTokenUser.is_anonymous,
+          topicInvitationIds,
+          prevUserToken,
+          with_system_message
+        )
+      );
+
+      if (getSecondUserStatus) {
+        topicInvitationIds = [];
+        await userTopicService.unfollowTopic(secondDetailUser.user_id, topic_id);
+        data.push(
+          await _afterPutTopic(
+            true,
+            token,
+            secondDetailUser.user_id,
+            name,
+            detailTokenUser.is_anonymous,
+            topicInvitationIds,
+            prevUserToken,
+            with_system_message
+          )
+        );
+      }
+    }
+
     return res.status(200).json({
       status: 'success',
       code: 200,
