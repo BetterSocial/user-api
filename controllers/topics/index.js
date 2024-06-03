@@ -14,7 +14,6 @@ const topics = require('./topics');
 const checkName = require('./checkName');
 const inviteMembers = require('./inviteMembers');
 const updateTopic = require('./updateTopic');
-const create = require('./create');
 const getFollowedTopic = require('./getFollowedTopic');
 const getLatestPost = require('./getLatestPost');
 const {
@@ -29,6 +28,7 @@ const UserTopicService = require('../../services/postgres/UserTopicService');
 const getSubscribableTopic = require('./getSubscribeableTopic');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const UsersFunction = require('../../databases/functions/users');
+const {insertTopics} = require('../../utils/post');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -102,6 +102,107 @@ const putFollowTopic = async (req, res) => {
   }
 };
 
+const followTopicV2Func = async (req) => {
+  const {name, with_system_message = false} = req.body;
+  const {token, userId} = req;
+
+  // logic get user sign and anonymous
+  let secondDetailUser;
+  let secondDetailUserId;
+  const detailTokenUser = await UsersFunction.findUserById(User, userId);
+  if (!detailTokenUser.is_anonymous) {
+    secondDetailUser = await UsersFunction.findAnonymousUserId(User, userId);
+  } else {
+    secondDetailUserId = await UsersFunction.findSignedUserId(User, userId);
+    secondDetailUser = await UsersFunction.findUserById(User, secondDetailUserId);
+  }
+
+  let prevUserToken = await createToken(secondDetailUser.user_id);
+  TopicValidator.validatePutTopicFollow({name});
+
+  //Logic get topic
+  const topicService = new TopicService(Topics);
+  const topic = await topicService.getTopicByName(name);
+  const {topic_id} = topic;
+  const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
+
+  //get follow status
+  const [getTokenUserStatus, getSecondUserStatus] = await Promise.all([
+    userTopicService.getFollowTopicStatus(detailTokenUser.user_id, topic_id),
+    userTopicService.getFollowTopicStatus(secondDetailUser.user_id, topic_id)
+  ]);
+
+  let topicInvitationIds = [];
+  let data = [];
+  if (getTokenUserStatus) {
+    await userTopicService.unfollowTopic(detailTokenUser.user_id, topic_id);
+    data.push(
+      await _afterPutTopic(
+        true,
+        token,
+        detailTokenUser.user_id,
+        name,
+        detailTokenUser.is_anonymous,
+        topicInvitationIds,
+        prevUserToken,
+        with_system_message
+      )
+    );
+  } else {
+    //get invitations topic detail
+    const topicInvitations = await TopicInvitations.findAll({
+      where: {
+        user_id_invited: userId,
+        topic_id
+      }
+    });
+
+    if (topicInvitations.length > 0) {
+      topicInvitationIds = topicInvitations.map(
+        (topicInvitation) => topicInvitation.topic_invitations_id
+      );
+      await TopicInvitations.destroy({
+        where: {
+          topic_invitations_id: topicInvitationIds
+        }
+      });
+    }
+
+    await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
+    data.push(
+      await _afterPutTopic(
+        false,
+        token,
+        detailTokenUser.user_id,
+        name,
+        detailTokenUser.is_anonymous,
+        topicInvitationIds,
+        prevUserToken,
+        with_system_message
+      )
+    );
+
+    if (getSecondUserStatus) {
+      topicInvitationIds = [];
+      await userTopicService.unfollowTopic(secondDetailUser.user_id, topic_id);
+      data.push(
+        await _afterPutTopic(
+          true,
+          token,
+          secondDetailUser.user_id,
+          name,
+          detailTokenUser.is_anonymous,
+          topicInvitationIds,
+          prevUserToken,
+          with_system_message
+        )
+      );
+    }
+  }
+
+  return data;
+};
+
 const getTopics = async (req, res) => {
   const {name} = req.query;
   const signUserId = req.userId;
@@ -170,105 +271,47 @@ const getTopics = async (req, res) => {
   }
 };
 
+const createTopic = async (req, res) => {
+  try {
+    let {name} = req.body;
+    name = name.toLowerCase();
+
+    let topics = await Topics.findOne({
+      where: {
+        name,
+        deleted_at: null
+      }
+    });
+
+    if (topics) {
+      return res.status(400).json({
+        code: 400,
+        status: 'failed',
+        message: 'Topic already exists'
+      });
+    }
+
+    const topicId = await insertTopics([name]);
+    await followTopicV2Func(req, res);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Success',
+      topicId
+    });
+  } catch (error) {
+    return res.json({
+      code: error.statusCode,
+      status: 'fail',
+      message: error.message,
+      data: 'null'
+    });
+  }
+};
+
 const followTopicV2 = async (req, res) => {
   try {
-    const {name, with_system_message = false} = req.body;
-    const {token, userId} = req;
-
-    // logic get user sign and anonymous
-    let secondDetailUser;
-    let secondDetailUserId;
-    const detailTokenUser = await UsersFunction.findUserById(User, userId);
-    if (!detailTokenUser.is_anonymous) {
-      secondDetailUser = await UsersFunction.findAnonymousUserId(User, userId);
-    } else {
-      secondDetailUserId = await UsersFunction.findSignedUserId(User, userId);
-      secondDetailUser = await UsersFunction.findUserById(User, secondDetailUserId);
-    }
-
-    let prevUserToken = await createToken(secondDetailUser.user_id);
-    TopicValidator.validatePutTopicFollow({name});
-
-    //Logic get topic
-    const topicService = new TopicService(Topics);
-    const topic = await topicService.getTopicByName(name);
-    const {topic_id} = topic;
-    const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
-
-    //get follow status
-    const [getTokenUserStatus, getSecondUserStatus] = await Promise.all([
-      userTopicService.getFollowTopicStatus(detailTokenUser.user_id, topic_id),
-      userTopicService.getFollowTopicStatus(secondDetailUser.user_id, topic_id)
-    ]);
-
-    let topicInvitationIds = [];
-    let data = [];
-    if (getTokenUserStatus) {
-      await userTopicService.unfollowTopic(detailTokenUser.user_id, topic_id);
-      data.push(
-        await _afterPutTopic(
-          true,
-          token,
-          detailTokenUser.user_id,
-          name,
-          detailTokenUser.is_anonymous,
-          topicInvitationIds,
-          prevUserToken,
-          with_system_message
-        )
-      );
-    } else {
-      //get invitations topic detail
-      const topicInvitations = await TopicInvitations.findAll({
-        where: {
-          user_id_invited: userId,
-          topic_id
-        }
-      });
-
-      if (topicInvitations.length > 0) {
-        topicInvitationIds = topicInvitations.map(
-          (topicInvitation) => topicInvitation.topic_invitations_id
-        );
-        await TopicInvitations.destroy({
-          where: {
-            topic_invitations_id: topicInvitationIds
-          }
-        });
-      }
-
-      await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
-      data.push(
-        await _afterPutTopic(
-          false,
-          token,
-          detailTokenUser.user_id,
-          name,
-          detailTokenUser.is_anonymous,
-          topicInvitationIds,
-          prevUserToken,
-          with_system_message
-        )
-      );
-
-      if (getSecondUserStatus) {
-        topicInvitationIds = [];
-        await userTopicService.unfollowTopic(secondDetailUser.user_id, topic_id);
-        data.push(
-          await _afterPutTopic(
-            true,
-            token,
-            secondDetailUser.user_id,
-            name,
-            detailTokenUser.is_anonymous,
-            topicInvitationIds,
-            prevUserToken,
-            with_system_message
-          )
-        );
-      }
-    }
-
+    const data = await followTopicV2Func(req);
     return res.status(200).json({
       status: 'success',
       code: 200,
@@ -441,8 +484,8 @@ const getFollowerList = async (req, res) => {
 module.exports = {
   topics,
   checkName,
-  create,
   inviteMembers,
+  createTopic,
   updateTopic,
   putFollowTopic,
   getFollowTopic,
