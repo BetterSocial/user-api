@@ -14,7 +14,6 @@ const topics = require('./topics');
 const checkName = require('./checkName');
 const inviteMembers = require('./inviteMembers');
 const updateTopic = require('./updateTopic');
-const create = require('./create');
 const getFollowedTopic = require('./getFollowedTopic');
 const getLatestPost = require('./getLatestPost');
 const {
@@ -29,6 +28,7 @@ const UserTopicService = require('../../services/postgres/UserTopicService');
 const getSubscribableTopic = require('./getSubscribeableTopic');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const UsersFunction = require('../../databases/functions/users');
+const {insertTopics} = require('../../utils/post');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -170,6 +170,52 @@ const getTopics = async (req, res) => {
   }
 };
 
+const createTopic = async (req, res) => {
+  try {
+    let {name} = req.body;
+    name = name.toLowerCase();
+
+    const {token, userId} = req;
+
+    let topics = await Topics.findOne({
+      where: {
+        name,
+        deleted_at: null
+      }
+    });
+
+    if (topics) {
+      return res.status(400).json({
+        code: 400,
+        status: 'failed',
+        message: 'Topic already exists'
+      });
+    }
+
+    const topic_id = await insertTopics([name]);
+    await followTopicViaCreateTopic({token, name, topic_id, userId});
+
+    return res.status(200).json({
+      success: true,
+      message: 'Success',
+      topic_id
+    });
+  } catch (error) {
+    return res.json({
+      code: error.statusCode,
+      status: 'fail',
+      message: error.message,
+      data: 'null'
+    });
+  }
+};
+
+const followTopicViaCreateTopic = async ({token, name, topic_id, userId}) => {
+  const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
+  await userTopicService.followTopic(userId, topic_id);
+  await _afterPutTopic(false, token, userId, name, false, [], null, false);
+};
+
 const followTopicV2 = async (req, res) => {
   try {
     const {name, with_system_message = false} = req.body;
@@ -218,24 +264,13 @@ const followTopicV2 = async (req, res) => {
         )
       );
     } else {
-      //get invitations topic detail
-      const topicInvitations = await TopicInvitations.findAll({
+      //destroy invitations topic detail
+      await TopicInvitations.destroy({
         where: {
           user_id_invited: userId,
           topic_id
         }
       });
-
-      if (topicInvitations.length > 0) {
-        topicInvitationIds = topicInvitations.map(
-          (topicInvitation) => topicInvitation.topic_invitations_id
-        );
-        await TopicInvitations.destroy({
-          where: {
-            topic_invitations_id: topicInvitationIds
-          }
-        });
-      }
 
       await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
       data.push(
@@ -441,8 +476,8 @@ const getFollowerList = async (req, res) => {
 module.exports = {
   topics,
   checkName,
-  create,
   inviteMembers,
+  createTopic,
   updateTopic,
   putFollowTopic,
   getFollowTopic,
