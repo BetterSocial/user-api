@@ -23,7 +23,8 @@ const {
   UserTopicHistory,
   sequelize,
   User,
-  TopicInvitations
+  TopicInvitations,
+  CommunityMessageFormat
 } = require('../../databases/models');
 const UserTopicService = require('../../services/postgres/UserTopicService');
 const getSubscribableTopic = require('./getSubscribeableTopic');
@@ -238,6 +239,7 @@ const followTopicV2 = async (req, res) => {
       }
 
       await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
+      await _topicAutoMessage(userId, topic_id, detailTokenUser);
       data.push(
         await _afterPutTopic(
           false,
@@ -289,6 +291,28 @@ const followTopicV2 = async (req, res) => {
       message: 'Internal server error',
       data: 'null'
     });
+  }
+};
+
+const _topicAutoMessage = async (user_id, topic_id, detailTokenUser) => {
+  try {
+    const communityMessageFormat = await CommunityMessageFormat.findOne({
+      where: {user_id, topic_id, status: '1'}
+    });
+    if (communityMessageFormat && !detailTokenUser.is_anonymous) {
+      await UserTopic.update(
+        {notified: false, is_anonymous: detailTokenUser.is_anonymous},
+        {where: {user_id, topic_id}}
+      );
+    } else {
+      await UserTopic.update(
+        {notified: true, is_anonymous: detailTokenUser.is_anonymous},
+        {where: {user_id, topic_id}}
+      );
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };
 

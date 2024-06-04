@@ -109,34 +109,6 @@ class UserTopicService {
       throw new InvariantError('failed add new user topic');
     }
   }
-
-  async topicAutoMessage(user_id, topic_id) {
-    try {
-      let date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-      await sequelize.transaction(async (_t) => {
-        let userTopic = {
-          user_topics_id: uuidv4(),
-          user_id: user_id,
-          topic_id: topic_id,
-          created_at: date,
-          updated_at: date
-        };
-
-        await this._userTopicModel.create(userTopic);
-
-        let userTopicHistory = {
-          user_id: user_id,
-          topic_id: topic_id,
-          action: 'in',
-          created_at: date
-        };
-        await this._userTopicHistoryModel.create(userTopicHistory);
-      });
-    } catch (error) {
-      console.log(error);
-      throw new InvariantError('failed add new user topic');
-    }
-  }
 }
 
 module.exports = UserTopicService;

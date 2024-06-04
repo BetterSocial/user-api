@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
   }
   CommunityMessageFormat.init(
     {
+      community_message_format_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true
+      },
       user_id: {type: DataTypes.STRING, allowNull: false},
       topic_id: {type: DataTypes.BIGINT, allowNull: false},
       message: {type: DataTypes.TEXT, allowNull: false},
