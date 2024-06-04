@@ -297,16 +297,17 @@ const followTopicV2 = async (req, res) => {
 const _topicAutoMessage = async (user_id, topic_id, detailTokenUser) => {
   try {
     const communityMessageFormat = await CommunityMessageFormat.findOne({
-      where: {user_id, topic_id, status: '1'}
+      where: {topic_id, status: '1'}
     });
+
     if (communityMessageFormat && !detailTokenUser.is_anonymous) {
       await UserTopic.update(
-        {notified: false, is_anonymous: detailTokenUser.is_anonymous},
+        {notify_user: true, is_anonymous: detailTokenUser.is_anonymous},
         {where: {user_id, topic_id}}
       );
     } else {
       await UserTopic.update(
-        {notified: true, is_anonymous: detailTokenUser.is_anonymous},
+        {notify_user: false, is_anonymous: detailTokenUser.is_anonymous},
         {where: {user_id, topic_id}}
       );
     }

@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       user_id: {type: DataTypes.STRING, allowNull: false},
       topic_id: {type: DataTypes.BIGINT, allowNull: false},
-      notified: {type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false},
+      notify_user: {type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false},
       is_anonymous: {type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false},
       createdAt: {
         type: DataTypes.DATE,
