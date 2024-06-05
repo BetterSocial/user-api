@@ -30,7 +30,7 @@ router.post(
   topicsController.inviteMembers
 );
 router.post('/create', validate(TopicValidation.create), isAuth, topicsController.createTopic);
-router.get('/', isAuth, topicsController.getTopics);
+router.get('/', validate(TopicValidation.getTopic), isAuth, topicsController.getTopics);
 router.get(
   '/follower-list',
   QueryParamsValidationMiddleware.searchTopicFollower,

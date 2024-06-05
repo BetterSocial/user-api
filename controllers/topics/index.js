@@ -103,9 +103,14 @@ const putFollowTopic = async (req, res) => {
 };
 
 const getTopics = async (req, res) => {
-  const {name} = req.query;
+  const {name, withMinimumFollower = true} = req.query;
   const signUserId = req.userId;
   const anonymousId = await getAnonymUser(req.userId);
+
+  let withMinimumFollowerQuery = '';
+  if (withMinimumFollower) {
+    withMinimumFollowerQuery = `HAVING count("topicFollower"."user_id") >= 5`;
+  }
 
   try {
     const results = await sequelize.query(
@@ -140,7 +145,7 @@ const getTopics = async (req, res) => {
                 "Topic"."name" ILIKE :likeQuery
             GROUP BY 
                 "Topic"."topic_id"
-            HAVING count("topicFollower"."user_id") >= 5
+            ${withMinimumFollowerQuery}
             ORDER BY
                 "followersCount" DESC
             LIMIT 50`,
