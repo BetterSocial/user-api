@@ -17,7 +17,9 @@ const chatSearch = async (req, res) => {
         ON B.user_id_follower = :userId AND B.user_id_followed = A.user_id
         WHERE 
             A.username ILIKE :query AND 
-            A.user_id != :userId
+            A.user_id != :userId AND
+            A.verified_status != 'UNVERIFIED' AND
+            A.is_anonymous = false
         LIMIT 5
         OFFSET :offset`;
 
@@ -43,6 +45,7 @@ const chatSearch = async (req, res) => {
   WHERE 
       A.username ILIKE :query AND 
       A.user_id != :userId AND
+      A.verified_status != 'UNVERIFIED' AND
       A.is_anonymous = false
       ${additionalQuery}
   ORDER BY B.user_id_followed
