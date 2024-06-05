@@ -15,7 +15,7 @@ const SearchDomain = async (req, res) => {
 
   try {
     const domains = await sequelize.query(
-      `SELECT 
+      `SELECT distinct
         "Domain"."domain_page_id" AS "domain_id_followed",
         "Domain"."domain_name",
         "Domain"."logo",
