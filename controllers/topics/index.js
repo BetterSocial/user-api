@@ -280,7 +280,7 @@ const followTopicV2 = async (req, res) => {
       });
 
       await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
-      await _topicAutoMessage(token, userId, topic_id, detailTokenUser);
+      await _topicAutoMessage(userId, topic_id, detailTokenUser);
       data.push(
         await _afterPutTopic(
           false,
@@ -335,14 +335,14 @@ const followTopicV2 = async (req, res) => {
   }
 };
 
-const _topicAutoMessage = async (token, user_id, topic_id, detailTokenUser) => {
+const _topicAutoMessage = async (user_id, topic_id, detailTokenUser) => {
   try {
     const communityMessageFormat = await CommunityMessageFormat.findOne({
       where: {topic_id, status: '1'}
     });
 
     if (communityMessageFormat && !detailTokenUser.is_anonymous) {
-      followTopicServiceQueue(token, user_id, topic_id);
+      followTopicServiceQueue(user_id, topic_id);
     }
   } catch (error) {
     console.log(error);

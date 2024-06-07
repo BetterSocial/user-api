@@ -57,9 +57,8 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
   }
 };
 
-const followTopicServiceQueue = async (token, user_id, topic_id) => {
+const followTopicServiceQueue = async (user_id, topic_id) => {
   const data = {
-    token,
     user_id,
     topic_id
   };
