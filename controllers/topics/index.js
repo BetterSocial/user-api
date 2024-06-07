@@ -30,6 +30,7 @@ const getSubscribableTopic = require('./getSubscribeableTopic');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const UsersFunction = require('../../databases/functions/users');
 const {insertTopics} = require('../../utils/post');
+const {followTopicServiceQueue} = require('../../services/redis');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -279,7 +280,7 @@ const followTopicV2 = async (req, res) => {
       });
 
       await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
-      await _topicAutoMessage(userId, topic_id, detailTokenUser);
+      await _topicAutoMessage(token, userId, topic_id, detailTokenUser);
       data.push(
         await _afterPutTopic(
           false,
@@ -334,22 +335,14 @@ const followTopicV2 = async (req, res) => {
   }
 };
 
-const _topicAutoMessage = async (user_id, topic_id, detailTokenUser) => {
+const _topicAutoMessage = async (token, user_id, topic_id, detailTokenUser) => {
   try {
     const communityMessageFormat = await CommunityMessageFormat.findOne({
       where: {topic_id, status: '1'}
     });
 
     if (communityMessageFormat && !detailTokenUser.is_anonymous) {
-      await UserTopic.update(
-        {notify_user: true, is_anonymous: detailTokenUser.is_anonymous},
-        {where: {user_id, topic_id}}
-      );
-    } else {
-      await UserTopic.update(
-        {notify_user: false, is_anonymous: detailTokenUser.is_anonymous},
-        {where: {user_id, topic_id}}
-      );
+      followTopicServiceQueue(token, user_id, topic_id);
     }
   } catch (error) {
     console.log(error);
