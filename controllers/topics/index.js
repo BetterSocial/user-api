@@ -342,7 +342,12 @@ const _topicAutoMessage = async (user_id, topic_id, detailTokenUser) => {
     });
     if (communityMessageFormats && !detailTokenUser.is_anonymous) {
       for (const format of communityMessageFormats) {
-        followTopicServiceQueue(user_id, topic_id, format.delay_time);
+        followTopicServiceQueue(
+          user_id,
+          topic_id,
+          format.community_message_format_id,
+          format.delay_time
+        );
       }
     }
   } catch (error) {

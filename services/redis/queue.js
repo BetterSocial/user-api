@@ -59,12 +59,12 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
   }
 };
 
-const followTopicServiceQueue = async (user_id, topic_id, delay) => {
+const followTopicServiceQueue = async (user_id, topic_id, community_message_format_id, delay) => {
   const data = {
     user_id,
-    topic_id
+    topic_id,
+    community_message_format_id
   };
-
   let currentTime = momentTz().tz('America/Los_Angeles');
   const randomTime = sample([6, 7, 8]);
   const additionalDays = delay;
