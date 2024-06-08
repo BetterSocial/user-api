@@ -18,6 +18,18 @@ registerV2Queue.on('error', (err) => {
   console.log('error on assigning register v2 queue', err);
 });
 
+const followTopicQueue = new Bull('followTopic', connectRedis, {
+  redis: {
+    ...bullConfig,
+    maxRetriesPerRequest: 100,
+    connectTimeout: 30000
+  }
+});
+
+followTopicQueue.on('error', (err) => {
+  console.log('error on assigning register v2 queue', err);
+});
+
 let registerServiceQueue;
 
 const registerV2ServiceQueue = async (token, userId, follows, topics, locations, myAnonUserId) => {
@@ -45,7 +57,25 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
   }
 };
 
+const followTopicServiceQueue = async (user_id, topic_id) => {
+  const data = {
+    user_id,
+    topic_id
+  };
+
+  const options = {
+    jobId: uuidv4(),
+    removeOnComplete: true
+  };
+  try {
+    await followTopicQueue.add(data, options);
+  } catch (e) {
+    console.log('error', e);
+  }
+};
+
 module.exports = {
   registerServiceQueue,
-  registerV2ServiceQueue
+  registerV2ServiceQueue,
+  followTopicServiceQueue
 };

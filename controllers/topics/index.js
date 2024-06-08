@@ -30,6 +30,7 @@ const getSubscribableTopic = require('./getSubscribeableTopic');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const UsersFunction = require('../../databases/functions/users');
 const {insertTopics} = require('../../utils/post');
+const {followTopicServiceQueue} = require('../../services/redis');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -341,15 +342,7 @@ const _topicAutoMessage = async (user_id, topic_id, detailTokenUser) => {
     });
 
     if (communityMessageFormat && !detailTokenUser.is_anonymous) {
-      await UserTopic.update(
-        {notify_user: true, is_anonymous: detailTokenUser.is_anonymous},
-        {where: {user_id, topic_id}}
-      );
-    } else {
-      await UserTopic.update(
-        {notify_user: false, is_anonymous: detailTokenUser.is_anonymous},
-        {where: {user_id, topic_id}}
-      );
+      followTopicServiceQueue(user_id, topic_id);
     }
   } catch (error) {
     console.log(error);
