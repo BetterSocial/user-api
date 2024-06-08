@@ -337,12 +337,18 @@ const followTopicV2 = async (req, res) => {
 
 const _topicAutoMessage = async (user_id, topic_id, detailTokenUser) => {
   try {
-    const communityMessageFormat = await CommunityMessageFormat.findOne({
+    const communityMessageFormats = await CommunityMessageFormat.findAll({
       where: {topic_id, status: '1'}
     });
-
-    if (communityMessageFormat && !detailTokenUser.is_anonymous) {
-      followTopicServiceQueue(user_id, topic_id);
+    if (communityMessageFormats && !detailTokenUser.is_anonymous) {
+      for (const format of communityMessageFormats) {
+        followTopicServiceQueue(
+          user_id,
+          topic_id,
+          format.community_message_format_id,
+          format.delay_time
+        );
+      }
     }
   } catch (error) {
     console.log(error);

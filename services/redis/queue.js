@@ -1,5 +1,7 @@
 const Bull = require('bull');
 const {v4: uuidv4} = require('uuid');
+const momentTz = require('moment-timezone');
+const {sample} = require('lodash');
 
 const {convertingUserFormatForLocation} = require('../../utils/custom');
 const {bullConfig, redisUrl} = require('../../config/redis');
@@ -57,15 +59,27 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
   }
 };
 
-const followTopicServiceQueue = async (user_id, topic_id) => {
+const followTopicServiceQueue = async (user_id, topic_id, community_message_format_id, delay) => {
   const data = {
     user_id,
-    topic_id
+    topic_id,
+    community_message_format_id
   };
+  let currentTime = momentTz().tz('America/Los_Angeles');
+  const randomTime = sample([6, 7, 8]);
+  const additionalDays = delay;
+
+  let requiredTime = momentTz()
+    .tz('America/Los_Angeles')
+    .set({hour: randomTime})
+    .add(additionalDays, 'days');
+
+  const diffTime = requiredTime.diff(currentTime, 'milliseconds');
 
   const options = {
     jobId: uuidv4(),
-    removeOnComplete: true
+    removeOnComplete: true,
+    delay: diffTime
   };
   try {
     await followTopicQueue.add(data, options);
