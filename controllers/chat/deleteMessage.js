@@ -18,26 +18,26 @@ const deleteMessage = async (req, res) => {
     await client.partialUpdateMessage(messageID, {
       set: {
         message_type: MESSAGE_TYPE.DELETED,
-        text: 'This message has been deleted'
+        text: 'This message has been deleted',
+        attachments: []
       }
     });
-    let destroy = await client.deleteMessage(messageID);
+
     // sent empty message to channel
     let baseMessage = {
       user_id: req.userId,
-      message_type: 'deleted',
+      message_type: 'notification-deleted',
+      text: 'This message has been deleted',
       deleted_message_id: messageID,
-      deleted_message_created_at: message?.created_at,
-      deleted_message_updated_at: message?.updated_at
+      deleted_message_created_at: message?.message?.created_at,
+      deleted_message_updated_at: message?.message?.updated_at
     };
+
+    console.log('baseMessage', baseMessage);
     const channel = client.channel('messaging', channelId);
     await channel.sendMessage(baseMessage, {
       skip_push: true
     });
-
-    if (!destroy) {
-      return res.status(500).json({message: 'Error deleting chat'});
-    }
 
     return res.status(200).json({message: 'Message deleted'});
   } catch (e) {
