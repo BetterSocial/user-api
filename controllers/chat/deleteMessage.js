@@ -26,7 +26,9 @@ const deleteMessage = async (req, res) => {
     let baseMessage = {
       user_id: req.userId,
       message_type: 'deleted',
-      deleted_message_id: messageID
+      deleted_message_id: messageID,
+      deleted_message_created_at: message?.created_at,
+      deleted_message_updated_at: message?.updated_at
     };
     const channel = client.channel('messaging', channelId);
     await channel.sendMessage(baseMessage, {
