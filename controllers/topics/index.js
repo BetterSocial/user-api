@@ -180,7 +180,7 @@ const getTopics = async (req, res) => {
 const createTopic = async (req, res) => {
   try {
     let {name} = req.body;
-    name = name.toLowerCase();
+    name = name.toLowerCase().trim();
 
     const {token, userId} = req;
 
