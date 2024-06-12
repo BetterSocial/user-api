@@ -42,8 +42,8 @@ const filterAllTopics = (text, topics = []) => {
 
   let unique_topics = [
     ...new Set([
-      ...topicsFromTextWithoutHashtag.map((topic) => topic.toLowerCase()),
-      ...topics.map((topic) => topic.toLowerCase())
+      ...topicsFromTextWithoutHashtag.map((topic) => topic.toLowerCase().trim()),
+      ...topics.map((topic) => topic.toLowerCase().trim())
     ])
   ];
   return unique_topics;
