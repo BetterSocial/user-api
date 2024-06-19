@@ -87,6 +87,7 @@ const SearchUser = async (req, res) => {
           AND u.user_id != :userId
           AND u.is_anonymous = false
           AND u.is_banned = false
+          AND u.user_id != :admin_user_id
           AND u.verified_status != 'UNVERIFIED') 
       ORDER BY  
           recently_active DESC,
@@ -101,6 +102,7 @@ const SearchUser = async (req, res) => {
           allow_anon_dm,
           userId,
           minimumKarmaScore: MINIMUM_KARMA_SCORE,
+          admin_user_id: process.env.BETTER_ADMIN_ID,
           limit
         }
       }

@@ -107,6 +107,7 @@ const InitDiscoveryUserData = async (req, res) => {
           AND A.is_anonymous = false 
           AND A.is_banned = false
           AND A.karma_score > :minimumKarmaScore
+          AND A.user_id != :admin_user_id
           ${where_anon_dm} 
           ${filterBlockedUser}
         ORDER BY
@@ -125,7 +126,8 @@ const InitDiscoveryUserData = async (req, res) => {
         allow_anon_dm,
         limit: limit,
         offset: page * limit,
-        minimumKarmaScore: MINIMUM_KARMA_SCORE
+        minimumKarmaScore: MINIMUM_KARMA_SCORE,
+        admin_user_id: process.env.BETTER_ADMIN_ID
       }
     });
     let suggestedUsers = usersWithCommonFollowerResult;
