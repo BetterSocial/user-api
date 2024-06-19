@@ -3,8 +3,13 @@
 const {sequelize} = require('../../databases/models');
 
 module.exports = async (req, res) => {
-  const {topics, locations, page} = req.query;
+  const {topics, locations, page, includeAdmin} = req.query;
   const result = [];
+
+  let queryAdmin = 'AND a.user_id != :admin_user_id';
+  if (includeAdmin) {
+    queryAdmin = '';
+  }
 
   const limit = 7;
   const offset = (page - 1) * limit;
@@ -57,6 +62,7 @@ module.exports = async (req, res) => {
                             AND a.karma_score > 45
                             AND a.user_id != :admin_user_id
                             AND b.topic_id = :topic_id
+                            ${queryAdmin}
                           ORDER BY 
                             CASE WHEN a.last_active_at > now() - interval '7' day THEN 0 ELSE 1 END,
                             CASE WHEN a.profile_pic_path NOT LIKE '%default-profile-picture%' THEN 0 ELSE 1 END,
