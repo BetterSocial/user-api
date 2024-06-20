@@ -1,11 +1,11 @@
 const {User} = require('../../databases/models');
-const Validator = require('fastest-validator');
 const moment = require('moment');
-const v = new Validator();
 const updateUser = require('../../services/getstream/updateUser');
+const {USERS_DEFAULT_IMAGE} = require('../../helpers/constants');
 
 module.exports = async (req, res) => {
   try {
+    let defaultImage = USERS_DEFAULT_IMAGE;
     const user = await User.findOne({
       where: {
         user_id: req.userId
@@ -20,13 +20,16 @@ module.exports = async (req, res) => {
     } else {
       let myTs = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
 
-      updateUser(req?.userId, {
+      await updateUser(req?.userId, {
         username: user.username,
-        profile_pic_url: null
+        profile_pic_url: defaultImage,
+        profileImage: defaultImage,
+        image: defaultImage
       });
-      const [numberOfAffectedRows, affectedRows] = await User.update(
+
+      const [_numberOfAffectedRows, affectedRows] = await User.update(
         {
-          profile_pic_path: null,
+          profile_pic_path: defaultImage,
           updated_at: myTs
         },
         {
