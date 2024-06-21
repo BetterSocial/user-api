@@ -40,7 +40,12 @@ module.exports = async (req, res) => {
     if (comment?.user?.id && !actors.includes(comment.user.id)) {
       actors.push(comment.user.id);
     }
-    comment?.latest_children?.comment?.forEach(collectUserIds);
+    comment?.latest_children?.comment
+      ?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+      .forEach(collectUserIds);
+    comment?.own_children?.comment
+      ?.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+      .forEach(collectUserIds);
   };
   comments.forEach(collectUserIds);
 
