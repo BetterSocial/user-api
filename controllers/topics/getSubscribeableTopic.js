@@ -5,6 +5,12 @@ const {sequelize, Post} = require('../../databases/models');
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
+
+/**
+ * Set to 9 because `hasUserPosted` will take 1 tag
+ */
+const MAX_USER_TOPIC_TAGS_ALLOWED = 9;
+
 module.exports = async (req, res) => {
   const userId = req.userId;
 
@@ -18,7 +24,7 @@ module.exports = async (req, res) => {
     AND Topics.sign = true 
     AND Topics.categories IS NOT NULL
     ORDER BY Topics.sort ASC
-    LIMIT 10`;
+    LIMIT ${MAX_USER_TOPIC_TAGS_ALLOWED}`;
 
   const topicHistoryQuery = `
     SELECT 
