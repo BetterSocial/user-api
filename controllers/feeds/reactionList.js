@@ -12,15 +12,8 @@ module.exports = async (req, res) => {
     const post = await Getstream.feed.getPlainFeedById(params.id);
     const myAnonymousId = await getAnonymUser(req.userId);
     const reaction = await reactionList(params.id, query.kind, query.limit);
-    let sortByDate = reaction.results.sort(
-      (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix()
-    );
-    sortByDate = sortByDate.map((commentRes) => {
-      const sortComment = commentRes?.latest_children?.comment?.sort(
-        (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix()
-      );
-      return {...commentRes, latest_children: {comment: sortComment}};
-    });
+
+    let level1Comments = buildComment(1, reaction.results);
 
     // get comment users
 
@@ -31,12 +24,12 @@ module.exports = async (req, res) => {
       }
       comment?.latest_children?.comment?.forEach(collectUserIds);
     };
-    sortByDate.forEach(collectUserIds);
+    level1Comments.forEach(collectUserIds);
 
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
 
     const removeSensitiveData = await Promise.all(
-      sortByDate.map(async (data) => {
+      level1Comments.map(async (data) => {
         return handleAnonymousData(
           data,
           req,
@@ -63,3 +56,30 @@ module.exports = async (req, res) => {
     });
   }
 };
+
+function sortCommentsCreatedAtAscending(comments) {
+  return comments.sort(
+    (prev, next) => moment(prev.created_at).unix() - moment(next.created_at).unix()
+  );
+}
+
+function buildComment(level, comments) {
+  if (level > 3 || !Array.isArray(comments)) return [];
+  const built = comments?.map((comment) => {
+    const nextLevelComments = buildComment(level + 1, comment?.latest_children?.comment);
+
+    if (level === 3)
+      return {
+        ...comment
+      };
+
+    return {
+      ...comment,
+      latest_children: {
+        comment: sortCommentsCreatedAtAscending(nextLevelComments)
+      }
+    };
+  });
+
+  return built;
+}
