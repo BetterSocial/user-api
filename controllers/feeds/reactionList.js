@@ -6,6 +6,9 @@ const {handleAnonymousData} = require('../../utils');
 const {User} = require('../../databases/models');
 const UsersFunction = require('../../databases/functions/users');
 
+const INITIAL_COMMENT_LEVEL = 1;
+const MAX_COMMENT_LEVEL = 3;
+
 module.exports = async (req, res) => {
   try {
     const {params, query} = req;
@@ -13,7 +16,7 @@ module.exports = async (req, res) => {
     const myAnonymousId = await getAnonymUser(req.userId);
     const reaction = await reactionList(params.id, query.kind, query.limit);
 
-    let level1Comments = buildComment(1, reaction.results);
+    let level1Comments = buildComment(INITIAL_COMMENT_LEVEL, reaction.results);
 
     // get comment users
 
@@ -58,17 +61,18 @@ module.exports = async (req, res) => {
 };
 
 function sortCommentsCreatedAtAscending(comments) {
-  return comments.sort(
+  return [...comments].sort(
     (prev, next) => moment(prev.created_at).unix() - moment(next.created_at).unix()
   );
 }
 
 function buildComment(level, comments) {
-  if (level > 3 || !Array.isArray(comments)) return [];
+  if (!Array.isArray(comments)) return [];
+
   const built = comments?.map((comment) => {
     const nextLevelComments = buildComment(level + 1, comment?.latest_children?.comment);
 
-    if (level === 3)
+    if (level === MAX_COMMENT_LEVEL)
       return {
         ...comment
       };
@@ -81,5 +85,5 @@ function buildComment(level, comments) {
     };
   });
 
-  return built;
+  return sortCommentsCreatedAtAscending(built);
 }
