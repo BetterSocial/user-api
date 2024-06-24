@@ -11,17 +11,18 @@ const chatSearch = async (req, res) => {
   const userId = req.userId;
 
   let followedUserSearchQuery = `
-        SELECT B.user_id_follower, B.user_id_followed, * 
-        FROM users A 
-        INNER JOIN user_follow_user B
-        ON B.user_id_follower = :userId AND B.user_id_followed = A.user_id
-        WHERE 
-            A.username ILIKE :query AND 
-            A.user_id != :userId AND
-            A.verified_status != 'UNVERIFIED' AND
-            A.is_anonymous = false
-        LIMIT 5
-        OFFSET :offset`;
+    SELECT B.user_id_follower, B.user_id_followed, * 
+    FROM users A 
+    INNER JOIN user_follow_user B
+    ON B.user_id_follower = :userId AND B.user_id_followed = A.user_id
+    WHERE 
+        A.username ILIKE :query AND 
+        A.user_id != :userId AND
+        A.verified_status != 'UNVERIFIED' AND
+        A.is_anonymous = false AND
+        A.user_id != :adminUserId
+    LIMIT 5
+    OFFSET :offset`;
 
   try {
     let followedUserSearchQueryResult = await sequelize.query(followedUserSearchQuery, {
@@ -29,7 +30,8 @@ const chatSearch = async (req, res) => {
       replacements: {
         offset: parseInt(offset),
         query: `%${q}%`,
-        userId
+        userId,
+        adminUserId: process.env.BETTER_ADMIN_ID
       }
     });
     let followed = followedUserSearchQueryResult;
@@ -38,19 +40,20 @@ const chatSearch = async (req, res) => {
     let additionalQuery = followed?.length > 0 ? `AND A.user_id NOT IN (:followedIds)` : '';
 
     let moreUserSearchQuery = `
-  SELECT B.user_id_follower, B.user_id_followed, * 
-  FROM users A 
-  LEFT JOIN user_follow_user B
-  ON B.user_id_followed = :userId AND B.user_id_follower = A.user_id
-  WHERE 
-      A.username ILIKE :query AND 
-      A.user_id != :userId AND
-      A.verified_status != 'UNVERIFIED' AND
-      A.is_anonymous = false
-      ${additionalQuery}
-  ORDER BY B.user_id_followed
-  LIMIT :limit
-  OFFSET :offset`;
+      SELECT B.user_id_follower, B.user_id_followed, * 
+      FROM users A 
+      LEFT JOIN user_follow_user B
+      ON B.user_id_followed = :userId AND B.user_id_follower = A.user_id
+      WHERE 
+          A.username ILIKE :query AND 
+          A.user_id != :userId AND
+          A.verified_status != 'UNVERIFIED' AND
+          A.is_anonymous = false AND
+          A.user_id != :adminUserId
+          ${additionalQuery}
+      ORDER BY B.user_id_followed
+      LIMIT :limit
+      OFFSET :offset`;
 
     const userOffset = parseInt(offset) - parseInt(followed?.length || 0);
 
@@ -61,7 +64,8 @@ const chatSearch = async (req, res) => {
         query: `%${q}%`,
         userId,
         limit: limit - (followed?.length || 0),
-        followedIds
+        followedIds,
+        adminUserId: process.env.BETTER_ADMIN_ID
       }
     });
     let moreUsers = moreUserSearchQueryResult;
