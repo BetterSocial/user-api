@@ -1,4 +1,4 @@
-const {sequelize} = require('../../databases/models');
+const {sequelize, Post} = require('../../databases/models');
 
 /**
  *
@@ -20,12 +20,6 @@ module.exports = async (req, res) => {
     ORDER BY Topics.sort ASC
     LIMIT 10`;
 
-  const followedOnboardingTopicQueryResult = await sequelize.query(followedOnboardingTopicQuery, {
-    replacements: {
-      userId
-    }
-  });
-
   const topicHistoryQuery = `
     SELECT 
       DISTINCT name 
@@ -33,11 +27,33 @@ module.exports = async (req, res) => {
     INNER JOIN topics Topics 
     ON UserTopicsHistory.topic_id = Topics.topic_id 
     WHERE UserTopicsHistory.user_id = :userId`;
-  const topicHistoryQueryResult = await sequelize.query(topicHistoryQuery, {
+
+  const topicHistoryQueryOperation = sequelize.query(topicHistoryQuery, {
     replacements: {
       userId
     }
   });
+
+  const followedOnboardingTopicQueryOperation = sequelize.query(followedOnboardingTopicQuery, {
+    replacements: {
+      userId
+    }
+  });
+
+  const hasUserPostedQueryOperation = Post.findAll({
+    where: {
+      author_user_id: userId
+    },
+    limit: 1,
+    raw: true
+  });
+
+  const [followedOnboardingTopicQueryResult, topicHistoryQueryResult, hasUserPosted] =
+    await Promise.all([
+      followedOnboardingTopicQueryOperation,
+      topicHistoryQueryOperation,
+      hasUserPostedQueryOperation
+    ]);
 
   res.json({
     status: 'success',
@@ -45,7 +61,8 @@ module.exports = async (req, res) => {
     message: 'Success get topic user',
     data: {
       topics: followedOnboardingTopicQueryResult[0],
-      history: topicHistoryQueryResult[0]
+      history: topicHistoryQueryResult[0],
+      hasUserPosted: hasUserPosted?.length > 0
     }
   });
 };
