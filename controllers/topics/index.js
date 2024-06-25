@@ -280,17 +280,6 @@ const followTopicV2 = async (req, res) => {
 
       await userTopicService.followTopic(detailTokenUser.user_id, topic_id);
       await _topicAutoMessage(userId, topic_id, detailTokenUser);
-      data.push(
-        await _afterPutTopic(
-          false,
-          token,
-          detailTokenUser.user_id,
-          name,
-          detailTokenUser.is_anonymous,
-          topicInvitationIds,
-          with_system_message
-        )
-      );
 
       // Remove signed/anon user counterpart if actor user is following.
       // Fixing the existing channel where signed/anon user counterpart is not removed when actor user is following.
@@ -311,6 +300,20 @@ const followTopicV2 = async (req, res) => {
           )
         );
       }
+
+      // Move follow _afterPutTopic to bottom so send system message is sent after
+      // All follow/unfollow process is done
+      data.push(
+        await _afterPutTopic(
+          false,
+          token,
+          detailTokenUser.user_id,
+          name,
+          detailTokenUser.is_anonymous,
+          topicInvitationIds,
+          with_system_message
+        )
+      );
     }
 
     return res.status(200).json({
