@@ -220,7 +220,7 @@ const createTopic = async (req, res) => {
 const followTopicViaCreateTopic = async ({token, name, topic_id, userId}) => {
   const userTopicService = new UserTopicService(UserTopic, UserTopicHistory);
   await userTopicService.followTopic(userId, topic_id);
-  await _afterPutTopic(false, token, userId, name, false, [], null, false);
+  await _afterPutTopic(false, token, userId, name, false, [], false);
 };
 
 const followTopicV2 = async (req, res) => {
@@ -266,7 +266,6 @@ const followTopicV2 = async (req, res) => {
           name,
           detailTokenUser.is_anonymous,
           topicInvitationIds,
-          prevUserToken,
           with_system_message
         )
       );
@@ -289,10 +288,13 @@ const followTopicV2 = async (req, res) => {
           name,
           detailTokenUser.is_anonymous,
           topicInvitationIds,
-          prevUserToken,
           with_system_message
         )
       );
+
+      // Remove signed/anon user counterpart if actor user is following.
+      // Fixing the existing channel where signed/anon user counterpart is not removed when actor user is following.
+      await removeTopicFromChatTab(name, secondDetailUser?.user_id);
 
       if (getSecondUserStatus) {
         topicInvitationIds = [];
@@ -300,12 +302,11 @@ const followTopicV2 = async (req, res) => {
         data.push(
           await _afterPutTopic(
             true,
-            token,
+            prevUserToken,
             secondDetailUser.user_id,
             name,
             detailTokenUser.is_anonymous,
             topicInvitationIds,
-            prevUserToken,
             with_system_message
           )
         );
@@ -363,14 +364,13 @@ const _afterPutTopic = async (
   name,
   isAnonymous,
   topicInvitationsId,
-  prevUserToken,
   withSystemMessage = false
 ) => {
   // follow / unfollow main feed topic
   try {
     if (isUnfollow) {
-      await unfollowMainFeedTopic(prevUserToken, userId, name);
-      await removeTopicFromChatTab(token, name, userId);
+      await removeTopicFromChatTab(name, userId);
+      await unfollowMainFeedTopic(token, userId, name);
     } else {
       await followMainFeedTopic(token, userId, name);
       await addTopicToChatTab(

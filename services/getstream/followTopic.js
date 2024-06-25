@@ -131,7 +131,7 @@ const addTopicToChatTab = async (
   }
 };
 
-const removeTopicFromChatTab = async (token, topicName, userId) => {
+const removeTopicFromChatTab = async (topicName, userId) => {
   try {
     const name = topicName.toLowerCase();
     const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
