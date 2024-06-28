@@ -35,6 +35,8 @@ const sendMultiDeviceTaggedNotification = require('../fcmToken/sendMultiDeviceTa
 const PostFunction = require('../../../databases/functions/post');
 const {StreamChat} = require('stream-chat');
 const Environment = require('../../../config/environment');
+const {upVote} = require('../../getstream');
+const {countProcess} = require('../../../process');
 
 const isEmptyMessageAllowed = (body) => {
   const isPollPost = body?.verb === POST_VERB_POLL;
@@ -325,6 +327,11 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
   try {
     if (isAnonimous) post = await Getstream.feed.createAnonymousPost(userDetail?.user_id, data);
     else post = await Getstream.feed.createPost(req?.token, data);
+
+    // Upvote post before sending the success message
+    await upVote(post?.id, req.token, req?.userId);
+    countProcess(post?.id, {upvote_count: +1}, {upvote_count: 1});
+
     body.tagUsers?.forEach(async (user_id) => {
       await sendMultiDeviceTaggedNotification(user, user_id, post.message, post.id);
     });
