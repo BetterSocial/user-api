@@ -87,7 +87,7 @@ module.exports = async (req, res) => {
         await channel.sendMessage({user_id: req?.userId, text: invitations_msg}, {skip_push: true});
         //end topic invitation message primary chat
 
-        let userToken = await FcmToken.findOne({
+        let userTokens = await FcmToken.findAll({
           where: {
             user_id
           }
@@ -103,10 +103,13 @@ module.exports = async (req, res) => {
             type: 'topic'
           }
         };
-        if (userToken) {
-          messaging()
-            .sendToDevice(userToken.token, payload)
-            .then(() => {});
+        if (userTokens) {
+          // looping for each user token
+          userTokens.forEach((userToken) => {
+            messaging()
+              .sendToDevice(userToken.token, payload)
+              .then(() => {});
+          });
         }
 
         return user_id;
