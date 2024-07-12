@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const moment = require('moment');
 const stream = require('getstream');
-const {PollingOption, LogPolling, sequelize} = require('../../databases/models');
+const {PollingOption, LogPolling, UserFollowUser, sequelize} = require('../../databases/models');
 const {NO_POLL_OPTION_UUID, POST_TYPE_POLL} = require('../../helpers/constants');
 const {getDetailFeed} = require('../../services/getstream');
 const {responseSuccess} = require('../../utils/Responses');
@@ -9,6 +9,7 @@ const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const {User} = require('../../databases/models');
 const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
+const UserFollowUserFunction = require('../../databases/functions/userFollowUser');
 
 module.exports = async (req, res) => {
   const {id} = req.query;
@@ -142,6 +143,19 @@ module.exports = async (req, res) => {
     notifId.push(item.id);
   }
   await client.feed('notification', req.userId).get({mark_read: notifId, mark_seen: notifId});
+
+  try {
+    const userFollow = await UserFollowUserFunction.checkTargetUserFollowStatus(
+      UserFollowUser,
+      req.userId,
+      newItem?.actor?.id
+    );
+
+    const isFollowingTarget = userFollow?.isMeFollowingTarget;
+    newItem.is_following_target = isFollowingTarget;
+  } catch (e) {
+    console.log('Error getting user follow status', e);
+  }
 
   return res.status(200).json(responseSuccess('success get detail feed', newItem));
 };
