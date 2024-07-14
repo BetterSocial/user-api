@@ -39,7 +39,6 @@ module.exports = async (req, res) => {
 
       return res.status(400).json(response);
     }
-
     await Promise.all(
       member_ids.map(async (user_id) => {
         let user = await User.findOne({
@@ -57,10 +56,9 @@ module.exports = async (req, res) => {
           return res.status(400).json(response);
         }
 
+        const topic_invitations_id = await uuid();
         const invitations_msg = `${inviter.username} invited you to join ${topics.name} community`;
 
-        //topic invitation message primary chat
-        const topic_invitations_id = await uuid();
         await TopicInvitations.create({
           topic_invitations_id: topic_invitations_id,
           user_id_inviter: req?.userId,
@@ -84,8 +82,7 @@ module.exports = async (req, res) => {
           }
         );
         await channel.create();
-        await channel.sendMessage({user_id: req?.userId, text: invitations_msg}, {skip_push: true});
-        //end topic invitation message primary chat
+        await channel.sendMessage({user_id: user_id, text: invitations_msg}, {skip_push: true});
 
         let userTokens = await FcmToken.findAll({
           where: {
@@ -111,8 +108,6 @@ module.exports = async (req, res) => {
               .then(() => {});
           });
         }
-
-        return user_id;
       })
     );
 
