@@ -49,6 +49,7 @@ router.get('/feed-chat/:feedId', isAuth, feed.getOneFeedChatService);
 router.post('/open-graph', isAuth, feed.getOpenGraph);
 router.delete('/:postId', isAuth, feed.deletePost);
 router.delete('/anonymous/:postId', isAuth, feed.deleteAnonymousPost);
+router.delete('/anonymous-v2/:postId', isAuthAnonim, feed.deleteAnonymousPostV2);
 
 router.get('/feed-sync/:userId', feed.feedSync);
 router.post('/feed-action-notification/:kind', isAuth, feed.notificationCommentFeed);
