@@ -4,7 +4,7 @@ const getstreamService = require('../../services/getstream');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
-const {getMessage} = require('./getFeedChat');
+const {getMessage, isMediaOnlyMessage} = require('./getFeedChat');
 
 const constructData = ({selfUserId, data, datum, constantActor, shouldIncludeActorData = true}) => {
   datum.isOwningReaction = selfUserId === datum.user_id;
@@ -180,7 +180,8 @@ const getOneFeedChatService = async (req, res) => {
       isAnonym,
       comments,
       upvotes,
-      downvotes
+      downvotes,
+      isMediaOnlyMessage: isMediaOnlyMessage(data.results[0])
     };
 
     const blockCount = await UserBlockedUser.count({

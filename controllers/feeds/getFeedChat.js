@@ -40,11 +40,15 @@ const mappingFeed = (req, feeds) => {
 };
 
 const getMessage = (b) => {
-  const isImagesIncluded = b?.images_url?.length > 0 || b?.object?.images_url?.length > 0;
-  const isMessageEmpty = (b?.message || '')?.length === 0;
-  if (isImagesIncluded && isMessageEmpty) return 'Media 🏞️';
+  if (isMediaOnlyMessage(b)) return 'Media 🏞️';
   if (typeof b.object === 'object') return b?.object?.message;
   return b?.message;
+};
+
+const isMediaOnlyMessage = (b) => {
+  const isImagesIncluded = b?.images_url?.length > 0 || b?.object?.images_url?.length > 0;
+  const isMessageEmpty = (b?.message || '')?.length === 0;
+  return isImagesIncluded && isMessageEmpty;
 };
 
 const getDetail = (req, b, id, anonymousId) => {
@@ -90,7 +94,8 @@ const getDetail = (req, b, id, anonymousId) => {
     isOwnPost,
     isOwnAnonymousPost,
     actor,
-    showToast: b.showToast
+    showToast: b.showToast,
+    isMediaOnlyMessage: isMediaOnlyMessage(b)
   };
 };
 
@@ -269,7 +274,8 @@ const getFeedChatService = async (req, res) => {
         isOwnAnonymousPost,
         message,
         actor,
-        showToast = false
+        showToast = false,
+        isMediaOnlyMessage = false
       } = postDetail;
 
       const user = karmaScores.find((user) => user.user_id === actor.id);
@@ -305,7 +311,8 @@ const getFeedChatService = async (req, res) => {
           postMaker: actor,
           isAnonym,
           comments: [],
-          showToast
+          showToast,
+          isMediaOnlyMessage
         });
       }
       const myReaction = b.reaction;
@@ -339,6 +346,7 @@ const getFeedChatService = async (req, res) => {
 module.exports = {
   getMessage,
   getFeedChatService,
+  isMediaOnlyMessage,
   mappingFeed,
   getDetail,
   countLevel2,

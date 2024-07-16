@@ -55,7 +55,9 @@ const getAnonymousFeedChatService = async (req, res) => {
         isOwnAnonymousPost,
         isOwnPost,
         message,
-        actor
+        actor,
+        isMediaOnlyMessage = false,
+        showToast = false
       } = getDetail(req, b, mySignedId, req?.userId);
       const mapCountLevel2 = countLevel2(childComment);
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
@@ -83,7 +85,9 @@ const getAnonymousFeedChatService = async (req, res) => {
           upvote,
           postMaker: actor,
           isAnonym,
-          comments: []
+          comments: [],
+          showToast,
+          isMediaOnlyMessage
         });
       }
       const myReaction = b.reaction;
