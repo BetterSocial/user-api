@@ -39,6 +39,14 @@ const mappingFeed = (req, feeds) => {
   return mapping;
 };
 
+const getMessage = (b) => {
+  const isImagesIncluded = b?.images_url?.length > 0 || b?.object?.images_url?.length > 0;
+  const isMessageEmpty = (b?.message || '')?.length === 0;
+  if (isImagesIncluded && isMessageEmpty) return 'Media 🏞️';
+  if (typeof b.object === 'object') return b?.object?.message;
+  return b?.message;
+};
+
 const getDetail = (req, b, id, anonymousId) => {
   const activity_id = b.reaction?.activity_id || b.id;
   const expired_at = b?.object?.expired_at || b.expired_at || null;
@@ -46,7 +54,7 @@ const getDetail = (req, b, id, anonymousId) => {
   const upvote = typeof b.object === 'object' ? b.object.reaction_counts?.upvotes : 0;
   const totalComment = typeof b.object === 'object' ? b.object.reaction_counts?.comment : 0;
   const childComment = typeof b.object === 'object' ? b.object?.latest_reactions?.comment : [0];
-  const message = typeof b.object === 'object' ? b.object.message : b.message;
+  const message = getMessage(b);
   const constantActor = typeof b.object === 'object' ? b.object.actor : b.actor;
   let actor = typeof b.object === 'object' ? b.object.actor : b.actor;
   const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity;
@@ -246,6 +254,7 @@ const getFeedChatService = async (req, res) => {
     const newGroup = {};
     const groupingFeed = newFeed.reduce((a, b) => {
       const localDate = moment.utc(b.time).local().format();
+      const postDetail = getDetail(req, b, req?.userId, myAnonymousId?.user_id);
       const {
         activity_id,
         expired_at,
@@ -261,7 +270,7 @@ const getFeedChatService = async (req, res) => {
         message,
         actor,
         showToast = false
-      } = getDetail(req, b, req?.userId, myAnonymousId?.user_id);
+      } = postDetail;
 
       const user = karmaScores.find((user) => user.user_id === actor.id);
       actor.karmaScores = roundingKarmaScore(user?.karma_score || 0);
