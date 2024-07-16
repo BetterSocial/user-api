@@ -337,6 +337,7 @@ const getFeedChatService = async (req, res) => {
 };
 
 module.exports = {
+  getMessage,
   getFeedChatService,
   mappingFeed,
   getDetail,

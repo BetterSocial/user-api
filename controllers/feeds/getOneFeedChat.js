@@ -4,6 +4,7 @@ const getstreamService = require('../../services/getstream');
 const ErrorResponse = require('../../utils/response/ErrorResponse');
 const UsersFunction = require('../../databases/functions/users');
 const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
+const {getMessage} = require('./getFeedChat');
 
 const constructData = ({selfUserId, data, datum, constantActor, shouldIncludeActorData = true}) => {
   datum.isOwningReaction = selfUserId === datum.user_id;
@@ -157,6 +158,8 @@ const getOneFeedChatService = async (req, res) => {
       actor.id = null;
     }
 
+    const titlePost = getMessage(data.results[0]);
+
     const response = {
       activity_id: data.results[0].id,
       data: {
@@ -170,7 +173,7 @@ const getOneFeedChatService = async (req, res) => {
       isOwnAnonymousPost: selfAnonymousUserId === postMakerUserId,
       totalCommentBadge: comments.filter((comment) => comment.actor.id !== req.userId).length ?? 0,
       type: 'post-notif',
-      titlePost: data.results[0].object?.message ?? data.results[0].message,
+      titlePost,
       downvote: data.results[0].reaction_counts?.downvotes ?? 0,
       upvote: data.results[0].reaction_counts?.upvotes ?? 0,
       postMaker: actor,
