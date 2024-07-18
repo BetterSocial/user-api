@@ -51,14 +51,14 @@ const isMediaOnlyMessage = (b) => {
   return isImagesIncluded && isMessageEmpty;
 };
 
-const getDetail = (req, b, id, anonymousId) => {
+const getDetail = (req, b, id, anonymousId, options = {}) => {
   const activity_id = b.reaction?.activity_id || b.id;
   const expired_at = b?.object?.expired_at || b.expired_at || null;
   const downvote = typeof b.object === 'object' ? b.object.reaction_counts?.downvotes : 0;
   const upvote = typeof b.object === 'object' ? b.object.reaction_counts?.upvotes : 0;
   const totalComment = typeof b.object === 'object' ? b.object.reaction_counts?.comment : 0;
   const childComment = typeof b.object === 'object' ? b.object?.latest_reactions?.comment : [0];
-  const message = getMessage(b);
+  const message = options?.getNewMediaMessage ? getMessage(b) : b.message || '';
   const constantActor = typeof b.object === 'object' ? b.object.actor : b.actor;
   let actor = typeof b.object === 'object' ? b.object.actor : b.actor;
   const isAnonym = typeof b.object === 'object' ? b.object.anonimity : b.anonimity;
@@ -218,7 +218,7 @@ const getFeedGroup = async (groupingFeed) => {
   return feedGroup;
 };
 
-const getFeedChatService = async (req, res) => {
+const getFeedChatService = async (req, res, options = {}) => {
   try {
     const myAnonymousId = await UsersFunction.findAnonymousUserId(User, req.userId);
 
@@ -259,7 +259,7 @@ const getFeedChatService = async (req, res) => {
     const newGroup = {};
     const groupingFeed = newFeed.reduce((a, b) => {
       const localDate = moment.utc(b.time).local().format();
-      const postDetail = getDetail(req, b, req?.userId, myAnonymousId?.user_id);
+      const postDetail = getDetail(req, b, req?.userId, myAnonymousId?.user_id, options);
       const {
         activity_id,
         expired_at,

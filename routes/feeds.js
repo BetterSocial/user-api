@@ -46,6 +46,15 @@ router.get('/i_vote_comment', isAuth, feed.iVoteComment);
 router.get('/feed-chat/', isAuth, feed.getFeedChatService);
 router.get('/feed-chat/anonymous', isAuthAnonim, feed.getAnonymousFeedChatService);
 router.get('/feed-chat/:feedId', isAuth, feed.getOneFeedChatService);
+router.get('/feed-chat-v2/', isAuth, (req, res) =>
+  feed.getFeedChatService(req, res, {getNewMediaMessage: true})
+);
+router.get('/feed-chat-v2/anonymous', isAuthAnonim, (req, res) =>
+  feed.getAnonymousFeedChatService(req, res, {getNewMediaMessage: true})
+);
+router.get('/feed-chat-v2/:feedId', isAuth, (req, res) =>
+  feed.getOneFeedChatService(req, res, {getNewMediaMessage: true})
+);
 router.post('/open-graph', isAuth, feed.getOpenGraph);
 router.delete('/:postId', isAuth, feed.deletePost);
 router.delete('/anonymous/:postId', isAuth, feed.deleteAnonymousPost);
