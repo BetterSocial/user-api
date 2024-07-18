@@ -92,12 +92,14 @@ module.exports = async (req, res) => {
 
         const payload = {
           notification: {
-            title: invitations_msg,
+            title: `#${topics?.name}`,
+            body: invitations_msg,
             image: user.profile_pic_path
           },
           data: {
             topic_id,
-            type: 'topic'
+            type: 'topic',
+            topic_name: topics?.name
           }
         };
         if (userTokens) {
