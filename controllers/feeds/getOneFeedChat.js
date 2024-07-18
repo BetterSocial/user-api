@@ -67,7 +67,7 @@ const getReaction = (req, latest_reactions, constantActor) => {
   return {comments, upvotes, downvotes};
 };
 
-const getOneFeedChatService = async (req, res) => {
+const getOneFeedChatService = async (req, res, options = {}) => {
   let selfSignedUserId = null;
   let selfAnonymousUserId = null;
 
@@ -158,7 +158,9 @@ const getOneFeedChatService = async (req, res) => {
       actor.id = null;
     }
 
-    const titlePost = getMessage(data.results[0]);
+    const titlePost = options?.getNewMediaMessage
+      ? getMessage(data.results[0])
+      : data.results[0].message || '';
 
     const response = {
       activity_id: data.results[0].id,

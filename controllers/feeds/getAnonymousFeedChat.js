@@ -12,7 +12,7 @@ const {
   getFeedGroup
 } = require('./getFeedChat');
 
-const getAnonymousFeedChatService = async (req, res) => {
+const getAnonymousFeedChatService = async (req, res, options = {}) => {
   try {
     let {last_fetch_date = null} = req.query;
     if (last_fetch_date) {
@@ -58,7 +58,7 @@ const getAnonymousFeedChatService = async (req, res) => {
         actor,
         isMediaOnlyMessage = false,
         showToast = false
-      } = getDetail(req, b, mySignedId, req?.userId);
+      } = getDetail(req, b, mySignedId, req?.userId, options);
       const mapCountLevel2 = countLevel2(childComment);
       const totalCommentLevel3 = countCommentLv3(childComment, [0]);
       const total3 = totalCommentLevel3.reduce((a1, b1) => a1 + b1, 0);
