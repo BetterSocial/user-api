@@ -29,6 +29,7 @@ const BetterSocialCore = {
   },
   fcmToken: {
     sendNotification: require('./fcmToken/sendNotification'),
+    sendChatNotificationByChannelMembers: require('./fcmToken/sendChatNotificationByChannelMembers'),
     sendCommentNotification: require('./fcmToken/sendCommentNotification'),
     sendReplyCommentNotification: require('./fcmToken/sendReplyCommentNotification'),
     sendMultiDeviceNotification: require('./fcmToken/sendMultiDeviceNotification'),
