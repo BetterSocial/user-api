@@ -50,6 +50,8 @@ const InitDiscoveryUserData = async (req, res) => {
     );
     let topicIds = user_topics.map((topic) => topic.topic_id);
 
+    const topicIdQuery = topicIds?.length > 0 ? `AND tp.topic_id in (:topicIds)` : '';
+
     const usersWithCommonFollowerQuery = `
         SELECT 
             A.user_id,
@@ -76,7 +78,7 @@ const InitDiscoveryUserData = async (req, res) => {
             ) as community_info,
             ( select count(name) > 1 from topics as tp
 							left join user_topics as utp on tp.topic_id = utp.topic_id
-							where utp.user_id = A.user_id and tp.topic_id in (:topicIds) LIMIT 2
+							where utp.user_id = A.user_id ${topicIdQuery} LIMIT 2
 						) as community_info_result,
             (SELECT COUNT(*) FROM user_follow_user WHERE user_id_followed = A.user_id) AS followersCount,
             EXISTS (
