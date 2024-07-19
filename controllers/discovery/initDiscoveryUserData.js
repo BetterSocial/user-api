@@ -124,7 +124,6 @@ const InitDiscoveryUserData = async (req, res) => {
       type: QueryTypes.SELECT,
       replacements: {
         userId,
-        // topicIds: topicIds || [],
         topicIds,
         allow_anon_dm,
         limit: limit,
