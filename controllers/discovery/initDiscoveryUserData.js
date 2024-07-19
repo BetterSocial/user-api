@@ -120,8 +120,6 @@ const InitDiscoveryUserData = async (req, res) => {
         LIMIT :limit
         OFFSET :offset`;
 
-    console.log('topicsIds', topicIds);
-
     let usersWithCommonFollowerResult = await sequelize.query(usersWithCommonFollowerQuery, {
       type: QueryTypes.SELECT,
       replacements: {
