@@ -3,6 +3,7 @@ const moment = require('moment');
 const Getstream = require('../../vendor/getstream');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const {handleAnonymousData} = require('../../utils');
+const {getListBlockUser} = require('../../services/blockUser');
 const {User} = require('../../databases/models');
 const UsersFunction = require('../../databases/functions/users');
 
@@ -14,8 +15,21 @@ module.exports = async (req, res) => {
     const {params, query} = req;
     const post = await Getstream.feed.getPlainFeedById(params.id);
     const myAnonymousId = await getAnonymUser(req.userId);
+    const blockedUserList = await getListBlockUser(req.userId);
+    // Convert string to array if necessary
+    let blockedUserArray;
+    if (typeof blockedUserList === 'string') {
+      try {
+        blockedUserArray = JSON.parse(blockedUserList);
+      } catch (error) {
+        console.error('Error parsing blockedUserList:', error);
+        blockedUserArray = [];
+      }
+    } else {
+      blockedUserArray = blockedUserList;
+    }
+    const blockedUsers = blockedUserArray.map((user) => user.user_id_blocked);
     const reaction = await reactionList(params.id, query.kind, query.limit);
-
     let level1Comments = buildComment(INITIAL_COMMENT_LEVEL, reaction.results);
 
     // get comment users
@@ -28,6 +42,8 @@ module.exports = async (req, res) => {
       comment?.latest_children?.comment?.forEach(collectUserIds);
     };
     level1Comments.forEach(collectUserIds);
+    // Filter out comments from blocked users
+    level1Comments = level1Comments.filter((comment) => !blockedUsers.includes(comment.user.id));
 
     const karmaScores = await UsersFunction.getUsersKarmaScore(User, actors);
 
