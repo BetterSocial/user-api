@@ -67,7 +67,6 @@ module.exports = async (req, res) => {
       total: removeSensitiveData.length
     });
   } catch (e) {
-    console.log('DEBUG error => ', e);
     res.status(400).send({
       success: false,
       data: [],
