@@ -44,7 +44,9 @@ const checkHumanIdExchangeToken = async (req, res) => {
       return SuccessResponse(res, {
         code: 500,
         data: false,
-        message: 'User is UNVERIFIED'
+        message: 'User is UNVERIFIED',
+        is_banned: false,
+        humanIdData: data
       });
     }
 
