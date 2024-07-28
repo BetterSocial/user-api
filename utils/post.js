@@ -294,7 +294,8 @@ function modifyReactionsPost(post) {
     }
 
     if (!isUserDataIncluded) {
-      next.user.data = {};
+      next.user = next.user ?? {};
+      next.user.data = next.user.data ?? {};
     }
 
     acc.push(next);
