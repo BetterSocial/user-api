@@ -99,6 +99,8 @@ const registerV2 = async (req, res) => {
    */
   try {
     if (isUnverifiedUser) {
+      await Getstream.core.updateUserRemoveHumanId(insertedObject?.user);
+
       token = Getstream.core.createToken(insertedObject?.user?.user_id);
       anonymousToken = Getstream.core.createToken(
         insertedObject?.anonymousUser?.user_id?.toLowerCase()
