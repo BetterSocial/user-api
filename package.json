@@ -11,7 +11,8 @@
     "prepare": "husky install",
     "lint": "eslint . --ext .js",
     "update-env-dev": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config dev > .env.development",
-    "update-env-prod": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config prd > .env.production"
+    "update-env-prod": "doppler secrets download -p bettersocial-userapi --no-file --format env-no-quotes --config prd > .env.production",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.2.1",
@@ -50,6 +51,7 @@
     "node-cache": "^5.1.2",
     "notenv": "^2.0.3",
     "open-graph-scraper": "^6.3.2",
+    "patch-package": "^8.0.0",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.5.1",
