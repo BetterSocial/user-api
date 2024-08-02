@@ -19,12 +19,11 @@ const leaveGroupMember = async (req, res) => {
 
     const client = new StreamChat(Environment.GETSTREAM_API_KEY, Environment.GETSTREAM_API_SECRET);
     const currentChannel = await client.channel(CHANNEL_TYPE_STRING.GROUP, channelId);
-    const queriedChannel = await client.queryChannels({
-      type: CHANNEL_TYPE_STRING.GROUP,
-      id: channelId
-    });
 
-    let all_members = queriedChannel[0].data.members.map((member) => member.user.id);
+    const response = await Getstream.chat.removeGroupMember(channelId, userId);
+    const {channel, channelApiResponse} = response.data || {};
+
+    let all_members = channelApiResponse?.members?.map((member) => member.user.id);
 
     const textOwnUser = `You left this group`;
     const textTargetUser = `${ownUser.username} left this group`;
@@ -49,9 +48,6 @@ const leaveGroupMember = async (req, res) => {
         skip_push: true
       }
     );
-
-    const response = await Getstream.chat.removeGroupMember(channelId, userId);
-    const {channel, channelApiResponse} = response.data || {};
 
     const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
       await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, false);
