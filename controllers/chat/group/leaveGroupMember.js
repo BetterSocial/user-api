@@ -24,7 +24,7 @@ const leaveGroupMember = async (req, res) => {
       id: channelId
     });
 
-    let all_members = queriedChannel[0].data.better_channel_member.map((member) => member.user.id);
+    let all_members = queriedChannel[0].data.members.map((member) => member.user.id);
 
     const textOwnUser = `You left this group`;
     const textTargetUser = `${ownUser.username} left this group`;

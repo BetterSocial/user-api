@@ -24,7 +24,7 @@ const removeGroupMember = async (req, res) => {
       members: {$in: [userId]}
     });
 
-    let all_members = queriedChannel[0].data.better_channel_member.map((member) => member.user.id);
+    let all_members = queriedChannel[0].data.members.map((member) => member.user.id);
 
     const textOwnUser = `You removed ${targetUserModel.username} from this group`;
     const textTargetUser = `${ownUser.username} removed you from this group`;
