@@ -57,7 +57,7 @@ const removeGroupMember = async (req, res) => {
     let channelResponse;
     try {
       const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
-        await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
+        await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, false);
 
       await BetterSocialCore.fcmToken.sendGroupChatNotification(
         targetUserModel.user_id,

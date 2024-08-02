@@ -54,7 +54,7 @@ const leaveGroupMember = async (req, res) => {
     const {channel, channelApiResponse} = response.data || {};
 
     const {newChannelName, betterChannelMember, betterChannelMemberObject, updatedChannel} =
-      await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, true);
+      await BetterSocialCore.chat.updateBetterChannelMembers(channel, channelApiResponse, false);
 
     channelResponse = updatedChannel;
 

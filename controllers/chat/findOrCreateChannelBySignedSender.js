@@ -45,12 +45,18 @@ const findOrCreateChannelBySignedSender = async (req, res) => {
       }
     }
 
+    const shouldBetterChannelMembersUpdated = channelType !== CHANNEL_TYPE.GROUP;
     const findOrCreateChannel = await channel.create();
     const {betterChannelMember, newChannelName, betterChannelMemberObject, updatedChannel} =
-      await BetterSocialCore.chat.updateBetterChannelMembers(channel, findOrCreateChannel, true, {
-        channelType,
-        channel_type: channelType
-      });
+      await BetterSocialCore.chat.updateBetterChannelMembers(
+        channel,
+        findOrCreateChannel,
+        shouldBetterChannelMembersUpdated,
+        {
+          channelType,
+          channel_type: channelType
+        }
+      );
 
     findOrCreateChannel.channel.name = newChannelName;
 

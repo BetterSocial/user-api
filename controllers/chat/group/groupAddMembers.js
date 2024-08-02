@@ -96,7 +96,7 @@ const groupAddMembers = async (req, res) => {
         await BetterSocialCore.chat.updateBetterChannelMembers(
           channelToAdd,
           responseChannel,
-          true,
+          false,
           {
             channelType: CHANNEL_TYPE.GROUP,
             channel_type: CHANNEL_TYPE.GROUP
