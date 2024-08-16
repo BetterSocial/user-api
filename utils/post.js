@@ -236,6 +236,38 @@ const insertTopics = async (topics = []) => {
   }
 };
 
+/**
+ *
+ * @param {String} topics
+ */
+const insertSingleTopic = async (topic) => {
+  const lastTopic = await Topics.findOne({
+    order: [['topic_id', 'DESC']],
+    limit: 1,
+    raw: true
+  });
+
+  const topicIndex = parseInt(lastTopic.topic_id, 10) + parseInt(1, 10);
+
+  try {
+    await Topics.findOrCreate({
+      where: {name: topic},
+      defaults: {
+        topic_id: topicIndex,
+        name: topic,
+        icon_path: '',
+        is_custom_topic: true,
+        created_at: new Date(),
+        categories: ''
+      }
+    });
+
+    return topicIndex;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 function getFeedDuration(durationFeed) {
   let expiredAt = null;
 
@@ -429,6 +461,7 @@ module.exports = {
   filterFeeds,
   handleCreatePostTO,
   insertTopics,
+  insertSingleTopic,
   isPostBlocked,
   modifyAnonimityPost,
   modifyAnonymousAndBlockPost,

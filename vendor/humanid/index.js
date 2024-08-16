@@ -28,6 +28,7 @@ const verifyExchangeToken = async (exchangeToken) => {
     };
   } catch (error) {
     console.log('error verifying token to human ID');
+    console.log(error);
     // send error to sentry
     Sentry.captureException('error verifying token to human ID');
     return {
