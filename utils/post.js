@@ -229,8 +229,6 @@ const insertTopics = async (topics = []) => {
           categories: ''
         }
       });
-
-      return topicIndex;
     } catch (e) {
       console.log(e);
       break;
