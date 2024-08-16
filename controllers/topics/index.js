@@ -29,7 +29,7 @@ const UserTopicService = require('../../services/postgres/UserTopicService');
 const getSubscribableTopic = require('./getSubscribeableTopic');
 const {getAnonymUser} = require('../../utils/getAnonymUser');
 const UsersFunction = require('../../databases/functions/users');
-const {insertTopics} = require('../../utils/post');
+const {insertSingleTopic} = require('../../utils/post');
 const {followTopicServiceQueue} = require('../../services/redis');
 
 const getFollowTopic = async (req, res) => {
@@ -199,7 +199,7 @@ const createTopic = async (req, res) => {
       });
     }
 
-    const topic_id = await insertTopics([name]);
+    const topic_id = await insertSingleTopic(name);
     await followTopicViaCreateTopic({token, name, topic_id, userId});
 
     return res.status(200).json({
