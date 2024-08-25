@@ -36,14 +36,14 @@ const UserFollowUserFunction = require('../databases/functions/userFollowUser');
 const filterAllTopics = (text, topics = []) => {
   const topicsFromText = text.match(/#([A-Z0-9-_]+)\b/gi) || [];
   const topicsFromTextWithoutHashtag = topicsFromText.reduce((acc, next) => {
-    acc.push(next.slice(1));
+    acc.push(next.replace(/#/g, ''));
     return acc;
   }, []);
 
   let unique_topics = [
     ...new Set([
       ...topicsFromTextWithoutHashtag.map((topic) => topic.toLowerCase().trim()),
-      ...topics.map((topic) => topic.toLowerCase().trim())
+      ...topics.map((topic) => topic.replace(/#/g, '').toLowerCase().trim())
     ])
   ];
   return unique_topics;
@@ -216,13 +216,14 @@ const insertTopics = async (topics = []) => {
 
     const topic = topics[index];
     const topicIndex = parseInt(lastTopic.topic_id, 10) + parseInt(index, 10) + parseInt(1, 10);
+    const filterHashTagFromTopic = topic.replace(/#/g, '');
 
     try {
       await Topics.findOrCreate({
-        where: {name: topic},
+        where: {name: filterHashTagFromTopic},
         defaults: {
           topic_id: topicIndex,
-          name: topic,
+          name: filterHashTagFromTopic,
           icon_path: '',
           is_custom_topic: true,
           created_at: new Date(),

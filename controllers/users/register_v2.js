@@ -44,6 +44,7 @@ const registerV2 = async (req, res) => {
       await checkUser.update(users);
       updatedUser = await checkUser.save();
     } catch (e) {
+      console.log('error on updating unverified user', e);
       return res.status(500).json({
         status: 'error on sql transaction',
         code: 500,
