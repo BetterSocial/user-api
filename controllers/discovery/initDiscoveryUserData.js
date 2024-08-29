@@ -2,7 +2,7 @@ const {sequelize, UserBlockedUser} = require('../../databases/models');
 const _ = require('lodash');
 const {QueryTypes} = require('sequelize');
 const UsersFunction = require('../../databases/functions/users');
-const {MINIMUM_KARMA_SCORE} = require('../../helpers/constants');
+const {MINIMUM_KARMA_SCORE, MAX_EXCLUDED_USERS} = require('../../helpers/constants');
 
 /**
  *
@@ -12,6 +12,7 @@ const {MINIMUM_KARMA_SCORE} = require('../../helpers/constants');
  */
 const InitDiscoveryUserData = async (req, res) => {
   let {limit = 50, page = 0, allow_anon_dm} = req.query;
+  let {excluded_users = []} = req.body;
   page = parseInt(page);
 
   const {userId} = req;
@@ -28,6 +29,11 @@ const InitDiscoveryUserData = async (req, res) => {
     filterBlockedUser += `AND A.user_id NOT IN (${blockedIds
       .map((item) => `'${item}'`)
       .join(',')})`;
+  }
+
+  let filterExcludedUser = '';
+  if (excluded_users && excluded_users?.length > 0) {
+    filterExcludedUser += `AND A.user_id NOT IN (:excluded_users)`;
   }
 
   try {
@@ -112,6 +118,7 @@ const InitDiscoveryUserData = async (req, res) => {
           AND A.user_id != :admin_user_id
           ${where_anon_dm} 
           ${filterBlockedUser}
+          ${filterExcludedUser}
         ORDER BY
           recently_active DESC,
           community_info_result DESC,
@@ -129,7 +136,8 @@ const InitDiscoveryUserData = async (req, res) => {
         limit: limit,
         offset: page * limit,
         minimumKarmaScore: MINIMUM_KARMA_SCORE,
-        admin_user_id: process.env.BETTER_ADMIN_ID
+        admin_user_id: process.env.BETTER_ADMIN_ID,
+        excluded_users: excluded_users?.splice(0, MAX_EXCLUDED_USERS)
       }
     });
     let suggestedUsers = usersWithCommonFollowerResult;
