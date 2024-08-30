@@ -144,8 +144,9 @@ module.exports = async (req, res) => {
       }
 
       copyUser.anonymousChannelIdWithTargetUser = existingAnonymousChannel?.channel_id;
-      client.disconnectUser();
     } catch (error) {
+      console.log('error', error);
+    } finally {
       client.disconnectUser();
     }
 
