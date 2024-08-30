@@ -54,7 +54,6 @@ const getChannelDetail = async (req, res) => {
   }
 
   const shouldBetterChannelMembersUpdated = channel_type !== CHANNEL_TYPE_STRING.GROUP;
-  console.log('channelType', channel_type, shouldBetterChannelMembersUpdated);
 
   const {betterChannelMember, betterChannelMemberObject, updatedChannel} =
     await BetterSocialCore.chat.updateBetterChannelMembers(
