@@ -4,7 +4,7 @@ const {User} = require('../../databases/models');
 const {ResponseSuccess} = require('../../utils/Responses');
 const UsersFunction = require('../../databases/functions/users');
 const BetterSocialCore = require('../../services/bettersocial');
-const {MESSAGE_TYPE, CHANNEL_TYPE} = require('../../helpers/constants');
+const {MESSAGE_TYPE, CHANNEL_TYPE_STRING} = require('../../helpers/constants');
 
 /**
  *
@@ -53,7 +53,7 @@ const getChannelDetail = async (req, res) => {
     });
   }
 
-  const shouldBetterChannelMembersUpdated = channel_type !== CHANNEL_TYPE.GROUP;
+  const shouldBetterChannelMembersUpdated = channel_type !== CHANNEL_TYPE_STRING.GROUP;
 
   const {betterChannelMember, betterChannelMemberObject, updatedChannel} =
     await BetterSocialCore.chat.updateBetterChannelMembers(
