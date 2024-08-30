@@ -113,36 +113,41 @@ module.exports = async (req, res) => {
     copyUser.karma_score = roundingKarmaScore(copyUser.karma_score);
 
     const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
-    client.connectUser({id: req.userId}, req.token);
+    try {
+      client.connectUser({id: req.userId}, req.token);
 
-    const existingAnonymousChannelPromise = ChatAnonUserInfo.findOne({
-      where: {
-        my_anon_user_id: selfAnonymousUser?.user_id,
-        target_user_id: targetUserId,
-        context: null
-      },
-      raw: true
-    });
+      const existingAnonymousChannelPromise = ChatAnonUserInfo.findOne({
+        where: {
+          my_anon_user_id: selfAnonymousUser?.user_id,
+          target_user_id: targetUserId,
+          context: null
+        },
+        raw: true
+      });
 
-    const signedChannelPromise = client.queryChannels({
-      type: 'messaging',
-      members: {
-        $eq: [targetUserId, req.userId]
+      const signedChannelPromise = client.queryChannels({
+        type: 'messaging',
+        members: {
+          $eq: [targetUserId, req.userId]
+        }
+      });
+
+      const [existingAnonymousChannel, signedChannels] = await Promise.all([
+        existingAnonymousChannelPromise,
+        signedChannelPromise
+      ]);
+
+      const signedChannel = signedChannels?.[0];
+
+      if (signedChannel) {
+        copyUser.signedChannelIdWithTargetUser = signedChannel?.id;
       }
-    });
 
-    const [existingAnonymousChannel, signedChannels] = await Promise.all([
-      existingAnonymousChannelPromise,
-      signedChannelPromise
-    ]);
-
-    const signedChannel = signedChannels?.[0];
-
-    if (signedChannel) {
-      copyUser.signedChannelIdWithTargetUser = signedChannel?.id;
+      copyUser.anonymousChannelIdWithTargetUser = existingAnonymousChannel?.channel_id;
+      client.disconnectUser();
+    } catch (error) {
+      client.disconnectUser();
     }
-
-    copyUser.anonymousChannelIdWithTargetUser = existingAnonymousChannel?.channel_id;
 
     return res.status(200).json({
       status: 'success',
