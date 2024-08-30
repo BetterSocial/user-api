@@ -4,6 +4,7 @@ const {checkMoreOrLess} = require('../../helpers/checkMoreOrLess');
 const UsersFunction = require('../../databases/functions/users');
 const {getDb} = require('../../databases/config/mongodb_conn');
 const {DB_COLLECTION_POST_SCORE} = require('../../services/score/constant');
+const {StreamChat} = require('stream-chat');
 
 const countAuthorPost = async (authorId, anonAuthorId) => {
   const userIds = [authorId, anonAuthorId];
@@ -90,6 +91,20 @@ module.exports = async (req, res) => {
       if (copyUser.is_karma_unlocked) {
         await updateKarmaUnlocked(req.userId);
       }
+    }
+
+    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
+    try {
+      await client.upsertUser({
+        id: req.userId,
+        name: copyUser?.username,
+        image: copyUser?.profile_pic_path,
+        username: copyUser?.username
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await client.disconnectUser();
     }
 
     return res.json({
