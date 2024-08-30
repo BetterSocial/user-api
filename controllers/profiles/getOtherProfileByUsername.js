@@ -1,6 +1,8 @@
-const {User, sequelize} = require('../../databases/models');
+const UsersFunction = require('../../databases/functions/users');
+const {User, ChatAnonUserInfo, sequelize} = require('../../databases/models');
 const {checkMoreOrLess} = require('../../helpers/checkMoreOrLess');
-const ropundingKarmaScore = require('../../helpers/roundingKarmaScore');
+const roundingKarmaScore = require('../../helpers/roundingKarmaScore');
+const {StreamChat} = require('stream-chat');
 
 module.exports = async (req, res) => {
   try {
@@ -45,21 +47,39 @@ module.exports = async (req, res) => {
                                     AND B.is_anonymous = false`;
     const isFollowingQuery = `SELECT * FROM user_follow_user WHERE user_id_followed= :user_id_followed AND user_id_follower= :user_id_follower`;
 
-    const getFollowerCount = await sequelize.query(getFollowerCountQuery, {
+    const getFollowerCountPromise = sequelize.query(getFollowerCountQuery, {
       replacements: {user_id: targetUserId}
     });
 
-    const getFollowingCount = await sequelize.query(getFollowingCountQuery, {
+    const getFollowingCountPromise = sequelize.query(getFollowingCountQuery, {
       replacements: {user_id: targetUserId}
     });
 
-    const isFollowing = await sequelize.query(isFollowingQuery, {
+    const isFollowingPromise = sequelize.query(isFollowingQuery, {
       replacements: {user_id_followed: req?.userId || '', user_id_follower: targetUserId}
     });
 
-    const isMeFollowingTarget = await sequelize.query(isFollowingQuery, {
+    const isMeFollowingTargetPromise = sequelize.query(isFollowingQuery, {
       replacements: {user_id_followed: targetUserId || '', user_id_follower: req?.userId || ''}
     });
+
+    const selfAnonymousUserIdPromise = UsersFunction.findAnonymousUserId(User, req?.userId, {
+      raw: true
+    });
+
+    const [
+      getFollowerCount,
+      getFollowingCount,
+      isFollowing,
+      isMeFollowingTarget,
+      selfAnonymousUser
+    ] = await Promise.all([
+      getFollowerCountPromise,
+      getFollowingCountPromise,
+      isFollowingPromise,
+      isMeFollowingTargetPromise,
+      selfAnonymousUserIdPromise
+    ]);
 
     const getFollowerCountResult = getFollowerCount?.[0]?.[0]?.count_follower;
     const getFollowingCountResult = getFollowingCount?.[0]?.[0]?.count_following;
@@ -90,7 +110,39 @@ module.exports = async (req, res) => {
       }
     }
 
-    copyUser.karma_score = ropundingKarmaScore(copyUser.karma_score);
+    copyUser.karma_score = roundingKarmaScore(copyUser.karma_score);
+
+    const client = StreamChat.getInstance(process.env.API_KEY, process.env.SECRET);
+    client.connectUser({id: req.userId}, req.token);
+
+    const existingAnonymousChannelPromise = ChatAnonUserInfo.findOne({
+      where: {
+        my_anon_user_id: selfAnonymousUser?.user_id,
+        target_user_id: targetUserId,
+        context: null
+      },
+      raw: true
+    });
+
+    const signedChannelPromise = client.queryChannels({
+      type: 'messaging',
+      members: {
+        $eq: [targetUserId, req.userId]
+      }
+    });
+
+    const [existingAnonymousChannel, signedChannels] = await Promise.all([
+      existingAnonymousChannelPromise,
+      signedChannelPromise
+    ]);
+
+    const signedChannel = signedChannels?.[0];
+
+    if (signedChannel) {
+      copyUser.signedChannelIdWithTargetUser = signedChannel?.id;
+    }
+
+    copyUser.anonymousChannelIdWithTargetUser = existingAnonymousChannel?.channel_id;
 
     return res.status(200).json({
       status: 'success',
