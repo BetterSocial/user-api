@@ -24,10 +24,19 @@ const sendMultiDeviceCommentNotification = async (
         data: {
           feed_id: activity_id,
           type: 'feed'
-        }
+        },
+        token: user?.token
       };
 
-      await messaging().sendToDevice(user?.token, payload);
+      try {
+        await messaging().send(payload);
+      } catch (error) {
+        if (error.code === 'messaging/registration-token-not-registered') {
+          console.error(`Token ${user?.token} removed from database: ${error.message}`);
+        } else {
+          console.error(`Failed to send message: ${error.message}`);
+        }
+      }
     })
   );
 };
