@@ -54,12 +54,13 @@ module.exports = async (req, res) => {
       data: {
         feed_id: req.body.activityId,
         type: 'reaction'
-      }
+      },
+      token: userToken.token
     };
     if (userToken) {
       if (detailUser.user_id !== detailSendUser.user_id) {
         messaging()
-          .sendToDevice(userToken.token, payload)
+          .send(payload)
           .then(() => {});
       }
     }

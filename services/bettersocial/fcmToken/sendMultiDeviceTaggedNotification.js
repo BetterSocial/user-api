@@ -29,9 +29,10 @@ const sendMultiDeviceTaggedNotification = async (
         data: {
           feed_id: activity_id,
           type: 'feed'
-        }
+        },
+        token: user?.token
       };
-      await messaging().sendToDevice(user?.token, payload);
+      await messaging().send(payload);
     })
   );
 };

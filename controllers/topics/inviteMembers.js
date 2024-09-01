@@ -90,23 +90,25 @@ module.exports = async (req, res) => {
           }
         });
 
-        const payload = {
-          notification: {
-            title: `#${topics?.name}`,
-            body: invitations_msg,
-            image: user.profile_pic_path
-          },
-          data: {
-            topic_id,
-            type: 'topic',
-            topic_name: topics?.name
-          }
-        };
         if (userTokens) {
           // looping for each user token
           userTokens.forEach((userToken) => {
+            const payload = {
+              notification: {
+                title: `#${topics?.name}`,
+                body: invitations_msg,
+                image: user.profile_pic_path
+              },
+              data: {
+                topic_id,
+                type: 'topic',
+                topic_name: topics?.name
+              },
+              token: userToken?.token
+            };
+
             messaging()
-              .sendToDevice(userToken.token, payload)
+              .send(payload)
               .then(() => {});
           });
         }
