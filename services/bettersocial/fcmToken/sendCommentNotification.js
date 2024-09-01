@@ -17,11 +17,12 @@ const sendCommentNotification = async (userTargetId, commentAuthor, message, act
     data: {
       feed_id: activity_id,
       type: 'feed'
-    }
+    },
+    token: userTargetToken?.token
   };
   if (userTargetToken) {
     messaging()
-      .sendToDevice(userTargetToken?.token, payload)
+      .send(payload)
       .then(() => {});
   }
 };

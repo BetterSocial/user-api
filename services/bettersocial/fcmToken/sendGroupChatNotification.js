@@ -10,12 +10,13 @@ const sendGroupChatNotification = async (userTargetId, message) => {
       title: message,
       body: message
     },
-    data: {}
+    data: {},
+    token: userTargetToken?.token
   };
   if (userTargetToken) {
     try {
       messaging()
-        .sendToDevice(userTargetToken?.token, payload)
+        .send(payload)
         .then(() => {});
     } catch (error) {
       console.log('error send group chat notifications', error);

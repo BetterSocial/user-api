@@ -22,11 +22,12 @@ const sendNotification = async (
       user_id: userIdFollowed,
       user_id_follower: userIdFollower,
       username_follower: userNameFollower
-    }
+    },
+    token: userTargetToken?.token
   };
   if (userTargetToken) {
     messaging()
-      .sendToDevice(userTargetToken?.token, payload)
+      .send(payload)
       .then(() => {});
   }
 };

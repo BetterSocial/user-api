@@ -97,11 +97,12 @@ module.exports = async (req, res) => {
             user_id: req.body.user_id_followed,
             user_id_follower: req.body.user_id_follower,
             username_follower: req.body.username_follower
-          }
+          },
+          token: userToken.token
         };
         if (userToken) {
           messaging()
-            .sendToDevice(userToken.token, payload)
+            .send(payload)
             .then(() => {});
         }
 

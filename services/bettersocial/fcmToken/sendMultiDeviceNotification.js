@@ -24,10 +24,11 @@ const sendMultiDeviceNotification = async (
           user_id: userIdFollowed,
           user_id_follower: userIdFollower,
           username_follower: userNameFollower
-        }
+        },
+        token: user?.token
       };
 
-      await messaging().sendToDevice(user?.token, payload);
+      await messaging().send(payload);
     })
   );
 };
