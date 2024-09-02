@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const {Model} = require('sequelize');
 /**
  *
@@ -26,7 +27,7 @@ module.exports = async (
   if (!userFollowUserHistoryModel)
     throw new Error('userFollowUserHistoryModel is required to block user');
 
-  const {postId = '', transaction = null} = params;
+  const {postId = '', commentId = '', transaction = null} = params;
   await userFollowUserModel.destroy(
     {
       where: {
@@ -41,7 +42,7 @@ module.exports = async (
     user_id_follower: targetUserId,
     user_id_followed: selfUserId,
     action: 'out',
-    source: `postId:${postId}`
+    source: commentId ? `commentId:${commentId}` : `postId:${postId}`
   };
 
   await userFollowUserHistoryModel.create(history, {transaction});

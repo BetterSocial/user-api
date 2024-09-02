@@ -30,6 +30,9 @@ const GenerateBodyValidationMiddleware = (schema) => {
 
 const BodyValidationMiddleware = {
   blockAnonymousPostV2: GenerateBodyValidationMiddleware(BodyValidationSchema.blockAnonymousPostV2),
+  blockAnonymousCommentV2: GenerateBodyValidationMiddleware(
+    BodyValidationSchema.blockAnonymousCommentV2
+  ),
   blockUserV2: GenerateBodyValidationMiddleware(BodyValidationSchema.blockUserV2),
   checkHumanIdExchangeToken: GenerateBodyValidationMiddleware(
     BodyValidationSchema.checkHumanIdExchangeToken

@@ -39,6 +39,7 @@ const BetterSocialCore = {
     sendChatNotification: require('./fcmToken/sendChatNotification')
   },
   post: {
+    blockAnonymousComment: require('./post/blockAnonymousComment'),
     blockAnonymousPost: require('./post/blockAnonymousPost'),
     createPost: require('./post/createPost'),
     createPostV3: BetterSocialCreatePostV3,
