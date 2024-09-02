@@ -1,4 +1,5 @@
 const blockAnonymousPostV2 = require('./blockAnonymousPostV2');
+const blockAnonymousCommentV2 = require('./blockAnonymousCommentV2');
 const childDownvote = require('./childDownvote');
 const childUpvote = require('./childUpvote');
 const comment = require('./comment');
@@ -50,6 +51,7 @@ const commentVoteV2 = require('./commentVoteV2');
 const feedSync = require('./feedSync');
 
 module.exports = {
+  blockAnonymousCommentV2,
   blockAnonymousPostV2,
   childDownvote,
   childUpvote,

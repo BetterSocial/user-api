@@ -80,6 +80,12 @@ router.post(
   BodyValidationMiddleware.blockAnonymousPostV2,
   feed.blockAnonymousPostV2
 );
+router.post(
+  '/block-anonymous-comment-v2',
+  isAuthV2,
+  BodyValidationMiddleware.blockAnonymousCommentV2,
+  feed.blockAnonymousCommentV2
+);
 router.get('/reaction-list/:id', isAuth, feed.reactionList);
 router.post(
   '/comment-v3-anonymous',

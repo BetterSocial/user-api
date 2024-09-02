@@ -1,6 +1,7 @@
 /* eslint-disable global-require */
 const BodyValidationSchema = {
   blockAnonymousPostV2: require('./blockAnonymousPostV2Schema'),
+  blockAnonymousCommentV2: require('./blockAnonymousCommentV2Schema'),
   blockUserV2: require('./blockUserV2Schema'),
   changeBio: require('./changeBioSchema'),
   changeProfileImage: require('./changeProfileImageSchema'),

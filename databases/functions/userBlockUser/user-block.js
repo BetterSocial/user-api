@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const {Model} = require('sequelize');
 const {v4: uuidv4} = require('uuid');
 
@@ -38,6 +39,8 @@ module.exports = async (
   const {
     message = '',
     postId = null,
+    // eslint-disable-next-line no-unused-vars
+    commentId = null,
     reason = null,
     isAnonymous = false,
     transaction = null
