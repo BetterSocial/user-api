@@ -5,7 +5,8 @@ const momentTz = require('moment-timezone');
 const {v4: uuidv4} = require('uuid');
 const UsersFunction = require('../../databases/functions/users');
 const {followTopicQueue} = require('../../services/redis/queue');
-const {User, CommunityMessageFormat} = require('../../databases/models');
+const {User, CommunityMessageFormat, UserTopic} = require('../../databases/models');
+const {Op} = require('sequelize');
 
 const sendMessageToQueue = async (user_id, topic_id, community_message_format_id, delay) => {
   const data = {
@@ -30,9 +31,18 @@ const sendMessageToQueue = async (user_id, topic_id, community_message_format_id
   }
 };
 
+const calculateDelay = (joinDate, delay) => {
+  let currentTime = momentTz().tz('America/Los_Angeles');
+  let requiredTime = momentTz(joinDate).tz('America/Los_Angeles');
+
+  let diffTime = requiredTime.diff(currentTime, 'days');
+  diffTime = Math.abs(diffTime + delay);
+  return diffTime == 0 ? 60 * 1000 : diffTime * 24 * 60 * 60 * 1000;
+};
+
 module.exports = async (req, res) => {
   const {userId} = req;
-  const {communityMessageFormatId, topicId, targetUserId, delay} = req.body;
+  const {communityMessageFormatId, topicId, targetUserId, targetDate, delay} = req.body;
 
   //   check if the the user is anonymous
   const detailTokenUser = await UsersFunction.findUserById(User, userId);
@@ -61,12 +71,37 @@ module.exports = async (req, res) => {
       });
       if (communityMessageFormats && !detailTokenUser.is_anonymous) {
         for (const format of communityMessageFormats) {
-          sendMessageToQueue(
-            targetUserId,
-            topicId,
-            format.community_message_format_id,
-            delay || format.delay
-          );
+          if (targetUserId) {
+            sendMessageToQueue(
+              targetUserId,
+              topicId,
+              format.community_message_format_id,
+              delay || format.delay
+            );
+          } else {
+            // get all user who follow the topic in certain period
+            const users = await UserTopic.findAll({
+              where: {
+                topic_id: topicId,
+                createdAt: {
+                  [Op.between]: [
+                    momentTz(targetDate).startOf('day').toDate(),
+                    momentTz(targetDate).endOf('day').toDate()
+                  ]
+                }
+              }
+            });
+            for (const user of users) {
+              // calculate the delay time
+              let calculatedDelay = calculateDelay('2024-09-02', format.delay_time);
+              sendMessageToQueue(
+                user.user_id,
+                topicId,
+                format.community_message_format_id,
+                calculatedDelay
+              );
+            }
+          }
         }
       }
     } catch (error) {
@@ -74,12 +109,6 @@ module.exports = async (req, res) => {
       return res.status(404).json({message: 'Error while sending message'});
     }
   }
-  // get list of user who follow the topic
-  //   const users = await UserTopic.findAll({
-  //     where: {
-  //       topic_id: topicId
-  //     }
-  //   });
   return res.status(200).json({
     status: 'success',
     code: 200,
