@@ -37,7 +37,7 @@ const calculateDelay = (joinDate, delay) => {
 
   let diffTime = requiredTime.diff(currentTime, 'days');
   diffTime = Math.abs(diffTime + delay);
-  return diffTime == 0 ? 60 * 1000 : diffTime * 24 * 60 * 60 * 1000;
+  return diffTime == 0 ? delay * 60 * 1000 : diffTime * 24 * 60 * 60 * 1000;
 };
 
 module.exports = async (req, res) => {
