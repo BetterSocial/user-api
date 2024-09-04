@@ -90,6 +90,7 @@ const followTopicServiceQueue = async (user_id, topic_id, community_message_form
 
 module.exports = {
   registerServiceQueue,
+  followTopicQueue,
   registerV2ServiceQueue,
   followTopicServiceQueue
 };

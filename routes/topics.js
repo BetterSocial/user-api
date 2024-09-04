@@ -16,6 +16,7 @@ router.get('/follow', isAuth, topicsController.getFollowTopic);
 router.get('/latest', validate(TopicValidation.latestPost), isAuth, topicsController.getLatestPost);
 router.put('/follow', isAuth, topicsController.putFollowTopic);
 router.put('/follow-v2', isAuth, topicsController.followTopicV2);
+router.put('/broadcast-message', isAuth, topicsController.broadcastMessage);
 router.put(
   '/:topicName',
   validate(TopicValidation.updateTopic),

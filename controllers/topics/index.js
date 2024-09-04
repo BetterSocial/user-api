@@ -31,6 +31,7 @@ const {getAnonymUser} = require('../../utils/getAnonymUser');
 const UsersFunction = require('../../databases/functions/users');
 const {insertSingleTopic} = require('../../utils/post');
 const {followTopicServiceQueue} = require('../../services/redis');
+const broadcastMessage = require('./broadcastMessage');
 
 const getFollowTopic = async (req, res) => {
   try {
@@ -518,5 +519,6 @@ module.exports = {
   getTopics,
   getSubscribableTopic,
   followTopicV2,
-  getLatestPost
+  getLatestPost,
+  broadcastMessage
 };
