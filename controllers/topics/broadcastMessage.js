@@ -42,7 +42,7 @@ const calculateDelay = (joinDate, delay) => {
 
 module.exports = async (req, res) => {
   const {userId} = req;
-  const {communityMessageFormatId, topicId, targetUserId, targetDate, delay} = req.body;
+  const {communityMessageFormatId, topicId, topicIds, targetUserId, targetDate, delay} = req.body;
 
   //   check if the the user is anonymous
   const detailTokenUser = await UsersFunction.findUserById(User, userId);
@@ -64,6 +64,53 @@ module.exports = async (req, res) => {
       communityMessageFormatId,
       delay || communityMessageFormat.delay
     );
+  } else if (topicIds) {
+    console.log('topicIds', topicIds);
+    topicIds.forEach(async (topId) => {
+      try {
+        const communityMessageFormats = await CommunityMessageFormat.findAll({
+          where: {topic_id: topId, status: '1'}
+        });
+        if (communityMessageFormats && !detailTokenUser.is_anonymous) {
+          for (const format of communityMessageFormats) {
+            if (targetUserId) {
+              sendMessageToQueue(
+                targetUserId,
+                topId,
+                format.community_message_format_id,
+                delay || format.delay
+              );
+            } else {
+              // get all user who follow the topic in certain period
+              const users = await UserTopic.findAll({
+                where: {
+                  topic_id: topId,
+                  createdAt: {
+                    [Op.between]: [
+                      momentTz(targetDate).startOf('day').toDate(),
+                      momentTz(targetDate).endOf('day').toDate()
+                    ]
+                  }
+                }
+              });
+              for (const user of users) {
+                // calculate the delay time
+                let calculatedDelay = calculateDelay('2024-09-02', format.delay_time);
+                sendMessageToQueue(
+                  user.user_id,
+                  topicId,
+                  format.community_message_format_id,
+                  calculatedDelay
+                );
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        return res.status(404).json({message: 'Error while sending message'});
+      }
+    });
   } else if (topicId) {
     try {
       const communityMessageFormats = await CommunityMessageFormat.findAll({
