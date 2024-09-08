@@ -114,7 +114,7 @@ const sendSignedMesage = async (req, res) => {
 
     // Send PN to all members in group chat except sender
     if (channelType === 1) {
-      let better_channel_member = createdChannel?.channel?.better_channel_member;
+      let better_channel_member = createdChannel?.members;
       channelMember = better_channel_member.filter((element) => element.user_id !== req.userId);
       senderInfo = better_channel_member.find((element) => element.user_id === req.userId);
     }

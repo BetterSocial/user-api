@@ -18,6 +18,7 @@ const SEPARATOR = ', ';
  *
  * @param {import('stream-chat').Channel} chatChannel
  * @param {import("stream-chat").ChannelAPIResponse} channel
+ * @param {boolean} withUpdate
  * @param {Partial<import("stream-chat").ChannelResponse>} additionalUpdateData
  * @returns {Promise<UpdateBetterChannelMember>}
  */
