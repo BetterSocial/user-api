@@ -161,7 +161,9 @@ const sendSignedMesage = async (req, res) => {
       is_big_message: 'false',
       attachment: JSON.stringify(attachments) ?? '',
       created_at: chat.message.created_at,
-      is_annoymous: 'false'
+      is_annoymous: 'false',
+      priority: 'high',
+      content_available: 'true'
     };
     const dataSizeInBytes = Buffer.byteLength(JSON.stringify(dataPayload), 'utf8');
     const dataSizeInKilobytes = dataSizeInBytes / 1024;
