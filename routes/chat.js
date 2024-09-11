@@ -27,7 +27,8 @@ const {
   sendAnonymousMessage,
   newChatAnonymous,
   leaveGroupMember,
-  getMessageDetail
+  getMessageDetail,
+  testFCMToken
 } = require('../controllers/chat');
 const {ChatValidation} = require('../joi-validations/chat.validations');
 const {validate} = require('../middlewares/joi-validation/validate');
@@ -145,5 +146,6 @@ router.post(
 );
 
 router.get('/message/:messageID', auth.isAuth, getMessageDetail);
+router.post('/test-fcm-token', auth.isAuth, testFCMToken);
 
 module.exports = router;

@@ -18,6 +18,7 @@ const deleteMessage = require('./deleteMessage');
 const newChatAnonymous = require('./newChatAnonymous');
 const leaveGroupMember = require('./group/leaveGroupMember');
 const getMessageDetail = require('./getMessageDetail');
+const testFCMToken = require('./testFCMToken');
 
 module.exports = {
   changeChannelDetail,
@@ -39,5 +40,6 @@ module.exports = {
   deleteMessage,
   newChatAnonymous,
   leaveGroupMember,
-  getMessageDetail
+  getMessageDetail,
+  testFCMToken
 };
