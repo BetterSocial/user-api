@@ -28,7 +28,15 @@ const sendMultiDeviceNotification = async (
         token: user?.token
       };
 
-      await messaging().send(payload);
+      try {
+        await messaging().send(payload);
+      } catch (error) {
+        if (error.code === 'messaging/registration-token-not-registered') {
+          console.error(`Token ${user?.token} not found: ${error.message}`);
+        } else {
+          console.error(`Failed to send push notification: ${error.message}`);
+        }
+      }
     })
   );
 };
