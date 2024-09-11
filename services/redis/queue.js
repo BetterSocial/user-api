@@ -59,6 +59,22 @@ const registerV2ServiceQueue = async (token, userId, follows, topics, locations,
   }
 };
 
+const setRequiredTime = (delay) => {
+  let requiredTime = momentTz().tz('America/Los_Angeles');
+  if (delay === 0) {
+    const randomTime = Math.floor(Math.random() * (40 - 10 + 1)) + 10;
+    requiredTime = momentTz().tz('America/Los_Angeles').add(randomTime, 'minutes');
+  } else {
+    const randomTime = sample([6, 7, 8]);
+    const additionalDays = delay;
+    requiredTime = momentTz()
+      .tz('America/Los_Angeles')
+      .set({hour: randomTime})
+      .add(additionalDays, 'days');
+  }
+  return requiredTime;
+};
+
 const followTopicServiceQueue = async (user_id, topic_id, community_message_format_id, delay) => {
   const data = {
     user_id,
@@ -66,14 +82,7 @@ const followTopicServiceQueue = async (user_id, topic_id, community_message_form
     community_message_format_id
   };
   let currentTime = momentTz().tz('America/Los_Angeles');
-  const randomTime = sample([6, 7, 8]);
-  const additionalDays = delay;
-
-  let requiredTime = momentTz()
-    .tz('America/Los_Angeles')
-    .set({hour: randomTime})
-    .add(additionalDays, 'days');
-
+  let requiredTime = setRequiredTime(delay);
   const diffTime = requiredTime.diff(currentTime, 'milliseconds');
 
   const options = {
