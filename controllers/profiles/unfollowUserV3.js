@@ -137,7 +137,6 @@ module.exports = async (req, res) => {
     });
   } catch (e) {
     console.log('Error in unfollow user v3 scoring');
-    return ErrorResponse.e409(res, e.message);
   }
 
   return SuccessResponse(res, {

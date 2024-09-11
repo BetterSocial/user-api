@@ -91,7 +91,6 @@ module.exports = async (req, res) => {
     });
   } catch (e) {
     console.log('Error in follow user v3 scoring');
-    return ErrorResponse.e409(res, e.message);
   }
 
   if (with_system_message) {
@@ -116,7 +115,6 @@ module.exports = async (req, res) => {
       );
     } catch (e) {
       console.error('Error in sending system message', e);
-      return ErrorResponse.e409(res, e.message);
     }
   }
 
@@ -130,7 +128,6 @@ module.exports = async (req, res) => {
   } catch (e) {
     console.log('Error in follow user v3 fcm');
     console.log(e);
-    return ErrorResponse.e409(res, e.message);
   }
 
   return SuccessResponse(res, {
