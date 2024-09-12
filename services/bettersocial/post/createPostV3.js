@@ -228,7 +228,8 @@ async function processSendSystemMessage(
               resolve();
             })
             .catch((e) => {
-              reject(e);
+              // TODO: Temporary fix, implement the sending message in queue if fails.
+              console.log('error send system message', e);
             });
         })
         .catch((e) => reject(e));
