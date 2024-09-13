@@ -17,6 +17,8 @@ module.exports = async (req, res) => {
         code: 400,
         message: 'Topic not found'
       });
+
+      return;
     }
 
     const feedClient = stream.connect(process.env.API_KEY, process.env.SECRET, process.env.APP_ID);
