@@ -172,17 +172,21 @@ const sendSignedMesage = async (req, res) => {
       dataPayload.attachment = '';
     }
 
-    BetterSocialCore.fcmToken.sendChatNotificationByChannelMembers(
-      channelMember,
-      {
-        notification: notificationPayload,
-        data: dataPayload
-      },
-      {
-        priority: 'high',
-        content_available: true
-      }
-    );
+    BetterSocialCore.fcmToken
+      .sendChatNotificationByChannelMembers(
+        channelMember,
+        {
+          notification: notificationPayload,
+          data: dataPayload
+        },
+        {
+          priority: 'high',
+          content_available: true
+        }
+      )
+      .catch((e) => {
+        console.log('error send chat notification', e.code);
+      });
 
     await client.disconnectUser();
     return res.status(200).json(responseSuccess('sent', chat));

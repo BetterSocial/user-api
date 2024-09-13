@@ -15,7 +15,10 @@ const sendChatNotification = async (userTargetId, payload) => {
         };
         messaging()
           .send(newPayload)
-          .then(() => {});
+          .then(() => {})
+          .catch((e) => {
+            console.log('error send chat notification in promise', e.code);
+          });
       });
     } catch (error) {
       console.log('error send chat notifications', error);
