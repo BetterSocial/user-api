@@ -289,9 +289,12 @@ const initChatFromPost = async (req, res) => {
 
     const response = {
       ...updatedChannel,
+      channel: {
+        ...updatedChannel?.channel
+      },
       better_channel_members: betterChannelMember,
       better_channel_members_object: betterChannelMemberObject,
-      messageHistories: messageHistory.results
+      messages: messageHistory.results
     };
     await client.disconnectUser();
 
