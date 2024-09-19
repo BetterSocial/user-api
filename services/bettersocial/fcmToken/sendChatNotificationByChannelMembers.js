@@ -12,7 +12,7 @@ const sendChatNotificationByChannelMembers = async (
       ...payload,
       data: {
         ...payload.data,
-        is_annoymous: member.is_anonymous.toString()
+        is_annoymous: member?.is_anonymous?.toString() || 'false'
       }
     };
     sendChatNotification(member?.user_id, newPayload, options);
