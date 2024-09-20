@@ -151,13 +151,14 @@ const BetterSocialCreateCommentChildV3 = async (req) => {
       await countProcess(reaction_id, {comment_count: +1}, {comment_count: 1});
     }
 
-    await sendMultiDeviceReplyCommentNotification(
-      signedUserIdFeed,
-      req.user,
-      message,
-      reaction_id,
-      postTitle
-    );
+    if (!(await UsersFunction.checkIsMe(User, signedUserIdFeed, userId)))
+      await sendMultiDeviceReplyCommentNotification(
+        signedUserIdFeed,
+        req.user,
+        message,
+        reaction_id,
+        postTitle
+      );
 
     QueueTrigger.addCommentToDb({
       postId: result?.activity_id,
@@ -221,14 +222,14 @@ const BetterSocialCreateCommentChildV3Anonymous = async (req) => {
     if (body?.message?.length > 80) {
       await countProcess(reaction_id, {comment_count: +1}, {comment_count: 1});
     }
-
-    await sendMultiDeviceReplyCommentNotification(
-      signedUserIdFeed,
-      commentAuthor,
-      message,
-      reaction_id,
-      postTitle
-    );
+    if (!(await UsersFunction.checkIsMe(User, signedUserIdFeed, userId)))
+      await sendMultiDeviceReplyCommentNotification(
+        signedUserIdFeed,
+        commentAuthor,
+        message,
+        reaction_id,
+        postTitle
+      );
 
     QueueTrigger.addCommentToDb({
       postId: result?.activity_id,
