@@ -330,7 +330,7 @@ const BetterSocialCreatePostV3 = async (req, isAnonimous = true) => {
     else post = await Getstream.feed.createPost(req?.token, data);
 
     // Upvote post before sending the success message
-    await upVote(post?.id, req.token, req?.userId);
+    await upVote(post?.id, req.token, userDetail?.user_id);
     countProcess(post?.id, {upvote_count: +1}, {upvote_count: 1});
 
     body.tagUsers?.forEach(async (user_id) => {
