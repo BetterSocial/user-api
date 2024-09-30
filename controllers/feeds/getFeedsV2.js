@@ -39,8 +39,6 @@ const feedSwitch = async (feed) => {
     case 'main_feed_following':
       return 'main_feed_f2';
     case 'main_feed_f2':
-      return 'main_feed_broad';
-    case 'main_feed_broad':
       return 'main_feed';
     default:
       return 'main_feed_following';
